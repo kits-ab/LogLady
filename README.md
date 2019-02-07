@@ -14,6 +14,7 @@
 - [Learn Node - Learning Path](https://developer.ibm.com/series/learn-node-learning-path)
 - [JavaScript 30](https://javascript30.com)
 - [Node JS Docs](https://nodejs.org/docs)
+- [How to Learn React — A roadmap from beginner to advanced](https://medium.freecodecamp.org/learning-react-roadmap-from-scratch-to-advanced-bff7735531b6)
 
 *Test*
 - [Mocha](https://mochajs.org)
