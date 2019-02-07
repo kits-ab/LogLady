@@ -1,2 +1,7 @@
-# logs-in-action
-Log file viewer
+# Logs In Action
+
+### Setup
+* `npm install`
+
+### Testing
+* `npm test`
