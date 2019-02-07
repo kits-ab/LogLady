@@ -1,0 +1,26 @@
+{
+  "name": "logs-in-action",
+  "version": "1.0.0",
+  "description": "Log file viewer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kits-ab/logs-in-action.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kits-ab/logs-in-action/issues"
+  },
+  "homepage": "https://github.com/kits-ab/logs-in-action#readme",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^5.13.0",
+    "mocha": "^5.2.0",
+    "prettier": "^1.16.4"
+  }
+}
