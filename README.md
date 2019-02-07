@@ -30,3 +30,4 @@
 - [React](https://reactjs.org/docs/getting-started.html)
 - [Webpack](https://webpack.js.org/)
 - [How to use package.json scripts as build tool](https://scotch.io/tutorials/using-npm-as-a-build-tool)
+- [Awesome Electron Links](https://github.com/sindresorhus/awesome-electron)
