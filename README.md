@@ -10,16 +10,20 @@
 
 ## Useful links
 
-*Learn*
+*Learn Javascript and Node*
 - [Learn Node - Learning Path](https://developer.ibm.com/series/learn-node-learning-path)
 - [JavaScript 30](https://javascript30.com)
-
-*Tools*
-- [Electron](https://electronjs.org/)
 - [Node JS Docs](https://nodejs.org/docs)
-- [Travis CI](https://docs.travis-ci.com)
-- [Prettier](https://prettier.io)
+
+*Test*
 - [Mocha](https://mochajs.org)
 - [Chai JS](https://www.chaijs.com)
+
+*Code style & lint*
+- [Prettier](https://prettier.io)
 - [ESLint](https://eslint.org)
+
+*...more*
+- [Electron](https://electronjs.org/)
+- [Travis CI](https://docs.travis-ci.com)
 - [React](https://reactjs.org/docs/getting-started.html)
