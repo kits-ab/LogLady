@@ -7,18 +7,19 @@
 *Test*
 * `npm test`
 
----
-
 
 ## Useful links
 
 *Learn*
-- https://developer.ibm.com/series/learn-node-learning-path/
-- https://javascript30.com/
+- [Learn Node - Learning Path](https://developer.ibm.com/series/learn-node-learning-path)
+- [JavaScript 30](https://javascript30.com)
 
 *Tools*
-- https://nodejs.org/docs/l
-- https://docs.travis-ci.com
-- https://prettier.io
-- https://www.chaijs.com
-- https://eslint.org
+- [Electron](https://electronjs.org/)
+- [Node JS Docs](https://nodejs.org/docs)
+- [Travis CI](https://docs.travis-ci.com)
+- [Prettier](https://prettier.io)
+- [Mocha](https://mochajs.org)
+- [Chai JS](https://www.chaijs.com)
+- [ESLint](https://eslint.org)
+- [React](https://reactjs.org/docs/getting-started.html)
