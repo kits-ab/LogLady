@@ -1,12 +1,13 @@
 # Logs In Action
 
-## How to
-*Setup*
-* `npm install`
+## How to develop
+Node version used: `8.4.0`, others (newer versions) may work as well.
 
-*Test*
-* `npm test`
+Start with running `npm install`.
 
+Run `npm test` to run tests.
+
+Run `npm run lint` to check for code errors
 
 ## Useful links
 
