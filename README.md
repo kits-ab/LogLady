@@ -31,3 +31,13 @@
 - [Webpack](https://webpack.js.org/)
 - [How to use package.json scripts as build tool](https://scotch.io/tutorials/using-npm-as-a-build-tool)
 - [Awesome Electron Links](https://github.com/sindresorhus/awesome-electron)
+
+## Project Overview
+#### Context
+![Context Overview](docs/Context.png "Context")
+
+#### Containers
+![Containers](docs/Containers.png "Containers")
+
+#### Continous Integration
+![Continous Integration](docs/CI.png "Continous Integration")
