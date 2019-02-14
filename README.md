@@ -32,6 +32,7 @@ _Code style & lint_
 _React JS_
 
 - [Official Videos](https://reactjs.org/community/videos.html)
+- [Official Tutorial](https://reactjs.org/tutorial/tutorial.html)
 - [Articles](https://reactjs.org/community/articles.html)
 - [Courses](https://reactjs.org/community/courses.html)
 
@@ -39,7 +40,6 @@ _...more_
 
 - [Electron](https://electronjs.org/)
 - [Travis CI](https://docs.travis-ci.com)
-- [React](https://reactjs.org/docs/getting-started.html)
 - [Webpack](https://webpack.js.org/)
 - [How to use package.json scripts as build tool](https://scotch.io/tutorials/using-npm-as-a-build-tool)
 - [Awesome Electron Links](https://github.com/sindresorhus/awesome-electron)
