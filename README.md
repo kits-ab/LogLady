@@ -29,6 +29,12 @@ _Code style & lint_
 - [Prettier](https://prettier.io)
 - [ESLint](https://eslint.org)
 
+_React JS_
+
+- [Official Videos](https://reactjs.org/community/videos.html)
+- [Articles](https://reactjs.org/community/articles.html)
+- [Courses](https://reactjs.org/community/courses.html)
+
 _...more_
 
 - [Electron](https://electronjs.org/)
