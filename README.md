@@ -61,24 +61,24 @@ _...more_
 ![Continous Integration](docs/CI.png 'Continous Integration')
 
 ### Message Flow
-* Input - Source of log data, e.g. files, console output.
+* Source - Source of log data, e.g. files, console output.
 * Adapter - A module specialized for reading a partical kind of input
 * Engine - Aggregates and buffers data
 * Display - UI display device
 * Export - Exports data to other formats
 
-#### Input
-Input|Adapter|Engine|Display/Export
+#### Source
+Source|Adapter|Engine|Display/Export
 -----|-------|------|--------------
 Generator change|Adapter reads|Engine notifies listeners|Listeners can read change if relevant
 #### Random Input
-Seekable Input|Adapter|Engine|Display/Export
+Seekable Source|Adapter|Engine|Display/Export
 -----|-------|------|--------------
 Device reads block|Adapter reads|Engine notifies listeners|Listeners can read change if relevant
 #### Scan Input
-Seekable Input|Adapter|Engine|Display/Export
+Seekable Source|Adapter|Engine|Display/Export
 -----|-------|------|--------------
-Complete scans with filter|Adapter reads|Engine notifies listeners|Listeners can read change if relevant
+Complete scan with filter|Adapter reads|Engine notifies listeners|Listeners can read change if relevant
 #### Random Seek
 Display/Export|Engine|Adapter
 --------------|------|-------
@@ -86,4 +86,4 @@ Display/Export requests data at position|Engine notifies Adapter|Adapter starts 
 #### Full Scan
 Display/Export|Engine|Adapter
 --------------|------|-------
-Display/Export requests full data scan|Engine notifies Adapter|Adapter starts filtered input cycle
+Display/Export requests full data scan|Engine notifies Adapter|Adapter starts scan input cycle
