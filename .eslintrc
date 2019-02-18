@@ -8,6 +8,7 @@
   },
   "rules": {
     "prettier/prettier": "error",
-    "arrow-body-style": ["error", "as-needed"]
+    "arrow-body-style": ["error", "as-needed"],
+    "eqeqeq": ["error", "always", {"null": "ignore"}]
   }
 }
