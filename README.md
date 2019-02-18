@@ -1,4 +1,4 @@
-# Logs In Action
+# LogLady
 
 ## How to develop
 
