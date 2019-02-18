@@ -62,7 +62,7 @@ _...more_
 
 ### Message Flow
 * Source - Source of log data, e.g. files, console output.
-* Adapter - A module specialized for reading a partical kind of input
+* Adapter - A module specialized for reading a particular kind of input
 * Engine - Aggregates and buffers data
 * Display - UI display device
 * Export - Exports data to other formats
