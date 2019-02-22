@@ -1,0 +1,4 @@
+The "data after the last issue seems to be resolved in my
+version of node (0.12.7). So I prefer this answer,
+which seems the simplest and most elegant.
+some text
