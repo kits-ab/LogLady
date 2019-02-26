@@ -5,7 +5,6 @@ const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 //const url = require('url');
 const isDev = require('electron-is-dev');
-// const updater = require('node_modules/electron-simple-updater/index');
 const updater = require('electron-simple-updater');
 
 updater.init();
