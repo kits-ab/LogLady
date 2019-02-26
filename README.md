@@ -8,6 +8,8 @@ Run `npm test` to run tests.
 
 Run `npm run lint` to check for code errors
 
+Run `electron-dev to run application in developer mode with live update
+
 (Node version used: `8.4.0`, others (newer versions) may work as well.)
 
 Make sure your editor of choice has plugins for ESLint and Prettier installed _(for VSCode these are recommended: [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode))_, because then it will give a lot of hints for what the linter complains about.
