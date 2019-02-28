@@ -45,7 +45,7 @@
   "license": "ISC",
   "husky": {
     "hooks": {
-      "precommit": "npm run lint && set CI=true&&npm test npm test"
+      "precommit": "npm run lint && npm test"
     }
   },
   "browserslist": [
