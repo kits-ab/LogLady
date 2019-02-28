@@ -18,7 +18,7 @@ Make sure your editor of choice has plugins for ESLint and Prettier installed _(
 
 Tasks can be found in [Projects](https://github.com/kits-ab/LogLady/projects/1).
 
- Assign one to yourself then create branch from develop and name it `feature/whetever-you-are-doing-#corresponding-task-ID`.
+ Assign one to yourself then create branch from develop and name it `feature/whatever-you-are-doing-#corresponding-task-ID`.
 
 Example: `feature/branchName-#5`
 

@@ -8,6 +8,7 @@
   "dependencies": {
     "concurrently": "^4.1.0",
     "electron-is-dev": "^1.0.1",
+    "electron-simple-updater": "^1.4.3",
     "eslint-config-react-app": "^3.0.7",
     "react": "^16.8.2",
     "react-dom": "^16.8.2",
