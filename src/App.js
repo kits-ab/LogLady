@@ -17,7 +17,6 @@ class App extends Component {
           >
             kits.se
           </a>
-          <p>So all in allw</p>
         </header>
       </div>
     );
