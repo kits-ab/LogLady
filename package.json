@@ -32,7 +32,8 @@
     "lint": "eslint src",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test ",
+    "test": "react-scripts test",
+    "test-pre-commit": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
     "electron-dev": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
     "electron-pack": "build -l -c.extraMetadata.main=build/electron.js",
@@ -45,7 +46,7 @@
   "license": "ISC",
   "husky": {
     "hooks": {
-      "precommit": "npm run lint && npm test"
+      "pre-commit": "npm run lint && npm run test-pre-commit"
     }
   },
   "browserslist": [
