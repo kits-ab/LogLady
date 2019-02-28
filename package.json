@@ -33,7 +33,6 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "test-pre-commit": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
     "electron-dev": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
     "electron-pack": "build -l -c.extraMetadata.main=build/electron.js",
