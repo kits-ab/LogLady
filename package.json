@@ -11,10 +11,12 @@
     "electron-is-dev": "^1.0.1",
     "electron-simple-updater": "^1.4.3",
     "eslint-config-react-app": "^3.0.7",
+    "nthline": "^1.0.1",
     "react": "^16.8.2",
     "react-dom": "^16.8.2",
     "react-scripts": "2.1.5",
     "read-last-lines": "^1.6.0",
+    "tail": "^2.0.2",
     "wait-on": "^3.2.0"
   },
   "devDependencies": {

@@ -2,6 +2,7 @@ const fs = require('fs');
 const chokidar = require('chokidar');
 // const Tail = require('tail').Tail;
 const lastLines = require('read-last-lines');
+const nthLine = require('nthline');
 
 const readPos = fs.createReadStream('myLittleFile.txt');
 
@@ -28,13 +29,13 @@ const readPos = fs.createReadStream('myLittleFile.txt');
 //   console.log('ERROR: ', err);
 // });
 
-function readLastLines(filePath, numberOfLines) {
+const readLastLines = (filePath, numberOfLines) => {
   lastLines.read(filePath, numberOfLines).then(lines => {
     console.log(lines);
   });
-}
+};
 
-function getNumberOfLines(filePath) {
+const getNumberOfLines = filePath => {
   return new Promise((resolve, reject) => {
     let lineCount = 0;
     fs.createReadStream(filePath)
@@ -47,30 +48,44 @@ function getNumberOfLines(filePath) {
         } while (idx !== -1);
       })
       .on('end', () => {
-        console.log(lineCount);
         resolve(lineCount);
       })
       .on('error', reject);
   });
-}
+};
 
-function readFile(filePath) {
-  fs.readFile(filePath, 'utf8', (err, data) => {
+const readFile = filePath => {
+  fs.readFile(filePath, (err, data) => {
     if (err) {
       throw err;
     }
     console.log(data);
     console.log('DONE!');
   });
-}
+};
 
-function readFileWithCreateReadStream(filePath) {}
+//wrong order because of async.
+const readNthLines = (filePath, lineNumber, numberOfLines) => {
+  let i;
+  for (i = 0; i < numberOfLines; i++) {
+    nthLine(lineNumber + i, filePath).then(line => {
+      console.log(line);
+    });
+  }
+};
 
-// getNumberOfLines('myLittleFile.txt');
-// getNumberOfLines('text.txt');
+// getNumberOfLines('myLittleFile.txt').then(lineCount => {
+//   console.log(lineCount);
+// });
+// getNumberOfLines('text.txt').then(lineCount => {
+//   console.log(lineCount);
+// });
 
 // readFile('myLittleFile.txt');
 // readFile('text.txt');
 
-readLastLines('myLittleFile.txt', 100);
+// readLastLines('myLittleFile.txt', 5);
 // readLastLines('text.txt', 10);
+
+readNthLines('myLittleFile.txt', 100, 5);
+// readNthLines('text.txt', 100, 5);
