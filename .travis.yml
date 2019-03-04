@@ -2,7 +2,8 @@ language: node_js
 node_js:
   - 'stable'
 os: osx
-install:
-  - npm install
-scripts:
+cache:
+  directories:
+    - node_modules
+script:
   - npm run electron-pack
