@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Lead } from '@kokitotsos/react-components';
 import logo from './log.jpg';
 import './App.css';
 
@@ -9,7 +8,7 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <Lead>We log everything</Lead>
+          <p>We log everything!</p>
           <a
             className="App-link"
             href="https://kits.se"
