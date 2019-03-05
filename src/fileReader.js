@@ -100,32 +100,44 @@ const readFile = filePath => {
 };
 
 //wrong order because of async.
-const readNthLines = (filePath, lineNumber, numberOfLines) => {
+const readNthLines = async (filePath, lineNumber, numberOfLines) => {
   let i;
   for (i = 0; i < numberOfLines; i++) {
-    nthLine(lineNumber + i, filePath).then(line => {
+    await nthLine(lineNumber + i, filePath).then(line => {
       console.log(line);
     });
   }
 };
 
-// getNumberOfLines('myLittleFile.txt').then(lineCount => {
-//   console.log(lineCount);
-// });
-// getNumberOfLines('text.txt').then(lineCount => {
-//   console.log(lineCount);
-// });
+//Call on getNumberOfLines
+getNumberOfLines('myLittleFile.txt').then(lineCount => {
+  console.log(lineCount);
+});
 
-// readFile('myLittleFile.txt');
-// readFile('text.txt');
+//Call on readFile
+readFile('myLittleFile.txt')
+  .then(data => {
+    console.log(data);
+  })
+  .catch(err => {
+    console.log(err);
+  });
 
-// readLastLines('myLittleFile.txt', 5);
-// readLastLines('text.txt', 10);
+//Call on readLastLinesa
+readLastLines('myLittleFile.txt', 5)
+  .then(lines => {
+    console.log(lines);
+  })
+  .catch(err => {
+    console.log(err);
+  });
 
-// readNthLines('myLittleFile.txt', 100, 5);
-// readNthLines('text.txt', 100, 5);
+//Call on readNthLines
+readNthLines('myLittleFile.txt', 100, 15);
 
 module.exports = {
   readFile: readFile,
-  readLastLines: readLastLines
+  readLastLines: readLastLines,
+  getNumberOfLines: getNumberOfLines,
+  readNthLines: readNthLines
 };
