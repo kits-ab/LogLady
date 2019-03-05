@@ -30,9 +30,25 @@ const readPos = fs.createReadStream('myLittleFile.txt');
 // });
 
 const readLastLines = (filePath, numberOfLines) => {
-  lastLines.read(filePath, numberOfLines).then(lines => {
-    console.log(lines);
-  });
+  return new Promise(
+    (resolve, reject) => {
+      lastLines
+        .read(filePath, numberOfLines)
+        .then(lines => {
+          resolve(lines);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    }
+    // lastLines.read(filePath, numberOfLines).then(lines => {
+    //   process.send({
+    //     type: 'lastLines',
+    //     data: lines
+    //   });
+    //   console.log(lines);
+    // });
+  );
 };
 
 const getNumberOfLines = filePath => {
@@ -55,13 +71,32 @@ const getNumberOfLines = filePath => {
 };
 
 const readFile = filePath => {
-  fs.readFile(filePath, (err, data) => {
-    if (err) {
-      throw err;
-    }
-    console.log(data);
-    console.log('DONE!');
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
   });
+
+  // fs.readFile(filePath, (err, data) => {
+  //   if (err) {
+  //     process.send({
+  //       type: 'Read File error',
+  //       data: err
+  //     });
+  //     throw err;
+  //   } else {
+  //     process.send({
+  //       type: 'readFile',
+  //       data: data
+  //     });
+  //   }
+  //   console.log(data);
+  //   console.log('DONE!');
+  // });
 };
 
 //wrong order because of async.
@@ -87,5 +122,10 @@ const readNthLines = (filePath, lineNumber, numberOfLines) => {
 // readLastLines('myLittleFile.txt', 5);
 // readLastLines('text.txt', 10);
 
-readNthLines('myLittleFile.txt', 100, 5);
+// readNthLines('myLittleFile.txt', 100, 5);
 // readNthLines('text.txt', 100, 5);
+
+module.exports = {
+  readFile: readFile,
+  readLastLines: readLastLines
+};
