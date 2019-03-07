@@ -1,16 +1,10 @@
 const fs = require('fs');
 const chokidar = require('chokidar');
-// const Tail = require('tail').Tail;
 const lastLines = require('read-last-lines');
 const nthLine = require('nthline');
+const alwaysTail = require('always-tail');
 
-const readPos = fs.createReadStream('myLittleFile.txt');
-
-// readPos.on('open', () => {
-//   readPos.pipe(process.stdout);
-// });
-
-// const writeStream = fs.createWriteStream('myLittleFile.txt');
+// const writeStream = fs.createWriteStream('./src/myLittleFile.txt');
 // writeStream.once('open', fd => {
 //   for (let i = 0; i < 1000000; i++) {
 //     writeStream.write(`${i}\n`);
@@ -18,37 +12,27 @@ const readPos = fs.createReadStream('myLittleFile.txt');
 //   writeStream.end();
 // });
 
-// let tailOptions = { follow: true };
-// const tail = new Tail('myLittleFile.txt');
-
-// tail.on('line', data => {
-//   console.log(data);
-// });
-
-// tail.on('error', err => {
-//   console.log('ERROR: ', err);
-// });
+const startAlwaysTail = filePath => {
+  let tail = new alwaysTail(filePath, '\n', { interval: 500 });
+  tail.on('line', line => {
+    console.log(line);
+  });
+  tail.on('error', err => {
+    console.log(err);
+  });
+};
 
 const readLastLines = (filePath, numberOfLines) => {
-  return new Promise(
-    (resolve, reject) => {
-      lastLines
-        .read(filePath, numberOfLines)
-        .then(lines => {
-          resolve(lines);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    }
-    // lastLines.read(filePath, numberOfLines).then(lines => {
-    //   process.send({
-    //     type: 'lastLines',
-    //     data: lines
-    //   });
-    //   console.log(lines);
-    // });
-  );
+  return new Promise((resolve, reject) => {
+    lastLines
+      .read(filePath, numberOfLines)
+      .then(lines => {
+        resolve(lines);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
 };
 
 const getNumberOfLines = filePath => {
@@ -70,9 +54,9 @@ const getNumberOfLines = filePath => {
   });
 };
 
-const readFile = filePath => {
+const readFile = (filePath, enc) => {
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, (err, data) => {
+    fs.readFile(filePath, enc, (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -80,26 +64,8 @@ const readFile = filePath => {
       }
     });
   });
-
-  // fs.readFile(filePath, (err, data) => {
-  //   if (err) {
-  //     process.send({
-  //       type: 'Read File error',
-  //       data: err
-  //     });
-  //     throw err;
-  //   } else {
-  //     process.send({
-  //       type: 'readFile',
-  //       data: data
-  //     });
-  //   }
-  //   console.log(data);
-  //   console.log('DONE!');
-  // });
 };
 
-//wrong order because of async.
 const readNthLines = async (filePath, lineNumber, numberOfLines) => {
   let i;
   for (i = 0; i < numberOfLines; i++) {
@@ -109,31 +75,34 @@ const readNthLines = async (filePath, lineNumber, numberOfLines) => {
   }
 };
 
-//Call on getNumberOfLines
-getNumberOfLines('myLittleFile.txt').then(lineCount => {
-  console.log(lineCount);
-});
+// //Call on getNumberOfLines
+// getNumberOfLines('myLittleFile.txt').then(lineCount => {
+//   console.log(lineCount);
+// });
 
 //Call on readFile
-readFile('myLittleFile.txt')
-  .then(data => {
-    console.log(data);
-  })
-  .catch(err => {
-    console.log(err);
-  });
+// readFile('./src/myLittleFile.txt', null)
+//   .then(data => {
+//     console.log(data);
+//   })
+//   .catch(err => {
+//     console.log(err);
+//   });
 
-//Call on readLastLinesa
-readLastLines('myLittleFile.txt', 5)
-  .then(lines => {
-    console.log(lines);
-  })
-  .catch(err => {
-    console.log(err);
-  });
+// //Call on readLastLinesa
+// readLastLines('myLittleFile.txt', 5)
+//   .then(lines => {
+//     console.log(lines);
+//   })
+//   .catch(err => {
+//     console.log(err);
+//   });
 
-//Call on readNthLines
-readNthLines('myLittleFile.txt', 100, 15);
+// //Call on readNthLines
+// readNthLines('myLittleFile.txt', 100, 15);
+
+//Call on startAlwaysTail
+startAlwaysTail('./src/myLittleFile.txt');
 
 module.exports = {
   readFile: readFile,
