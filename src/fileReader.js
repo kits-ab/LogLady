@@ -68,11 +68,13 @@ const readFile = (filePath, enc) => {
 
 const readNthLines = async (filePath, lineNumber, numberOfLines) => {
   let i;
+  let lines = {};
   for (i = 0; i < numberOfLines; i++) {
-    await nthLine(lineNumber + i, filePath).then(line => {
-      console.log(line);
+    await nthLine(lineNumber + i - 1, filePath).then(line => {
+      lines[lineNumber + i] = line;
     });
   }
+  console.log(JSON.stringify(lines, null, 2));
 };
 
 // //Call on getNumberOfLines
@@ -99,10 +101,10 @@ const readNthLines = async (filePath, lineNumber, numberOfLines) => {
 //   });
 
 // //Call on readNthLines
-// readNthLines('myLittleFile.txt', 100, 15);
+readNthLines('./src/myLittleFile.txt', 1, 5);
 
 //Call on startAlwaysTail
-startAlwaysTail('./src/myLittleFile.txt');
+// startAlwaysTail('./src/myLittleFile.txt');
 
 module.exports = {
   readFile: readFile,
