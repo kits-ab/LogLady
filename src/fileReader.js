@@ -101,7 +101,7 @@ const readNthLines = async (filePath, lineNumber, numberOfLines) => {
 //   });
 
 // //Call on readNthLines
-readNthLines('./src/myLittleFile.txt', 1, 5);
+// readNthLines('./src/myLittleFile.txt', 1, 5);
 
 //Call on startAlwaysTail
 // startAlwaysTail('./src/myLittleFile.txt');
