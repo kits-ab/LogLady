@@ -1,7 +1,7 @@
 const fs = require('fs');
-const chokidar = require('chokidar');
+//const chokidar = require('chokidar');
 const lastLines = require('read-last-lines');
-const nthLine = require('nthline');
+//const nthLine = require('nthline');
 const alwaysTail = require('always-tail');
 
 // const writeStream = fs.createWriteStream('./src/myLittleFile.txt');
@@ -66,7 +66,7 @@ const readFile = (filePath, enc) => {
   });
 };
 
-const readNthLines = async (filePath, lineNumber, numberOfLines) => {
+/*const readNthLines = async (filePath, lineNumber, numberOfLines) => {
   let i;
   let lines = {};
   for (i = 0; i < numberOfLines; i++) {
@@ -75,7 +75,7 @@ const readNthLines = async (filePath, lineNumber, numberOfLines) => {
     });
   }
   console.log(JSON.stringify(lines, null, 2));
-};
+};*/
 
 // //Call on getNumberOfLines
 // getNumberOfLines('myLittleFile.txt').then(lineCount => {
@@ -109,6 +109,6 @@ const readNthLines = async (filePath, lineNumber, numberOfLines) => {
 module.exports = {
   readFile: readFile,
   readLastLines: readLastLines,
-  getNumberOfLines: getNumberOfLines,
-  readNthLines: readNthLines
+  getNumberOfLines: getNumberOfLines
+  //readNthLines: readNthLines
 };
