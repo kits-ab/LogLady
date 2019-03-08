@@ -1,8 +1,7 @@
 const fs = require('fs');
-const chokidar = require('chokidar');
 const lastLines = require('read-last-lines');
-const nthLine = require('nthline');
-const alwaysTail = require('always-tail');
+// const nthLine = require('nthline');
+// const alwaysTail = require('always-tail');
 
 // const writeStream = fs.createWriteStream('./src/myLittleFile.txt');
 // writeStream.once('open', fd => {
@@ -12,15 +11,15 @@ const alwaysTail = require('always-tail');
 //   writeStream.end();
 // });
 
-const startAlwaysTail = filePath => {
-  let tail = new alwaysTail(filePath, '\n', { interval: 500 });
-  tail.on('line', line => {
-    console.log(line);
-  });
-  tail.on('error', err => {
-    console.log(err);
-  });
-};
+// const startAlwaysTail = filePath => {
+//   let tail = new alwaysTail(filePath, '\n', { interval: 500 });
+//   tail.on('line', line => {
+//     console.log(line);
+//   });
+//   tail.on('error', err => {
+//     console.log(err);
+//   });
+// };
 
 const readLastLines = (filePath, numberOfLines) => {
   return new Promise((resolve, reject) => {
@@ -66,16 +65,16 @@ const readFile = (filePath, enc) => {
   });
 };
 
-const readNthLines = async (filePath, lineNumber, numberOfLines) => {
-  let i;
-  let lines = {};
-  for (i = 0; i < numberOfLines; i++) {
-    await nthLine(lineNumber + i - 1, filePath).then(line => {
-      lines[lineNumber + i] = line;
-    });
-  }
-  console.log(JSON.stringify(lines, null, 2));
-};
+// const readNthLines = async (filePath, lineNumber, numberOfLines) => {
+//   let i;
+//   let lines = {};
+//   for (i = 0; i < numberOfLines; i++) {
+//     await nthLine(lineNumber + i - 1, filePath).then(line => {
+//       lines[lineNumber + i] = line;
+//     });
+//   }
+//   console.log(JSON.stringify(lines, null, 2));
+// };
 
 // //Call on getNumberOfLines
 // getNumberOfLines('myLittleFile.txt').then(lineCount => {
@@ -109,6 +108,6 @@ const readNthLines = async (filePath, lineNumber, numberOfLines) => {
 module.exports = {
   readFile: readFile,
   readLastLines: readLastLines,
-  getNumberOfLines: getNumberOfLines,
-  readNthLines: readNthLines
+  getNumberOfLines: getNumberOfLines
+  // readNthLines: readNthLines
 };
