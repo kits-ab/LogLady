@@ -1,20 +1,26 @@
 const fileReader = require('../adapters/fileReader');
 
 const readLines = (filePath, numberOfLines) => {
-  return new Promise((resolve, reject) => {
-    fileReader
-      .readLastLines(filePath, numberOfLines)
-      .then(lines => {
-        resolve(lines);
-      })
-      .catch(err => {
-        reject(err);
-      });
-  });
+  return fileReader.readLastLines(filePath, numberOfLines);
 };
-
 // readLines('src/resources/myLittleFile.txt', 10);
 
+const readNthLines = (filePath, lineNumber, numberOfLines) => {
+  return fileReader.readNthLines(filePath, lineNumber, numberOfLines);
+};
+// readNthLines('src/resources/myLittleFile.txt', 10, 5).then(lines => {
+//   console.log('Lines in engine.js...', JSON.stringify(lines, null, 2));
+// });
+
+const getNumberOfLines = _filePath => {
+  return fileReader.getNumberOfLines(_filePath);
+};
+// getNumberOfLines('src/resources/myLittleFile.txt').then(lines => {
+//   console.log('number of lines: ', lines);
+// });
+
 module.exports = {
-  readLines: readLines
+  readLines: readLines,
+  readNthLines: readNthLines,
+  getNumberOfLines: getNumberOfLines
 };

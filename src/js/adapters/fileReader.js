@@ -1,6 +1,6 @@
 const fs = require('fs');
 const lastLines = require('read-last-lines');
-// const nthLine = require('nthline');
+const nthLine = require('nthline');
 // const alwaysTail = require('always-tail');
 
 // const writeStream = fs.createWriteStream('./src/myLittleFile.txt');
@@ -22,16 +22,7 @@ const lastLines = require('read-last-lines');
 // };
 
 const readLastLines = (filePath, numberOfLines) => {
-  return new Promise((resolve, reject) => {
-    lastLines
-      .read(filePath, numberOfLines)
-      .then(lines => {
-        resolve(lines);
-      })
-      .catch(err => {
-        reject(err);
-      });
-  });
+  return lastLines.read(filePath, numberOfLines);
 };
 
 const getNumberOfLines = filePath => {
@@ -49,7 +40,9 @@ const getNumberOfLines = filePath => {
       .on('end', () => {
         resolve(lineCount);
       })
-      .on('error', reject);
+      .on('error', err => {
+        reject(err);
+      });
   });
 };
 
@@ -65,16 +58,26 @@ const readFile = (filePath, enc) => {
   });
 };
 
-// const readNthLines = async (filePath, lineNumber, numberOfLines) => {
-//   let i;
-//   let lines = {};
-//   for (i = 0; i < numberOfLines; i++) {
-//     await nthLine(lineNumber + i - 1, filePath).then(line => {
-//       lines[lineNumber + i] = line;
-//     });
-//   }
-//   console.log(JSON.stringify(lines, null, 2));
-// };
+const readNthLines = (filePath, lineNumber, numberOfLines) => {
+  return new Promise(async (resolve, reject) => {
+    let i;
+    let lines = {};
+    for (i = 0; i < numberOfLines; i++) {
+      await nthLine(lineNumber + i - 1, filePath)
+        .then(line => {
+          lines[lineNumber + i] = line;
+        })
+        .catch(err => {
+          reject(err);
+        });
+    }
+    if (lines !== null) {
+      resolve(lines);
+    } else {
+      reject('Error occured.');
+    }
+  });
+};
 
 // //Call on getNumberOfLines
 // getNumberOfLines('myLittleFile.txt').then(lineCount => {
@@ -100,7 +103,7 @@ const readFile = (filePath, enc) => {
 //   });
 
 // //Call on readNthLines
-// readNthLines('./src/myLittleFile.txt', 1, 5);
+// readNthLines('./src/resources/myLittleFile.txt', 1, 5);
 
 //Call on startAlwaysTail
 // startAlwaysTail('./src/myLittleFile.txt');
@@ -108,6 +111,6 @@ const readFile = (filePath, enc) => {
 module.exports = {
   readFile: readFile,
   readLastLines: readLastLines,
-  getNumberOfLines: getNumberOfLines
-  // readNthLines: readNthLines
+  getNumberOfLines: getNumberOfLines,
+  readNthLines: readNthLines
 };
