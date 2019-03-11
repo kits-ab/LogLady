@@ -6,6 +6,7 @@
   "homepage": "./",
   "main": "public/electron.js",
   "dependencies": {
+    "chokidar": "^2.1.2",
     "concurrently": "^4.1.0",
     "electron-is-dev": "^1.0.1",
     "electron-simple-updater": "^1.4.3",
