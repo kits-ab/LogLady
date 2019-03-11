@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Log file viewer",
   "author": "lalala",
-  "homepage": "./",
+  "homepage": "./js/view/App.js",
   "main": "public/electron.js",
   "dependencies": {
     "always-tail": "^0.2.0",
