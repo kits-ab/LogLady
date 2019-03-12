@@ -58,25 +58,17 @@ const readFile = (filePath, enc) => {
   });
 };
 
-const readNthLines = (filePath, lineNumber, numberOfLines) => {
-  return new Promise(async (resolve, reject) => {
-    let i;
-    let lines = {};
-    for (i = 0; i < numberOfLines; i++) {
-      await nthLine(lineNumber + i - 1, filePath)
-        .then(line => {
-          lines[lineNumber + i] = line;
-        })
-        .catch(err => {
-          reject(err);
-        });
-    }
-    if (lines !== null) {
-      resolve(lines);
-    } else {
-      reject('Error occured.');
-    }
-  });
+const readNthLines = async (filePath, lineNumber, numberOfLines) => {
+  let i;
+  let lines = {};
+  for (i = 0; i < numberOfLines; i++) {
+    lines[lineNumber + i] = await nthLine(lineNumber + i - 1, filePath);
+  }
+  if (lines !== null) {
+    return lines;
+  } else {
+    return 'Error occured.';
+  }
 };
 
 // //Call on getNumberOfLines
@@ -103,7 +95,9 @@ const readNthLines = (filePath, lineNumber, numberOfLines) => {
 //   });
 
 // //Call on readNthLines
-// readNthLines('./src/resources/myLittleFile.txt', 1, 5);
+readNthLines('./src/resources/myLittleFile.txt', 1, 15).then(lines => {
+  console.log(JSON.stringify(lines, null, 2));
+});
 
 //Call on startAlwaysTail
 // startAlwaysTail('./src/myLittleFile.txt');

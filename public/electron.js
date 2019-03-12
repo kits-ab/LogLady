@@ -12,21 +12,22 @@ ipcMain.on('asynchronous-message', (event, arg) => {
 
   let argObjReply = {};
   switch (arg.functionToCall) {
+    case 'getTime':
+      //Just to demonstrate that our listener can be live.
+      //Change interval to 10000 if you use live reloading during development.
+      //Or comment it our entirely.
+      setInterval(() => {
+        argObjReply.functionThatReplied = 'time';
+        argObjReply.returnValue = Date.now();
+        event.sender.send('asynchronous-reply', argObjReply);
+      }, 1);
+      break;
     case 'getLastLines':
       getLastLines(arg.filePath, arg.numberOfLines)
         .then(lines => {
           argObjReply.functionThatReplied = 'getLastLines';
           argObjReply.returnValue = lines;
           event.sender.send('asynchronous-reply', argObjReply);
-
-          //Just to demonstrate that our listener is live.
-          //Change interval to 10000 if you use live reloading during development.
-          //Or comment it our entirely.
-          setInterval(() => {
-            argObjReply.functionThatReplied = 'time';
-            argObjReply.returnValue = Date.now();
-            event.sender.send('asynchronous-reply', argObjReply);
-          }, 1);
         })
         .catch(err => {
           argObjReply.functionThatReplied = 'error';

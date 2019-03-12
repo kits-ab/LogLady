@@ -46,14 +46,15 @@ class App extends Component {
   ipcContainer = () => {
     ipcRenderer.on('asynchronous-reply', (event, arg) => {
       switch (arg.functionThatReplied) {
+        //Just to show that our listener can be live.
+        case 'time':
+          this.setTime(arg.returnValue);
+          break;
         case 'getLastLines':
           this.setLastLines(arg.returnValue);
           break;
         case 'getNthLines':
           this.setNthLines(JSON.stringify(arg.returnValue, null, 2));
-          break;
-        case 'time':
-          this.setTime(arg.returnValue);
           break;
         case 'getNumberOfLines':
           this.setNumberOfLines(arg.returnValue);
@@ -77,6 +78,9 @@ class App extends Component {
 
     argObj.functionToCall = 'getNumberOfLines';
     ipcRenderer.send('asynchronous-message', argObj);
+
+    argObj.functionToCall = 'getTime';
+    ipcRenderer.send('asynchronous-message', argObj);
   };
 
   render() {
@@ -84,7 +88,7 @@ class App extends Component {
       <div>
         <p>hej värld</p>
         <p>
-          Our listener is live (and can keep up with ms): {this.state.time}{' '}
+          Our listener can be live (and can keep up with ms): {this.state.time}{' '}
         </p>
         <p>Get number of lines: {this.state.numberOfLines}</p>
         <p>Get last lines: {this.state.lastLines}</p>
