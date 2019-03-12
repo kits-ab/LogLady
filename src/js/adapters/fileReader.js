@@ -1,5 +1,20 @@
 const fs = require('fs');
 const lastLines = require('read-last-lines');
+const notifier = require('node-notifier');
+const chokidar = require('chokidar');
+
+const seeMeFile = './src/testFileForWatch.log';
+
+chokidar.watch(seeMeFile).on('all', (event, path) => {
+  console.log(event, path);
+
+  if (event === 'change') {
+    notifier.notify({
+      title: 'Note',
+      message: 'change in file'
+    });
+  }
+});
 // const nthLine = require('nthline');
 // const alwaysTail = require('always-tail');
 
