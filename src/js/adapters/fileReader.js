@@ -21,6 +21,13 @@ const nthLine = require('nthline');
 //   });
 // };
 
+const readLastLinesLive = filePath => {
+  readLastLines(filePath, 10).then(lines => {
+    console.log(lines);
+  });
+};
+readLastLinesLive('./src/resources/myLittleFile.txt');
+
 const readLastLines = (filePath, numberOfLines) => {
   return lastLines.read(filePath, numberOfLines);
 };
@@ -95,12 +102,12 @@ const readNthLines = async (filePath, lineNumber, numberOfLines) => {
 //   });
 
 // //Call on readNthLines
-readNthLines('./src/resources/myLittleFile.txt', 1, 15).then(lines => {
-  console.log(JSON.stringify(lines, null, 2));
-});
+// readNthLines('./src/resources/myLittleFile.txt', 1, 15).then(lines => {
+//   console.log(JSON.stringify(lines, null, 2));
+// });
 
 //Call on startAlwaysTail
-// startAlwaysTail('./src/myLittleFile.txt');
+// startAlwaysTail('./src/resources/myLittleFile.txt');
 
 module.exports = {
   readFile: readFile,

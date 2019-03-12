@@ -1,4 +1,8 @@
+const { fork } = require('child_process');
+const { EventEmitter } = require('events');
 const fileReader = require('../adapters/fileReader');
+
+const events = new EventEmitter();
 
 const readLines = (filePath, numberOfLines) => {
   return fileReader.readLastLines(filePath, numberOfLines);
