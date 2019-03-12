@@ -28,7 +28,12 @@ console.log(updater.version);
 let mainWindow;
 
 const createWindow = () => {
-  mainWindow = new BrowserWindow({ width: 900, height: 680 });
+  mainWindow = new BrowserWindow({
+    width: 900,
+    height: 680,
+    autoHideMenuBar: true,
+    darkTheme: true
+  });
   mainWindow.loadURL(
     isDev
       ? 'http://localhost:3000'
