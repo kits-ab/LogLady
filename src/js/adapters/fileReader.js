@@ -2,25 +2,26 @@ const fs = require('fs');
 const lastLines = require('read-last-lines');
 const notifier = require('node-notifier');
 const chokidar = require('chokidar');
-
+const nthLine = require('nthline');
 const seeMeFile = './src/testFileForWatch.log';
 
-chokidar.watch(seeMeFile).on('all', (event, path) => {
-  console.log(event, path);
+// chokidar.watch(seeMeFile).on('all', (event, path) => {
+//   console.log(event, path);
 
-  if (event === 'change') {
-    notifier.notify({
-      title: 'Note',
-      message: 'change in file'
-    });
-  }
-});
+//   if (event === 'change') {
+//     notifier.notify({
+//       title: 'Note',
+//       message: 'change in file'
+//     });
+//   }
+// });
 // const nthLine = require('nthline');
 // const alwaysTail = require('always-tail');
+const watcher = require('chokidar');
 
-// const writeStream = fs.createWriteStream('./src/myLittleFile.txt');
+// const writeStream = fs.createWriteStream('./src/resources/myLittleFile.txt');
 // writeStream.once('open', fd => {
-//   for (let i = 0; i < 1000000; i++) {
+//   for (let i = 1; i < 1000001; i++) {
 //     writeStream.write(`${i}\n`);
 //   }
 //   writeStream.end();
@@ -37,17 +38,16 @@ chokidar.watch(seeMeFile).on('all', (event, path) => {
 // };
 
 const readLastLines = (filePath, numberOfLines) => {
-  return new Promise((resolve, reject) => {
-    lastLines
-      .read(filePath, numberOfLines)
-      .then(lines => {
-        resolve(lines);
-      })
-      .catch(err => {
-        reject(err);
-      });
-  });
+  return lastLines.read(filePath, numberOfLines);
 };
+
+const readLinesLive = filePath => {
+  readLastLines(filePath, 10).then(lines => {
+    console.log(lines);
+  });
+  watcher.watch(filePath).on('all', (event, path) => {});
+};
+// readLinesLive('./src/resources/myLittleFile.txt');
 
 const getNumberOfLines = filePath => {
   return new Promise((resolve, reject) => {
@@ -64,7 +64,9 @@ const getNumberOfLines = filePath => {
       .on('end', () => {
         resolve(lineCount);
       })
-      .on('error', reject);
+      .on('error', err => {
+        reject(err);
+      });
   });
 };
 
@@ -80,16 +82,18 @@ const readFile = (filePath, enc) => {
   });
 };
 
-// const readNthLines = async (filePath, lineNumber, numberOfLines) => {
-//   let i;
-//   let lines = {};
-//   for (i = 0; i < numberOfLines; i++) {
-//     await nthLine(lineNumber + i - 1, filePath).then(line => {
-//       lines[lineNumber + i] = line;
-//     });
-//   }
-//   console.log(JSON.stringify(lines, null, 2));
-// };
+const readNthLines = async (filePath, lineNumber, numberOfLines) => {
+  let i;
+  let lines = {};
+  for (i = 0; i < numberOfLines; i++) {
+    lines[lineNumber + i] = await nthLine(lineNumber + i - 1, filePath);
+  }
+  if (lines !== null) {
+    return lines;
+  } else {
+    return 'Error occured.';
+  }
+};
 
 // //Call on getNumberOfLines
 // getNumberOfLines('myLittleFile.txt').then(lineCount => {
@@ -115,14 +119,16 @@ const readFile = (filePath, enc) => {
 //   });
 
 // //Call on readNthLines
-// readNthLines('./src/myLittleFile.txt', 1, 5);
+// readNthLines('./src/resources/myLittleFile.txt', 1, 15).then(lines => {
+//   console.log(JSON.stringify(lines, null, 2));
+// });
 
 //Call on startAlwaysTail
-// startAlwaysTail('./src/myLittleFile.txt');
+// startAlwaysTail('./src/resources/myLittleFile.txt');
 
 module.exports = {
   readFile: readFile,
   readLastLines: readLastLines,
-  getNumberOfLines: getNumberOfLines
-  // readNthLines: readNthLines
+  getNumberOfLines: getNumberOfLines,
+  readNthLines: readNthLines
 };

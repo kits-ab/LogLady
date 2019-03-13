@@ -1,3 +1,5 @@
+import { doesNotReject } from 'assert';
+
 global.require = electron => {
   return {
     ipcRenderer: {

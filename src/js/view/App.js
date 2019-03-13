@@ -5,32 +5,98 @@ const { ipcRenderer } = window.require('electron');
 class App extends Component {
   constructor(props) {
     super(props);
-    this.setLines = this.setLines.bind(this);
-    this.ipcContainer = this.ipcContainer.bind(this);
+
     this.state = {
-      lines: ''
+      lastLines: '',
+      nthLines: '',
+      time: '',
+      numberOfLines: ''
     };
+
     this.ipcContainer();
   }
-  setLines(arg) {
+  setLastLines = _returnValue => {
     this.setState({
-      lines: arg
+      lastLines: _returnValue
     });
-  }
+  };
 
-  ipcContainer() {
+  setNthLines = _returnValue => {
+    this.setState({
+      nthLines: _returnValue
+    });
+    console.log('nth Lines: ', this.state.nthLines);
+  };
+
+  setTime = _returnValue => {
+    let theTime = new Date(_returnValue);
+
+    this.setState({
+      time:
+        theTime.toLocaleTimeString('sv-SE') + ':' + theTime.getMilliseconds()
+    });
+  };
+
+  setNumberOfLines = _returnValue => {
+    this.setState({
+      numberOfLines: _returnValue
+    });
+  };
+
+  ipcContainer = () => {
     ipcRenderer.on('asynchronous-reply', (event, arg) => {
-      this.setLines(arg);
+      switch (arg.functionThatReplied) {
+        //Just to show that our listener can be live.
+        case 'time':
+          this.setTime(arg.returnValue);
+          break;
+        case 'getLastLines':
+          this.setLastLines(arg.returnValue);
+          break;
+        case 'getNthLines':
+          this.setNthLines(JSON.stringify(arg.returnValue, null, 2));
+          break;
+        case 'getNumberOfLines':
+          this.setNumberOfLines(arg.returnValue);
+          break;
+        default:
+          window.alert('Error has occured: ', arg.returnValue);
+      }
       console.log('arg in app.js: ', arg);
     });
-    ipcRenderer.send('asynchronous-message', 'getLines');
-  }
+
+    //Create an object and pass it as arg to ipcRenderer.send()
+    let argObj = {};
+    argObj.functionToCall = 'getLastLines';
+    argObj.filePath = 'src/resources/myLittleFile.txt';
+    argObj.numberOfLines = 5;
+    argObj.lineNumber = 10;
+    ipcRenderer.send('asynchronous-message', argObj);
+
+    argObj.functionToCall = 'getNthLines';
+    ipcRenderer.send('asynchronous-message', argObj);
+
+    argObj.functionToCall = 'getNumberOfLines';
+    ipcRenderer.send('asynchronous-message', argObj);
+
+    argObj.functionToCall = 'getTime';
+    ipcRenderer.send('asynchronous-message', argObj);
+  };
 
   render() {
     return (
       <div>
         <p>hej värld</p>
-        <p>Lines: {this.state.lines}</p>
+        <p>
+          Our listener can be live (and can keep up with ms): {this.state.time}{' '}
+        </p>
+        <p>Get number of lines: {this.state.numberOfLines}</p>
+        <p>Get last lines: {this.state.lastLines}</p>
+        <p>
+          Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
+        </p>
+        Get Nth lines (with {'<pre>'} tags to keep json formatting):
+        <pre>{this.state.nthLines}</pre>
       </div>
     );
   }
