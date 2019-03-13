@@ -2,10 +2,11 @@ const fs = require('fs');
 const lastLines = require('read-last-lines');
 const nthLine = require('nthline');
 // const alwaysTail = require('always-tail');
+const watcher = require('chokidar');
 
-// const writeStream = fs.createWriteStream('./src/myLittleFile.txt');
+// const writeStream = fs.createWriteStream('./src/resources/myLittleFile.txt');
 // writeStream.once('open', fd => {
-//   for (let i = 0; i < 1000000; i++) {
+//   for (let i = 1; i < 1000001; i++) {
 //     writeStream.write(`${i}\n`);
 //   }
 //   writeStream.end();
@@ -21,16 +22,17 @@ const nthLine = require('nthline');
 //   });
 // };
 
-const readLastLinesLive = filePath => {
-  readLastLines(filePath, 10).then(lines => {
-    console.log(lines);
-  });
-};
-readLastLinesLive('./src/resources/myLittleFile.txt');
-
 const readLastLines = (filePath, numberOfLines) => {
   return lastLines.read(filePath, numberOfLines);
 };
+
+const readLinesLive = filePath => {
+  readLastLines(filePath, 10).then(lines => {
+    console.log(lines);
+  });
+  watcher.watch(filePath).on('all', (event, path) => {});
+};
+// readLinesLive('./src/resources/myLittleFile.txt');
 
 const getNumberOfLines = filePath => {
   return new Promise((resolve, reject) => {

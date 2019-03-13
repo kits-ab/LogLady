@@ -95,10 +95,8 @@ class App extends Component {
         <p>
           Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
         </p>
-        <p>
-          Get Nth lines (with {'<pre>'} tags to keep json formatting):
-          <pre>{this.state.nthLines}</pre>
-        </p>
+        Get Nth lines (with {'<pre>'} tags to keep json formatting):
+        <pre>{this.state.nthLines}</pre>
       </div>
     );
   }
