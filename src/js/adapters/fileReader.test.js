@@ -6,6 +6,7 @@ it('reads a file and prints content to console', () => {
     .then(data => {
       console.log(data);
       expect(data).toBe('this is the content');
+      done();
     })
     .catch(err => {
       console.log(err);
