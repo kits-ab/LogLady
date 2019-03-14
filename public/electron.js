@@ -81,6 +81,8 @@ const createWindow = () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  require('../src/js/view/menu');
 };
 
 app.on('ready', createWindow);
