@@ -24,6 +24,35 @@ const template = [
     ]
   },
   {
+    label: 'Log',
+    submenu: [
+      {
+        label: 'Open...',
+        click() {
+          require('electron').shell.openExternal('http://electron.atom.io');
+        }
+      },
+      {
+        label: 'Open recent'
+      },
+      {
+        label: 'Save'
+      },
+      {
+        label: 'Save as...'
+      },
+      {
+        label: 'Find'
+      },
+      {
+        label: 'Log-settings'
+      },
+      {
+        label: 'Close log'
+      }
+    ]
+  },
+  {
     label: 'Edit',
     submenu: [
       {
@@ -103,35 +132,6 @@ const template = [
       },
       {
         role: 'close'
-      }
-    ]
-  },
-  {
-    label: 'Log',
-    submenu: [
-      {
-        label: 'Open...',
-        click() {
-          require('electron').shell.openExternal('http://electron.atom.io');
-        }
-      },
-      {
-        label: 'Open recent'
-      },
-      {
-        label: 'Save'
-      },
-      {
-        label: 'Save as...'
-      },
-      {
-        label: 'Find'
-      },
-      {
-        label: 'Log-settings'
-      },
-      {
-        label: 'Close log'
       }
     ]
   },
