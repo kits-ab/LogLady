@@ -16,11 +16,11 @@ ipcMain.on('asynchronous-message', (event, arg) => {
       //Just to demonstrate that our listener can be live.
       //Change interval to 10000 if you use live reloading during development.
       //Or comment it our entirely.
-      setInterval(() => {
-        argObjReply.functionThatReplied = 'time';
-        argObjReply.returnValue = Date.now();
-        event.sender.send('asynchronous-reply', argObjReply);
-      }, 1);
+      // setInterval(() => {
+      //   argObjReply.functionThatReplied = 'time';
+      //   argObjReply.returnValue = Date.now();
+      //   event.sender.send('asynchronous-reply', argObjReply);
+      // }, 2000);
       break;
     case 'getLastLines':
       getLastLines(arg.filePath, arg.numberOfLines)

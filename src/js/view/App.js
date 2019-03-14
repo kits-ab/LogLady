@@ -1,3 +1,4 @@
+import Feed from './components/Feed';
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
@@ -97,6 +98,7 @@ class App extends Component {
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
         <pre>{this.state.nthLines}</pre>
+        <Feed rows={this.state.lastLines} />
       </div>
     );
   }
