@@ -62,7 +62,7 @@ class App extends Component {
         default:
           window.alert('Error has occured: ', arg.returnValue);
       }
-      console.log('arg in app.js: ', arg);
+      // console.log('arg in app.js: ', arg);
     });
 
     //Create an object and pass it as arg to ipcRenderer.send()

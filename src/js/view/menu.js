@@ -1,4 +1,5 @@
 const { Menu } = require('electron');
+const { dialog } = require('electron');
 
 const template = [
   {
@@ -29,7 +30,9 @@ const template = [
       {
         label: 'Open...',
         click() {
-          require('electron').shell.openExternal('http://electron.atom.io');
+          dialog.showOpenDialog({
+            properties: ['openFile', 'openDirectory', 'multiSelections']
+          });
         }
       },
       {
