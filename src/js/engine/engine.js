@@ -1,26 +1,41 @@
 const { fork } = require('child_process');
 const { EventEmitter } = require('events');
 const fileReader = require('../adapters/fileReader');
+const { ipcMain } = require('electron');
 
 const events = new EventEmitter();
 
-const readLines = (filePath, numberOfLines) =>
-  fileReader.readLastLines(filePath, numberOfLines);
-// readLines('src/resources/myLittleFile.txt', 10);
+ipcMain.on('getTime', (event, time) => {
+  setInterval(() => {
+    let time = Date.now();
+    event.sender.send('theTime', time);
+  }, 1000);
+});
 
-const readNthLines = (filePath, lineNumber, numberOfLines) =>
-  fileReader.readNthLines(filePath, lineNumber, numberOfLines);
-// readNthLines('src/resources/myLittleFile.txt', 10, 5).then(lines => {
-//   console.log('Lines in engine.js...', JSON.stringify(lines, null, 2));
-// });
+ipcMain.on('getLastLines', (event, lastLines) => {
+  fileReader
+    .readLastLines(lastLines.filePath, lastLines.numberOfLines)
+    .then(lines => {
+      console.log(lines);
+      event.sender.send('lastLines', lines);
+    });
+});
 
-const getNumberOfLines = _filePath => fileReader.getNumberOfLines(_filePath);
-// getNumberOfLines('src/resources/myLittleFile.txt').then(lines => {
-//   console.log('number of lines: ', lines);
-// });
+ipcMain.on('getNthLines', (event, nthLines) => {
+  fileReader
+    .readNthLines(
+      nthLines.filePath,
+      nthLines.lineNumber,
+      nthLines.numberOfLines
+    )
+    .then(lines => {
+      console.log(lines);
+      event.sender.send('theLines', lines);
+    });
+});
 
-module.exports = {
-  readLines: readLines,
-  readNthLines: readNthLines,
-  getNumberOfLines: getNumberOfLines
-};
+ipcMain.on('getNumberOfLines', (event, nol) => {
+  fileReader.getNumberOfLines(nol.filePath).then(lines => {
+    event.sender.send('nol', lines);
+  });
+});
