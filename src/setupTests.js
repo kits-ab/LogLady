@@ -8,6 +8,9 @@ global.require = electron => {
       },
       on: (eventName, handler) => {
         console.log('on', eventName, handler);
+      },
+      once: (eventName, handler) => {
+        console.log('once', eventName, handler);
       }
     }
   };

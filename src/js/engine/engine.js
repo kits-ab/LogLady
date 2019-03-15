@@ -12,7 +12,7 @@ ipcMain.on('getTime', (event, time) => {
   }, 1000);
 });
 
-ipcMain.on('getLastLines', (event, lastLines) => {
+ipcMain.once('getLastLines', (event, lastLines) => {
   fileReader
     .readLastLines(lastLines.filePath, lastLines.numberOfLines)
     .then(lines => {
@@ -21,7 +21,7 @@ ipcMain.on('getLastLines', (event, lastLines) => {
     });
 });
 
-ipcMain.on('getNthLines', (event, nthLines) => {
+ipcMain.once('getNthLines', (event, nthLines) => {
   fileReader
     .readNthLines(
       nthLines.filePath,
@@ -30,12 +30,12 @@ ipcMain.on('getNthLines', (event, nthLines) => {
     )
     .then(lines => {
       console.log(lines);
-      event.sender.send('theLines', lines);
+      event.sender.send('nthLines', lines);
     });
 });
 
-ipcMain.on('getNumberOfLines', (event, nol) => {
-  fileReader.getNumberOfLines(nol.filePath).then(lines => {
-    event.sender.send('nol', lines);
+ipcMain.once('getNumberOfLines', (event, numberOfLines) => {
+  fileReader.getNumberOfLines(numberOfLines.filePath).then(lines => {
+    event.sender.send('numberOfLines', lines);
   });
 });

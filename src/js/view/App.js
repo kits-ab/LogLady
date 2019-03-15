@@ -59,21 +59,21 @@ class App extends Component {
 
     ipcRenderer.send('getNumberOfLines', argObj);
 
-    ipcRenderer.on('nol', (event, nol) => {
-      console.log(nol);
-      this.setNumberOfLines(nol);
+    ipcRenderer.once('numberOfLines', (event, numberOfLines) => {
+      console.log(numberOfLines);
+      this.setNumberOfLines(numberOfLines);
     });
 
     ipcRenderer.send('getNthLines', argObj);
 
-    ipcRenderer.on('theLines', (event, lines) => {
+    ipcRenderer.once('nthLines', (event, lines) => {
       console.log(lines);
       this.setNthLines(JSON.stringify(lines, null, 2));
     });
 
     ipcRenderer.send('getLastLines', argObj);
 
-    ipcRenderer.on('lastLines', (event, lastLines) => {
+    ipcRenderer.once('lastLines', (event, lastLines) => {
       this.setLastLines(lastLines);
     });
   };
