@@ -25,7 +25,7 @@ class App extends Component {
     this.setState({
       nthLines: _returnValue
     });
-    console.log('nth Lines: ', this.state.nthLines);
+    //console.log('nth Lines: ', this.state.nthLines);
   };
 
   setTime = _returnValue => {
@@ -44,43 +44,38 @@ class App extends Component {
   };
 
   ipcContainer = () => {
-    ipcRenderer.on('asynchronous-reply', (event, arg) => {
-      switch (arg.functionThatReplied) {
-        //Just to show that our listener can be live.
-        case 'time':
-          this.setTime(arg.returnValue);
-          break;
-        case 'getLastLines':
-          this.setLastLines(arg.returnValue);
-          break;
-        case 'getNthLines':
-          this.setNthLines(JSON.stringify(arg.returnValue, null, 2));
-          break;
-        case 'getNumberOfLines':
-          this.setNumberOfLines(arg.returnValue);
-          break;
-        default:
-          window.alert('Error has occured: ', arg.returnValue);
-      }
-      console.log('arg in app.js: ', arg);
-    });
-
     //Create an object and pass it as arg to ipcRenderer.send()
     let argObj = {};
-    argObj.functionToCall = 'getLastLines';
     argObj.filePath = 'src/resources/myLittleFile.txt';
     argObj.numberOfLines = 5;
     argObj.lineNumber = 10;
-    ipcRenderer.send('asynchronous-message', argObj);
 
-    argObj.functionToCall = 'getNthLines';
-    ipcRenderer.send('asynchronous-message', argObj);
+    //Just to show that our listener can be live.
+    ipcRenderer.send('getTime', 'time');
 
-    argObj.functionToCall = 'getNumberOfLines';
-    ipcRenderer.send('asynchronous-message', argObj);
+    ipcRenderer.on('theTime', (event, time) => {
+      this.setTime(time);
+    });
 
-    argObj.functionToCall = 'getTime';
-    ipcRenderer.send('asynchronous-message', argObj);
+    ipcRenderer.send('getNumberOfLines', argObj);
+
+    ipcRenderer.on('nol', (event, nol) => {
+      console.log(nol);
+      this.setNumberOfLines(nol);
+    });
+
+    ipcRenderer.send('getNthLines', argObj);
+
+    ipcRenderer.on('theLines', (event, lines) => {
+      console.log(lines);
+      this.setNthLines(JSON.stringify(lines, null, 2));
+    });
+
+    ipcRenderer.send('getLastLines', argObj);
+
+    ipcRenderer.on('lastLines', (event, lastLines) => {
+      this.setLastLines(lastLines);
+    });
   };
 
   render() {
