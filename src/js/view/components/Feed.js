@@ -1,6 +1,7 @@
 import React from 'react';
 import { FeedView } from '../styled_components/Containers';
 import { Input, Button } from '../styled_components/Interactions';
+import { filterMatchingRows } from './helpers/feed_helper';
 
 class Feed extends React.Component {
   constructor(props) {
@@ -19,9 +20,7 @@ class Feed extends React.Component {
   render() {
     const rows =
       this.props.rows &&
-      this.props.rows
-        .split('\n')
-        .filter(item => item.match(this.state.filterText));
+      filterMatchingRows(this.state.filterText, this.props.rows);
 
     return (
       <FeedView live={this.state.live}>
