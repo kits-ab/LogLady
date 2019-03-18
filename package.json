@@ -68,6 +68,7 @@
   "build": {
     "appId": "com.example.electron-cra",
     "files": [
+      "src/**/*",
       "build/**/*",
       "node_modules/**/*"
     ],
