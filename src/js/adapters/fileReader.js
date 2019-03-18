@@ -37,8 +37,9 @@ const watcher = require('chokidar');
 //   });
 // };
 
-const readLastLines = (filePath, numberOfLines) =>
-  lastLines.read(filePath, numberOfLines);
+const readLastLines = (filePath, numberOfLines) => {
+  return lastLines.read(filePath, numberOfLines);
+};
 
 const readLinesLive = filePath => {
   readLastLines(filePath, 10).then(lines => {
@@ -48,8 +49,8 @@ const readLinesLive = filePath => {
 };
 // readLinesLive('./src/resources/myLittleFile.txt');
 
-const getNumberOfLines = filePath =>
-  new Promise((resolve, reject) => {
+const getNumberOfLines = filePath => {
+  return new Promise((resolve, reject) => {
     let lineCount = 0;
     fs.createReadStream(filePath)
       .on('data', buffer => {
@@ -67,9 +68,10 @@ const getNumberOfLines = filePath =>
         reject(err);
       });
   });
+};
 
-const readFile = (filePath, enc) =>
-  new Promise((resolve, reject) => {
+const readFile = (filePath, enc) => {
+  return new Promise((resolve, reject) => {
     fs.readFile(filePath, enc, (err, data) => {
       if (err) {
         reject(err);
@@ -78,6 +80,7 @@ const readFile = (filePath, enc) =>
       }
     });
   });
+};
 
 const readNthLines = async (filePath, lineNumber, numberOfLines) => {
   let i;
