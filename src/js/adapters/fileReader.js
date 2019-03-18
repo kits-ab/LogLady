@@ -17,7 +17,6 @@ const seeMeFile = './src/testFileForWatch.log';
 // });
 // const nthLine = require('nthline');
 // const alwaysTail = require('always-tail');
-const watcher = require('chokidar');
 
 // const writeStream = fs.createWriteStream('./src/resources/myLittleFile.txt');
 // writeStream.once('open', fd => {
@@ -42,19 +41,44 @@ const readLastLines = (filePath, numberOfLines) => {
 };
 
 const readLinesLive = filePath => {
-  readLastLines(filePath, 10).then(lines => {
-    console.log(lines);
+  // readLastLines(filePath, 10).then(lines => {
+  //   console.log(lines);
+  // });
+  let chars = 0;
+  let lastIndex = 0;
+  let readStream = fs
+    .createReadStream(filePath)
+    .setEncoding('utf8')
+    .on('data', buffer => {
+      lastIndex += buffer.lastIndexOf('\n');
+      // lastIndex += chars;
+    })
+    .on('end', () => {
+      console.log('lastIndex: ', lastIndex);
+    })
+    .on('error', err => {
+      throw new Error(err);
+    });
+  let watcher = chokidar.watch(filePath).on('change', (event, path) => {
+    let readStreamFromLastIndex = fs
+      .createReadStream(filePath, {
+        start: lastIndex + 1
+      })
+      .setEncoding('utf8');
+    readStreamFromLastIndex.on('data', buffer => {
+      console.log(buffer.subString(0, buffer.to.lastIndexOf('\n')));
+      lastIndex += buffer.lastIndexOf('\n');
+    });
   });
-  watcher.watch(filePath).on('all', (event, path) => {});
 };
-// readLinesLive('./src/resources/myLittleFile.txt');
+readLinesLive('./src/resources/myLittleFile.txt');
 
 const getNumberOfLines = filePath => {
   return new Promise((resolve, reject) => {
     let lineCount = 0;
+    let idx = -1;
     fs.createReadStream(filePath)
       .on('data', buffer => {
-        let idx = -1;
         lineCount--;
         do {
           idx = buffer.indexOf(10, idx + 1);
@@ -62,6 +86,8 @@ const getNumberOfLines = filePath => {
         } while (idx !== -1);
       })
       .on('end', () => {
+        console.log('idx: ', idx);
+        console.log('lineCount: ', lineCount);
         resolve(lineCount);
       })
       .on('error', err => {
@@ -69,6 +95,7 @@ const getNumberOfLines = filePath => {
       });
   });
 };
+// getNumberOfLines('src/resources/myLittleFile.txt');
 
 const readFile = (filePath, enc) => {
   return new Promise((resolve, reject) => {
