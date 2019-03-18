@@ -17,7 +17,7 @@
     "nthline": "^1.0.1",
     "react": "^16.8.2",
     "react-dom": "^16.8.2",
-    "react-scripts": "2.1.5",
+    "react-scripts": "^2.1.8",
     "read-last-lines": "^1.6.0",
     "wait-on": "^3.2.0"
   },
@@ -42,7 +42,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron-dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron-pack": "build -lmw -c.extraMetadata.main=build/electron.js",
+    "electron-pack": "build -l -c.extraMetadata.main=build/electron.js",
     "preelectron-pack": "npm run build"
   },
   "repository": {
@@ -64,6 +64,7 @@
   "build": {
     "appId": "com.example.electron-cra",
     "files": [
+      "src/**/*",
       "build/**/*",
       "node_modules/**/*"
     ],
