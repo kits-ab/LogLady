@@ -13,7 +13,6 @@ global.require = electron => {
       },
       once: (eventName, handler) => {
         console.log('once', eventName, handler);
-      }
     }
   }
 });
