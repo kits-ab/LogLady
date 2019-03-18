@@ -4,19 +4,6 @@ const notifier = require('node-notifier');
 const chokidar = require('chokidar');
 const nthLine = require('nthline');
 const seeMeFile = './src/testFileForWatch.log';
-
-// chokidar.watch(seeMeFile).on('all', (event, path) => {
-//   console.log(event, path);
-
-//   if (event === 'change') {
-//     notifier.notify({
-//       title: 'Note',
-//       message: 'change in file'
-//     });
-//   }
-// });
-// const nthLine = require('nthline');
-// const alwaysTail = require('always-tail');
 const watcher = require('chokidar');
 
 // const writeStream = fs.createWriteStream('./src/resources/myLittleFile.txt');
@@ -27,29 +14,20 @@ const watcher = require('chokidar');
 //   writeStream.end();
 // });
 
-// const startAlwaysTail = filePath => {
-//   let tail = new alwaysTail(filePath, '\n', { interval: 500 });
-//   tail.on('line', line => {
-//     console.log(line);
-//   });
-//   tail.on('error', err => {
-//     console.log(err);
-//   });
-// };
-
-const readLastLines = (filePath, numberOfLines) =>
-  lastLines.read(filePath, numberOfLines);
+const readLastLines = (filePath, numberOfLines) => {
+  return lastLines.read(filePath, numberOfLines);
+};
 
 const readLinesLive = filePath => {
-  readLastLines(filePath, 10).then(lines => {
+  return readLastLines(filePath, 10).then(lines => {
     console.log(lines);
   });
   watcher.watch(filePath).on('all', (event, path) => {});
 };
 // readLinesLive('./src/resources/myLittleFile.txt');
 
-const getNumberOfLines = filePath =>
-  new Promise((resolve, reject) => {
+const getNumberOfLines = filePath => {
+  return new Promise((resolve, reject) => {
     let lineCount = 0;
     fs.createReadStream(filePath)
       .on('data', buffer => {
@@ -67,9 +45,10 @@ const getNumberOfLines = filePath =>
         reject(err);
       });
   });
+};
 
-const readFile = (filePath, enc) =>
-  new Promise((resolve, reject) => {
+const readFile = (filePath, enc) => {
+  return new Promise((resolve, reject) => {
     fs.readFile(filePath, enc, (err, data) => {
       if (err) {
         reject(err);
@@ -78,6 +57,7 @@ const readFile = (filePath, enc) =>
       }
     });
   });
+};
 
 const readNthLines = async (filePath, lineNumber, numberOfLines) => {
   let i;
