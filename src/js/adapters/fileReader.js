@@ -66,8 +66,8 @@ const readLinesLive = filePath => {
       })
       .setEncoding('utf8');
     readStreamFromLastIndex.on('data', buffer => {
-      console.log(buffer.subString(0, buffer.to.lastIndexOf('\n')));
-      lastIndex += buffer.lastIndexOf('\n');
+      lastIndex += buffer.lastIndexOf('\n') + 1;
+      console.log(buffer);
     });
   });
 };
