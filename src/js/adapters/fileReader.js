@@ -5,19 +5,6 @@ const chokidar = require('chokidar');
 const nthLine = require('nthline');
 const seeMeFile = './src/testFileForWatch.log';
 
-// chokidar.watch(seeMeFile).on('all', (event, path) => {
-//   console.log(event, path);
-
-//   if (event === 'change') {
-//     notifier.notify({
-//       title: 'Note',
-//       message: 'change in file'
-//     });
-//   }
-// });
-// const nthLine = require('nthline');
-// const alwaysTail = require('always-tail');
-
 // const writeStream = fs.createWriteStream('./src/resources/myLittleFile.txt');
 // writeStream.once('open', fd => {
 //   for (let i = 1; i < 1000001; i++) {
@@ -25,16 +12,6 @@ const seeMeFile = './src/testFileForWatch.log';
 //   }
 //   writeStream.end();
 // });
-
-// const startAlwaysTail = filePath => {
-//   let tail = new alwaysTail(filePath, '\n', { interval: 500 });
-//   tail.on('line', line => {
-//     console.log(line);
-//   });
-//   tail.on('error', err => {
-//     console.log(err);
-//   });
-// };
 
 const readLastLines = (filePath, numberOfLines) => {
   return lastLines.read(filePath, numberOfLines);
@@ -59,19 +36,31 @@ const readLinesLive = filePath => {
     .on('error', err => {
       throw new Error(err);
     });
-  let watcher = chokidar.watch(filePath).on('change', (event, path) => {
+  let watcher = chokidar.watch(filePath).on('change', (event, path, stats) => {
+    // console.log('stats: ', stats);
+    // var watchSize = 0;
+    // if (stats && stats.size !== watchSize) {
+    // watchSize = stats.size;
     let readStreamFromLastIndex = fs
       .createReadStream(filePath, {
-        start: lastIndex + 1
+        start: lastIndex
       })
       .setEncoding('utf8');
     readStreamFromLastIndex.on('data', buffer => {
-      lastIndex += buffer.lastIndexOf('\n') + 1;
-      console.log(buffer);
+      lastIndex += buffer.lastIndexOf('\n');
+      let lines = '';
+      if (buffer.split('\n')[0] === '') {
+        lines = buffer.slice(1, buffer.lastIndexOf('\n'));
+      } else {
+        lines = buffer.slice(0, buffer.lastIndexOf('\n'));
+      }
+      console.log(lines);
     });
+    // }
   });
 };
-readLinesLive('./src/resources/myLittleFile.txt');
+// readLinesLive('./src/resources/myLittleFile.txt');
+// readLinesLive('../lologoggenerator/app/lologog/testLog.txt');
 
 const getNumberOfLines = filePath => {
   return new Promise((resolve, reject) => {
