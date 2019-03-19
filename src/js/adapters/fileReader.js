@@ -22,16 +22,16 @@ const readLinesLive = filePath => {
   //   console.log(lines);
   // });
   let chars = 0;
-  let lastIndex = 0;
+  let lastNewlineIndex = 0;
   let readStream = fs
     .createReadStream(filePath)
     .setEncoding('utf8')
     .on('data', buffer => {
-      lastIndex += buffer.lastIndexOf('\n');
+      lastNewlineIndex += buffer.lastIndexOf('\n');
       // lastIndex += chars;
     })
     .on('end', () => {
-      console.log('lastIndex: ', lastIndex);
+      console.log('lastNewlineIndex: ', lastNewlineIndex);
     })
     .on('error', err => {
       throw new Error(err);
@@ -43,11 +43,11 @@ const readLinesLive = filePath => {
     // watchSize = stats.size;
     let readStreamFromLastIndex = fs
       .createReadStream(filePath, {
-        start: lastIndex
+        start: lastNewlineIndex
       })
       .setEncoding('utf8');
     readStreamFromLastIndex.on('data', buffer => {
-      lastIndex += buffer.lastIndexOf('\n');
+      lastNewlineIndex += buffer.lastIndexOf('\n');
       let lines = '';
       if (buffer.split('\n')[0] === '') {
         lines = buffer.slice(1, buffer.lastIndexOf('\n'));
