@@ -15,11 +15,20 @@ class App extends Component {
       lastLines: '',
       nthLines: '',
       time: '',
-      numberOfLines: ''
+      numberOfLines: '',
+      liveLines: 'hej',
+      autoScroll: true
     };
 
     this.ipcContainer();
   }
+
+  setLiveLines = _returnValue => {
+    this.setState({
+      liveLines: this.state.liveLines + '\n' + _returnValue
+    });
+  };
+
   setLastLines = _returnValue => {
     this.setState({
       lastLines: _returnValue
@@ -62,6 +71,14 @@ class App extends Component {
       this.setTime(time);
     });
 
+    //comment out next line if not using lologoggenerator
+    argObj.filePath = '../lologoggenerator/app/lologog/testLog.txt';
+    ipcRenderer.send('getLiveLines', argObj);
+
+    ipcRenderer.on('liveLines', (event, lines) => {
+      this.setLiveLines(lines);
+    });
+
     ipcRenderer.send('getNumberOfLines', argObj);
 
     ipcRenderer.once('numberOfLines', (event, numberOfLines) => {
@@ -81,9 +98,23 @@ class App extends Component {
     ipcRenderer.once('lastLines', (event, lastLines) => {
       this.setLastLines(lastLines);
     });
+
+    window.addEventListener('keydown', e => {
+      if (e.keyCode === 32) {
+        this.handleAutoScroll();
+      }
+    });
+  };
+
+  handleAutoScroll = () => {
+    this.setState({
+      autoScroll: !this.state.autoScroll
+    });
   };
 
   render() {
+    this.state.autoScroll && window.scrollTo(0, document.body.scrollHeight);
+
     return (
       <div>
         {
@@ -97,6 +128,7 @@ class App extends Component {
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
         <pre>{this.state.nthLines}</pre>
+        <pre>Get live lives: {this.state.liveLines}</pre>
         <Statusbar>
           <ul>
             <li>filePath</li>
