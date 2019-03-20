@@ -5,7 +5,8 @@ const path = require('path');
 const isDev = require('electron-is-dev');
 const updater = require('electron-simple-updater');
 const engine = require('../src/js/engine/engine');
-
+const createMenu = require('../src/js/view/menu');
+const { Menu } = require('electron');
 updater.init();
 
 console.log(updater.version);
@@ -27,8 +28,7 @@ const createWindow = () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-
-  require('../src/js/view/menu');
+  Menu.setApplicationMenu(createMenu.createMenu());
 };
 
 app.on('ready', createWindow);

@@ -72,7 +72,7 @@ class App extends Component {
     });
 
     //comment out next line if not using lologoggenerator
-    argObj.filePath = '../lologoggenerator/app/lologog/testLog.txt';
+    argObj.filePath = 'src/resources/myLittleFile.txt';
     ipcRenderer.send('getLiveLines', argObj);
 
     ipcRenderer.on('liveLines', (event, lines) => {
