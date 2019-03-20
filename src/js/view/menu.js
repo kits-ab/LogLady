@@ -1,11 +1,10 @@
 const { Menu } = require('electron');
 const { dialog } = require('electron');
+const { EventEmitter } = require('events');
+
+const menuEvents = new EventEmitter();
 
 const createMenu = () => {
-  let killMe;
-  const test = killMe => {
-    console.log(killMe, '---->outside template');
-  };
   const template = [
     {
       label: 'LogLady',
@@ -40,9 +39,7 @@ const createMenu = () => {
                 properties: ['openFile', 'multiSelections']
               },
               filePath => {
-                console.log(filePath, '----> inside click()');
-                killMe = filePath;
-                test(killMe);
+                menuEvents.emit('filePath', filePath);
               }
             );
           }
@@ -167,5 +164,6 @@ const createMenu = () => {
 };
 
 module.exports = {
-  createMenu: createMenu
+  createMenu: createMenu,
+  menuEvents: menuEvents
 };
