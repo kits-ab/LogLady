@@ -5,8 +5,8 @@ const chokidar = require('chokidar');
 const nthLine = require('nthline');
 const seeMeFile = './src/testFileForWatch.log';
 const { EventEmitter } = require('events');
-
 const fileReaderEvents = new EventEmitter();
+const watcher = require('chokidar');
 
 // const writeStream = fs.createWriteStream('./src/resources/myLittleFile.txt');
 // writeStream.once('open', fd => {

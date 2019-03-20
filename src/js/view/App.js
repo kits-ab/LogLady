@@ -1,8 +1,11 @@
-import { throws } from 'assert';
-
+import { Statusbar, SettingIcon } from './Container';
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
+const settings = require('../../resources/settings.png');
+const error = require('../../resources/error.png');
+const warning = require('../../resources/warning.png');
+const info = require('../../resources/info.png');
 
 class App extends Component {
   constructor(props) {
@@ -114,11 +117,11 @@ class App extends Component {
 
     return (
       <div>
-        <p>hej värld</p>
-        <p>
-          Our listener can be live (and can keep up with ms): {this.state.time}{' '}
-        </p>
-        <p>Get number of lines: {this.state.numberOfLines}</p>
+        {
+          //<p>
+          // Our listener can be live (and can keep up with ms): {this.state.time}{' '}
+          //</p>
+        }
         <p>Get last lines: {this.state.lastLines}</p>
         <p>
           Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
@@ -126,6 +129,31 @@ class App extends Component {
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
         <pre>{this.state.nthLines}</pre>
         <pre>Get live lives: {this.state.liveLines}</pre>
+        <Statusbar>
+          <ul>
+            <li>filePath</li>
+
+            <li>lines:{this.state.numberOfLines}</li>
+
+            <li>Storlek</li>
+
+            <li>
+              <img src={error} alt="error" /> : 1{' '}
+            </li>
+
+            <li>
+              <img src={warning} alt="warnings" /> : 10
+            </li>
+
+            <li>
+              <img src={info} alt="info" /> : 5{' '}
+            </li>
+
+            <li>
+              <SettingIcon src={settings} alt="settings" />
+            </li>
+          </ul>
+        </Statusbar>
       </div>
     );
   }
