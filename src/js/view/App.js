@@ -17,10 +17,11 @@ class App extends Component {
       time: '',
       numberOfLines: '',
       liveLines: 'hej',
-      autoScroll: true
+      autoScroll: true,
+      filePath: ''
     };
 
-    this.ipcContainer();
+    this.startListener();
   }
 
   setLiveLines = _returnValue => {
@@ -57,10 +58,24 @@ class App extends Component {
     });
   };
 
+  setFilePath = _returnValue => {
+    this.setState({
+      filePath: _returnValue
+    });
+  };
+
+  startListener = () => {
+    ipcRenderer.on('filePath', (event, filePath) => {
+      this.setFilePath(filePath.toString());
+      this.ipcContainer();
+    });
+  };
+
   ipcContainer = () => {
+    console.log('filepath: ', this.state.filePath);
     //Create an object and pass it as arg to ipcRenderer.send()
     let argObj = {};
-    argObj.filePath = 'src/resources/myLittleFile.txt';
+    argObj.filePath = this.state.filePath;
     argObj.numberOfLines = 5;
     argObj.lineNumber = 10;
 
@@ -72,7 +87,7 @@ class App extends Component {
     });
 
     //comment out next line if not using lologoggenerator
-    argObj.filePath = '../lologoggenerator/app/lologog/testLog.txt';
+    // argObj.filePath = 'src/resources/myLittleFile.txt';
     ipcRenderer.send('getLiveLines', argObj);
 
     ipcRenderer.on('liveLines', (event, lines) => {
@@ -131,7 +146,7 @@ class App extends Component {
         <pre>Get live lives: {this.state.liveLines}</pre>
         <Statusbar>
           <ul>
-            <li>filePath</li>
+            <li>filePath: {this.state.filePath}</li>
 
             <li>lines:{this.state.numberOfLines}</li>
 
