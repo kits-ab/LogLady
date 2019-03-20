@@ -1,3 +1,5 @@
+import { throws } from 'assert';
+
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
@@ -10,11 +12,20 @@ class App extends Component {
       lastLines: '',
       nthLines: '',
       time: '',
-      numberOfLines: ''
+      numberOfLines: '',
+      liveLines: 'hej',
+      autoScroll: true
     };
 
     this.ipcContainer();
   }
+
+  setLiveLines = _returnValue => {
+    this.setState({
+      liveLines: this.state.liveLines + '\n' + _returnValue
+    });
+  };
+
   setLastLines = _returnValue => {
     this.setState({
       lastLines: _returnValue
@@ -43,6 +54,12 @@ class App extends Component {
     });
   };
 
+  gobottom = () => {
+    var documentHeight = document.documentElement.offsetHeight;
+    var viewportHeight = window.innerHeight;
+    window.scrollTo(0, documentHeight - viewportHeight);
+  };
+
   ipcContainer = () => {
     //Create an object and pass it as arg to ipcRenderer.send()
     let argObj = {};
@@ -55,6 +72,14 @@ class App extends Component {
 
     ipcRenderer.on('theTime', (event, time) => {
       this.setTime(time);
+    });
+
+    //comment out next line if not using lologoggenerator
+    argObj.filePath = '../lologoggenerator/app/lologog/testLog.txt';
+    ipcRenderer.send('getLiveLines', argObj);
+
+    ipcRenderer.on('liveLines', (event, lines) => {
+      this.setLiveLines(lines);
     });
 
     ipcRenderer.send('getNumberOfLines', argObj);
@@ -76,9 +101,23 @@ class App extends Component {
     ipcRenderer.once('lastLines', (event, lastLines) => {
       this.setLastLines(lastLines);
     });
+
+    window.addEventListener('keydown', e => {
+      if (e.keyCode === 32) {
+        this.handleAutoScroll();
+      }
+    });
+  };
+
+  handleAutoScroll = () => {
+    this.setState({
+      autoScroll: !this.state.autoScroll
+    });
   };
 
   render() {
+    this.state.autoScroll && window.scrollTo(0, document.body.scrollHeight);
+
     return (
       <div>
         <p>hej värld</p>
@@ -92,6 +131,7 @@ class App extends Component {
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
         <pre>{this.state.nthLines}</pre>
+        <pre>Get live lives: {this.state.liveLines}</pre>
       </div>
     );
   }

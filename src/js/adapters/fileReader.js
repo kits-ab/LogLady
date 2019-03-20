@@ -4,6 +4,9 @@ const notifier = require('node-notifier');
 const chokidar = require('chokidar');
 const nthLine = require('nthline');
 const seeMeFile = './src/testFileForWatch.log';
+const { EventEmitter } = require('events');
+
+const fileReaderEvents = new EventEmitter();
 
 // const writeStream = fs.createWriteStream('./src/resources/myLittleFile.txt');
 // writeStream.once('open', fd => {
@@ -18,24 +21,25 @@ const readLastLines = (filePath, numberOfLines) => {
 };
 
 const readLinesLive = filePath => {
-  // readLastLines(filePath, 10).then(lines => {
-  //   console.log(lines);
-  // });
-  let chars = 0;
+  //begin by reading and emitting the last 10 lines
+  readLastLines(filePath, 10).then(lines => {
+    fileReaderEvents.emit('liveLines', lines);
+  });
+  //find and save the index of the last newline characters
   let lastNewlineIndex = 0;
-  let readStream = fs
-    .createReadStream(filePath)
+  fs.createReadStream(filePath)
     .setEncoding('utf8')
     .on('data', buffer => {
       lastNewlineIndex += buffer.lastIndexOf('\n');
-      // lastIndex += chars;
     })
     .on('end', () => {
-      console.log('lastNewlineIndex: ', lastNewlineIndex);
+      // console.log('lastNewlineIndex: ', lastNewlineIndex);
     })
     .on('error', err => {
       throw new Error(err);
     });
+  //start a watcher and read the new lines starting from the last newline index
+  //whenever there is a change to the file.
   let watcher = chokidar.watch(filePath).on('change', (event, path, stats) => {
     // console.log('stats: ', stats);
     // var watchSize = 0;
@@ -54,7 +58,8 @@ const readLinesLive = filePath => {
       } else {
         lines = buffer.slice(0, buffer.lastIndexOf('\n'));
       }
-      console.log(lines);
+      // console.log(lines);
+      fileReaderEvents.emit('liveLines', lines);
     });
     // }
   });
@@ -75,8 +80,8 @@ const getNumberOfLines = filePath => {
         } while (idx !== -1);
       })
       .on('end', () => {
-        console.log('idx: ', idx);
-        console.log('lineCount: ', lineCount);
+        // console.log('idx: ', idx);
+        // console.log('lineCount: ', lineCount);
         resolve(lineCount);
       })
       .on('error', err => {
@@ -146,5 +151,7 @@ module.exports = {
   readFile: readFile,
   readLastLines: readLastLines,
   getNumberOfLines: getNumberOfLines,
-  readNthLines: readNthLines
+  readNthLines: readNthLines,
+  readLinesLive: readLinesLive,
+  fileReaderEvents: fileReaderEvents
 };

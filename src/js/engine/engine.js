@@ -12,11 +12,19 @@ ipcMain.on('getTime', (event, time) => {
   }, 1000);
 });
 
+ipcMain.on('getLiveLines', (event, argObj) => {
+  fileReader.readLinesLive(argObj.filePath);
+  fileReader.fileReaderEvents.on('liveLines', lines => {
+    // console.log('live engine.js: ', lines);
+    event.sender.send('liveLines', lines);
+  });
+});
+
 ipcMain.once('getLastLines', (event, lastLines) => {
   fileReader
     .readLastLines(lastLines.filePath, lastLines.numberOfLines)
     .then(lines => {
-      console.log(lines);
+      // console.log(lines);
       event.sender.send('lastLines', lines);
     });
 });
@@ -29,7 +37,7 @@ ipcMain.once('getNthLines', (event, nthLines) => {
       nthLines.numberOfLines
     )
     .then(lines => {
-      console.log(lines);
+      // console.log(lines);
       event.sender.send('nthLines', lines);
     });
 });
