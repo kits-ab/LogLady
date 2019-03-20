@@ -54,12 +54,6 @@ class App extends Component {
     });
   };
 
-  gobottom = () => {
-    var documentHeight = document.documentElement.offsetHeight;
-    var viewportHeight = window.innerHeight;
-    window.scrollTo(0, documentHeight - viewportHeight);
-  };
-
   ipcContainer = () => {
     //Create an object and pass it as arg to ipcRenderer.send()
     let argObj = {};
