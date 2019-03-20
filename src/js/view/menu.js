@@ -153,7 +153,9 @@ const createMenu = () => {
         {
           label: 'Learn More',
           click() {
-            require('electron').shell.openExternal('http://electron.atom.io');
+            require('electron').shell.openExternal(
+              'https://kits.se/om/akarkhatab'
+            );
           }
         }
       ]
