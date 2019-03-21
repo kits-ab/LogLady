@@ -1,9 +1,5 @@
-const { fork } = require('child_process');
-const { EventEmitter } = require('events');
 const fileReader = require('../adapters/fileReader');
 const { ipcMain } = require('electron');
-
-const events = new EventEmitter();
 
 ipcMain.on('getTime', (event, time) => {
   setInterval(() => {
@@ -46,4 +42,15 @@ ipcMain.once('getNumberOfLines', (event, numberOfLines) => {
   fileReader.getNumberOfLines(numberOfLines.filePath).then(lines => {
     event.sender.send('numberOfLines', lines);
   });
+});
+
+ipcMain.once('getFileSize', (event, argObj) => {
+  fileReader
+    .getFileSizeInBytes(argObj.filePath)
+    .then(size => {
+      event.sender.send('fileSize', size);
+    })
+    .catch(err => {
+      event.sender.send('error', err);
+    });
 });
