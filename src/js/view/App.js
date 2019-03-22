@@ -16,9 +16,10 @@ class App extends Component {
       nthLines: '',
       time: '',
       numberOfLines: '',
-      liveLines: 'hej',
+      liveLines: '',
       autoScroll: true,
-      filePath: ''
+      filePath: '',
+      fileSize: ''
     };
 
     this.startListener();
@@ -40,7 +41,6 @@ class App extends Component {
     this.setState({
       nthLines: _returnValue
     });
-    //console.log('nth Lines: ', this.state.nthLines);
   };
 
   setTime = _returnValue => {
@@ -61,6 +61,12 @@ class App extends Component {
   setFilePath = _returnValue => {
     this.setState({
       filePath: _returnValue
+    });
+  };
+
+  setFileSize = _returnValue => {
+    this.setState({
+      fileSize: _returnValue
     });
   };
 
@@ -114,6 +120,11 @@ class App extends Component {
       this.setLastLines(lastLines);
     });
 
+    ipcRenderer.send('getFileSize', argObj);
+    ipcRenderer.once('fileSize', (event, size) => {
+      this.setFileSize(size);
+    });
+
     window.addEventListener('keydown', e => {
       if (e.keyCode === 32) {
         this.handleAutoScroll();
@@ -143,14 +154,14 @@ class App extends Component {
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
         <pre>{this.state.nthLines}</pre>
-        <pre>Get live lives: {this.state.liveLines}</pre>
+        <pre>Get live lines: {this.state.liveLines}</pre>
         <Statusbar>
           <ul>
             <li>filePath: {this.state.filePath}</li>
 
             <li>lines:{this.state.numberOfLines}</li>
 
-            <li>Storlek</li>
+            <li>Storlek: {this.state.fileSize}</li>
 
             <li>
               <img src={error} alt="error" /> : 1{' '}

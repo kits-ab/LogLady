@@ -3,7 +3,6 @@ const lastLines = require('read-last-lines');
 const notifier = require('node-notifier');
 const chokidar = require('chokidar');
 const nthLine = require('nthline');
-const seeMeFile = './src/testFileForWatch.log';
 const { EventEmitter } = require('events');
 const fileReaderEvents = new EventEmitter();
 const watcher = require('chokidar');
@@ -23,7 +22,7 @@ const readLastLines = (filePath, numberOfLines) => {
 const readLinesLive = filePath => {
   //begin by reading and emitting the last 10 lines
   readLastLines(filePath, 10).then(lines => {
-    fileReaderEvents.emit('liveLines', lines);
+    fileReaderEvents.emit('liveLines', lines.slice(0, lines.lastIndexOf('\n')));
   });
   //find and save the index of the last newline characters
   let lastNewlineIndex = 0;
@@ -33,14 +32,15 @@ const readLinesLive = filePath => {
       lastNewlineIndex += buffer.lastIndexOf('\n');
     })
     .on('end', () => {
-      // console.log('lastNewlineIndex: ', lastNewlineIndex);
+      console.log('lastNewlineIndex: ', lastNewlineIndex);
     })
     .on('error', err => {
       throw new Error(err);
     });
   //start a watcher and read the new lines starting from the last newline index
   //whenever there is a change to the file.
-  let watcher = chokidar.watch(filePath).on('change', (event, path, stats) => {
+  let watcher = chokidar.watch(filePath).on('change', (event, path) => {
+    console.log('watcher started.');
     // console.log('stats: ', stats);
     // var watchSize = 0;
     // if (stats && stats.size !== watchSize) {
@@ -58,7 +58,7 @@ const readLinesLive = filePath => {
       } else {
         lines = buffer.slice(0, buffer.lastIndexOf('\n'));
       }
-      // console.log(lines);
+      console.log('FR: ', lines);
       fileReaderEvents.emit('liveLines', lines);
     });
     // }
@@ -112,40 +112,18 @@ const readNthLines = async (filePath, lineNumber, numberOfLines) => {
   if (lines !== null) {
     return lines;
   } else {
-    return 'Error occured.';
+    throw new Error('Lines are null.');
   }
 };
 
-// //Call on getNumberOfLines
-// getNumberOfLines('myLittleFile.txt').then(lineCount => {
-//   console.log(lineCount);
-// });
-
-//Call on readFile
-// readFile('./src/myLittleFile.txt', null)
-//   .then(data => {
-//     console.log(data);
-//   })
-//   .catch(err => {
-//     console.log(err);
-//   });
-
-// //Call on readLastLinesa
-// readLastLines('myLittleFile.txt', 5)
-//   .then(lines => {
-//     console.log(lines);
-//   })
-//   .catch(err => {
-//     console.log(err);
-//   });
-
-// //Call on readNthLines
-// readNthLines('./src/resources/myLittleFile.txt', 1, 15).then(lines => {
-//   console.log(JSON.stringify(lines, null, 2));
-// });
-
-//Call on startAlwaysTail
-// startAlwaysTail('./src/resources/myLittleFile.txt');
+const getFileSizeInBytes = async filePath => {
+  try {
+    const fileSizeInBytes = fs.statSync(filePath).size;
+    return fileSizeInBytes;
+  } catch (e) {
+    throw new Error(e);
+  }
+};
 
 module.exports = {
   readFile: readFile,
@@ -153,5 +131,6 @@ module.exports = {
   getNumberOfLines: getNumberOfLines,
   readNthLines: readNthLines,
   readLinesLive: readLinesLive,
-  fileReaderEvents: fileReaderEvents
+  fileReaderEvents: fileReaderEvents,
+  getFileSizeInBytes: getFileSizeInBytes
 };
