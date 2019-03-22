@@ -1,4 +1,5 @@
 import { Statusbar, SettingIcon } from './Container';
+import Highlight from './components/Hightlight';
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
@@ -16,7 +17,7 @@ class App extends Component {
       nthLines: '',
       time: '',
       numberOfLines: '',
-      liveLines: 'hej',
+      liveLines: '',
       autoScroll: true,
       filePath: ''
     };
@@ -144,6 +145,7 @@ class App extends Component {
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
         <pre>{this.state.nthLines}</pre>
         <pre>Get live lives: {this.state.liveLines}</pre>
+        <Highlight rows={this.state.liveLines} />
         <Statusbar>
           <ul>
             <li>filePath: {this.state.filePath}</li>
