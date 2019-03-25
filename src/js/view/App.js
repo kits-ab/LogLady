@@ -1,4 +1,4 @@
-import { Statusbar, SettingIcon, Settings } from './Container';
+import { Statusbar, SettingIcon } from './Container';
 import TabSettings from './TabSettings';
 
 const React = require('react');
@@ -9,7 +9,6 @@ const error = require('../../resources/error.png');
 const warning = require('../../resources/warning.png');
 const info = require('../../resources/info.png');
 
-let index = 1;
 class App extends Component {
   constructor(props) {
     super(props);
