@@ -1,4 +1,6 @@
-import { Statusbar, SettingIcon } from './Container';
+import { Statusbar, SettingIcon, Settings } from './Container';
+import TabSettings from './TabSettings';
+
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
@@ -7,6 +9,7 @@ const error = require('../../resources/error.png');
 const warning = require('../../resources/warning.png');
 const info = require('../../resources/info.png');
 
+let index = 1;
 class App extends Component {
   constructor(props) {
     super(props);
@@ -18,11 +21,17 @@ class App extends Component {
       numberOfLines: '',
       liveLines: 'hej',
       autoScroll: true,
-      filePath: ''
+      filePath: '',
+      showSettings: false
     };
 
     this.startListener();
   }
+  onTabChange = activeKey => {
+    this.setState({
+      activeKey
+    });
+  };
 
   setLiveLines = _returnValue => {
     this.setState({
@@ -127,6 +136,12 @@ class App extends Component {
     });
   };
 
+  settingClick = () => {
+    this.setState({
+      showSettings: !this.state.showSettings
+    });
+  };
+
   render() {
     this.state.autoScroll && window.scrollTo(0, document.body.scrollHeight);
 
@@ -144,6 +159,7 @@ class App extends Component {
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
         <pre>{this.state.nthLines}</pre>
         <pre>Get live lives: {this.state.liveLines}</pre>
+        {this.state.showSettings ? <TabSettings /> : null}
         <Statusbar>
           <ul>
             <li>filePath: {this.state.filePath}</li>
@@ -165,7 +181,13 @@ class App extends Component {
             </li>
 
             <li>
-              <SettingIcon src={settings} alt="settings" />
+              <SettingIcon
+                src={settings}
+                onClick={() => {
+                  this.settingClick();
+                }}
+                alt="settings"
+              />
             </li>
           </ul>
         </Statusbar>
