@@ -19,7 +19,8 @@ class App extends Component {
       numberOfLines: '',
       liveLines: '',
       autoScroll: true,
-      filePath: ''
+      filePath: '',
+      fileSize: ''
     };
 
     this.startListener();
@@ -41,7 +42,6 @@ class App extends Component {
     this.setState({
       nthLines: _returnValue
     });
-    //console.log('nth Lines: ', this.state.nthLines);
   };
 
   setTime = _returnValue => {
@@ -62,6 +62,12 @@ class App extends Component {
   setFilePath = _returnValue => {
     this.setState({
       filePath: _returnValue
+    });
+  };
+
+  setFileSize = _returnValue => {
+    this.setState({
+      fileSize: _returnValue
     });
   };
 
@@ -115,6 +121,11 @@ class App extends Component {
       this.setLastLines(lastLines);
     });
 
+    ipcRenderer.send('getFileSize', argObj);
+    ipcRenderer.once('fileSize', (event, size) => {
+      this.setFileSize(size);
+    });
+
     window.addEventListener('keydown', e => {
       if (e.keyCode === 32) {
         this.handleAutoScroll();
@@ -151,7 +162,7 @@ class App extends Component {
 
             <li>lines:{this.state.numberOfLines}</li>
 
-            <li>Storlek</li>
+            <li>Storlek: {this.state.fileSize}</li>
 
             <li>
               <img src={error} alt="error" /> : 1{' '}
