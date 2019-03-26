@@ -8,7 +8,7 @@ class LogViewer extends React.Component {
     this.state = {
       lineFilterText: '',
       textToHighlight: '',
-      highlightColor: ''
+      highlightColor: 'red'
     };
   }
 
@@ -55,22 +55,30 @@ class LogViewer extends React.Component {
           placeholder="highlight"
           onChange={this.onHighlightInput}
         />
-        {lines &&
-          lines.map((line, i) => {
-            return (
-              <p
-                style={
-                  line.match(this.state.textToHighlight) &&
-                  this.state.textToHighlight
-                    ? { background: this.state.highlightColor }
-                    : {}
-                }
-                key={i}
-              >
-                {line}
-              </p>
-            );
-          })}
+        <div
+          style={{
+            overflow: 'auto',
+            height: '300px',
+            border: '1px black solid'
+          }}
+        >
+          {lines &&
+            lines.map((line, i) => {
+              return (
+                <p
+                  style={
+                    line.match(this.state.textToHighlight) &&
+                    this.state.textToHighlight
+                      ? { background: this.state.highlightColor }
+                      : {}
+                  }
+                  key={i}
+                >
+                  {line}
+                </p>
+              );
+            })}
+        </div>
       </div>
     );
   }

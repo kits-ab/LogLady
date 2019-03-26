@@ -1,4 +1,3 @@
-
 import { Statusbar, SettingIcon, Wrapper } from './Container';
 import TabSettings from './TabSettings';
 import LogViewer from './components/LogViewer';
@@ -163,13 +162,13 @@ class App extends Component {
           // Our listener can be live (and can keep up with ms): {this.state.time}{' '}
           //</p>
         }
-        <p>Get last lines: {this.state.lastLines}</p>
+        {/* <p>Get last lines: {this.state.lastLines}</p>
         <p>
           Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
         {this.state.showSettings ? <TabSettings /> : null}
-        <pre>{this.state.nthLines}</pre>
+        <pre>{this.state.nthLines}</pre> */}
         <LogViewer lines={this.state.liveLines} />
         <Statusbar>
           <ul>
