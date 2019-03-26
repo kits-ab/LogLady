@@ -1,5 +1,5 @@
 import { Statusbar, SettingIcon } from './Container';
-import LineFilter from './components/LineFilter';
+import LogViewer from './components/LogViewer';
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
@@ -18,7 +18,7 @@ class App extends Component {
       time: '',
       numberOfLines: '',
       liveLines: '',
-      autoScroll: true,
+      autoScroll: false,
       filePath: '',
       fileSize: ''
     };
@@ -93,8 +93,6 @@ class App extends Component {
       this.setTime(time);
     });
 
-    //comment out next line if not using lologoggenerator
-    // argObj.filePath = 'src/resources/myLittleFile.txt';
     ipcRenderer.send('getLiveLines', argObj);
 
     ipcRenderer.on('liveLines', (event, lines) => {
@@ -155,7 +153,7 @@ class App extends Component {
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
         <pre>{this.state.nthLines}</pre>
-        <LineFilter lines={this.state.liveLines} />
+        <LogViewer lines={this.state.liveLines} />
         <Statusbar>
           <ul>
             <li>filePath: {this.state.filePath}</li>
