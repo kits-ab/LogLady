@@ -1,5 +1,6 @@
 import { Statusbar, SettingIcon } from './Container';
 import LineFilter from './components/LineFilter';
+import Highlight from './components/Highlight';
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
@@ -156,6 +157,7 @@ class App extends Component {
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
         <pre>{this.state.nthLines}</pre>
         <LineFilter lines={this.state.liveLines} />
+        <Highlight />
         <Statusbar>
           <ul>
             <li>filePath: {this.state.filePath}</li>

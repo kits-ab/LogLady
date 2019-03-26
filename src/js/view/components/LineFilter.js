@@ -4,7 +4,7 @@ import { findMatches } from './lineFilter_helper';
 class LineFilter extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { LineFilterText: '' };
+    this.state = { LineFilterText: '', highlightText: '' };
   }
 
   onLineFilterInput = event => {
@@ -19,6 +19,10 @@ class LineFilter extends React.Component {
     return matchArray;
   };
 
+  onHighlightInput = event => {
+    this.setState({ highlightText: event.target.value });
+  };
+
   render() {
     const lines = this.props.lines && this.createLineArray();
     return (
@@ -27,6 +31,11 @@ class LineFilter extends React.Component {
           type="text"
           placeholder="filter"
           onChange={this.onLineFilterInput}
+        />
+        <input
+          type="text"
+          placeholder="highlight"
+          onChange={this.onHighlightInput}
         />
         {lines &&
           lines.map((line, i) => {
