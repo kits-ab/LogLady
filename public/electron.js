@@ -47,7 +47,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-module.exports = {
-  mainWindow: mainWindow
-};

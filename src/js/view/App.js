@@ -1,5 +1,7 @@
+
 import { Statusbar, SettingIcon, Wrapper } from './Container';
 import TabSettings from './TabSettings';
+import LogViewer from './components/LogViewer';
 
 const React = require('react');
 const { Component } = require('react');
@@ -18,10 +20,12 @@ class App extends Component {
       nthLines: '',
       time: '',
       numberOfLines: '',
-      liveLines: 'hej',
-      autoScroll: true,
+
+      liveLines: '',
+      autoScroll: false,
       filePath: '',
-      showSettings: false
+      showSettings: false,
+      fileSize: ''
     };
 
     this.startListener();
@@ -48,7 +52,6 @@ class App extends Component {
     this.setState({
       nthLines: _returnValue
     });
-    //console.log('nth Lines: ', this.state.nthLines);
   };
 
   setTime = _returnValue => {
@@ -69,6 +72,12 @@ class App extends Component {
   setFilePath = _returnValue => {
     this.setState({
       filePath: _returnValue
+    });
+  };
+
+  setFileSize = _returnValue => {
+    this.setState({
+      fileSize: _returnValue
     });
   };
 
@@ -94,8 +103,6 @@ class App extends Component {
       this.setTime(time);
     });
 
-    //comment out next line if not using lologoggenerator
-    // argObj.filePath = 'src/resources/myLittleFile.txt';
     ipcRenderer.send('getLiveLines', argObj);
 
     ipcRenderer.on('liveLines', (event, lines) => {
@@ -120,6 +127,11 @@ class App extends Component {
 
     ipcRenderer.once('lastLines', (event, lastLines) => {
       this.setLastLines(lastLines);
+    });
+
+    ipcRenderer.send('getFileSize', argObj);
+    ipcRenderer.once('fileSize', (event, size) => {
+      this.setFileSize(size);
     });
 
     window.addEventListener('keydown', e => {
@@ -156,16 +168,16 @@ class App extends Component {
           Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
-        <pre>{this.state.nthLines}</pre>{' '}
-        <pre>Get live lives: {this.state.liveLines}</pre>
         {this.state.showSettings ? <TabSettings /> : null}
+        <pre>{this.state.nthLines}</pre>
+        <LogViewer lines={this.state.liveLines} />
         <Statusbar>
           <ul>
             <li>filePath: {this.state.filePath}</li>
 
             <li>lines:{this.state.numberOfLines}</li>
 
-            <li>Storlek</li>
+            <li>Storlek: {this.state.fileSize}</li>
 
             <li>
               <img src={error} alt="error" /> : 1{' '}
