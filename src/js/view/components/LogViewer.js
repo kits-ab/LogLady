@@ -1,26 +1,33 @@
 import React from 'react';
 import { findMatches } from './lineFilter_helper';
 
-class LineFilter extends React.Component {
+class LogViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { LineFilterText: '', highlightText: '' };
+    this.state = {
+      lineFilterText: '',
+      textToHighlight: ''
+    };
   }
 
   onLineFilterInput = event => {
-    this.setState({ LineFilterText: event.target.value });
+    this.setState({ lineFilterText: event.target.value });
   };
 
   createLineArray = () => {
     const lineArray = [];
     lineArray.push(...this.props.lines.split('\n'));
-    const matchArray = findMatches(this.state.LineFilterText, lineArray);
+    const matchArray = findMatches(this.state.lineFilterText, lineArray);
 
     return matchArray;
   };
 
   onHighlightInput = event => {
-    this.setState({ highlightText: event.target.value });
+    this.setState({
+      textToHighlight: event.target.value
+        ? new RegExp(event.target.value, 'gi')
+        : ''
+    });
   };
 
   render() {
@@ -40,7 +47,15 @@ class LineFilter extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <p active={this.state.active} key={i}>
+              <p
+                style={
+                  line.match(this.state.textToHighlight) &&
+                  this.state.textToHighlight
+                    ? { background: 'red' }
+                    : {}
+                }
+                key={i}
+              >
                 {line}
               </p>
             );
@@ -50,4 +65,4 @@ class LineFilter extends React.Component {
   }
 }
 
-export default LineFilter;
+export default LogViewer;
