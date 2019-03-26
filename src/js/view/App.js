@@ -1,5 +1,8 @@
-import { Statusbar, SettingIcon } from './Container';
+
+import { Statusbar, SettingIcon, Wrapper } from './Container';
+import TabSettings from './TabSettings';
 import LogViewer from './components/LogViewer';
+
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
@@ -17,14 +20,21 @@ class App extends Component {
       nthLines: '',
       time: '',
       numberOfLines: '',
+
       liveLines: '',
       autoScroll: false,
       filePath: '',
+      showSettings: false,
       fileSize: ''
     };
 
     this.startListener();
   }
+  onTabChange = activeKey => {
+    this.setState({
+      activeKey
+    });
+  };
 
   setLiveLines = _returnValue => {
     this.setState({
@@ -137,11 +147,17 @@ class App extends Component {
     });
   };
 
+  settingClick = () => {
+    this.setState({
+      showSettings: !this.state.showSettings
+    });
+  };
+
   render() {
     this.state.autoScroll && window.scrollTo(0, document.body.scrollHeight);
 
     return (
-      <div>
+      <Wrapper>
         {
           //<p>
           // Our listener can be live (and can keep up with ms): {this.state.time}{' '}
@@ -152,6 +168,7 @@ class App extends Component {
           Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
+        {this.state.showSettings ? <TabSettings /> : null}
         <pre>{this.state.nthLines}</pre>
         <LogViewer lines={this.state.liveLines} />
         <Statusbar>
@@ -175,11 +192,17 @@ class App extends Component {
             </li>
 
             <li>
-              <SettingIcon src={settings} alt="settings" />
+              <SettingIcon
+                src={settings}
+                onClick={() => {
+                  this.settingClick();
+                }}
+                alt="settings"
+              />
             </li>
           </ul>
         </Statusbar>
-      </div>
+      </Wrapper>
     );
   }
 }
