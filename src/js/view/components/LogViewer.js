@@ -35,6 +35,7 @@ class LogViewer extends React.Component {
     return (
       <div>
         <input
+          id="filterInput"
           type="text"
           placeholder="filter"
           onChange={this.onLineFilterInput}
