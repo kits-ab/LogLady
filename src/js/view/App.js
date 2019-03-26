@@ -1,4 +1,4 @@
-import { Statusbar, SettingIcon } from './Container';
+import { Statusbar, SettingIcon, Wrapper } from './Container';
 import TabSettings from './TabSettings';
 
 const React = require('react');
@@ -145,7 +145,7 @@ class App extends Component {
     this.state.autoScroll && window.scrollTo(0, document.body.scrollHeight);
 
     return (
-      <div>
+      <Wrapper>
         {
           //<p>
           // Our listener can be live (and can keep up with ms): {this.state.time}{' '}
@@ -156,7 +156,7 @@ class App extends Component {
           Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting):
-        <pre>{this.state.nthLines}</pre>
+        <pre>{this.state.nthLines}</pre>{' '}
         <pre>Get live lives: {this.state.liveLines}</pre>
         {this.state.showSettings ? <TabSettings /> : null}
         <Statusbar>
@@ -190,7 +190,7 @@ class App extends Component {
             </li>
           </ul>
         </Statusbar>
-      </div>
+      </Wrapper>
     );
   }
 }

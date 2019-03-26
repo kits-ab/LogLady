@@ -1,11 +1,20 @@
 import styled from 'styled-components';
 
+export const Wrapper = styled.div`
+  position: relative;
+  margin: 0;
+  padding-bottom: 6rem;
+  min-height: 100%;
+`;
 export const Statusbar = styled.div`
-  position: fixed;
   bottom: 0;
-  background-color: #cccccc05;
   width: 100%;
   border-top: 2px solid #e6e6e6;
+  clear: both;
+  position: fixed;
+  right: 0;
+  left: 0;
+  background-color: #ffffff;
 
   ul {
     list-style: none;
@@ -31,27 +40,42 @@ export const SettingIcon = styled.img`
 `;
 
 export const Settings = styled.div`
-  width: 300px;
-
-  bottom: 0;
+  z-index: 101;
+  margin-bottom: 50px;
   float: right;
-  margin: 0;
-  padding: 0;
-
-  color: #373737;
-  padding: 30px;
+  overflow: scroll;
+  padding: 20px;
+  display: inline;
+  border: 2px solid #e6e6e6;
+  border-radius: 20px 0 0 20px;
+  color: #a6a6a6;
+  height: 400px;
 
   h1,
   h2 {
     font-size: 16px;
   }
 
-  input[type='color'] {
-    border: none;
-  }
-
   input[type='text'] {
     width: 100px;
     margin-left: 20px;
+    float: right;
+    height: 10px;
+  }
+
+  input[type='color'] {
+    border: none;
+    float: right;
+    height: 17px;
+  }
+
+  button {
+    background-color: #ffffff;
+    border: 2px solid #e6e6e6;
+    border-radius: 10px;
+    color: #2e2e2e;
+    float: right;
+    padding: 5px 10px;
+    font-size: 15px;
   }
 `;
