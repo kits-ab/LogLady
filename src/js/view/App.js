@@ -166,9 +166,9 @@ class App extends Component {
         <p>
           Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
         </p>
-        Get Nth lines (with {'<pre>'} tags to keep json formatting):
+        Get Nth lines (with {'<pre>'} tags to keep json formatting): */}
         {this.state.showSettings ? <TabSettings /> : null}
-        <pre>{this.state.nthLines}</pre> */}
+        {/* <pre>{this.state.nthLines}</pre> */}
         <LogViewer lines={this.state.liveLines} />
         <Statusbar>
           <ul>

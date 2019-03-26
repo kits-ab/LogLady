@@ -40,15 +40,15 @@ class LogViewer extends React.Component {
     const lines = this.props.lines && this.createLineArray();
     return (
       <div>
+        <SketchPicker
+          color={this.state.highlightColor}
+          onChangeComplete={this.onHighlightColorInput}
+        />
         <input
           id="filterInput"
           type="text"
           placeholder="filter"
           onChange={this.onLineFilterInput}
-        />
-        <SketchPicker
-          color={this.state.highlightColor}
-          onChangeComplete={this.onHighlightColorInput}
         />
         <input
           type="text"
