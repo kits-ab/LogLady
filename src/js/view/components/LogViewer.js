@@ -1,4 +1,5 @@
 import React from 'react';
+import { SketchPicker } from 'react-color';
 import { findMatches } from './lineFilter_helper';
 
 class LogViewer extends React.Component {
@@ -6,7 +7,8 @@ class LogViewer extends React.Component {
     super(props);
     this.state = {
       lineFilterText: '',
-      textToHighlight: ''
+      textToHighlight: '',
+      highlightColor: ''
     };
   }
 
@@ -30,6 +32,10 @@ class LogViewer extends React.Component {
     });
   };
 
+  onHighlightColorInput = color => {
+    this.setState({ highlightColor: color.hex });
+  };
+
   render() {
     const lines = this.props.lines && this.createLineArray();
     return (
@@ -39,6 +45,10 @@ class LogViewer extends React.Component {
           type="text"
           placeholder="filter"
           onChange={this.onLineFilterInput}
+        />
+        <SketchPicker
+          color={this.state.highlightColor}
+          onChangeComplete={this.onHighlightColorInput}
         />
         <input
           type="text"
@@ -52,7 +62,7 @@ class LogViewer extends React.Component {
                 style={
                   line.match(this.state.textToHighlight) &&
                   this.state.textToHighlight
-                    ? { background: 'red' }
+                    ? { background: this.state.highlightColor }
                     : {}
                 }
                 key={i}
