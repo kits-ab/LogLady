@@ -20,3 +20,4 @@ deploy:
     - dist/loglady Setup 1.0.0.exe
   on:
     repo: kits-ab/LogLady
+    tag: true
