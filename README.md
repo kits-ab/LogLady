@@ -1,4 +1,4 @@
-# Logs In Action
+# LogLady
 
 ## How to develop
 
@@ -8,9 +8,31 @@ Run `npm test` to run tests.
 
 Run `npm run lint` to check for code errors
 
+Run  `npm run electron-dev` to run application in developer mode with live update
+
 (Node version used: `8.4.0`, others (newer versions) may work as well.)
 
 Make sure your editor of choice has plugins for ESLint and Prettier installed _(for VSCode these are recommended: [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode))_, because then it will give a lot of hints for what the linter complains about.
+
+### How to name branches and git flow
+
+Tasks can be found in [Projects](https://github.com/kits-ab/LogLady/projects/1).
+
+ Assign one to yourself then create branch from develop and name it `feature/whatever-you-are-doing-#corresponding-task-ID`.
+
+Example: `feature/branchName-#5`
+
+ **Note:** _feature_ is an example, it could be:
+
+- feature
+- hotfix
+- release
+
+Commit messages should start with task ID
+
+Example: `#5 update README. Explained naming.`
+
+Push when done. Make pull request where you add task ID to beginning of comment.
 
 ## Useful links
 
@@ -62,7 +84,7 @@ _...more_
 
 ### Message Flow
 * Source - Source of log data, e.g. files, console output.
-* Adapter - A module specialized for reading a partical kind of input
+* Adapter - A module specialized for reading a particular kind of input
 * Engine - Aggregates and buffers data
 * Display - UI display device
 * Export - Exports data to other formats

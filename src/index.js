@@ -1,11 +1,12 @@
-const fs = require('fs');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './js/view/App';
+import * as serviceWorker from './serviceWorker';
 
-const multiply = (a, b) => a * b;
+ReactDOM.render(<App />, document.getElementById('root'));
 
-const double = a => multiply(a, 2);
-
-const readPackageJson = callback => {
-  fs.readFile('./package.json', { encoding: 'utf-8' }, callback);
-};
-
-module.exports = { multiply, double, readPackageJson };
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: http://bit.ly/CRA-PWA
+serviceWorker.register();

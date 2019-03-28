@@ -1,0 +1,14 @@
+const fileReader = require('./fileReader');
+
+it('reads a file and prints content to console', done => {
+  fileReader
+    .readFile('./src/resources/example.txt', 'utf8')
+    .then(data => {
+      expect(data).toBe('this is the content');
+      done();
+    })
+    .catch(err => {
+      console.log(err);
+      done();
+    });
+});

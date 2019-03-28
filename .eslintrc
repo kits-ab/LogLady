@@ -1,5 +1,5 @@
 {
-  "extends": ["airbnb-base", "prettier"],
+  "extends": ["prettier", "react-app"],
   "plugins": ["prettier"],
   "env": {
     "node": true,
@@ -8,6 +8,7 @@
   },
   "rules": {
     "prettier/prettier": "error",
-    "arrow-body-style": ["error", "as-needed"]
+    "arrow-body-style": ["error", "always"],
+    "eqeqeq": ["error", "always", { "null": "ignore" }]
   }
 }
