@@ -4,6 +4,7 @@ node_js:
 os: osx
 script:
   - npm run lint
+  - npm test
   - npm run electron-pack
 deploy:
   provider: releases
