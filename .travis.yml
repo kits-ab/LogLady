@@ -10,10 +10,3 @@ branches:
   only:
     - master
     - develop
-deploy:
-  provider: releases
-  api_key: $GITHUB_TOKEN
-  file: 'dist/loglady 1.0.0.AppImage'
-  skip_cleanup: true
-  on:
-    tags: false
