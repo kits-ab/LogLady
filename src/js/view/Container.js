@@ -41,15 +41,13 @@ export const SettingIcon = styled.img`
 
 export const Settings = styled.div`
   z-index: 101;
-  margin-bottom: 50px;
   float: right;
   overflow: scroll;
   padding: 20px;
   display: inline;
   border: 2px solid #e6e6e6;
-  border-radius: 20px 0 0 20px;
+  border-radius: 10px 0 0 10px;
   color: #a6a6a6;
-  height: 400px;
 
   h1,
   h2 {
@@ -68,14 +66,19 @@ export const Settings = styled.div`
     float: right;
     height: 17px;
   }
+`;
 
-  button {
-    background-color: #ffffff;
-    border: 2px solid #e6e6e6;
-    border-radius: 10px;
-    color: #2e2e2e;
-    float: right;
-    padding: 5px 10px;
-    font-size: 15px;
-  }
+export const SaveButton = styled.button`
+  background-color: #ffffff;
+  border: 2px solid #e6e6e6;
+  border-radius: 10px;
+  color: #2e2e2e;
+  float: right;
+  padding: 5px 10px;
+  font-size: 15px;
+`;
+
+export const CloseButton = styled.img`
+  float: right;
+  width: 17px;
 `;

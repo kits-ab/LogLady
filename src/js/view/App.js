@@ -26,14 +26,8 @@ class App extends Component {
       showSettings: false,
       fileSize: ''
     };
-
     this.startListener();
   }
-  onTabChange = activeKey => {
-    this.setState({
-      activeKey
-    });
-  };
 
   setLiveLines = _returnValue => {
     this.setState({
