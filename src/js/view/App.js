@@ -25,7 +25,6 @@ class App extends Component {
       fileSize: '',
       activeTail: false
     };
-
     this.startListener();
   }
 
