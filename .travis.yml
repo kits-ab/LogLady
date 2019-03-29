@@ -10,8 +10,6 @@ branches:
   only:
     - master
     - develop
-before_deploy:
-  - git tag $GIT_TAG
 deploy:
   provider: releases
   api_key:
