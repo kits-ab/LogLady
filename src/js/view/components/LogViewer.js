@@ -11,6 +11,8 @@ class LogViewer extends React.Component {
       highlightColor: 'red',
       autoScroll: false
     };
+
+    this.liveLinesContainer = React.createRef();
   }
 
   onLineFilterInput = event => {
@@ -37,17 +39,16 @@ class LogViewer extends React.Component {
     this.setState({ highlightColor: color.hex });
   };
 
-  componentWillReceiveProps = next => {
-    this.handleAutoScroll();
+  componentDidUpdate = () => {
+    if (this.state.autoScroll !== this.props.activeTail) {
+      this.handleAutoScroll();
+    }
   };
 
   componentDidMount = () => {
     const containerObserver = new MutationObserver(this.scrollToBottom);
     const observerConfig = { childList: true };
-    containerObserver.observe(
-      document.querySelector('#liveLinesContainer'),
-      observerConfig
-    );
+    containerObserver.observe(this.liveLinesContainer.current, observerConfig);
 
     window.addEventListener('keydown', e => {
       if (e.keyCode === 32) {
@@ -59,20 +60,15 @@ class LogViewer extends React.Component {
   createContainerObserver = () => {
     const containerObserver = new MutationObserver(this.scrollToBottom);
     const observerConfig = { childList: true };
-    containerObserver.observe(
-      document.querySelector('#liveLinesContainer'),
-      observerConfig
-    );
+    containerObserver.observe(this.liveLinesContainer.current, observerConfig);
   };
 
   handleAutoScroll = () => {
     !this.state.autoScroll &&
-      document
-        .querySelector('#liveLinesContainer')
-        .scrollTo(
-          0,
-          document.querySelector('#liveLinesContainer').scrollHeight
-        );
+      this.liveLinesContainer.current.scrollTo(
+        0,
+        this.liveLinesContainer.current.scrollHeight
+      );
     this.setState({
       autoScroll: !this.state.autoScroll
     });
@@ -80,12 +76,10 @@ class LogViewer extends React.Component {
 
   scrollToBottom = () => {
     if (this.state.autoScroll) {
-      document
-        .querySelector('#liveLinesContainer')
-        .scrollTo(
-          0,
-          document.querySelector('#liveLinesContainer').scrollHeight
-        );
+      this.liveLinesContainer.current.scrollTo(
+        0,
+        this.liveLinesContainer.current.scrollHeight
+      );
     }
   };
 
@@ -109,16 +103,28 @@ class LogViewer extends React.Component {
           onChange={this.onHighlightInput}
         />
         {this.state.autoScroll ? (
-          <p style={{ fontSize: '10px', color: 'green' }}>
-            Autoscroll is active. Press space to deactivate it.
+          <p
+            style={{
+              fontSize: '10px',
+              backgroundColor: 'green',
+              width: '240px'
+            }}
+          >
+            Tail is enabled. You can disable it in the settings tab.
           </p>
         ) : (
-          <p style={{ fontSize: '10px', color: 'red' }}>
-            Press space to activate autoscroll.
+          <p
+            style={{
+              fontSize: '10px',
+              backgroundColor: 'red',
+              width: '240px'
+            }}
+          >
+            Tail is disabled. You can enable it in the settings tab.
           </p>
         )}
         <div
-          id="liveLinesContainer"
+          ref={this.liveLinesContainer}
           style={{
             overflow: 'auto',
             height: '300px',
