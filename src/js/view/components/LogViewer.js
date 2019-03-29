@@ -1,5 +1,5 @@
 import React from 'react';
-import { SketchPicker } from 'react-color';
+import { GithubPicker } from 'react-color';
 import { findMatches } from './lineFilter_helper';
 
 class LogViewer extends React.Component {
@@ -8,7 +8,8 @@ class LogViewer extends React.Component {
     this.state = {
       lineFilterText: '',
       textToHighlight: '',
-      highlightColor: 'red'
+      highlightColor: 'red',
+      autoScroll: false
     };
   }
 
@@ -36,11 +37,59 @@ class LogViewer extends React.Component {
     this.setState({ highlightColor: color.hex });
   };
 
+  componentDidMount = () => {
+    const containerObserver = new MutationObserver(this.scrollToBottom);
+    const observerConfig = { childList: true };
+    containerObserver.observe(
+      document.querySelector('#liveLinesContainer'),
+      observerConfig
+    );
+
+    window.addEventListener('keydown', e => {
+      if (e.keyCode === 32) {
+        this.handleAutoScroll();
+      }
+    });
+  };
+
+  createContainerObserver = () => {
+    const containerObserver = new MutationObserver(this.scrollToBottom);
+    const observerConfig = { childList: true };
+    containerObserver.observe(
+      document.querySelector('#liveLinesContainer'),
+      observerConfig
+    );
+  };
+
+  handleAutoScroll = () => {
+    !this.state.autoScroll &&
+      document
+        .querySelector('#liveLinesContainer')
+        .scrollTo(
+          0,
+          document.querySelector('#liveLinesContainer').scrollHeight
+        );
+    this.setState({
+      autoScroll: !this.state.autoScroll
+    });
+  };
+
+  scrollToBottom = () => {
+    if (this.state.autoScroll) {
+      document
+        .querySelector('#liveLinesContainer')
+        .scrollTo(
+          0,
+          document.querySelector('#liveLinesContainer').scrollHeight
+        );
+    }
+  };
+
   render() {
     const lines = this.props.lines && this.createLineArray();
     return (
       <div>
-        <SketchPicker
+        <GithubPicker
           color={this.state.highlightColor}
           onChangeComplete={this.onHighlightColorInput}
         />
@@ -55,7 +104,17 @@ class LogViewer extends React.Component {
           placeholder="highlight"
           onChange={this.onHighlightInput}
         />
+        {this.state.autoScroll ? (
+          <p style={{ fontSize: '10px', color: 'green' }}>
+            Autoscroll is active. Press space to deactivate it.
+          </p>
+        ) : (
+          <p style={{ fontSize: '10px', color: 'red' }}>
+            Press space to activate autoscroll.
+          </p>
+        )}
         <div
+          id="liveLinesContainer"
           style={{
             overflow: 'auto',
             height: '300px',
