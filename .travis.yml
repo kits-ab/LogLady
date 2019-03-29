@@ -20,5 +20,4 @@ deploy:
     - 'dist/loglady Setup 1.0.0.exe'
   skip_cleanup: true
   on:
-    repo: kits-ab/LogLady
     tags: true
