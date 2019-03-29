@@ -19,15 +19,22 @@ class App extends Component {
       nthLines: '',
       time: '',
       numberOfLines: '',
-
       liveLines: '',
       filePath: '',
       showSettings: false,
-      fileSize: ''
+      fileSize: '',
+      activeTail: false
     };
 
     this.startListener();
   }
+
+  handleActiveTail = () => {
+    this.setState({
+      activeTail: !this.state.activeTail
+    });
+  };
+
   onTabChange = activeKey => {
     this.setState({
       activeKey
@@ -149,9 +156,14 @@ class App extends Component {
           Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting): */}
-        {this.state.showSettings ? <TabSettings /> : null}
+        {this.state.showSettings ? (
+          <TabSettings activeTail={this.handleActiveTail} />
+        ) : null}
         {/* <pre>{this.state.nthLines}</pre> */}
-        <LogViewer lines={this.state.liveLines} />
+        <LogViewer
+          lines={this.state.liveLines}
+          activeTail={this.state.activeTail}
+        />
         <Statusbar>
           <ul>
             <li>filePath: {this.state.filePath}</li>

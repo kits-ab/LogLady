@@ -37,6 +37,10 @@ class LogViewer extends React.Component {
     this.setState({ highlightColor: color.hex });
   };
 
+  componentWillReceiveProps = next => {
+    this.handleAutoScroll();
+  };
+
   componentDidMount = () => {
     const containerObserver = new MutationObserver(this.scrollToBottom);
     const observerConfig = { childList: true };
