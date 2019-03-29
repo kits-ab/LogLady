@@ -10,8 +10,6 @@ branches:
   only:
     - master
     - develop
-before_deploy:
-  - git tag $GIT_TAG
 deploy:
   provider: releases
   api_key:
@@ -22,5 +20,4 @@ deploy:
     - 'dist/loglady Setup 1.0.0.exe'
   skip_cleanup: true
   on:
-    repo: kits-ab/LogLady
     tags: true
