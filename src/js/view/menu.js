@@ -1,7 +1,6 @@
 const { Menu } = require('electron');
 const { dialog } = require('electron');
 const { EventEmitter } = require('events');
-
 const menuEvents = new EventEmitter();
 
 const createMenu = () => {
@@ -24,7 +23,8 @@ const createMenu = () => {
           ]
         },
         {
-          label: 'Quit Loglady'
+          label: 'Quit LogLady',
+          role: 'quit'
         }
       ]
     },
