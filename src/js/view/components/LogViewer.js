@@ -107,7 +107,7 @@ class LogViewer extends React.Component {
             style={{
               fontSize: '10px',
               backgroundColor: 'green',
-              width: '240px'
+              width: '250px'
             }}
           >
             Tail is enabled. You can disable it in the settings tab.
@@ -117,7 +117,7 @@ class LogViewer extends React.Component {
             style={{
               fontSize: '10px',
               backgroundColor: 'red',
-              width: '240px'
+              width: '250px'
             }}
           >
             Tail is disabled. You can enable it in the settings tab.
