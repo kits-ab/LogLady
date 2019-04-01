@@ -10,10 +10,6 @@ branches:
   only:
     - master
     - develop
-before_deploy:
-  - export GIT_TAG=v1.0.0
-  - git tag $GIT_TAG -a -m "version 1.0.0"
-  - git push origin $GIT_TAG
 deploy:
   provider: releases
   api_key:
@@ -24,6 +20,5 @@ deploy:
     - 'loglady-setup-1.0.0.exe'
   skip_cleanup: true
   on:
-    tags: true
     branch: master
     tags: false
