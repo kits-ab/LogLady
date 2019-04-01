@@ -20,5 +20,4 @@ deploy:
     - 'loglady-setup-1.0.0.exe'
   skip_cleanup: true
   on:
-    tags: true
     branch: master
