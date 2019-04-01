@@ -19,15 +19,26 @@ class App extends Component {
       nthLines: '',
       time: '',
       numberOfLines: '',
-
       liveLines: '',
-      autoScroll: false,
       filePath: '',
       showSettings: false,
-      fileSize: ''
+      fileSize: '',
+      activeTail: false
     };
     this.startListener();
   }
+
+  handleActiveTail = () => {
+    this.setState({
+      activeTail: !this.state.activeTail
+    });
+  };
+
+  onTabChange = activeKey => {
+    this.setState({
+      activeKey
+    });
+  };
 
   setLiveLines = _returnValue => {
     this.setState({
@@ -82,7 +93,6 @@ class App extends Component {
   };
 
   ipcContainer = () => {
-    console.log('filepath: ', this.state.filePath);
     //Create an object and pass it as arg to ipcRenderer.send()
     let argObj = {};
     argObj.filePath = this.state.filePath;
@@ -105,14 +115,12 @@ class App extends Component {
     ipcRenderer.send('getNumberOfLines', argObj);
 
     ipcRenderer.once('numberOfLines', (event, numberOfLines) => {
-      console.log(numberOfLines);
       this.setNumberOfLines(numberOfLines);
     });
 
     ipcRenderer.send('getNthLines', argObj);
 
     ipcRenderer.once('nthLines', (event, lines) => {
-      console.log(lines);
       this.setNthLines(JSON.stringify(lines, null, 2));
     });
 
@@ -126,18 +134,6 @@ class App extends Component {
     ipcRenderer.once('fileSize', (event, size) => {
       this.setFileSize(size);
     });
-
-    window.addEventListener('keydown', e => {
-      if (e.keyCode === 32) {
-        this.handleAutoScroll();
-      }
-    });
-  };
-
-  handleAutoScroll = () => {
-    this.setState({
-      autoScroll: !this.state.autoScroll
-    });
   };
 
   settingClick = () => {
@@ -147,8 +143,6 @@ class App extends Component {
   };
 
   render() {
-    this.state.autoScroll && window.scrollTo(0, document.body.scrollHeight);
-
     return (
       <Wrapper>
         {
@@ -161,9 +155,14 @@ class App extends Component {
           Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting): */}
-        {this.state.showSettings ? <TabSettings /> : null}
+        {this.state.showSettings ? (
+          <TabSettings activeTail={this.handleActiveTail} />
+        ) : null}
         {/* <pre>{this.state.nthLines}</pre> */}
-        <LogViewer lines={this.state.liveLines} />
+        <LogViewer
+          lines={this.state.liveLines}
+          activeTail={this.state.activeTail}
+        />
         <Statusbar>
           <ul>
             <li>filePath: {this.state.filePath}</li>

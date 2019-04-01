@@ -20,7 +20,15 @@ global.require = electron => {
   };
 };
 
+global.MutationObserver = class {
+  constructor(callback) {}
+  disconnect() {}
+  observe(element, initObject) {}
+};
+
 const noop = () => {};
 Object.defineProperty(window, 'scrollTo', { value: noop, writable: true });
 
 HTMLCanvasElement.prototype.getContext = () => {};
+
+Element.prototype.scrollTo = () => {};

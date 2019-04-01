@@ -57,7 +57,8 @@ class TabSettings extends Component {
         <span>Informations:</span>{' '}
         <input type="color" name="color" value="#3a99d9" /> <br />
         <br />
-        <span>MiniTail: </span> <input type="checkbox" />
+        <span>MiniTail: </span>{' '}
+        <input type="checkbox" onChange={this.props.activeTail} />
         <br />
         <span>Background-color: MiniTail </span>
         <input type="color" name="color" value="#cccccc" />
