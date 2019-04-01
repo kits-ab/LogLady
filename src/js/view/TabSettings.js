@@ -1,4 +1,3 @@
-import LogViewer from './components/LogViewer';
 import { Settings, SaveButton, CloseButton } from './Container';
 const React = require('react');
 const { Component } = require('react');
