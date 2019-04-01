@@ -1,11 +1,32 @@
-import { Settings } from './Container';
+import { Settings, SaveButton, CloseButton } from './Container';
 const React = require('react');
 const { Component } = require('react');
+const close = require('../../resources/close.png');
 
 class TabSettings extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showSettings: true
+    };
+  }
+  closeSettings = () => {
+    this.setState({
+      showSettings: !this.state.showSettings
+    });
+  };
+
   render() {
-    return (
+    return this.state.showSettings ? (
       <Settings>
+        <CloseButton
+          onClick={() => {
+            this.closeSettings();
+          }}
+          src={close}
+          alt="close"
+        />
         <h1>Settings for Tab</h1>
         <span>Background-color:</span>
         <input type="color" name="color" value="#ffffff" />
@@ -36,7 +57,8 @@ class TabSettings extends Component {
         <span>Informations:</span>{' '}
         <input type="color" name="color" value="#3a99d9" /> <br />
         <br />
-        <span>MiniTail: </span> <input type="checkbox" />
+        <span>MiniTail: </span>{' '}
+        <input type="checkbox" onChange={this.props.activeTail} />
         <br />
         <span>Background-color: MiniTail </span>
         <input type="color" name="color" value="#cccccc" />
@@ -48,9 +70,15 @@ class TabSettings extends Component {
         <span>Timestamp: </span>
         <input type="checkbox" />
         <br />
-        <button>Save</button>
+        <SaveButton
+          onClick={() => {
+            this.closeSettings();
+          }}
+        >
+          Save
+        </SaveButton>
       </Settings>
-    );
+    ) : null;
   }
 }
 export default TabSettings;
