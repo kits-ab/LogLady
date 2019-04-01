@@ -6,10 +6,6 @@ script:
   - npm run lint
   - npm test
   - npm run electron-pack
-branches:
-  only:
-    - master
-    - develop
 deploy:
   provider: releases
   api_key:
