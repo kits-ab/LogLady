@@ -38,12 +38,6 @@ class LogViewer extends React.Component {
     });
   };
 
-  createContainerObserver = () => {
-    const containerObserver = new MutationObserver(this.scrollToBottom);
-    const observerConfig = { childList: true };
-    containerObserver.observe(this.liveLinesContainer.current, observerConfig);
-  };
-
   handleAutoScroll = () => {
     !this.state.autoScroll &&
       this.liveLinesContainer.current.scrollTo(

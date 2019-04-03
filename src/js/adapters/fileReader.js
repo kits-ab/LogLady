@@ -1,6 +1,5 @@
 const fs = require('fs');
 const lastLines = require('read-last-lines');
-const chokidar = require('chokidar');
 const nthLine = require('nthline');
 const { EventEmitter } = require('events');
 const fileReaderEvents = new EventEmitter();
@@ -37,12 +36,7 @@ const readLinesLive = filePath => {
     });
   //start a watcher and read the new lines starting from the last newline index
   //whenever there is a change to the file.
-  const watcher = chokidar.watch('file, dir, glob, or array', {
-    ignored: /(^|[\/\\])\../,
-    persistent: true
-  });
-  watcher.add(filePath);
-  watcher.on('change', (event, path) => {
+  fs.watch(filePath, (event, filename) => {
     console.log('watcher started.');
     let readStreamFromLastIndex = fs
       .createReadStream(filePath, {
