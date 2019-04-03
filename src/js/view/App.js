@@ -157,16 +157,10 @@ class App extends Component {
   render() {
     return (
       <Wrapper>
-        {
-          //<p>
-          // Our listener can be live (and can keep up with ms): {this.state.time}{' '}
-          //</p>
-        }
         {/* <p>Get last lines: {this.state.lastLines}</p>
         <p>
           Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
-        </p>
-        Get Nth lines (with {'<pre>'} tags to keep json formatting): */}
+        </p>*/}
         {this.state.showSettings ? (
           <TabSettings
             activeTail={this.handleActiveTail}

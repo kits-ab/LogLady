@@ -7,7 +7,6 @@
   "main": "public/electron.js",
   "dependencies": {
     "always-tail": "^0.2.0",
-    "chokidar": "^2.1.2",
     "concurrently": "^4.1.0",
     "electron-is-dev": "^1.0.1",
     "electron-simple-updater": "^1.4.3",

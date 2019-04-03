@@ -1,11 +1,8 @@
 const fs = require('fs');
 const lastLines = require('read-last-lines');
-const notifier = require('node-notifier');
-const chokidar = require('chokidar');
 const nthLine = require('nthline');
 const { EventEmitter } = require('events');
 const fileReaderEvents = new EventEmitter();
-const watcher = require('chokidar');
 
 // const writeStream = fs.createWriteStream('./src/resources/myLittleFile.txt');
 // writeStream.once('open', fd => {
@@ -39,12 +36,8 @@ const readLinesLive = filePath => {
     });
   //start a watcher and read the new lines starting from the last newline index
   //whenever there is a change to the file.
-  let watcher = chokidar.watch(filePath).on('change', (event, path) => {
+  fs.watch(filePath, (event, filename) => {
     console.log('watcher started.');
-    // console.log('stats: ', stats);
-    // var watchSize = 0;
-    // if (stats && stats.size !== watchSize) {
-    // watchSize = stats.size;
     let readStreamFromLastIndex = fs
       .createReadStream(filePath, {
         start: lastNewlineIndex
