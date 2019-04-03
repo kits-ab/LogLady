@@ -1,4 +1,6 @@
 import { Settings, SaveButton, CloseButton } from './Container';
+import { GithubPicker } from 'react-color';
+
 const React = require('react');
 const { Component } = require('react');
 const close = require('../../resources/close.png');
@@ -34,7 +36,28 @@ class TabSettings extends Component {
         <span>Text-color:</span> <input type="color" name="color" />
         <br />
         <h2>Filter:</h2>
-        <input type="color" value="#e54d42" />
+        <span>Custom: </span>
+        <input id="filterInput" type="text" onChange={this.onLineFilterInput} />
+        {/*<br />
+        <span>
+          Errors: <input type="text" placeholder="ERROR" />
+        </span>
+        <br />
+        <span>
+          Warnings: <input type="text" placeholder="WARN" />
+        </span>
+        <br />
+        <span>
+          Informations: <input type="text" placeholder="INFO" />
+        </span> */}
+        <h2>Highlights:</h2>
+        <span>Custom: </span>
+        <input type="text" onChange={this.onHighlightInput} />
+        <GithubPicker
+          color={this.state.highlightColor}
+          onChangeComplete={this.onHighlightColorInput}
+        />
+        {/*<input type="color" value="#e54d42" />
         <span>
           Errors: <input type="text" placeholder="ERROR" />
         </span>
@@ -48,14 +71,7 @@ class TabSettings extends Component {
         <span>
           Informations: <input type="text" placeholder="INFO" />
         </span>
-        <h2>Highlights:</h2>
-        <span>Errors:</span>
-        <input type="color" name="color" value="#e54d42" />
-        <br />
-        <span>Warnings:</span>
-        <input type="color" name="color" value="#f0c330" /> <br />
-        <span>Informations:</span>{' '}
-        <input type="color" name="color" value="#3a99d9" /> <br />
+        */}
         <br />
         <span>MiniTail: </span>{' '}
         <input type="checkbox" onChange={this.props.activeTail} />

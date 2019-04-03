@@ -34,12 +34,6 @@ class App extends Component {
     });
   };
 
-  onTabChange = activeKey => {
-    this.setState({
-      activeKey
-    });
-  };
-
   setLiveLines = _returnValue => {
     this.setState({
       liveLines: this.state.liveLines + '\n' + _returnValue

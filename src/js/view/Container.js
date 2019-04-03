@@ -56,9 +56,8 @@ export const Settings = styled.div`
 
   input[type='text'] {
     width: 100px;
-    margin-left: 20px;
-    float: right;
     height: 10px;
+    margin-bottom: 10px;
   }
 
   input[type='color'] {
