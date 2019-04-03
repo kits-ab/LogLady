@@ -1,5 +1,4 @@
 import React from 'react';
-import { GithubPicker } from 'react-color';
 import { findMatches } from './lineFilter_helper';
 
 class LogViewer extends React.Component {
@@ -7,36 +6,18 @@ class LogViewer extends React.Component {
     super(props);
     this.state = {
       lineFilterText: '',
-      textToHighlight: '',
-      highlightColor: 'red',
       autoScroll: false
     };
 
     this.liveLinesContainer = React.createRef();
   }
 
-  onLineFilterInput = event => {
-    this.setState({ lineFilterText: event.target.value });
-  };
-
   createLineArray = () => {
     const lineArray = [];
     lineArray.push(...this.props.lines.split('\n'));
-    const matchArray = findMatches(this.state.lineFilterText, lineArray);
+    const matchArray = findMatches(this.props.filterInputFieldValue, lineArray);
 
     return matchArray;
-  };
-
-  onHighlightInput = event => {
-    this.setState({
-      textToHighlight: event.target.value
-        ? new RegExp(event.target.value, 'gi')
-        : ''
-    });
-  };
-
-  onHighlightColorInput = color => {
-    this.setState({ highlightColor: color.hex });
   };
 
   componentDidUpdate = () => {
@@ -87,20 +68,18 @@ class LogViewer extends React.Component {
     const lines = this.props.lines && this.createLineArray();
     return (
       <div>
-        <GithubPicker
-          color={this.state.highlightColor}
-          onChangeComplete={this.onHighlightColorInput}
-        />
         <input
           id="filterInput"
           type="text"
           placeholder="filter"
-          onChange={this.onLineFilterInput}
+          value={this.props.filterInputFieldValue}
+          onChange={this.props.filterInputField}
         />
         <input
           type="text"
           placeholder="highlight"
-          onChange={this.onHighlightInput}
+          value={this.props.higlightInputFieldValue}
+          onChange={this.props.higlightInputField}
         />
         {this.state.autoScroll ? (
           <p
@@ -136,9 +115,10 @@ class LogViewer extends React.Component {
               return (
                 <p
                   style={
-                    line.match(this.state.textToHighlight) &&
-                    this.state.textToHighlight
-                      ? { background: this.state.highlightColor }
+                    line.match(
+                      new RegExp(this.props.higlightInputFieldValue, 'gi')
+                    ) && this.props.higlightInputFieldValue
+                      ? { background: this.props.highlightColorInput }
                       : {}
                   }
                   key={i}

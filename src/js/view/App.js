@@ -6,9 +6,6 @@ const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
 const settings = require('../../resources/settings.png');
-const error = require('../../resources/error.png');
-const warning = require('../../resources/warning.png');
-const info = require('../../resources/info.png');
 
 class App extends Component {
   constructor(props) {
@@ -23,7 +20,10 @@ class App extends Component {
       filePath: '',
       showSettings: false,
       fileSize: '',
-      activeTail: false
+      activeTail: false,
+      highlightColor: 'red',
+      highlightInputFieldValue: '',
+      filterInputFieldValue: ''
     };
     this.startListener();
   }
@@ -31,6 +31,24 @@ class App extends Component {
   handleActiveTail = () => {
     this.setState({
       activeTail: !this.state.activeTail
+    });
+  };
+
+  handleHighlightColorInput = event => {
+    this.setState({
+      highlightColor: event.hex
+    });
+  };
+
+  handleHiglightInputField = event => {
+    this.setState({
+      highlightInputFieldValue: event.target.value ? event.target.value : ''
+    });
+  };
+
+  handleFilterInputField = event => {
+    this.setState({
+      filterInputFieldValue: event.target.value
     });
   };
 
@@ -150,32 +168,32 @@ class App extends Component {
         </p>
         Get Nth lines (with {'<pre>'} tags to keep json formatting): */}
         {this.state.showSettings ? (
-          <TabSettings activeTail={this.handleActiveTail} />
+          <TabSettings
+            activeTail={this.handleActiveTail}
+            highlightColorInput={this.handleHighlightColorInput}
+            higlightInputField={this.handleHiglightInputField}
+            higlightInputFieldValue={this.state.highlightInputFieldValue}
+            filterInputField={this.handleFilterInputField}
+            filterInputFieldValue={this.state.filterInputFieldValue}
+          />
         ) : null}
         {/* <pre>{this.state.nthLines}</pre> */}
         <LogViewer
           lines={this.state.liveLines}
           activeTail={this.state.activeTail}
+          highlightColorInput={this.state.highlightColor}
+          higlightInputField={this.handleHiglightInputField}
+          higlightInputFieldValue={this.state.highlightInputFieldValue}
+          filterInputField={this.handleFilterInputField}
+          filterInputFieldValue={this.state.filterInputFieldValue}
         />
         <Statusbar>
           <ul>
-            <li>filePath: {this.state.filePath}</li>
+            <li>Path: {this.state.filePath}</li>
 
-            <li>lines:{this.state.numberOfLines}</li>
+            <li>Lines:{this.state.numberOfLines}</li>
 
-            <li>Storlek: {this.state.fileSize}</li>
-
-            <li>
-              <img src={error} alt="error" /> : 1{' '}
-            </li>
-
-            <li>
-              <img src={warning} alt="warnings" /> : 10
-            </li>
-
-            <li>
-              <img src={info} alt="info" /> : 5{' '}
-            </li>
+            <li>Size: {this.state.fileSize}</li>
 
             <li>
               <SettingIcon
