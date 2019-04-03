@@ -7,10 +7,16 @@ describe('LogViewer', () => {
     const data = 'hej\nknas\nord\nbest\n';
     const dataBool = true;
     const filterText = 'hej';
-    const wrapper = mount(<LogViewer lines={data} activeTail={dataBool} />);
+    const wrapper = mount(
+      <LogViewer
+        lines={data}
+        activeTail={dataBool}
+        filterInputFieldValue={filterText}
+      />
+    );
     wrapper
       .find('#filterInput')
       .simulate('change', { target: { value: filterText } });
-    expect(wrapper.state().lineFilterText).toEqual(filterText);
+    expect(wrapper.props().filterInputFieldValue).toEqual(filterText);
   });
 });
