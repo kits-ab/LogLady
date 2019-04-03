@@ -56,26 +56,9 @@ export const Settings = styled.div`
 
   input[type='text'] {
     width: 100px;
-    margin-left: 20px;
-    float: right;
     height: 10px;
+    margin-bottom: 10px;
   }
-
-  input[type='color'] {
-    border: none;
-    float: right;
-    height: 17px;
-  }
-`;
-
-export const SaveButton = styled.button`
-  background-color: #ffffff;
-  border: 2px solid #e6e6e6;
-  border-radius: 10px;
-  color: #2e2e2e;
-  float: right;
-  padding: 5px 10px;
-  font-size: 15px;
 `;
 
 export const CloseButton = styled.img`
