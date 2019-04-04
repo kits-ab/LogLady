@@ -6,6 +6,7 @@
   "homepage": "./",
   "main": "public/electron.js",
   "dependencies": {
+    "@material-ui/core": "^3.9.3",
     "always-tail": "^0.2.0",
     "concurrently": "^4.1.0",
     "electron-is-dev": "^1.0.1",
