@@ -7,7 +7,7 @@ class LogViewer extends React.Component {
     super(props);
     this.state = {
       lineFilterText: '',
-      activeTail: true
+      autoScroll: true
     };
 
     this.liveLinesContainer = React.createRef();
@@ -21,25 +21,36 @@ class LogViewer extends React.Component {
     return matchArray;
   };
 
+  componentDidUpdate = () => {
+    if (this.state.autoScroll !== this.props.activeTail) {
+      this.handleAutoScroll();
+    }
+  };
+
   componentDidMount = () => {
     const containerObserver = new MutationObserver(this.scrollToBottom);
     const observerConfig = { childList: true };
     containerObserver.observe(this.liveLinesContainer.current, observerConfig);
   };
 
-  handleActiveTail = () => {
-    this.setState({
-      activeTail: !this.state.activeTail
-    });
-    this.scrollToBottom();
-  };
-
-  scrollToBottom = () => {
-    this.state.activeTail &&
+  handleAutoScroll = () => {
+    !this.state.autoScroll &&
       this.liveLinesContainer.current.scrollTo(
         0,
         this.liveLinesContainer.current.scrollHeight
       );
+    this.setState({
+      autoScroll: !this.state.autoScroll
+    });
+  };
+
+  scrollToBottom = () => {
+    if (this.state.autoScroll) {
+      this.liveLinesContainer.current.scrollTo(
+        0,
+        this.liveLinesContainer.current.scrollHeight
+      );
+    }
   };
 
   render() {

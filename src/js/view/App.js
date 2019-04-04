@@ -25,10 +25,17 @@ class App extends Component {
       fileSize: '',
       highlightColor: 'red',
       highlightInputFieldValue: '',
-      filterInputFieldValue: ''
+      filterInputFieldValue: '',
+      activeTail: true
     };
     this.startListener();
   }
+
+  handleActiveTail = () => {
+    this.setState({
+      activeTail: !this.state.activeTail
+    });
+  };
 
   handleHighlightColorInput = event => {
     this.setState({
@@ -154,7 +161,13 @@ class App extends Component {
     return (
       <div style={{ display: 'grid' }}>
         <div style={{ display: 'block' }}>
-          <TopPanel />
+          <TopPanel
+            activeTail={this.handleActiveTail}
+            higlightInputField={this.handleHiglightInputField}
+            higlightInputFieldValue={this.state.highlightInputFieldValue}
+            filterInputField={this.handleFilterInputField}
+            filterInputFieldValue={this.state.filterInputFieldValue}
+          />
         </div>
         <div>
           <SplitPane
@@ -167,6 +180,7 @@ class App extends Component {
             <div>
               <LogViewer
                 lines={this.state.liveLines}
+                activeTail={this.state.activeTail}
                 highlightColorInput={this.state.highlightColor}
                 higlightInputField={this.handleHiglightInputField}
                 higlightInputFieldValue={this.state.highlightInputFieldValue}
