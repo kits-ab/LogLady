@@ -1,6 +1,9 @@
-import { Statusbar, SettingIcon, Wrapper } from './Container';
+import { Statusbar, SettingIcon } from './Container';
 import TabSettings from './TabSettings';
 import LogViewer from './components/LogViewer';
+import SplitPane from 'react-split-pane';
+import '../../css/App.css';
+import TopPanel from './components/TopPanel';
 
 const React = require('react');
 const { Component } = require('react');
@@ -149,29 +152,41 @@ class App extends Component {
 
   render() {
     return (
-      <Wrapper>
-        {/* <p>Get last lines: {this.state.lastLines}</p>
-        <p>
-          Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
-        </p>*/}
-        {this.state.showSettings ? (
-          <TabSettings
-            highlightColorInput={this.handleHighlightColorInput}
-            higlightInputField={this.handleHiglightInputField}
-            higlightInputFieldValue={this.state.highlightInputFieldValue}
-            filterInputField={this.handleFilterInputField}
-            filterInputFieldValue={this.state.filterInputFieldValue}
-          />
-        ) : null}
-        {/* <pre>{this.state.nthLines}</pre> */}
-        <LogViewer
-          lines={this.state.liveLines}
-          highlightColorInput={this.state.highlightColor}
-          higlightInputField={this.handleHiglightInputField}
-          higlightInputFieldValue={this.state.highlightInputFieldValue}
-          filterInputField={this.handleFilterInputField}
-          filterInputFieldValue={this.state.filterInputFieldValue}
-        />
+      <div style={{ display: 'grid' }}>
+        <div style={{ display: 'block' }}>
+          <TopPanel />
+        </div>
+        <div>
+          <SplitPane
+            split="horizontal"
+            minSize={50}
+            defaultSize={100}
+            maxSize={-5}
+            primary="second"
+          >
+            <div>
+              <LogViewer
+                lines={this.state.liveLines}
+                highlightColorInput={this.state.highlightColor}
+                higlightInputField={this.handleHiglightInputField}
+                higlightInputFieldValue={this.state.highlightInputFieldValue}
+                filterInputField={this.handleFilterInputField}
+                filterInputFieldValue={this.state.filterInputFieldValue}
+              />
+            </div>
+            <div>
+              {this.state.showSettings ? (
+                <TabSettings
+                  highlightColorInput={this.handleHighlightColorInput}
+                  higlightInputField={this.handleHiglightInputField}
+                  higlightInputFieldValue={this.state.highlightInputFieldValue}
+                  filterInputField={this.handleFilterInputField}
+                  filterInputFieldValue={this.state.filterInputFieldValue}
+                />
+              ) : null}
+            </div>
+          </SplitPane>
+        </div>
         <Statusbar>
           <ul>
             <li>Path: {this.state.filePath}</li>
@@ -191,7 +206,7 @@ class App extends Component {
             </li>
           </ul>
         </Statusbar>
-      </Wrapper>
+      </div>
     );
   }
 }

@@ -3,7 +3,7 @@ import LogViewer from './LogViewer';
 import { shallow, mount } from 'enzyme';
 
 describe('LogViewer', () => {
-  it('should set state to input', () => {
+  it.skip('should set state to input', () => {
     const data = 'hej\nknas\nord\nbest\n';
     const dataBool = true;
     const filterText = 'hej';

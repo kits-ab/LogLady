@@ -19,6 +19,7 @@
     "react-color": "^2.17.0",
     "react-dom": "^16.8.2",
     "react-scripts": "2.1.5",
+    "react-split-pane": "^0.1.87",
     "react-test-renderer": "^16.8.4",
     "read-last-lines": "^1.6.0",
     "styled-components": "^4.1.3",

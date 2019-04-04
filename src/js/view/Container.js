@@ -40,13 +40,8 @@ export const SettingIcon = styled.img`
 `;
 
 export const Settings = styled.div`
-  z-index: 101;
-  float: right;
-  overflow: scroll;
   padding: 20px;
-  display: inline;
   border: 2px solid #e6e6e6;
-  border-radius: 10px 0 0 10px;
   color: #a6a6a6;
 
   h1,
