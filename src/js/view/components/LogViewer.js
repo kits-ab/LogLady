@@ -1,12 +1,13 @@
 import React from 'react';
 import { findMatches } from './lineFilter_helper';
+import Switch from '@material-ui/core/Switch';
 
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       lineFilterText: '',
-      autoScroll: false
+      activeTail: true
     };
 
     this.liveLinesContainer = React.createRef();
@@ -20,42 +21,25 @@ class LogViewer extends React.Component {
     return matchArray;
   };
 
-  componentDidUpdate = () => {
-    if (this.state.autoScroll !== this.props.activeTail) {
-      this.handleAutoScroll();
-    }
-  };
-
   componentDidMount = () => {
     const containerObserver = new MutationObserver(this.scrollToBottom);
     const observerConfig = { childList: true };
     containerObserver.observe(this.liveLinesContainer.current, observerConfig);
-
-    window.addEventListener('keydown', e => {
-      if (e.keyCode === 32) {
-        this.handleAutoScroll();
-      }
-    });
   };
 
-  handleAutoScroll = () => {
-    !this.state.autoScroll &&
-      this.liveLinesContainer.current.scrollTo(
-        0,
-        this.liveLinesContainer.current.scrollHeight
-      );
+  handleActiveTail = () => {
     this.setState({
-      autoScroll: !this.state.autoScroll
+      activeTail: !this.state.activeTail
     });
+    this.scrollToBottom();
   };
 
   scrollToBottom = () => {
-    if (this.state.autoScroll) {
+    this.state.activeTail &&
       this.liveLinesContainer.current.scrollTo(
         0,
         this.liveLinesContainer.current.scrollHeight
       );
-    }
   };
 
   render() {
@@ -75,33 +59,21 @@ class LogViewer extends React.Component {
           value={this.props.higlightInputFieldValue}
           onChange={this.props.higlightInputField}
         />
-        {this.state.autoScroll ? (
-          <p
-            style={{
-              fontSize: '10px',
-              backgroundColor: 'green',
-              width: '250px'
-            }}
-          >
-            Tail is enabled. You can disable it in the settings tab.
-          </p>
-        ) : (
-          <p
-            style={{
-              fontSize: '10px',
-              backgroundColor: 'red',
-              width: '250px'
-            }}
-          >
-            Tail is disabled. You can enable it in the settings tab.
-          </p>
-        )}
+        <div style={{ float: 'right' }}>
+          <span>Tail: </span>{' '}
+          <Switch
+            color="primary"
+            checked={this.state.activeTail}
+            onChange={this.handleActiveTail}
+          />
+        </div>
         <div
           ref={this.liveLinesContainer}
           style={{
             overflow: 'auto',
             height: '300px',
-            border: '1px black solid'
+            border: '1px black solid',
+            width: '100%'
           }}
         >
           {lines &&

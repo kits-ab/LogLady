@@ -50,8 +50,6 @@ class TabSettings extends Component {
           onChangeComplete={this.props.highlightColorInput}
         />
         <br />
-        <span>MiniTail: </span>{' '}
-        <input type="checkbox" onChange={this.props.activeTail} />
       </Settings>
     ) : null;
   }

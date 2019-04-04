@@ -20,19 +20,12 @@ class App extends Component {
       filePath: '',
       showSettings: false,
       fileSize: '',
-      activeTail: false,
       highlightColor: 'red',
       highlightInputFieldValue: '',
       filterInputFieldValue: ''
     };
     this.startListener();
   }
-
-  handleActiveTail = () => {
-    this.setState({
-      activeTail: !this.state.activeTail
-    });
-  };
 
   handleHighlightColorInput = event => {
     this.setState({
@@ -163,7 +156,6 @@ class App extends Component {
         </p>*/}
         {this.state.showSettings ? (
           <TabSettings
-            activeTail={this.handleActiveTail}
             highlightColorInput={this.handleHighlightColorInput}
             higlightInputField={this.handleHiglightInputField}
             higlightInputFieldValue={this.state.highlightInputFieldValue}
@@ -174,7 +166,6 @@ class App extends Component {
         {/* <pre>{this.state.nthLines}</pre> */}
         <LogViewer
           lines={this.state.liveLines}
-          activeTail={this.state.activeTail}
           highlightColorInput={this.state.highlightColor}
           higlightInputField={this.handleHiglightInputField}
           higlightInputFieldValue={this.state.highlightInputFieldValue}
