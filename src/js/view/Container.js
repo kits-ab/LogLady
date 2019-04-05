@@ -40,8 +40,7 @@ export const SettingIcon = styled.img`
 `;
 
 export const Settings = styled.div`
-  padding: 20px;
-  border: 2px solid #e6e6e6;
+  margin: 70px 20px 0 25px;
   color: #a6a6a6;
 
   h1,
