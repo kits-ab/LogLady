@@ -159,8 +159,8 @@ class App extends Component {
 
   render() {
     return (
-      <div style={{ display: 'grid' }}>
-        <div style={{ display: 'block' }}>
+      <div>
+        <div>
           <TopPanel
             activeTail={this.handleActiveTail}
             higlightInputField={this.handleHiglightInputField}
@@ -173,7 +173,7 @@ class App extends Component {
           <SplitPane
             split="horizontal"
             minSize={50}
-            defaultSize={100}
+            defaultSize={300}
             maxSize={-5}
             primary="second"
           >

@@ -57,27 +57,6 @@ class LogViewer extends React.Component {
     const lines = this.props.lines && this.createLineArray();
     return (
       <div>
-        {/* <input
-          id="filterInput"
-          type="text"
-          placeholder="filter"
-          value={this.props.filterInputFieldValue}
-          onChange={this.props.filterInputField}
-        />
-        <input
-          type="text"
-          placeholder="highlight"
-          value={this.props.higlightInputFieldValue}
-          onChange={this.props.higlightInputField}
-        />
-        <div style={{ float: 'right', marginRight: '1.5%' }}>
-          <span>Tail: </span>{' '}
-          <Switch
-            color="primary"
-            checked={this.state.activeTail}
-            onChange={this.handleActiveTail}
-          />
-        </div> */}
         <div
           ref={this.liveLinesContainer}
           style={{
@@ -85,7 +64,7 @@ class LogViewer extends React.Component {
             height: '500px',
             border: '1px black solid',
             width: '97%',
-            margin: '0.5% 1.5%'
+            margin: '5% 1.5% 0 1.5%'
           }}
         >
           {lines &&

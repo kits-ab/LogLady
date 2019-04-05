@@ -17,32 +17,35 @@ class TopPanel extends React.Component {
 
   render() {
     return (
-      <AppBar position="fixed" color="default">
-        <p>LogLady</p>
+      <AppBar
+        style={{
+          backgroundColor: '#ddd',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          position: 'fixed'
+        }}
+      >
+        <p style={{ margin: '1.5em', color: '#222' }}>LogLady</p>
         <TextField
           label="filter"
           value={this.props.filterInputFieldValue}
           onChange={this.props.filterInputField}
-          margin="normal"
-          variant="filled"
-          fullWidth={false}
-          styles={{ flex: '1' }}
+          margin="dense"
+          variant="outlined"
+          style={{ margin: '0.7em' }}
         />
-        <input
-          id="filterInput"
-          type="text"
-          placeholder="filter"
-          value={this.props.filterInputFieldValue}
-          onChange={this.props.filterInputField}
-        />
-        <input
-          type="text"
-          placeholder="highlight"
+        <TextField
+          label="filter"
           value={this.props.higlightInputFieldValue}
           onChange={this.props.higlightInputField}
+          margin="dense"
+          variant="outlined"
+          style={{ margin: '0.7em' }}
         />
-        <div style={{ float: 'right', marginRight: '1.5%' }}>
-          <span>Tail: </span>{' '}
+
+        <div style={{ margin: '0.8% 0 0 58%' }}>
+          <span style={{ color: '#222' }}>Tail: </span>{' '}
           <Switch
             color="primary"
             checked={this.state.activeSwitch}
