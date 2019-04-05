@@ -1,6 +1,5 @@
 import React from 'react';
 import { findMatches } from './lineFilter_helper';
-import Switch from '@material-ui/core/Switch';
 
 class LogViewer extends React.Component {
   constructor(props) {
