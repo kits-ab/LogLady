@@ -56,6 +56,12 @@ class App extends Component {
     });
   };
 
+  handleSettingsPaneSize = () => {
+    this.setState({
+      settingsPaneSize: !this.state.showSettings ? '270px' : '0px'
+    });
+  };
+
   setLiveLines = _returnValue => {
     this.setState({
       liveLines: this.state.liveLines + '\n' + _returnValue
@@ -154,11 +160,9 @@ class App extends Component {
 
   settingClick = () => {
     this.setState({
-      settingsPaneSize: !this.state.showSettings ? '270px' : '0px'
-    });
-    this.setState({
       showSettings: !this.state.showSettings
     });
+    this.handleSettingsPaneSize();
   };
 
   render() {
@@ -194,6 +198,8 @@ class App extends Component {
             <div>
               {this.state.showSettings ? (
                 <TabSettings
+                  closeSettings={this.settingClick}
+                  handleSettingsPaneSize={this.handleSettingsPaneSize}
                   highlightColorInput={this.handleHighlightColorInput}
                   higlightInputField={this.handleHiglightInputField}
                   higlightInputFieldValue={this.state.highlightInputFieldValue}

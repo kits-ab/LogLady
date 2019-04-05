@@ -13,18 +13,13 @@ class TabSettings extends Component {
       showSettings: true
     };
   }
-  closeSettings = () => {
-    this.setState({
-      showSettings: !this.state.showSettings
-    });
-  };
 
   render() {
     return this.state.showSettings ? (
       <Settings>
         <CloseButton
           onClick={() => {
-            this.closeSettings();
+            this.props.closeSettings();
           }}
           src={close}
           alt="close"
