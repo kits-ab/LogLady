@@ -26,7 +26,8 @@ class App extends Component {
       highlightColor: 'red',
       highlightInputFieldValue: '',
       filterInputFieldValue: '',
-      activeTail: true
+      activeTail: true,
+      settingsPaneSize: '0px'
     };
     this.startListener();
   }
@@ -153,6 +154,9 @@ class App extends Component {
 
   settingClick = () => {
     this.setState({
+      settingsPaneSize: !this.state.showSettings ? '270px' : '0px'
+    });
+    this.setState({
       showSettings: !this.state.showSettings
     });
   };
@@ -172,8 +176,7 @@ class App extends Component {
         <div>
           <SplitPane
             split="vertical"
-            minSize={260}
-            defaultSize={260}
+            defaultSize={this.state.settingsPaneSize}
             allowResize={false}
             primary="second"
           >
