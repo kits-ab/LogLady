@@ -9,20 +9,6 @@ const createMenu = () => {
       label: 'LogLady',
       submenu: [
         {
-          label: 'About LogLady'
-        },
-        {
-          label: 'Preferences',
-          submenu: [
-            {
-              label: 'Settings'
-            },
-            {
-              label: 'Keyborad shortcuts'
-            }
-          ]
-        },
-        {
           label: 'Quit LogLady',
           role: 'quit'
         }
@@ -55,11 +41,6 @@ const createMenu = () => {
           click(item, focusedWindow) {
             if (focusedWindow) focusedWindow.reload();
           }
-        },
-        {
-          label: 'Show minitail',
-          type: 'checkbox',
-          checked: true
         },
         {
           label: 'Toggle Developer Tools',
