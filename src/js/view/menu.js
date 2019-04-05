@@ -43,53 +43,6 @@ const createMenu = () => {
               }
             );
           }
-        },
-        {
-          label: 'Open recent'
-        },
-        {
-          label: 'Save'
-        },
-        {
-          label: 'Save as...'
-        },
-        {
-          label: 'Find'
-        },
-        {
-          label: 'Log-settings'
-        },
-        {
-          label: 'Close log'
-        }
-      ]
-    },
-    {
-      label: 'Edit',
-      submenu: [
-        {
-          role: 'undo'
-        },
-        {
-          role: 'redo'
-        },
-        {
-          type: 'separator'
-        },
-        {
-          role: 'cut'
-        },
-        {
-          role: 'copy'
-        },
-        {
-          role: 'paste'
-        },
-        {
-          role: 'delete'
-        },
-        {
-          role: 'selectall'
         }
       ]
     },
