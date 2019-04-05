@@ -13,6 +13,7 @@ class TopPanel extends React.Component {
 
   handleActiveSwitch = () => {
     this.setState({ activeSwitch: !this.state.activeSwitch });
+    this.props.activeTail();
   };
 
   render() {
@@ -26,30 +27,36 @@ class TopPanel extends React.Component {
           position: 'fixed'
         }}
       >
-        <p style={{ margin: '1.5em', color: '#222' }}>LogLady</p>
-        <TextField
-          label="filter"
-          value={this.props.filterInputFieldValue}
-          onChange={this.props.filterInputField}
-          margin="dense"
-          variant="outlined"
-          style={{ margin: '0.7em' }}
-        />
-        <TextField
-          label="filter"
-          value={this.props.higlightInputFieldValue}
-          onChange={this.props.higlightInputField}
-          margin="dense"
-          variant="outlined"
-          style={{ margin: '0.7em' }}
-        />
+        <p style={{ margin: '12px 28px 0 28px', color: '#222' }}>LogLady</p>
+        <div style={{ width: '15%', margin: '0 5px' }}>
+          <TextField
+            placeholder="filter"
+            value={this.props.filterInputFieldValue}
+            onChange={this.props.filterInputField}
+            margin="dense"
+            variant="outlined"
+            style={{ margin: '10px 20px', height: '30px' }}
+            fullWidth="true"
+          />
+        </div>
+        <div style={{ width: '15%', margin: '0 5px' }}>
+          <TextField
+            placeholder="highlight"
+            value={this.props.higlightInputFieldValue}
+            onChange={this.props.higlightInputField}
+            margin="dense"
+            variant="outlined"
+            style={{ margin: '10px 20px', height: '30px' }}
+            fullWidth="true"
+          />
+        </div>
 
-        <div style={{ margin: '0.8% 0 0 58%' }}>
+        <div style={{ marginLeft: 'auto', marginRight: '1.5%' }}>
           <span style={{ color: '#222' }}>Tail: </span>{' '}
           <Switch
             color="primary"
             checked={this.state.activeSwitch}
-            onChange={this.props.activeTail && this.handleActiveSwitch}
+            onChange={this.handleActiveSwitch}
           />
         </div>
       </AppBar>

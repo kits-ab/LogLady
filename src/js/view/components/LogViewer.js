@@ -61,10 +61,10 @@ class LogViewer extends React.Component {
           ref={this.liveLinesContainer}
           style={{
             overflow: 'auto',
-            height: '500px',
+            height: '535px',
             border: '1px black solid',
             width: '97%',
-            margin: '5% 1.5% 0 1.5%'
+            margin: '70px 1.5% 0 1.5%'
           }}
         >
           {lines &&

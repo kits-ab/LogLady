@@ -2,7 +2,7 @@ import { Statusbar, SettingIcon } from './Container';
 import TabSettings from './TabSettings';
 import LogViewer from './components/LogViewer';
 import SplitPane from 'react-split-pane';
-import '../../css/App.css';
+//import '../../css/App.css';
 import TopPanel from './components/TopPanel';
 
 const React = require('react');
@@ -171,10 +171,10 @@ class App extends Component {
         </div>
         <div>
           <SplitPane
-            split="horizontal"
-            minSize={50}
-            defaultSize={300}
-            maxSize={-5}
+            split="vertical"
+            minSize={260}
+            defaultSize={260}
+            allowResize={false}
             primary="second"
           >
             <div>
