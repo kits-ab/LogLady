@@ -7,7 +7,6 @@ export const menuReducer = (state = {}, action) => {
           ? [...state.openFiles, action.data[0]]
           : [action.data[0]]
       };
-      console.log(_newState);
       return _newState;
     default:
       return state;

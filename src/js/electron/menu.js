@@ -3,7 +3,6 @@ const { dialog } = require('electron');
 
 const handleMenuItemClicked = _ipc => {
   return (type, data) => {
-    console.log({ type, data });
     _ipc.send('filePath', data);
     _ipc.send('app_store', { type: `menu_${type}`, data: data });
   };
