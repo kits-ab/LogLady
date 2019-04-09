@@ -1,11 +1,18 @@
 import { Statusbar, SettingIcon, Wrapper } from './Container';
 import TabSettings from './TabSettings';
 import LogViewer from './components/LogViewer';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import { menuReducer } from './reducers/menu_reducer';
+import { ipcListener } from './ipc_listener';
 
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
 const settings = require('../../resources/settings.png');
+
+const store = createStore(menuReducer);
+ipcListener(store.dispatch);
 
 class App extends Component {
   constructor(props) {
@@ -149,49 +156,55 @@ class App extends Component {
 
   render() {
     return (
-      <Wrapper>
-        {/* <p>Get last lines: {this.state.lastLines}</p>
+      <Provider store={store}>
+        <Wrapper>
+          {/* <p>Get last lines: {this.state.lastLines}</p>
         <p>
-          Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
+        Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
         </p>*/}
-        {this.state.showSettings ? (
-          <TabSettings
-            highlightColorInput={this.handleHighlightColorInput}
+          {this.state.showSettings ? (
+            <TabSettings
+              highlightColorInput={this.handleHighlightColorInput}
+              higlightInputField={this.handleHiglightInputField}
+              higlightInputFieldValue={this.state.highlightInputFieldValue}
+              filterInputField={this.handleFilterInputField}
+              filterInputFieldValue={this.state.filterInputFieldValue}
+            />
+          ) : null}
+          {/* <pre>{this.state.nthLines}</pre> */}
+          <LogViewer
+            lines={this.state.liveLines}
+            highlightColorInput={this.state.highlightColor}
             higlightInputField={this.handleHiglightInputField}
             higlightInputFieldValue={this.state.highlightInputFieldValue}
             filterInputField={this.handleFilterInputField}
             filterInputFieldValue={this.state.filterInputFieldValue}
           />
-        ) : null}
-        {/* <pre>{this.state.nthLines}</pre> */}
-        <LogViewer
-          lines={this.state.liveLines}
-          highlightColorInput={this.state.highlightColor}
-          higlightInputField={this.handleHiglightInputField}
-          higlightInputFieldValue={this.state.highlightInputFieldValue}
-          filterInputField={this.handleFilterInputField}
-          filterInputFieldValue={this.state.filterInputFieldValue}
-        />
-        <Statusbar>
-          <ul>
-            <li>Path: {this.state.filePath}</li>
+          <div>
+            <h3>Redux state</h3>
+            <pre>{JSON.stringify(store.getState(), null, 2)}</pre>
+          </div>
+          <Statusbar>
+            <ul>
+              <li>Path: {this.state.filePath}</li>
 
-            <li>Lines:{this.state.numberOfLines}</li>
+              <li>Lines:{this.state.numberOfLines}</li>
 
-            <li>Size: {this.state.fileSize}</li>
+              <li>Size: {this.state.fileSize}</li>
 
-            <li>
-              <SettingIcon
-                src={settings}
-                onClick={() => {
-                  this.settingClick();
-                }}
-                alt="settings"
-              />
-            </li>
-          </ul>
-        </Statusbar>
-      </Wrapper>
+              <li>
+                <SettingIcon
+                  src={settings}
+                  onClick={() => {
+                    this.settingClick();
+                  }}
+                  alt="settings"
+                />
+              </li>
+            </ul>
+          </Statusbar>
+        </Wrapper>
+      </Provider>
     );
   }
 }

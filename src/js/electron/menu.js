@@ -1,9 +1,16 @@
 const { Menu } = require('electron');
 const { dialog } = require('electron');
-const { EventEmitter } = require('events');
-const menuEvents = new EventEmitter();
 
-const createMenu = () => {
+const handleMenuItemClicked = _ipc => {
+  return (type, data) => {
+    console.log({ type, data });
+    _ipc.send('filePath', data);
+    _ipc.send('app_store', { type: `menu_${type}`, data: data });
+  };
+};
+
+const createMenu = ipc => {
+  const menuItemClicked = handleMenuItemClicked(ipc);
   const template = [
     {
       label: 'LogLady',
@@ -39,7 +46,7 @@ const createMenu = () => {
                 properties: ['openFile', 'multiSelections']
               },
               filePath => {
-                menuEvents.emit('filePath', filePath);
+                menuItemClicked('open', filePath);
               }
             );
           }
@@ -165,7 +172,4 @@ const createMenu = () => {
   return Menu.buildFromTemplate(template);
 };
 
-module.exports = {
-  createMenu: createMenu,
-  menuEvents: menuEvents
-};
+module.exports = { createMenu: createMenu };
