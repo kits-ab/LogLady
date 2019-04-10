@@ -1,6 +1,9 @@
-import { Statusbar, SettingIcon, Wrapper } from './Container';
+import { Statusbar, SettingIcon } from './Container';
 import TabSettings from './TabSettings';
 import LogViewer from './components/LogViewer';
+import SplitPane from 'react-split-pane';
+//import '../../css/App.css';
+import TopPanel from './components/TopPanel';
 
 const React = require('react');
 const { Component } = require('react');
@@ -22,10 +25,18 @@ class App extends Component {
       fileSize: '',
       highlightColor: 'red',
       highlightInputFieldValue: '',
-      filterInputFieldValue: ''
+      filterInputFieldValue: '',
+      activeTail: true,
+      settingsPaneSize: '0px'
     };
     this.startListener();
   }
+
+  handleActiveTail = () => {
+    this.setState({
+      activeTail: !this.state.activeTail
+    });
+  };
 
   handleHighlightColorInput = event => {
     this.setState({
@@ -42,6 +53,12 @@ class App extends Component {
   handleFilterInputField = event => {
     this.setState({
       filterInputFieldValue: event.target.value
+    });
+  };
+
+  handleSettingsPaneSize = () => {
+    this.setState({
+      settingsPaneSize: !this.state.showSettings ? '270px' : '0px'
     });
   };
 
@@ -145,33 +162,54 @@ class App extends Component {
     this.setState({
       showSettings: !this.state.showSettings
     });
+    this.handleSettingsPaneSize();
   };
 
   render() {
     return (
-      <Wrapper>
-        {/* <p>Get last lines: {this.state.lastLines}</p>
-        <p>
-          Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
-        </p>*/}
-        {this.state.showSettings ? (
-          <TabSettings
-            highlightColorInput={this.handleHighlightColorInput}
+      <div>
+        <div>
+          <TopPanel
+            activeTail={this.handleActiveTail}
             higlightInputField={this.handleHiglightInputField}
             higlightInputFieldValue={this.state.highlightInputFieldValue}
             filterInputField={this.handleFilterInputField}
             filterInputFieldValue={this.state.filterInputFieldValue}
           />
-        ) : null}
-        {/* <pre>{this.state.nthLines}</pre> */}
-        <LogViewer
-          lines={this.state.liveLines}
-          highlightColorInput={this.state.highlightColor}
-          higlightInputField={this.handleHiglightInputField}
-          higlightInputFieldValue={this.state.highlightInputFieldValue}
-          filterInputField={this.handleFilterInputField}
-          filterInputFieldValue={this.state.filterInputFieldValue}
-        />
+        </div>
+        <div>
+          <SplitPane
+            split="vertical"
+            defaultSize={this.state.settingsPaneSize}
+            allowResize={false}
+            primary="second"
+          >
+            <div>
+              <LogViewer
+                lines={this.state.liveLines}
+                activeTail={this.state.activeTail}
+                highlightColorInput={this.state.highlightColor}
+                higlightInputField={this.handleHiglightInputField}
+                higlightInputFieldValue={this.state.highlightInputFieldValue}
+                filterInputField={this.handleFilterInputField}
+                filterInputFieldValue={this.state.filterInputFieldValue}
+              />
+            </div>
+            <div>
+              {this.state.showSettings ? (
+                <TabSettings
+                  closeSettings={this.settingClick}
+                  handleSettingsPaneSize={this.handleSettingsPaneSize}
+                  highlightColorInput={this.handleHighlightColorInput}
+                  higlightInputField={this.handleHiglightInputField}
+                  higlightInputFieldValue={this.state.highlightInputFieldValue}
+                  filterInputField={this.handleFilterInputField}
+                  filterInputFieldValue={this.state.filterInputFieldValue}
+                />
+              ) : null}
+            </div>
+          </SplitPane>
+        </div>
         <Statusbar>
           <ul>
             <li>Path: {this.state.filePath}</li>
@@ -191,7 +229,7 @@ class App extends Component {
             </li>
           </ul>
         </Statusbar>
-      </Wrapper>
+      </div>
     );
   }
 }

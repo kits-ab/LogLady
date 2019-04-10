@@ -9,20 +9,6 @@ const createMenu = () => {
       label: 'LogLady',
       submenu: [
         {
-          label: 'About LogLady'
-        },
-        {
-          label: 'Preferences',
-          submenu: [
-            {
-              label: 'Settings'
-            },
-            {
-              label: 'Keyborad shortcuts'
-            }
-          ]
-        },
-        {
           label: 'Quit LogLady',
           role: 'quit'
         }
@@ -43,53 +29,6 @@ const createMenu = () => {
               }
             );
           }
-        },
-        {
-          label: 'Open recent'
-        },
-        {
-          label: 'Save'
-        },
-        {
-          label: 'Save as...'
-        },
-        {
-          label: 'Find'
-        },
-        {
-          label: 'Log-settings'
-        },
-        {
-          label: 'Close log'
-        }
-      ]
-    },
-    {
-      label: 'Edit',
-      submenu: [
-        {
-          role: 'undo'
-        },
-        {
-          role: 'redo'
-        },
-        {
-          type: 'separator'
-        },
-        {
-          role: 'cut'
-        },
-        {
-          role: 'copy'
-        },
-        {
-          role: 'paste'
-        },
-        {
-          role: 'delete'
-        },
-        {
-          role: 'selectall'
         }
       ]
     },
@@ -102,11 +41,6 @@ const createMenu = () => {
           click(item, focusedWindow) {
             if (focusedWindow) focusedWindow.reload();
           }
-        },
-        {
-          label: 'Show minitail',
-          type: 'checkbox',
-          checked: true
         },
         {
           label: 'Toggle Developer Tools',

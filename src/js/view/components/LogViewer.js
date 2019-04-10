@@ -1,13 +1,12 @@
 import React from 'react';
 import { findMatches } from './lineFilter_helper';
-import Switch from '@material-ui/core/Switch';
 
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       lineFilterText: '',
-      activeTail: true
+      autoScroll: true
     };
 
     this.liveLinesContainer = React.createRef();
@@ -21,59 +20,50 @@ class LogViewer extends React.Component {
     return matchArray;
   };
 
+  componentDidUpdate = () => {
+    if (this.state.autoScroll !== this.props.activeTail) {
+      this.handleAutoScroll();
+    }
+  };
+
   componentDidMount = () => {
     const containerObserver = new MutationObserver(this.scrollToBottom);
     const observerConfig = { childList: true };
     containerObserver.observe(this.liveLinesContainer.current, observerConfig);
   };
 
-  handleActiveTail = () => {
-    this.setState({
-      activeTail: !this.state.activeTail
-    });
-    this.scrollToBottom();
-  };
-
-  scrollToBottom = () => {
-    this.state.activeTail &&
+  handleAutoScroll = () => {
+    !this.state.autoScroll &&
       this.liveLinesContainer.current.scrollTo(
         0,
         this.liveLinesContainer.current.scrollHeight
       );
+    this.setState({
+      autoScroll: !this.state.autoScroll
+    });
+  };
+
+  scrollToBottom = () => {
+    if (this.state.autoScroll) {
+      this.liveLinesContainer.current.scrollTo(
+        0,
+        this.liveLinesContainer.current.scrollHeight
+      );
+    }
   };
 
   render() {
     const lines = this.props.lines && this.createLineArray();
     return (
       <div>
-        <input
-          id="filterInput"
-          type="text"
-          placeholder="filter"
-          value={this.props.filterInputFieldValue}
-          onChange={this.props.filterInputField}
-        />
-        <input
-          type="text"
-          placeholder="highlight"
-          value={this.props.higlightInputFieldValue}
-          onChange={this.props.higlightInputField}
-        />
-        <div style={{ float: 'right' }}>
-          <span>Tail: </span>{' '}
-          <Switch
-            color="primary"
-            checked={this.state.activeTail}
-            onChange={this.handleActiveTail}
-          />
-        </div>
         <div
           ref={this.liveLinesContainer}
           style={{
             overflow: 'auto',
-            height: '300px',
+            height: '535px',
             border: '1px black solid',
-            width: '100%'
+            width: '97%',
+            margin: '70px 1.5% 0 1.5%'
           }}
         >
           {lines &&
