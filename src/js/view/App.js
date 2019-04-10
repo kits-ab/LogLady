@@ -5,6 +5,7 @@ import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { menuReducer } from './reducers/menu_reducer';
 import { ipcListener } from './ipc_listener';
+import * as ipcPublisher from './ipc_publisher';
 
 const React = require('react');
 const { Component } = require('react');
@@ -136,7 +137,7 @@ class App extends Component {
       this.setNthLines(JSON.stringify(lines, null, 2));
     });
 
-    ipcRenderer.send('getLastLines', argObj);
+    this.props.send.getLastLines(argObj);
 
     ipcRenderer.once('lastLines', (event, lastLines) => {
       this.setLastLines(lastLines);
@@ -156,57 +157,65 @@ class App extends Component {
 
   render() {
     return (
-      <Provider store={store}>
-        <Wrapper>
-          {/* <p>Get last lines: {this.state.lastLines}</p>
+      <Wrapper>
+        {/* <p>Get last lines: {this.state.lastLines}</p>
         <p>
         Get Nth lines (5 rows starting from row 10): {this.state.nthLines}
         </p>*/}
-          {this.state.showSettings ? (
-            <TabSettings
-              highlightColorInput={this.handleHighlightColorInput}
-              higlightInputField={this.handleHiglightInputField}
-              higlightInputFieldValue={this.state.highlightInputFieldValue}
-              filterInputField={this.handleFilterInputField}
-              filterInputFieldValue={this.state.filterInputFieldValue}
-            />
-          ) : null}
-          {/* <pre>{this.state.nthLines}</pre> */}
-          <LogViewer
-            lines={this.state.liveLines}
-            highlightColorInput={this.state.highlightColor}
+        {this.state.showSettings ? (
+          <TabSettings
+            highlightColorInput={this.handleHighlightColorInput}
             higlightInputField={this.handleHiglightInputField}
             higlightInputFieldValue={this.state.highlightInputFieldValue}
             filterInputField={this.handleFilterInputField}
             filterInputFieldValue={this.state.filterInputFieldValue}
           />
-          <div>
-            <h3>Redux state</h3>
-            <pre>{JSON.stringify(store.getState(), null, 2)}</pre>
-          </div>
-          <Statusbar>
-            <ul>
-              <li>Path: {this.state.filePath}</li>
+        ) : null}
+        {/* <pre>{this.state.nthLines}</pre> */}
+        <LogViewer
+          lines={this.state.liveLines}
+          highlightColorInput={this.state.highlightColor}
+          higlightInputField={this.handleHiglightInputField}
+          higlightInputFieldValue={this.state.highlightInputFieldValue}
+          filterInputField={this.handleFilterInputField}
+          filterInputFieldValue={this.state.filterInputFieldValue}
+        />
+        <div>
+          <h3>Redux state</h3>
+          <pre>{JSON.stringify(store.getState(), null, 2)}</pre>
+        </div>
+        <Statusbar>
+          <ul>
+            <li>Path: {this.state.filePath}</li>
 
-              <li>Lines:{this.state.numberOfLines}</li>
+            <li>Lines:{this.state.numberOfLines}</li>
 
-              <li>Size: {this.state.fileSize}</li>
+            <li>Size: {this.state.fileSize}</li>
 
-              <li>
-                <SettingIcon
-                  src={settings}
-                  onClick={() => {
-                    this.settingClick();
-                  }}
-                  alt="settings"
-                />
-              </li>
-            </ul>
-          </Statusbar>
-        </Wrapper>
+            <li>
+              <SettingIcon
+                src={settings}
+                onClick={() => {
+                  this.settingClick();
+                }}
+                alt="settings"
+              />
+            </li>
+          </ul>
+        </Statusbar>
+      </Wrapper>
+    );
+  }
+}
+
+class AppContainer extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <App send={ipcPublisher} />
       </Provider>
     );
   }
 }
 
-export default App;
+export default AppContainer;
