@@ -189,8 +189,15 @@ class App extends Component {
             defaultSize={this.state.settingsPaneSize}
             allowResize={false}
             primary="second"
+            style={{
+              background: 'linear-gradient(magenta, mediumspringgreen)'
+            }}
           >
-            <div style={{ height: '100%' }}>
+            <div
+              style={{
+                height: '100%'
+              }}
+            >
               <LogViewer
                 lines={this.state.liveLines}
                 activeTail={this.state.activeTail}
@@ -201,7 +208,11 @@ class App extends Component {
                 filterInputFieldValue={this.state.filterInputFieldValue}
               />
             </div>
-            <div>
+            <div
+              style={{
+                background: 'linear-gradient(mediumspringgreen, magenta)'
+              }}
+            >
               {this.state.showSettings ? (
                 <TabSettings
                   closeSettings={this.settingClick}
@@ -222,6 +233,7 @@ class App extends Component {
           }
           fileSize={this.state.fileSize}
           numberOfLines={this.state.numberOfLines}
+          settingClick={this.settingClick}
         />
       </div>
     );

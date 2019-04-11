@@ -17,7 +17,7 @@ class StatusBar extends React.Component {
             <StatusBarSC.SettingIcon
               src={settings}
               onClick={() => {
-                this.settingClick();
+                this.props.settingClick();
               }}
               alt="settings"
             />
