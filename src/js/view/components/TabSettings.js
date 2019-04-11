@@ -1,9 +1,9 @@
-import { Settings, CloseButton } from './styledComponents/Container';
+import * as TabSettingsSC from '../styledComponents/TabSettingsStyledComponents';
 import { GithubPicker } from 'react-color';
 
 const React = require('react');
 const { Component } = require('react');
-const close = require('../../resources/close.png');
+const close = require('../../../resources/close.png');
 
 class TabSettings extends Component {
   constructor(props) {
@@ -16,8 +16,8 @@ class TabSettings extends Component {
 
   render() {
     return this.state.showSettings ? (
-      <Settings>
-        <CloseButton
+      <TabSettingsSC.Settings>
+        <TabSettingsSC.CloseButton
           onClick={() => {
             this.props.closeSettings();
           }}
@@ -25,27 +25,15 @@ class TabSettings extends Component {
           alt="close"
         />
         <h1>Settings for Tab</h1>
-        <h2>Filter:</h2>
-        <span>Custom: </span>
-        <input
-          id="filterInput"
-          type="text"
-          value={this.props.filterInputFieldValue}
-          onChange={this.props.filterInputField}
-        />
+
         <h2>Highlights:</h2>
-        <span>Custom: </span>
-        <input
-          type="text"
-          value={this.props.higlightInputFieldValue}
-          onChange={this.props.higlightInputField}
-        />
+        <p>Color for highlights</p>
         <GithubPicker
           color={this.props.highlightColor}
           onChangeComplete={this.props.highlightColorInput}
         />
         <br />
-      </Settings>
+      </TabSettingsSC.Settings>
     ) : null;
   }
 }

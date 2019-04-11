@@ -1,15 +1,17 @@
 import styled from 'styled-components';
 
 export const AppBar = styled.div`
-  background-color: #ddd;
+  background-color: orange;
   width: 100%;
   display: flex;
   flex-direction: row;
-  top: 0;
+  position: fixed;
+  z-index: 1;
 
+  top: 0;
   p {
     margin: 12px 28px 0 28px;
-    color: #222;
+    color: green;
   }
 `;
 
@@ -17,6 +19,12 @@ export const TextFieldInput = styled.input`
   width: 15%;
   margin: 10px 20px;
   height: 30px;
+  background: linear-gradient(#e66465, #9198e5);
+  color: lightgreen;
+
+  ::-webkit-input-placeholder {
+    color: yellow;
+  }
 `;
 
 export const TailSwitch = styled.label`
@@ -39,7 +47,7 @@ export const TailSwitch = styled.label`
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: red;
     -webkit-transition: 0.4s;
     transition: 0.4s;
     border-radius: 34px;
@@ -51,7 +59,7 @@ export const TailSwitch = styled.label`
     width: 20.8px;
     left: 4px;
     bottom: 4px;
-    background-color: white;
+    background-color: aquamarine;
     -webkit-transition: 0.4s;
     transition: 0.4s;
     border-radius: 50%;
@@ -72,6 +80,6 @@ export const Tail = styled.div`
   margin-right: 1.5%;
 
   span {
-    color: #222;
+    color: blue;
   }
 `;

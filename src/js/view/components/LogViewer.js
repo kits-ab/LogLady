@@ -1,5 +1,6 @@
 import React from 'react';
 import { findMatches } from './lineFilter_helper';
+import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 
 class LogViewer extends React.Component {
   constructor(props) {
@@ -55,36 +56,25 @@ class LogViewer extends React.Component {
   render() {
     const lines = this.props.lines && this.createLineArray();
     return (
-      <div>
-        <div
-          ref={this.liveLinesContainer}
-          style={{
-            overflow: 'auto',
-            height: '535px',
-            border: '1px black solid',
-            width: '97%',
-            margin: '70px 1.5% 0 1.5%'
-          }}
-        >
-          {lines &&
-            lines.map((line, i) => {
-              return (
-                <p
-                  style={
-                    line.match(
-                      new RegExp(this.props.higlightInputFieldValue, 'gi')
-                    ) && this.props.higlightInputFieldValue
-                      ? { background: this.props.highlightColorInput }
-                      : {}
-                  }
-                  key={i}
-                >
-                  {line}
-                </p>
-              );
-            })}
-        </div>
-      </div>
+      <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
+        {lines &&
+          lines.map((line, i) => {
+            return (
+              <p
+                style={
+                  line.match(
+                    new RegExp(this.props.higlightInputFieldValue, 'gi')
+                  ) && this.props.higlightInputFieldValue
+                    ? { background: this.props.highlightColorInput }
+                    : {}
+                }
+                key={i}
+              >
+                {line}
+              </p>
+            );
+          })}
+      </LogViewerSC.TextContainer>
     );
   }
 }

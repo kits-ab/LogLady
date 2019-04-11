@@ -32,24 +32,3 @@ export const SettingIcon = styled.img`
   float: right;
   padding: 0 40px;
 `;
-
-export const Settings = styled.div`
-  margin: 70px 20px 0 25px;
-  color: #a6a6a6;
-
-  h1,
-  h2 {
-    font-size: 16px;
-  }
-
-  input[type='text'] {
-    width: 100px;
-    height: 10px;
-    margin-bottom: 10px;
-  }
-`;
-
-export const CloseButton = styled.img`
-  float: right;
-  width: 17px;
-`;

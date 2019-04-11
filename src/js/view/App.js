@@ -1,5 +1,4 @@
-import { Statusbar, SettingIcon } from './styledComponents/Container';
-import TabSettings from './TabSettings';
+import TabSettings from './components/TabSettings';
 import LogViewer from './components/LogViewer';
 import SplitPane from 'react-split-pane';
 //import '../../css/App.css';
@@ -9,6 +8,7 @@ import { Provider } from 'react-redux';
 import { menuReducer } from './reducers/menu_reducer';
 import { ipcListener } from './ipc_listener';
 import * as ipcPublisher from './ipc_publisher';
+import * as StatusBarSC from './styledComponents/StatusBarStyledComponents';
 
 const React = require('react');
 const { Component } = require('react');
@@ -192,7 +192,7 @@ class App extends Component {
             allowResize={false}
             primary="second"
           >
-            <div>
+            <div style={{ height: '100%' }}>
               <LogViewer
                 lines={this.state.liveLines}
                 activeTail={this.state.activeTail}
@@ -222,7 +222,7 @@ class App extends Component {
           <h3>Redux state</h3>
           <pre>{JSON.stringify(store.getState(), null, 2)}</pre>
         </div> */}
-        <Statusbar>
+        <StatusBarSC.Statusbar>
           <ul>
             <li>Path: {this.state.filePath}</li>
 
@@ -231,7 +231,7 @@ class App extends Component {
             <li>Size: {this.state.fileSize}</li>
 
             <li>
-              <SettingIcon
+              <StatusBarSC.SettingIcon
                 src={settings}
                 onClick={() => {
                   this.settingClick();
@@ -240,7 +240,7 @@ class App extends Component {
               />
             </li>
           </ul>
-        </Statusbar>
+        </StatusBarSC.Statusbar>
       </div>
     );
   }
