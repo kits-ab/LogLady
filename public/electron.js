@@ -5,15 +5,11 @@ const path = require('path');
 const isDev = require('electron-is-dev');
 const updater = require('electron-simple-updater');
 const engine = require('../src/js/engine/engine');
-const menu = require('../src/js/view/menu');
+const menu = require('../src/js/electron/menu');
 const { Menu } = require('electron');
 updater.init();
 
 console.log(updater.version);
-
-menu.menuEvents.on('filePath', filePath => {
-  mainWindow.webContents.send('filePath', filePath);
-});
 
 let mainWindow;
 const createWindow = () => {
@@ -31,7 +27,7 @@ const createWindow = () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-  Menu.setApplicationMenu(menu.createMenu());
+  Menu.setApplicationMenu(menu.createMenu(mainWindow.webContents));
 };
 
 app.on('ready', createWindow);

@@ -1,14 +1,20 @@
-import { Statusbar, SettingIcon } from './Container';
-import TabSettings from './TabSettings';
+import TabSettings from './components/TabSettings';
 import LogViewer from './components/LogViewer';
 import SplitPane from 'react-split-pane';
-//import '../../css/App.css';
 import TopPanel from './components/TopPanel';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import { menuReducer } from './reducers/menu_reducer';
+import { ipcListener } from './ipc_listener';
+import * as ipcPublisher from './ipc_publisher';
+import Statusbar from './components/StatusBar';
 
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
-const settings = require('../../resources/settings.png');
+
+const store = createStore(menuReducer);
+ipcListener(store.dispatch);
 
 class App extends Component {
   constructor(props) {
@@ -146,7 +152,7 @@ class App extends Component {
       this.setNthLines(JSON.stringify(lines, null, 2));
     });
 
-    ipcRenderer.send('getLastLines', argObj);
+    this.props.send.getLastLines(argObj);
 
     ipcRenderer.once('lastLines', (event, lastLines) => {
       this.setLastLines(lastLines);
@@ -183,8 +189,15 @@ class App extends Component {
             defaultSize={this.state.settingsPaneSize}
             allowResize={false}
             primary="second"
+            style={{
+              background: 'linear-gradient(magenta, mediumspringgreen)'
+            }}
           >
-            <div>
+            <div
+              style={{
+                height: '100%'
+              }}
+            >
               <LogViewer
                 lines={this.state.liveLines}
                 activeTail={this.state.activeTail}
@@ -195,7 +208,11 @@ class App extends Component {
                 filterInputFieldValue={this.state.filterInputFieldValue}
               />
             </div>
-            <div>
+            <div
+              style={{
+                background: 'linear-gradient(mediumspringgreen, magenta)'
+              }}
+            >
               {this.state.showSettings ? (
                 <TabSettings
                   closeSettings={this.settingClick}
@@ -210,28 +227,27 @@ class App extends Component {
             </div>
           </SplitPane>
         </div>
-        <Statusbar>
-          <ul>
-            <li>Path: {this.state.filePath}</li>
-
-            <li>Lines:{this.state.numberOfLines}</li>
-
-            <li>Size: {this.state.fileSize}</li>
-
-            <li>
-              <SettingIcon
-                src={settings}
-                onClick={() => {
-                  this.settingClick();
-                }}
-                alt="settings"
-              />
-            </li>
-          </ul>
-        </Statusbar>
+        <Statusbar
+          filePath={
+            store.getState().openFiles ? store.getState().openFiles[0] : null
+          }
+          fileSize={this.state.fileSize}
+          numberOfLines={this.state.numberOfLines}
+          settingClick={this.settingClick}
+        />
       </div>
     );
   }
 }
 
-export default App;
+class AppContainer extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <App send={ipcPublisher} />
+      </Provider>
+    );
+  }
+}
+
+export default AppContainer;
