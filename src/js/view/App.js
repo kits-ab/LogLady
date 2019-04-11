@@ -1,19 +1,17 @@
 import TabSettings from './components/TabSettings';
 import LogViewer from './components/LogViewer';
 import SplitPane from 'react-split-pane';
-//import '../../css/App.css';
 import TopPanel from './components/TopPanel';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { menuReducer } from './reducers/menu_reducer';
 import { ipcListener } from './ipc_listener';
 import * as ipcPublisher from './ipc_publisher';
-import * as StatusBarSC from './styledComponents/StatusBarStyledComponents';
+import Statusbar from './components/StatusBar';
 
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
-const settings = require('../../resources/settings.png');
 
 const store = createStore(menuReducer);
 ipcListener(store.dispatch);
@@ -218,29 +216,13 @@ class App extends Component {
             </div>
           </SplitPane>
         </div>
-        {/* <div>
-          <h3>Redux state</h3>
-          <pre>{JSON.stringify(store.getState(), null, 2)}</pre>
-        </div> */}
-        <StatusBarSC.Statusbar>
-          <ul>
-            <li>Path: {this.state.filePath}</li>
-
-            <li>Lines:{this.state.numberOfLines}</li>
-
-            <li>Size: {this.state.fileSize}</li>
-
-            <li>
-              <StatusBarSC.SettingIcon
-                src={settings}
-                onClick={() => {
-                  this.settingClick();
-                }}
-                alt="settings"
-              />
-            </li>
-          </ul>
-        </StatusBarSC.Statusbar>
+        <Statusbar
+          filePath={
+            store.getState().openFiles ? store.getState().openFiles[0] : null
+          }
+          fileSize={this.state.fileSize}
+          numberOfLines={this.state.numberOfLines}
+        />
       </div>
     );
   }
