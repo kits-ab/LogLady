@@ -1,4 +1,4 @@
-import { Statusbar, SettingIcon } from './Container';
+import { Statusbar, SettingIcon } from './styledComponents/Container';
 import TabSettings from './TabSettings';
 import LogViewer from './components/LogViewer';
 import SplitPane from 'react-split-pane';
@@ -218,10 +218,10 @@ class App extends Component {
             </div>
           </SplitPane>
         </div>
-        <div>
+        {/* <div>
           <h3>Redux state</h3>
           <pre>{JSON.stringify(store.getState(), null, 2)}</pre>
-        </div>
+        </div> */}
         <Statusbar>
           <ul>
             <li>Path: {this.state.filePath}</li>

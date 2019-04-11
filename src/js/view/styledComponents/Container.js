@@ -1,11 +1,5 @@
 import styled from 'styled-components';
 
-export const Wrapper = styled.div`
-  position: relative;
-  margin: 0;
-  padding-bottom: 6rem;
-  min-height: 100%;
-`;
 export const Statusbar = styled.div`
   bottom: 0;
   width: 100%;

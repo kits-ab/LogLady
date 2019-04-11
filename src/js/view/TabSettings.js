@@ -1,4 +1,4 @@
-import { Settings, CloseButton } from './Container';
+import { Settings, CloseButton } from './styledComponents/Container';
 import { GithubPicker } from 'react-color';
 
 const React = require('react');
