@@ -4,11 +4,19 @@ import LogViewer from './components/LogViewer';
 import SplitPane from 'react-split-pane';
 //import '../../css/App.css';
 import TopPanel from './components/TopPanel';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import { menuReducer } from './reducers/menu_reducer';
+import { ipcListener } from './ipc_listener';
+import * as ipcPublisher from './ipc_publisher';
 
 const React = require('react');
 const { Component } = require('react');
 const { ipcRenderer } = window.require('electron');
 const settings = require('../../resources/settings.png');
+
+const store = createStore(menuReducer);
+ipcListener(store.dispatch);
 
 class App extends Component {
   constructor(props) {
@@ -146,7 +154,7 @@ class App extends Component {
       this.setNthLines(JSON.stringify(lines, null, 2));
     });
 
-    ipcRenderer.send('getLastLines', argObj);
+    this.props.send.getLastLines(argObj);
 
     ipcRenderer.once('lastLines', (event, lastLines) => {
       this.setLastLines(lastLines);
@@ -210,6 +218,10 @@ class App extends Component {
             </div>
           </SplitPane>
         </div>
+        <div>
+          <h3>Redux state</h3>
+          <pre>{JSON.stringify(store.getState(), null, 2)}</pre>
+        </div>
         <Statusbar>
           <ul>
             <li>Path: {this.state.filePath}</li>
@@ -234,4 +246,14 @@ class App extends Component {
   }
 }
 
-export default App;
+class AppContainer extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <App send={ipcPublisher} />
+      </Provider>
+    );
+  }
+}
+
+export default AppContainer;
