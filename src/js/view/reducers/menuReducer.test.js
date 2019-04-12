@@ -1,4 +1,4 @@
-import { menuReducer } from './menu_reducer';
+import { menuReducer } from './menuReducer';
 
 it('should return state at unknown type', () => {
   const state = { some: 'state' };

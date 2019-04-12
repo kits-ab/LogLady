@@ -1,5 +1,6 @@
 import React from 'react';
 import * as StatusBarSC from '../styledComponents/StatusBarStyledComponents';
+import { handleShowSettings } from '../actions/settingsActions';
 const settings = require('../../../resources/settings.png');
 
 class StatusBar extends React.Component {
@@ -17,7 +18,7 @@ class StatusBar extends React.Component {
             <StatusBarSC.SettingIcon
               src={settings}
               onClick={() => {
-                this.props.settingClick();
+                handleShowSettings(this.props.dispatch);
               }}
               alt="settings"
             />
