@@ -230,7 +230,9 @@ class App extends Component {
         </div>
         <Statusbar
           filePath={
-            store.getState().openFiles ? store.getState().openFiles[0] : null
+            store.getState().menuReducer.openFiles
+              ? store.getState().menuReducer.openFiles[0]
+              : null
           }
           fileSize={this.state.fileSize}
           numberOfLines={this.state.numberOfLines}
