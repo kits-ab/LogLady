@@ -16,7 +16,7 @@ class LogViewer extends React.Component {
   createLineArray = () => {
     const lineArray = [];
     lineArray.push(...this.props.lines.split('\n'));
-    const matchArray = findMatches(this.props.filterInputFieldValue, lineArray);
+    const matchArray = findMatches(this.props.filterInput, lineArray);
 
     return matchArray;
   };
@@ -54,7 +54,6 @@ class LogViewer extends React.Component {
   };
 
   render() {
-    console.log('sdfghj', this.props.tailSwitch, this.state.autoScroll);
     const lines = this.props.lines && this.createLineArray();
     return (
       <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
@@ -82,7 +81,8 @@ class LogViewer extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    tailSwitch: state.topPanelReducer.tailSwitch
+    tailSwitch: state.topPanelReducer.tailSwitch,
+    filterInput: state.topPanelReducer.filterInput
   };
 };
 

@@ -1,17 +1,25 @@
 import * as TopPanelSC from '../styledComponents/TopPanelStyledComponents';
 import React from 'react';
-import { handleTailSwitch } from '../actions/dispatchActions';
+import {
+  handleFilterInput,
+  handleTailSwitch
+} from '../actions/dispatchActions';
 import { connect } from 'react-redux';
 
 class TopPanel extends React.Component {
+  _handleFilterInput = event => {
+    handleFilterInput(this.props.dispatch, event.target.value);
+  };
   render() {
     return (
       <TopPanelSC.AppBar>
         <p>LogLady</p>
         <TopPanelSC.TextFieldInput
           placeholder="filter"
-          value={this.props.filterInputFieldValue}
-          onChange={this.props.filterInputField}
+          value={this.props.filterInput}
+          onChange={e => {
+            this._handleFilterInput(e);
+          }}
           type="text"
         />
 
@@ -29,7 +37,9 @@ class TopPanel extends React.Component {
             <input
               type="checkbox"
               checked={this.props.tailSwitch}
-              onChange={console.log('im constantly changing')}
+              onChange={() => {
+                handleTailSwitch(this.props.dispatch);
+              }}
             />
             <span />
           </TopPanelSC.TailSwitch>
@@ -41,7 +51,8 @@ class TopPanel extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    tailSwitch: state.topPanelReducer.tailSwitch
+    tailSwitch: state.topPanelReducer.tailSwitch,
+    filterInput: state.topPanelReducer.filterInput
   };
 };
 

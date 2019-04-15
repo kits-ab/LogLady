@@ -124,8 +124,6 @@ class App extends Component {
             dispatch={store.dispatch}
             higlightInputField={this.handleHiglightInputField}
             higlightInputFieldValue={this.state.highlightInputFieldValue}
-            filterInputField={this.handleFilterInputField}
-            filterInputFieldValue={this.state.filterInputFieldValue}
           />
         </div>
         <div>
@@ -139,8 +137,6 @@ class App extends Component {
               highlightColorInput={this.state.highlightColor}
               higlightInputField={this.handleHiglightInputField}
               higlightInputFieldValue={this.state.highlightInputFieldValue}
-              filterInputField={this.handleFilterInputField}
-              filterInputFieldValue={this.state.filterInputFieldValue}
             />
           </div>
           <div
@@ -152,10 +148,6 @@ class App extends Component {
               <TabSettings
                 handleSettingsPaneSize={this.handleSettingsPaneSize}
                 highlightColorInput={this.handleHighlightColorInput}
-                higlightInputField={this.handleHiglightInputField}
-                higlightInputFieldValue={this.state.highlightInputFieldValue}
-                filterInputField={this.handleFilterInputField}
-                filterInputFieldValue={this.state.filterInputFieldValue}
               />
             ) : null}
           </div>

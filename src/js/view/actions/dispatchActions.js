@@ -9,3 +9,10 @@ export const handleTailSwitch = dispatch => {
     type: 'tailSwitch'
   });
 };
+
+export const handleFilterInput = (dispatch, data) => {
+  dispatch({
+    type: 'filterInput',
+    data: data
+  });
+};
