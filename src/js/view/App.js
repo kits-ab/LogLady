@@ -120,11 +120,7 @@ class App extends Component {
     return (
       <div>
         <div>
-          <TopPanel
-            dispatch={store.dispatch}
-            higlightInputField={this.handleHiglightInputField}
-            higlightInputFieldValue={this.state.highlightInputFieldValue}
-          />
+          <TopPanel dispatch={store.dispatch} />
         </div>
         <div>
           <div
