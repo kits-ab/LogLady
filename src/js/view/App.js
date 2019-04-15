@@ -21,12 +21,8 @@ class App extends Component {
     this.state = {
       lastLines: '',
       nthLines: '',
-      time: '',
-      numberOfLines: '',
       liveLines: '',
       filePath: '',
-      // showSettings: false,
-      fileSize: '',
       highlightColor: 'red',
       highlightInputFieldValue: '',
       filterInputFieldValue: '',
@@ -84,30 +80,9 @@ class App extends Component {
     });
   };
 
-  setTime = _returnValue => {
-    let theTime = new Date(_returnValue);
-
-    this.setState({
-      time:
-        theTime.toLocaleTimeString('sv-SE') + ':' + theTime.getMilliseconds()
-    });
-  };
-
-  setNumberOfLines = _returnValue => {
-    this.setState({
-      numberOfLines: _returnValue
-    });
-  };
-
   setFilePath = _returnValue => {
     this.setState({
       filePath: _returnValue
-    });
-  };
-
-  setFileSize = _returnValue => {
-    this.setState({
-      fileSize: _returnValue
     });
   };
 
@@ -125,13 +100,6 @@ class App extends Component {
     argObj.numberOfLines = 5;
     argObj.lineNumber = 10;
 
-    //Just to show that our listener can be live.
-    ipcRenderer.send('getTime', 'time');
-
-    ipcRenderer.on('theTime', (event, time) => {
-      this.setTime(time);
-    });
-
     ipcRenderer.send('getLiveLines', argObj);
 
     ipcRenderer.on('liveLines', (event, lines) => {
@@ -139,10 +107,6 @@ class App extends Component {
     });
 
     ipcRenderer.send('getNumberOfLines', argObj);
-
-    ipcRenderer.once('numberOfLines', (event, numberOfLines) => {
-      this.setNumberOfLines(numberOfLines);
-    });
 
     ipcRenderer.send('getNthLines', argObj);
 
@@ -158,9 +122,6 @@ class App extends Component {
 
     // ipcRenderer.send('getFileSize', argObj);
     this.props.send.getFileSize(argObj);
-    ipcRenderer.once('fileSize', (event, size) => {
-      this.setFileSize(size);
-    });
   };
 
   render() {
@@ -208,17 +169,7 @@ class App extends Component {
             ) : null}
           </div>
         </div>
-        <Statusbar
-          filePath={
-            store.getState().menuReducer.openFiles
-              ? store.getState().menuReducer.openFiles[0]
-              : null
-          }
-          fileSize={this.state.fileSize}
-          numberOfLines={this.state.numberOfLines}
-          settingClick={this.settingClick}
-          dispatch={store.dispatch}
-        />
+        <Statusbar dispatch={store.dispatch} />
       </div>
     );
   }

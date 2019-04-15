@@ -6,11 +6,11 @@ const settings = require('../../../resources/settings.png');
 
 class StatusBar extends React.Component {
   render() {
-    console.log(this.props.openFiles);
+    console.log(this.props.fileSize);
     return (
       <StatusBarSC.Statusbar>
         <ul>
-          <li>Path: {this.props.filePath}</li>
+          <li>Path: {this.props.openFiles ? this.props.openFiles[0] : null}</li>
 
           <li>Lines:{this.props.numberOfLines}</li>
 
@@ -34,7 +34,9 @@ class StatusBar extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    openFiles: state.menuReducer.openFiles
+    openFiles: state.menuReducer.openFiles,
+    numberOfLines: state.logInfoReducer.numberOfLines,
+    fileSize: state.logInfoReducer.fileSize
   };
 };
 
