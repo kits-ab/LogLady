@@ -1,13 +1,15 @@
+import { combineReducers } from 'redux';
+import { logInfoReducer } from './logInfoReducer';
+import { logViewerReducer } from './logViewerReducer';
 import { menuReducer } from './menuReducer';
 import { settingsReducer } from './settingsReducer';
-import { logInfoReducer } from './logInfoReducer';
 import { topPanelReducer } from './topPanelReducer';
-import { combineReducers } from 'redux';
 
 const reducers = combineReducers({
+  logInfoReducer,
+  logViewerReducer,
   menuReducer,
   settingsReducer,
-  logInfoReducer,
   topPanelReducer
 });
 
