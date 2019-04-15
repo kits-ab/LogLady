@@ -26,17 +26,10 @@ class App extends Component {
       highlightColor: 'red',
       highlightInputFieldValue: '',
       filterInputFieldValue: '',
-      activeTail: true,
       settingsPaneSize: '0px'
     };
     this.startListener();
   }
-
-  handleActiveTail = () => {
-    this.setState({
-      activeTail: !this.state.activeTail
-    });
-  };
 
   handleHighlightColorInput = event => {
     this.setState({
@@ -120,7 +113,6 @@ class App extends Component {
       this.setLastLines(lastLines);
     });
 
-    // ipcRenderer.send('getFileSize', argObj);
     this.props.send.getFileSize(argObj);
   };
 
@@ -129,7 +121,7 @@ class App extends Component {
       <div>
         <div>
           <TopPanel
-            activeTail={this.handleActiveTail}
+            dispatch={store.dispatch}
             higlightInputField={this.handleHiglightInputField}
             higlightInputFieldValue={this.state.highlightInputFieldValue}
             filterInputField={this.handleFilterInputField}
@@ -144,7 +136,6 @@ class App extends Component {
           >
             <LogViewer
               lines={this.state.liveLines}
-              activeTail={this.state.activeTail}
               highlightColorInput={this.state.highlightColor}
               higlightInputField={this.handleHiglightInputField}
               higlightInputFieldValue={this.state.highlightInputFieldValue}

@@ -3,3 +3,9 @@ export const handleShowSettings = dispatch => {
     type: 'showSettings'
   });
 };
+
+export const handleTailSwitch = dispatch => {
+  dispatch({
+    type: 'tailSwitch'
+  });
+};

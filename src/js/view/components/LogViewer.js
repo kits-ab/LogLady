@@ -1,7 +1,7 @@
 import React from 'react';
 import { findMatches } from './lineFilterHelper';
 import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
-
+import { connect } from 'react-redux';
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
@@ -22,7 +22,7 @@ class LogViewer extends React.Component {
   };
 
   componentDidUpdate = () => {
-    if (this.state.autoScroll !== this.props.activeTail) {
+    if (this.state.autoScroll !== this.props.tailSwitch) {
       this.handleAutoScroll();
     }
   };
@@ -54,6 +54,7 @@ class LogViewer extends React.Component {
   };
 
   render() {
+    console.log('sdfghj', this.props.tailSwitch, this.state.autoScroll);
     const lines = this.props.lines && this.createLineArray();
     return (
       <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
@@ -79,4 +80,10 @@ class LogViewer extends React.Component {
   }
 }
 
-export default LogViewer;
+const mapStateToProps = state => {
+  return {
+    tailSwitch: state.topPanelReducer.tailSwitch
+  };
+};
+
+export default connect(mapStateToProps)(LogViewer);
