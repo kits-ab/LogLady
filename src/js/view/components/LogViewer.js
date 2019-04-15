@@ -1,7 +1,7 @@
 import React from 'react';
 import { findMatches } from './lineFilterHelper';
 import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
-
+import { connect } from 'react-redux';
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
@@ -16,13 +16,13 @@ class LogViewer extends React.Component {
   createLineArray = () => {
     const lineArray = [];
     lineArray.push(...this.props.lines.split('\n'));
-    const matchArray = findMatches(this.props.filterInputFieldValue, lineArray);
+    const matchArray = findMatches(this.props.filterInput, lineArray);
 
     return matchArray;
   };
 
   componentDidUpdate = () => {
-    if (this.state.autoScroll !== this.props.activeTail) {
+    if (this.state.autoScroll !== this.props.tailSwitch) {
       this.handleAutoScroll();
     }
   };
@@ -53,6 +53,12 @@ class LogViewer extends React.Component {
     }
   };
 
+  setHighlightColor = line => {
+    return line.match(new RegExp(this.props.highlightInput, 'gi')) &&
+      this.props.highlightInput
+      ? { background: this.props.highlightColorInput }
+      : {};
+  };
   render() {
     const lines = this.props.lines && this.createLineArray();
     return (
@@ -60,16 +66,7 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <p
-                style={
-                  line.match(
-                    new RegExp(this.props.higlightInputFieldValue, 'gi')
-                  ) && this.props.higlightInputFieldValue
-                    ? { background: this.props.highlightColorInput }
-                    : {}
-                }
-                key={i}
-              >
+              <p style={this.setHighlightColor(line)} key={i}>
                 {line}
               </p>
             );
@@ -79,4 +76,12 @@ class LogViewer extends React.Component {
   }
 }
 
-export default LogViewer;
+const mapStateToProps = state => {
+  return {
+    tailSwitch: state.topPanelReducer.tailSwitch,
+    filterInput: state.topPanelReducer.filterInput,
+    highlightInput: state.topPanelReducer.highlightInput
+  };
+};
+
+export default connect(mapStateToProps)(LogViewer);

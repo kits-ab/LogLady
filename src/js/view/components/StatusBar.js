@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as StatusBarSC from '../styledComponents/StatusBarStyledComponents';
-import { handleShowSettings } from '../actions/settingsActions';
+import { handleShowSettings } from '../actions/dispatchActions';
 const settings = require('../../../resources/settings.png');
 
 class StatusBar extends React.Component {

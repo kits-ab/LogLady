@@ -26,17 +26,10 @@ class App extends Component {
       highlightColor: 'red',
       highlightInputFieldValue: '',
       filterInputFieldValue: '',
-      activeTail: true,
       settingsPaneSize: '0px'
     };
     this.startListener();
   }
-
-  handleActiveTail = () => {
-    this.setState({
-      activeTail: !this.state.activeTail
-    });
-  };
 
   handleHighlightColorInput = event => {
     this.setState({
@@ -120,7 +113,6 @@ class App extends Component {
       this.setLastLines(lastLines);
     });
 
-    // ipcRenderer.send('getFileSize', argObj);
     this.props.send.getFileSize(argObj);
   };
 
@@ -128,13 +120,7 @@ class App extends Component {
     return (
       <div>
         <div>
-          <TopPanel
-            activeTail={this.handleActiveTail}
-            higlightInputField={this.handleHiglightInputField}
-            higlightInputFieldValue={this.state.highlightInputFieldValue}
-            filterInputField={this.handleFilterInputField}
-            filterInputFieldValue={this.state.filterInputFieldValue}
-          />
+          <TopPanel dispatch={store.dispatch} />
         </div>
         <div>
           <div
@@ -144,12 +130,9 @@ class App extends Component {
           >
             <LogViewer
               lines={this.state.liveLines}
-              activeTail={this.state.activeTail}
               highlightColorInput={this.state.highlightColor}
               higlightInputField={this.handleHiglightInputField}
               higlightInputFieldValue={this.state.highlightInputFieldValue}
-              filterInputField={this.handleFilterInputField}
-              filterInputFieldValue={this.state.filterInputFieldValue}
             />
           </div>
           <div
@@ -161,10 +144,6 @@ class App extends Component {
               <TabSettings
                 handleSettingsPaneSize={this.handleSettingsPaneSize}
                 highlightColorInput={this.handleHighlightColorInput}
-                higlightInputField={this.handleHiglightInputField}
-                higlightInputFieldValue={this.state.highlightInputFieldValue}
-                filterInputField={this.handleFilterInputField}
-                filterInputFieldValue={this.state.filterInputFieldValue}
               />
             ) : null}
           </div>
