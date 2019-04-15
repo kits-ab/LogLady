@@ -1,4 +1,4 @@
-import { findMatches } from './lineFilter_helper';
+import { findMatches } from './lineFilterHelper';
 
 describe('findMatches', () => {
   test('should return matching word', () => {

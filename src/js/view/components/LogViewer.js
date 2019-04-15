@@ -1,5 +1,5 @@
 import React from 'react';
-import { findMatches } from './lineFilter_helper';
+import { findMatches } from './lineFilterHelper';
 import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 
 class LogViewer extends React.Component {
