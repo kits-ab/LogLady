@@ -16,3 +16,10 @@ export const handleFilterInput = (dispatch, data) => {
     data: data
   });
 };
+
+export const handleHighlightInput = (dispatch, data) => {
+  dispatch({
+    type: 'highlightInput',
+    data: data
+  });
+};

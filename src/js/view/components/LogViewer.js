@@ -53,6 +53,12 @@ class LogViewer extends React.Component {
     }
   };
 
+  setHighlightColor = line => {
+    return line.match(new RegExp(this.props.highlightInput, 'gi')) &&
+      this.props.highlightInput
+      ? { background: this.props.highlightColorInput }
+      : {};
+  };
   render() {
     const lines = this.props.lines && this.createLineArray();
     return (
@@ -60,16 +66,7 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <p
-                style={
-                  line.match(
-                    new RegExp(this.props.higlightInputFieldValue, 'gi')
-                  ) && this.props.higlightInputFieldValue
-                    ? { background: this.props.highlightColorInput }
-                    : {}
-                }
-                key={i}
-              >
+              <p style={this.setHighlightColor(line)} key={i}>
                 {line}
               </p>
             );
@@ -82,7 +79,8 @@ class LogViewer extends React.Component {
 const mapStateToProps = state => {
   return {
     tailSwitch: state.topPanelReducer.tailSwitch,
-    filterInput: state.topPanelReducer.filterInput
+    filterInput: state.topPanelReducer.filterInput,
+    highlightInput: state.topPanelReducer.highlightInput
   };
 };
 

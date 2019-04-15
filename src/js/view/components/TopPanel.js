@@ -2,14 +2,12 @@ import * as TopPanelSC from '../styledComponents/TopPanelStyledComponents';
 import React from 'react';
 import {
   handleFilterInput,
+  handleHighlightInput,
   handleTailSwitch
 } from '../actions/dispatchActions';
 import { connect } from 'react-redux';
 
 class TopPanel extends React.Component {
-  _handleFilterInput = event => {
-    handleFilterInput(this.props.dispatch, event.target.value);
-  };
   render() {
     return (
       <TopPanelSC.AppBar>
@@ -18,15 +16,17 @@ class TopPanel extends React.Component {
           placeholder="filter"
           value={this.props.filterInput}
           onChange={e => {
-            this._handleFilterInput(e);
+            handleFilterInput(this.props.dispatch, e.target.value);
           }}
           type="text"
         />
 
         <TopPanelSC.TextFieldInput
           placeholder="highlight"
-          value={this.props.higlightInputFieldValue}
-          onChange={this.props.higlightInputField}
+          value={this.props.highlightInput}
+          onChange={e => {
+            handleHighlightInput(this.props.dispatch, e.target.value);
+          }}
           type="text"
         />
 
@@ -52,7 +52,8 @@ class TopPanel extends React.Component {
 const mapStateToProps = state => {
   return {
     tailSwitch: state.topPanelReducer.tailSwitch,
-    filterInput: state.topPanelReducer.filterInput
+    filterInput: state.topPanelReducer.filterInput,
+    highlightInput: state.topPanelReducer.highlightInput
   };
 };
 
