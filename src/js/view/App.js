@@ -1,12 +1,9 @@
 import TabSettings from './components/TabSettings';
 import LogViewer from './components/LogViewer';
-import SplitPane from 'react-split-pane';
 import TopPanel from './components/TopPanel';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import reducers from './reducers/index.js';
-// import { menuReducer } from './reducers/menuReducer';
-// import { settingsReducer } from './reducers/settingsReducer';
 import { ipcListener } from './ipcListener';
 import * as ipcPublisher from './ipcPublisher';
 import Statusbar from './components/StatusBar';

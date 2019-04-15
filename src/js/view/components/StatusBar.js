@@ -32,8 +32,6 @@ class StatusBar extends React.Component {
   }
 }
 
-// export default StatusBar;
-
 const mapStateToProps = state => {
   return {
     openFiles: state.menuReducer.openFiles
