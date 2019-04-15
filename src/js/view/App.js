@@ -5,8 +5,8 @@ import TopPanel from './components/TopPanel';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import reducers from './reducers/index.js';
-import { menuReducer } from './reducers/menuReducer';
-import { settingsReducer } from './reducers/settingsReducer';
+// import { menuReducer } from './reducers/menuReducer';
+// import { settingsReducer } from './reducers/settingsReducer';
 import { ipcListener } from './ipcListener';
 import * as ipcPublisher from './ipcPublisher';
 import Statusbar from './components/StatusBar';
@@ -166,13 +166,6 @@ class App extends Component {
     });
   };
 
-  // settingClick = () => {
-  //   this.setState({
-  //     showSettings: !this.state.showSettings
-  //   });
-  //   this.handleSettingsPaneSize();
-  // };
-
   render() {
     return (
       <div>
@@ -186,47 +179,37 @@ class App extends Component {
           />
         </div>
         <div>
-          <SplitPane
-            split="vertical"
-            defaultSize={this.state.settingsPaneSize}
-            allowResize={false}
-            primary="second"
+          <div
             style={{
-              background: 'linear-gradient(magenta, mediumspringgreen)'
+              height: '600px'
             }}
           >
-            <div
-              style={{
-                height: '100%'
-              }}
-            >
-              <LogViewer
-                lines={this.state.liveLines}
-                activeTail={this.state.activeTail}
-                highlightColorInput={this.state.highlightColor}
+            <LogViewer
+              lines={this.state.liveLines}
+              activeTail={this.state.activeTail}
+              highlightColorInput={this.state.highlightColor}
+              higlightInputField={this.handleHiglightInputField}
+              higlightInputFieldValue={this.state.highlightInputFieldValue}
+              filterInputField={this.handleFilterInputField}
+              filterInputFieldValue={this.state.filterInputFieldValue}
+            />
+          </div>
+          <div
+            style={{
+              background: 'linear-gradient(mediumspringgreen, magenta)'
+            }}
+          >
+            {store.getState().settingsReducer.showSettings ? (
+              <TabSettings
+                handleSettingsPaneSize={this.handleSettingsPaneSize}
+                highlightColorInput={this.handleHighlightColorInput}
                 higlightInputField={this.handleHiglightInputField}
                 higlightInputFieldValue={this.state.highlightInputFieldValue}
                 filterInputField={this.handleFilterInputField}
                 filterInputFieldValue={this.state.filterInputFieldValue}
               />
-            </div>
-            <div
-              style={{
-                background: 'linear-gradient(mediumspringgreen, magenta)'
-              }}
-            >
-              {store.getState().settingsReducer.showSettings ? (
-                <TabSettings
-                  handleSettingsPaneSize={this.handleSettingsPaneSize}
-                  highlightColorInput={this.handleHighlightColorInput}
-                  higlightInputField={this.handleHiglightInputField}
-                  higlightInputFieldValue={this.state.highlightInputFieldValue}
-                  filterInputField={this.handleFilterInputField}
-                  filterInputFieldValue={this.state.filterInputFieldValue}
-                />
-              ) : null}
-            </div>
-          </SplitPane>
+            ) : null}
+          </div>
         </div>
         <Statusbar
           filePath={

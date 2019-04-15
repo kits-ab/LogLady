@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 export const Settings = styled.div`
+  // float: right;
   margin: 70px 20px 0 25px;
   color: #a6a6a6;
   background-color: brown;
