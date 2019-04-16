@@ -1,5 +1,5 @@
 import React from 'react';
-import { findMatches } from './lineFilterHelper';
+import { findMatches } from './helpers/lineFilterHelper';
 import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 class LogViewer extends React.Component {
