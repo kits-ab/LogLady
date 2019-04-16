@@ -4,24 +4,12 @@ const nthLine = require('nthline');
 const { EventEmitter } = require('events');
 const fileReaderEvents = new EventEmitter();
 
-// const writeStream = fs.createWriteStream('./src/resources/myLittleFile.txt');
-// writeStream.once('open', fd => {
-//   for (let i = 1; i < 1000001; i++) {
-//     writeStream.write(`${i}\n`);
-//   }
-//   writeStream.end();
-// });
-
 const readLastLines = (filePath, numberOfLines) => {
   return lastLines.read(filePath, numberOfLines);
 };
 
-const readLinesLive = filePath => {
-  //begin by reading and emitting the last 10 lines
-  readLastLines(filePath, 10).then(lines => {
-    fileReaderEvents.emit('liveLines', lines.slice(0, lines.lastIndexOf('\n')));
-  });
-  //find and save the index of the last newline characters
+//find and save the index of the last newline characters
+const getLastNewlineIndex = filePath => {
   let lastNewlineIndex = 0;
   fs.createReadStream(filePath)
     .setEncoding('utf8')
@@ -34,8 +22,20 @@ const readLinesLive = filePath => {
     .on('error', err => {
       throw new Error(err);
     });
-  //start a watcher and read the new lines starting from the last newline index
-  //whenever there is a change to the file.
+  return lastNewlineIndex;
+};
+
+const formatLinesFromBuffer = _buffer => {
+  if (_buffer.split('\n')[0] === '') {
+    return _buffer.slice(1, _buffer.lastIndexOf('\n'));
+  } else {
+    return _buffer.slice(0, _buffer.lastIndexOf('\n'));
+  }
+};
+
+//start a watcher and read the new lines starting from the last newline index
+//whenever there is a change to the file.
+const startWatcher = (filePath, lastNewlineIndex) => {
   fs.watch(filePath, (event, filename) => {
     console.log('watcher started.');
     let readStreamFromLastIndex = fs
@@ -45,20 +45,21 @@ const readLinesLive = filePath => {
       .setEncoding('utf8');
     readStreamFromLastIndex.on('data', buffer => {
       lastNewlineIndex += buffer.lastIndexOf('\n');
-      let lines = '';
-      if (buffer.split('\n')[0] === '') {
-        lines = buffer.slice(1, buffer.lastIndexOf('\n'));
-      } else {
-        lines = buffer.slice(0, buffer.lastIndexOf('\n'));
-      }
-      console.log('FR: ', lines);
+      let lines = formatLinesFromBuffer(buffer);
+
       fileReaderEvents.emit('liveLines', lines);
     });
-    // }
   });
 };
-// readLinesLive('./src/resources/myLittleFile.txt');
-// readLinesLive('../lologoggenerator/app/lologog/testLog.txt');
+
+const readLinesLive = filePath => {
+  //begin by reading and emitting the last 10 lines
+  readLastLines(filePath, 10).then(lines => {
+    fileReaderEvents.emit('liveLines', lines.slice(0, lines.lastIndexOf('\n')));
+  });
+  let lastNewlineIndex = getLastNewlineIndex(filePath);
+  startWatcher(filePath, lastNewlineIndex);
+};
 
 const getNumberOfLines = filePath => {
   return new Promise((resolve, reject) => {
@@ -73,8 +74,6 @@ const getNumberOfLines = filePath => {
         } while (idx !== -1);
       })
       .on('end', () => {
-        // console.log('idx: ', idx);
-        // console.log('lineCount: ', lineCount);
         resolve(lineCount);
       })
       .on('error', err => {
@@ -82,7 +81,6 @@ const getNumberOfLines = filePath => {
       });
   });
 };
-// getNumberOfLines('src/resources/myLittleFile.txt');
 
 const readFile = (filePath, enc) => {
   return new Promise((resolve, reject) => {
