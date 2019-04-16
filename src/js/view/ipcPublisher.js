@@ -1,11 +1,16 @@
 const { ipcRenderer } = window.require('electron');
 
-export const getLastLines = argObj => {
-  console.log('Sending "getLastLines" over IPC', argObj);
-  ipcRenderer.send('getLastLines', argObj);
+export const getFileSize = argObj => {
+  ipcRenderer.send('getFileSize', argObj);
 };
 
-export const getFileSize = argObj => {
-  console.log('Sending "getFileSize" ocer IPC', argObj);
-  ipcRenderer.send('getFileSize', argObj);
+export const getLiveLines = argObj => {
+  ipcRenderer.send('getLiveLines', argObj);
+};
+
+export const getNthLines = argObj => {
+  ipcRenderer.send('getNthLines', argObj);
+};
+export const getNumberOfLines = argObj => {
+  ipcRenderer.send('getNumberOfLines', argObj);
 };

@@ -5,26 +5,15 @@ import { connect } from 'react-redux';
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      lineFilterText: '',
-      autoScroll: true
-    };
-
     this.liveLinesContainer = React.createRef();
   }
 
   createLineArray = () => {
     const lineArray = [];
-    lineArray.push(...this.props.lines.split('\n'));
+    lineArray.push(...this.props.liveLines.split('\n'));
     const matchArray = findMatches(this.props.filterInput, lineArray);
 
     return matchArray;
-  };
-
-  componentDidUpdate = () => {
-    if (this.state.autoScroll !== this.props.tailSwitch) {
-      this.handleAutoScroll();
-    }
   };
 
   componentDidMount = () => {
@@ -33,19 +22,8 @@ class LogViewer extends React.Component {
     containerObserver.observe(this.liveLinesContainer.current, observerConfig);
   };
 
-  handleAutoScroll = () => {
-    !this.state.autoScroll &&
-      this.liveLinesContainer.current.scrollTo(
-        0,
-        this.liveLinesContainer.current.scrollHeight
-      );
-    this.setState({
-      autoScroll: !this.state.autoScroll
-    });
-  };
-
   scrollToBottom = () => {
-    if (this.state.autoScroll) {
+    if (this.props.tailSwitch) {
       this.liveLinesContainer.current.scrollTo(
         0,
         this.liveLinesContainer.current.scrollHeight
@@ -60,7 +38,7 @@ class LogViewer extends React.Component {
       : {};
   };
   render() {
-    const lines = this.props.lines && this.createLineArray();
+    const lines = this.props.liveLines && this.createLineArray();
     return (
       <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
         {lines &&
@@ -78,9 +56,11 @@ class LogViewer extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    tailSwitch: state.topPanelReducer.tailSwitch,
     filterInput: state.topPanelReducer.filterInput,
-    highlightInput: state.topPanelReducer.highlightInput
+    highlightInput: state.topPanelReducer.highlightInput,
+    liveLines: state.logViewerReducer.liveLines,
+    nthLines: state.logViewerReducer.nthLines,
+    tailSwitch: state.topPanelReducer.tailSwitch
   };
 };
 

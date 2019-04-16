@@ -1,21 +1,15 @@
 const fileReader = require('../adapters/fileReader');
 const { ipcMain } = require('electron');
 
+let action = {};
+
 ipcMain.on('getLiveLines', (event, argObj) => {
   fileReader.readLinesLive(argObj.filePath);
   fileReader.fileReaderEvents.on('liveLines', lines => {
-    // console.log('live engine.js: ', lines);
-    event.sender.send('liveLines', lines);
+    action.type = 'liveLines';
+    action.data = lines;
+    event.sender.send('app_store', action);
   });
-});
-
-ipcMain.once('getLastLines', (event, lastLines) => {
-  fileReader
-    .readLastLines(lastLines.filePath, lastLines.numberOfLines)
-    .then(lines => {
-      // console.log(lines);
-      event.sender.send('lastLines', lines);
-    });
 });
 
 ipcMain.once('getNthLines', (event, nthLines) => {
@@ -26,12 +20,12 @@ ipcMain.once('getNthLines', (event, nthLines) => {
       nthLines.numberOfLines
     )
     .then(lines => {
-      // console.log(lines);
-      event.sender.send('nthLines', lines);
+      action.type = 'nthLines';
+      action.data = lines;
+      event.sender.send('app_store', action);
     });
 });
 
-let action = {};
 ipcMain.once('getNumberOfLines', (event, numberOfLines) => {
   fileReader.getNumberOfLines(numberOfLines.filePath).then(lines => {
     action.type = 'numberOfLines';

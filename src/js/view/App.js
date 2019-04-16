@@ -19,13 +19,8 @@ class App extends Component {
     super(props);
 
     this.state = {
-      lastLines: '',
-      nthLines: '',
-      liveLines: '',
       filePath: '',
       highlightColor: 'red',
-      highlightInputFieldValue: '',
-      filterInputFieldValue: '',
       settingsPaneSize: '0px'
     };
     this.startListener();
@@ -37,39 +32,9 @@ class App extends Component {
     });
   };
 
-  handleHiglightInputField = event => {
-    this.setState({
-      highlightInputFieldValue: event.target.value ? event.target.value : ''
-    });
-  };
-
-  handleFilterInputField = event => {
-    this.setState({
-      filterInputFieldValue: event.target.value
-    });
-  };
-
   handleSettingsPaneSize = () => {
     this.setState({
       settingsPaneSize: !this.state.showSettings ? '270px' : '0px'
-    });
-  };
-
-  setLiveLines = _returnValue => {
-    this.setState({
-      liveLines: this.state.liveLines + '\n' + _returnValue
-    });
-  };
-
-  setLastLines = _returnValue => {
-    this.setState({
-      lastLines: _returnValue
-    });
-  };
-
-  setNthLines = _returnValue => {
-    this.setState({
-      nthLines: _returnValue
     });
   };
 
@@ -93,27 +58,10 @@ class App extends Component {
     argObj.numberOfLines = 5;
     argObj.lineNumber = 10;
 
-    ipcRenderer.send('getLiveLines', argObj);
-
-    ipcRenderer.on('liveLines', (event, lines) => {
-      this.setLiveLines(lines);
-    });
-
-    ipcRenderer.send('getNumberOfLines', argObj);
-
-    ipcRenderer.send('getNthLines', argObj);
-
-    ipcRenderer.once('nthLines', (event, lines) => {
-      this.setNthLines(JSON.stringify(lines, null, 2));
-    });
-
-    this.props.send.getLastLines(argObj);
-
-    ipcRenderer.once('lastLines', (event, lastLines) => {
-      this.setLastLines(lastLines);
-    });
-
     this.props.send.getFileSize(argObj);
+    this.props.send.getLiveLines(argObj);
+    this.props.send.getNumberOfLines(argObj);
+    // this.props.send.getNthLines(argObj);
   };
 
   render() {
@@ -128,12 +76,7 @@ class App extends Component {
               height: '600px'
             }}
           >
-            <LogViewer
-              lines={this.state.liveLines}
-              highlightColorInput={this.state.highlightColor}
-              higlightInputField={this.handleHiglightInputField}
-              higlightInputFieldValue={this.state.highlightInputFieldValue}
-            />
+            <LogViewer highlightColorInput={this.state.highlightColor} />
           </div>
           <div
             style={{
