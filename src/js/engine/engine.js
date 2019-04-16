@@ -5,10 +5,9 @@ let action = {};
 
 ipcMain.on('getLiveLines', (event, argObj) => {
   fileReader.readLinesLive(argObj.filePath);
-  action.type = 'liveLines';
   fileReader.fileReaderEvents.on('liveLines', lines => {
+    action.type = 'liveLines';
     action.data = lines;
-    // console.log('action.data', action.data);
     event.sender.send('app_store', action);
   });
 });

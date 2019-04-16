@@ -15,6 +15,8 @@ class TabSettings extends Component {
   }
 
   render() {
+    console.log('hej');
+
     return this.state.showSettings ? (
       <TabSettingsSC.Settings>
         <TabSettingsSC.CloseButton

@@ -6,26 +6,23 @@ const settings = require('../../../resources/settings.png');
 
 class StatusBar extends React.Component {
   render() {
-    console.log(this.props.fileSize);
     return (
       <StatusBarSC.Statusbar>
         <ul>
           <li>Path: {this.props.openFiles ? this.props.openFiles[0] : null}</li>
-
           <li>Lines:{this.props.numberOfLines}</li>
-
           <li>Size: {this.props.fileSize}</li>
-          {this.props.openFiles ? (
-            <li>
-              <StatusBarSC.SettingIcon
-                src={settings}
-                onClick={() => {
-                  handleShowSettings(this.props.dispatch);
-                }}
-                alt="settings"
-              />
-            </li>
-          ) : null}
+          {/* {this.props.openFiles ? ( */}
+          <li>
+            <StatusBarSC.SettingIcon
+              src={settings}
+              onClick={() => {
+                handleShowSettings(this.props.dispatch);
+              }}
+              alt="settings"
+            />
+          </li>
+          {/* // ) : nu ll} */}
         </ul>
       </StatusBarSC.Statusbar>
     );
