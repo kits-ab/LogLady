@@ -23,3 +23,10 @@ export const handleHighlightInput = (dispatch, data) => {
     data: data
   });
 };
+
+export const handleHighlightColor = (dispatch, data) => {
+  dispatch({
+    type: 'highlightColor',
+    data: data
+  });
+};

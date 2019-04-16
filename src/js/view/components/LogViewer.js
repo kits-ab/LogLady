@@ -1,5 +1,5 @@
 import React from 'react';
-import { findMatches } from './lineFilterHelper';
+import { findMatches } from './helpers/lineFilterHelper';
 import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 class LogViewer extends React.Component {
@@ -34,7 +34,7 @@ class LogViewer extends React.Component {
   setHighlightColor = line => {
     return line.match(new RegExp(this.props.highlightInput, 'gi')) &&
       this.props.highlightInput
-      ? { background: this.props.highlightColorInput }
+      ? { background: this.props.highlightColor }
       : {};
   };
   render() {
@@ -58,6 +58,7 @@ const mapStateToProps = state => {
   return {
     filterInput: state.topPanelReducer.filterInput,
     highlightInput: state.topPanelReducer.highlightInput,
+    highlightColor: state.settingsReducer.highlightColor,
     liveLines: state.logViewerReducer.liveLines,
     nthLines: state.logViewerReducer.nthLines,
     tailSwitch: state.topPanelReducer.tailSwitch

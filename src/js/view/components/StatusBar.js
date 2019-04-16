@@ -12,7 +12,6 @@ class StatusBar extends React.Component {
           <li>Path: {this.props.openFiles ? this.props.openFiles[0] : null}</li>
           <li>Lines:{this.props.numberOfLines}</li>
           <li>Size: {this.props.fileSize}</li>
-          {/* {this.props.openFiles ? ( */}
           <li>
             <StatusBarSC.SettingIcon
               src={settings}
@@ -22,7 +21,6 @@ class StatusBar extends React.Component {
               alt="settings"
             />
           </li>
-          {/* // ) : nu ll} */}
         </ul>
       </StatusBarSC.Statusbar>
     );
