@@ -19,24 +19,10 @@ class App extends Component {
     super(props);
 
     this.state = {
-      filePath: '',
-      highlightColor: 'red',
-      settingsPaneSize: '0px'
+      filePath: ''
     };
     this.startListener();
   }
-
-  handleHighlightColorInput = event => {
-    this.setState({
-      highlightColor: event.hex
-    });
-  };
-
-  handleSettingsPaneSize = () => {
-    this.setState({
-      settingsPaneSize: !this.state.showSettings ? '270px' : '0px'
-    });
-  };
 
   setFilePath = _returnValue => {
     this.setState({
@@ -76,19 +62,14 @@ class App extends Component {
               height: '600px'
             }}
           >
-            <LogViewer highlightColorInput={this.state.highlightColor} />
+            <LogViewer />
           </div>
           <div
             style={{
               background: 'linear-gradient(mediumspringgreen, magenta)'
             }}
           >
-            {store.getState().settingsReducer.showSettings ? (
-              <TabSettings
-                handleSettingsPaneSize={this.handleSettingsPaneSize}
-                highlightColorInput={this.handleHighlightColorInput}
-              />
-            ) : null}
+            <TabSettings dispatch={store.dispatch} />
           </div>
         </div>
         <Statusbar dispatch={store.dispatch} />
