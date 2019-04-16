@@ -4,7 +4,7 @@ const { dialog } = require('electron');
 const handleMenuItemClicked = _ipc => {
   return (type, data) => {
     _ipc.send('filePath', data);
-    _ipc.send('app_store', { type: `menu_${type}`, data: data });
+    _ipc.send('backendMessages', { type: `menu_${type}`, data: data });
   };
 };
 

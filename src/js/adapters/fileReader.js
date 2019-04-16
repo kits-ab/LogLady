@@ -37,7 +37,6 @@ const formatLinesFromBuffer = _buffer => {
 //whenever there is a change to the file.
 const startWatcher = (filePath, lastNewlineIndex) => {
   fs.watch(filePath, (event, filename) => {
-    console.log('watcher started.');
     let readStreamFromLastIndex = fs
       .createReadStream(filePath, {
         start: lastNewlineIndex

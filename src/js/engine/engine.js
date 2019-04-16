@@ -3,46 +3,60 @@ const { ipcMain } = require('electron');
 
 let action = {};
 
-ipcMain.on('getLiveLines', (event, argObj) => {
-  fileReader.readLinesLive(argObj.filePath);
+const getLiveLines = (event, _argObj) => {
+  fileReader.readLinesLive(_argObj.filePath);
   fileReader.fileReaderEvents.on('liveLines', lines => {
     action.type = 'liveLines';
     action.data = lines;
-    event.sender.send('app_store', action);
+    event.sender.send('backendMessages', action);
   });
-});
+};
 
-ipcMain.once('getNthLines', (event, nthLines) => {
+const getNthLines = (event, _argObj) => {
   fileReader
-    .readNthLines(
-      nthLines.filePath,
-      nthLines.lineNumber,
-      nthLines.numberOfLines
-    )
+    .readNthLines(_argObj.filePath, _argObj.lineNumber, _argObj.numberOfLines)
     .then(lines => {
       action.type = 'nthLines';
       action.data = lines;
-      event.sender.send('app_store', action);
+      event.sender.send('backendMessages', action);
     });
-});
+};
 
-ipcMain.once('getNumberOfLines', (event, numberOfLines) => {
-  fileReader.getNumberOfLines(numberOfLines.filePath).then(lines => {
+const getNumberOfLines = (event, _argObj) => {
+  fileReader.getNumberOfLines(_argObj.filePath).then(lines => {
     action.type = 'numberOfLines';
     action.data = lines;
-    event.sender.send('app_store', action);
+    event.sender.send('backendMessages', action);
   });
-});
+};
 
-ipcMain.once('getFileSize', (event, argObj) => {
+const getFileSize = (event, _argObj) => {
   fileReader
-    .getFileSizeInBytes(argObj.filePath)
+    .getFileSizeInBytes(_argObj.filePath)
     .then(size => {
       action.type = 'fileSize';
       action.data = size;
-      event.sender.send('app_store', action);
+      event.sender.send('backendMessages', action);
     })
     .catch(err => {
       event.sender.send('error', err);
     });
+};
+
+ipcMain.on('frontendMessages', (event, _argObj) => {
+  switch (_argObj.function) {
+    case 'liveLines':
+      getLiveLines(event, _argObj);
+      break;
+    case 'numberOfLines':
+      getNumberOfLines(event, _argObj);
+      break;
+    case 'fileSize':
+      getFileSize(event, _argObj);
+      break;
+    case 'nthLines':
+      getNthLines(event, _argObj);
+      break;
+    default:
+  }
 });

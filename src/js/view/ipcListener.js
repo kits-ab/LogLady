@@ -1,8 +1,8 @@
-import { getLiveLines, getNumberOfLines, getFileSize } from './ipcPublisher';
+import { sendRequestToBackend } from './ipcPublisher';
 const { ipcRenderer } = window.require('electron');
 
 export const ipcListener = (dispatch, state) => {
-  ipcRenderer.on('app_store', (event, action) => {
+  ipcRenderer.on('backendMessages', (event, action) => {
     switch (action.type) {
       case 'menu_open':
         dispatch({
@@ -14,9 +14,12 @@ export const ipcListener = (dispatch, state) => {
         argObj.numberOfLines = 5;
         argObj.lineNumber = 10;
 
-        getLiveLines(argObj);
-        getNumberOfLines(argObj);
-        getFileSize(argObj);
+        argObj.function = 'liveLines';
+        sendRequestToBackend(argObj);
+        argObj.function = 'numberOfLines';
+        sendRequestToBackend(argObj);
+        argObj.function = 'fileSize';
+        sendRequestToBackend(argObj);
 
         break;
       default:
