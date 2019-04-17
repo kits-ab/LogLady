@@ -31,7 +31,7 @@ class TopPanel extends React.Component {
         />
 
         <TopPanelSC.Tail>
-          <span>Tail: </span>
+          <span>Tail:</span>
 
           <TopPanelSC.TailSwitch>
             <input

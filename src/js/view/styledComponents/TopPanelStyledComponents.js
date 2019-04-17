@@ -18,7 +18,7 @@ export const AppBar = styled.div`
 export const TextFieldInput = styled.input`
   width: 15%;
   margin: 10px 20px;
-  height: 30px;
+  height: 20px;
   background: linear-gradient(#e66465, #9198e5);
   color: lightgreen;
 
@@ -31,7 +31,7 @@ export const TailSwitch = styled.label`
   position: relative;
   display: inline-block;
   width: 48px;
-  height: 27.2px;
+  height: 25px;
   margin: 10px 20px;
 
   input {
@@ -55,10 +55,10 @@ export const TailSwitch = styled.label`
   span:before {
     position: absolute;
     content: '';
-    height: 20.8px;
-    width: 20.8px;
-    left: 4px;
-    bottom: 4px;
+    height: 22.8px;
+    width: 22.8px;
+    left: 1px;
+    bottom: 1.3px;
     background-color: aquamarine;
     -webkit-transition: 0.4s;
     transition: 0.4s;
@@ -69,15 +69,14 @@ export const TailSwitch = styled.label`
     background-color: #2196f3;
   }
   input:checked + span:before {
-    -webkit-transform: translateX(20.8px);
-    -ms-transform: translateX(20.8px);
-    transform: translateX(20.8px);
+    -webkit-transform: translateX(22.8px);
+    -ms-transform: translateX(22.8px);
+    transform: translateX(22.8px);
   }
 `;
 
 export const Tail = styled.div`
   margin-left: auto;
-  margin-right: 1.5%;
 
   span {
     color: blue;
