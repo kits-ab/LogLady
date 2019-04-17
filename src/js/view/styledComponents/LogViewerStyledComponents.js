@@ -10,3 +10,7 @@ export const TextContainer = styled.div`
   postition: fixed;
   margin: 70px 1.5% 0 1.5%;
 `;
+
+export const LogViewerContainer = styled.div`
+  height: 600px;
+`;

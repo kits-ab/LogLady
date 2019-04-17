@@ -16,3 +16,7 @@ export const CloseButton = styled.img`
   float: right;
   width: 17px;
 `;
+
+export const TabSettingsContainer = styled.div`
+  background: 'linear-gradient(mediumspringgreen, magenta)';
+`;

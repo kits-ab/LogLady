@@ -13,26 +13,28 @@ const React = require('react');
 class TabSettings extends Component {
   render() {
     return this.props.showSettings ? (
-      <TabSettingsSC.Settings>
-        <TabSettingsSC.CloseButton
-          onClick={() => {
-            handleShowSettings(this.props.dispatch);
-          }}
-          src={close}
-          alt="close"
-        />
-        <h1>Settings for Tab</h1>
+      <TabSettingsSC.TabSettingsContainer>
+        <TabSettingsSC.Settings>
+          <TabSettingsSC.CloseButton
+            onClick={() => {
+              handleShowSettings(this.props.dispatch);
+            }}
+            src={close}
+            alt="close"
+          />
+          <h1>Settings for Tab</h1>
 
-        <h2>Highlights:</h2>
-        <p>Color for highlights</p>
-        <GithubPicker
-          color={this.props.highlightColor}
-          onChangeComplete={e => {
-            handleHighlightColor(this.props.dispatch, e.hex);
-          }}
-        />
-        <br />
-      </TabSettingsSC.Settings>
+          <h2>Highlights:</h2>
+          <p>Color for highlights</p>
+          <GithubPicker
+            color={this.props.highlightColor}
+            onChangeComplete={e => {
+              handleHighlightColor(this.props.dispatch, e.hex);
+            }}
+          />
+          <br />
+        </TabSettingsSC.Settings>
+      </TabSettingsSC.TabSettingsContainer>
     ) : null;
   }
 }
