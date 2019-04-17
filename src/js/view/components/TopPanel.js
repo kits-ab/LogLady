@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 class TopPanel extends React.Component {
   render() {
     return (
-      <TopPanelSC.AppBar>
+      <TopPanelSC.TopPanel>
         <p>LogLady</p>
         <TopPanelSC.TextFieldInput
           placeholder="filter"
@@ -44,7 +44,7 @@ class TopPanel extends React.Component {
             <span />
           </TopPanelSC.TailSwitch>
         </TopPanelSC.Tail>
-      </TopPanelSC.AppBar>
+      </TopPanelSC.TopPanel>
     );
   }
 }

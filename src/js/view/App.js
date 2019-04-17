@@ -19,8 +19,8 @@ class App extends Component {
     return (
       <RootContainer>
         <TopPanel dispatch={store.dispatch} />
-        <LogViewer />
         <TabSettings dispatch={store.dispatch} />
+        <LogViewer />
         <Statusbar dispatch={store.dispatch} />
       </RootContainer>
     );

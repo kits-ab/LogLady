@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const AppBar = styled.div`
+export const TopPanel = styled.div`
   background-color: orange;
   width: 100%;
   display: flex;
