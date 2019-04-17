@@ -8,19 +8,17 @@ class StatusBar extends React.Component {
   render() {
     return (
       <StatusBarSC.Statusbar>
+        <StatusBarSC.SettingIcon
+          src={settings}
+          onClick={() => {
+            handleShowSettings(this.props.dispatch);
+          }}
+          alt="settings"
+        />
         <ul>
           <li>Path: {this.props.openFiles ? this.props.openFiles[0] : null}</li>
           <li>Lines:{this.props.numberOfLines}</li>
           <li>Size: {this.props.fileSize}</li>
-          <li>
-            <StatusBarSC.SettingIcon
-              src={settings}
-              onClick={() => {
-                handleShowSettings(this.props.dispatch);
-              }}
-              alt="settings"
-            />
-          </li>
         </ul>
       </StatusBarSC.Statusbar>
     );

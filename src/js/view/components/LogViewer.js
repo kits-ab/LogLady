@@ -37,9 +37,16 @@ class LogViewer extends React.Component {
       ? { background: this.props.highlightColor }
       : {};
   };
+
+  componentDidUpdate = () => {
+    console.log('height', window.innerHeight, 'width', window.innerWidth);
+  };
+
   render() {
     const lines = this.props.liveLines && this.createLineArray();
+
     return (
+      // <div style={{ height: '100vh' }}>
       <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
         {lines &&
           lines.map((line, i) => {
@@ -50,6 +57,7 @@ class LogViewer extends React.Component {
             );
           })}
       </LogViewerSC.TextContainer>
+      // </div>
     );
   }
 }

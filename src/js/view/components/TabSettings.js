@@ -14,6 +14,16 @@ class TabSettings extends Component {
   render() {
     return this.props.showSettings ? (
       <TabSettingsSC.Settings>
+        <TabSettingsSC.HighlightContainer>
+          <p>Color for highlights</p>
+          <GithubPicker
+            color={this.props.highlightColor}
+            triangle={'hide'}
+            onChangeComplete={e => {
+              handleHighlightColor(this.props.dispatch, e.hex);
+            }}
+          />
+        </TabSettingsSC.HighlightContainer>
         <TabSettingsSC.CloseButton
           onClick={() => {
             handleShowSettings(this.props.dispatch);
@@ -21,17 +31,6 @@ class TabSettings extends Component {
           src={close}
           alt="close"
         />
-        <h1>Settings for Tab</h1>
-
-        <h2>Highlights:</h2>
-        <p>Color for highlights</p>
-        <GithubPicker
-          color={this.props.highlightColor}
-          onChangeComplete={e => {
-            handleHighlightColor(this.props.dispatch, e.hex);
-          }}
-        />
-        <br />
       </TabSettingsSC.Settings>
     ) : null;
   }

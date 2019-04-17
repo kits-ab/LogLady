@@ -7,6 +7,7 @@ import reducers from './reducers/index.js';
 import { ipcListener } from './ipcListener';
 import * as ipcPublisher from './ipcPublisher';
 import Statusbar from './components/StatusBar';
+import { RootContainer } from './styledComponents/AppStyledComponents';
 const React = require('react');
 const { Component } = require('react');
 
@@ -16,28 +17,12 @@ ipcListener(store.dispatch, store.getState());
 class App extends Component {
   render() {
     return (
-      <div>
-        <div>
-          <TopPanel dispatch={store.dispatch} />
-        </div>
-        <div>
-          <div
-            style={{
-              height: '600px'
-            }}
-          >
-            <LogViewer />
-          </div>
-          <div
-            style={{
-              background: 'linear-gradient(mediumspringgreen, magenta)'
-            }}
-          >
-            <TabSettings dispatch={store.dispatch} />
-          </div>
-        </div>
+      <RootContainer>
+        <TopPanel dispatch={store.dispatch} />
+        <TabSettings dispatch={store.dispatch} />
+        <LogViewer />
         <Statusbar dispatch={store.dispatch} />
-      </div>
+      </RootContainer>
     );
   }
 }
