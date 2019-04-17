@@ -37,21 +37,27 @@ class LogViewer extends React.Component {
       ? { background: this.props.highlightColor }
       : {};
   };
+
+  componentDidUpdate = () => {
+    console.log('height', window.innerHeight, 'width', window.innerWidth);
+  };
+
   render() {
     const lines = this.props.liveLines && this.createLineArray();
+
     return (
-      <LogViewerSC.LogViewerContainer>
-        <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
-          {lines &&
-            lines.map((line, i) => {
-              return (
-                <p style={this.setHighlightColor(line)} key={i}>
-                  {line}
-                </p>
-              );
-            })}
-        </LogViewerSC.TextContainer>
-      </LogViewerSC.LogViewerContainer>
+      // <div style={{ height: '100vh' }}>
+      <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
+        {lines &&
+          lines.map((line, i) => {
+            return (
+              <p style={this.setHighlightColor(line)} key={i}>
+                {line}
+              </p>
+            );
+          })}
+      </LogViewerSC.TextContainer>
+      // </div>
     );
   }
 }

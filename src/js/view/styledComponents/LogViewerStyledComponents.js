@@ -2,15 +2,13 @@ import styled from 'styled-components';
 
 export const TextContainer = styled.div`
   overflow: auto;
-  height: 87%;
+  height: calc(100vh - 93px);
   border: 1px hotpink solid;
   background: linear-gradient(red, yellow);
   color: aquamarine;
-  width: 97%;
+  width: calc(100vw - 12px);
   postition: fixed;
-  margin: 70px 1.5% 0 1.5%;
+  margin: 55px 0 10px 5px;
 `;
 
-export const LogViewerContainer = styled.div`
-  height: 600px;
-`;
+// export const LogViewerContainer
