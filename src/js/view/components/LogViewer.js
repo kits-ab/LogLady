@@ -38,10 +38,6 @@ class LogViewer extends React.Component {
       : {};
   };
 
-  componentDidUpdate = () => {
-    console.log('height', window.innerHeight, 'width', window.innerWidth);
-  };
-
   render() {
     const lines = this.props.liveLines && this.createLineArray();
 

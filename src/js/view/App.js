@@ -12,7 +12,7 @@ const React = require('react');
 const { Component } = require('react');
 
 const store = createStore(reducers);
-ipcListener(store.dispatch, store.getState());
+ipcListener(store.dispatch);
 
 class App extends Component {
   render() {
