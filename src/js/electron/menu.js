@@ -24,7 +24,7 @@ const createMenu = ipc => {
       label: 'File',
       submenu: [
         {
-          label: 'Open...',
+          label: 'Open file...',
           click() {
             dialog.showOpenDialog(
               {
