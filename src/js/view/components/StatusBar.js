@@ -5,6 +5,20 @@ import { handleShowSettings } from '../actions/dispatchActions';
 const settings = require('../../../resources/settings.png');
 
 class StatusBar extends React.Component {
+  getFormattedFileSize = fileSize => {
+    if (fileSize >= 1000000000) {
+      return `${(fileSize / 1000000000).toFixed(2)} gigabytes`;
+    } else if (fileSize >= 1000000) {
+      return `${(fileSize / 1000000).toFixed(2)} megabytes`;
+    } else if (fileSize >= 1000) {
+      return `${(fileSize / 1000).toFixed(2)} kilobytes`;
+    } else if (fileSize) {
+      return `${fileSize} bytes`;
+    } else {
+      return `${0} bytes`;
+    }
+  };
+
   render() {
     return (
       <StatusBarSC.Statusbar>
@@ -18,7 +32,7 @@ class StatusBar extends React.Component {
         <ul>
           <li>Path: {this.props.openFiles ? this.props.openFiles[0] : null}</li>
           <li>Lines:{this.props.numberOfLines}</li>
-          <li>Size: {this.props.fileSize}</li>
+          <li>Size: {this.getFormattedFileSize(this.props.fileSize)}</li>
         </ul>
       </StatusBarSC.Statusbar>
     );
