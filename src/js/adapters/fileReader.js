@@ -1,4 +1,5 @@
 const fs = require('fs');
+const watch = require('node-watch');
 const lastLines = require('read-last-lines');
 const nthLine = require('nthline');
 const { EventEmitter } = require('events');
@@ -36,7 +37,7 @@ const formatLinesFromBuffer = _buffer => {
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
 const startWatcher = (filePath, lastNewlineIndex) => {
-  fs.watch(filePath, (event, filename) => {
+  watch(filePath, (event, filename) => {
     let readStreamFromLastIndex = fs
       .createReadStream(filePath, {
         start: lastNewlineIndex
@@ -45,6 +46,7 @@ const startWatcher = (filePath, lastNewlineIndex) => {
     readStreamFromLastIndex.on('data', buffer => {
       lastNewlineIndex += buffer.lastIndexOf('\n');
       let lines = formatLinesFromBuffer(buffer);
+      console.log(lines);
 
       fileReaderEvents.emit('liveLines', lines);
     });
