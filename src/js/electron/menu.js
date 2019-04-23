@@ -21,14 +21,14 @@ const createMenu = ipc => {
       ]
     },
     {
-      label: 'Log',
+      label: 'File',
       submenu: [
         {
-          label: 'Open...',
+          label: 'Open file...',
           click() {
             dialog.showOpenDialog(
               {
-                properties: ['openFile', 'multiSelections']
+                properties: ['openFile']
               },
               filePath => {
                 menuItemClicked('open', filePath);
