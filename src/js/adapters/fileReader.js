@@ -12,18 +12,23 @@ const readLastLines = (filePath, numberOfLines) => {
 //find and save the index of the last newline characters
 const getLastNewlineIndex = filePath => {
   let lastNewlineIndex = 0;
-  fs.createReadStream(filePath)
-    .setEncoding('utf8')
-    .on('data', buffer => {
-      lastNewlineIndex += buffer.lastIndexOf('\n');
-    })
-    .on('end', () => {
+  let readStream = fs.createReadStream(filePath).setEncoding('utf8');
+
+  readStream.on('data', buffer => {
+    console.log('return on on...');
+    lastNewlineIndex += buffer.lastIndexOf('\n');
+  });
+  readStream.on('error', err => {
+    throw new Error(err);
+  });
+  return new Promise((resolve, reject) => {
+    readStream.on('end', () => {
       console.log('lastNewlineIndex: ', lastNewlineIndex);
-    })
-    .on('error', err => {
-      throw new Error(err);
+      resolve(lastNewlineIndex);
     });
-  return lastNewlineIndex;
+  }).then(lastNewlineIndex => {
+    return lastNewlineIndex;
+  });
 };
 
 const formatLinesFromBuffer = _buffer => {
@@ -37,7 +42,8 @@ const formatLinesFromBuffer = _buffer => {
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
 const startWatcher = (filePath, lastNewlineIndex) => {
-  watch(filePath, (event, filename) => {
+  console.log('start watcher... ', lastNewlineIndex);
+  fs.watch(filePath, (event, filename) => {
     let readStreamFromLastIndex = fs
       .createReadStream(filePath, {
         start: lastNewlineIndex
@@ -54,12 +60,13 @@ const startWatcher = (filePath, lastNewlineIndex) => {
 };
 
 const readLinesLive = filePath => {
-  //begin by reading and emitting the last 10 lines
-  readLastLines(filePath, 10).then(lines => {
-    fileReaderEvents.emit('liveLines', lines.slice(0, lines.lastIndexOf('\n')));
+  // readLastLines(filePath, 10).then(lines => {
+  //   fileReaderEvents.emit('liveLines', lines.slice(0, lines.lastIndexOf('\n')));
+  // });
+  getLastNewlineIndex(filePath).then(lastNewlineIndex => {
+    console.log('read lines live... ', lastNewlineIndex);
+    startWatcher(filePath, lastNewlineIndex);
   });
-  let lastNewlineIndex = getLastNewlineIndex(filePath);
-  startWatcher(filePath, lastNewlineIndex);
 };
 
 const getNumberOfLines = filePath => {
