@@ -43,6 +43,7 @@ class LogViewer extends React.Component {
     return (
       // <div style={{ height: '100vh' }}>
       <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
+        <LogViewerSC.CloseFileButton />
         {lines &&
           lines.map((line, i) => {
             return (
