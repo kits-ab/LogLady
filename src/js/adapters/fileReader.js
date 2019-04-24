@@ -26,8 +26,6 @@ const getLastNewlineIndex = filePath => {
       console.log('lastNewlineIndex: ', lastNewlineIndex);
       resolve(lastNewlineIndex);
     });
-  }).then(lastNewlineIndex => {
-    return lastNewlineIndex;
   });
 };
 
