@@ -17,12 +17,10 @@ let mainWindow;
 const windowStateKeeper = windowName => {
   let window, windowState;
   function setBounds() {
-    // Restore from appConfig
     if (appConfig.has(`windowState.${windowName}`)) {
       windowState = appConfig.get(`windowState.${windowName}`);
       return;
     }
-    // Default
     windowState = {
       x: undefined,
       y: undefined,
@@ -30,19 +28,19 @@ const windowStateKeeper = windowName => {
       height: 800
     };
   }
-  function saveState() {
+  const saveState = () => {
     if (!windowState.isMaximized) {
       windowState = window.getBounds();
     }
     windowState.isMaximized = window.isMaximized();
     appConfig.set(`windowState.${windowName}`, windowState);
-  }
-  function track(win) {
+  };
+  const track = win => {
     window = win;
     ['resize', 'move', 'close'].forEach(event => {
       win.on(event, saveState);
     });
-  }
+  };
   setBounds();
   return {
     x: windowState.x,
