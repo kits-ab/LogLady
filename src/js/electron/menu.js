@@ -25,12 +25,14 @@ const createMenu = ipc => {
       submenu: [
         {
           label: 'Open file...',
+          accelerator: 'CmdOrCtrl+O',
           click() {
             dialog.showOpenDialog(
               {
                 properties: ['openFile']
               },
               filePath => {
+                if (filePath === undefined) return;
                 menuItemClicked('open', filePath);
               }
             );
