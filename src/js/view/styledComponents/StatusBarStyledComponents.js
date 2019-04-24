@@ -8,13 +8,13 @@ export const Statusbar = styled.div`
   position: fixed;
   right: 0;
   left: 0;
-  background-color: greenYellow;
+  background-color: darkgrey;
   display: flex;
   flex-direction: row;
 
   ul {
     list-style: none;
-    color: #ff00ff;
+    color: white;
     margin: 3px;
   }
 

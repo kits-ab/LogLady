@@ -6,8 +6,8 @@ export const Settings = styled.div`
   width: 100vw;
   margin-top: 30px;
   position: fixed;
-  color: brown;
-  background: lime;
+  color: #222;
+  background: #ccc;
   justify-content: space-between;
 `;
 
