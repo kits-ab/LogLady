@@ -3,8 +3,6 @@ const { ipcRenderer } = window.require('electron');
 
 export const ipcListener = (dispatch, state) => {
   ipcRenderer.on('backendMessages', (event, action) => {
-    // console.log('in listener', action.data);
-
     switch (action.type) {
       case 'menu_open':
         dispatch({
@@ -32,4 +30,8 @@ export const ipcListener = (dispatch, state) => {
         break;
     }
   });
+};
+
+export const removeAllListeners = () => {
+  ipcRenderer.removeAllListeners('backendMessages');
 };

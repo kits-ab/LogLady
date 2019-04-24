@@ -40,8 +40,6 @@ class LogViewer extends React.Component {
 
   render() {
     const lines = this.props.liveLines && this.createLineArray();
-
-    // console.log(this.props.liveLines);
     return (
       // <div style={{ height: '100vh' }}>
       <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
