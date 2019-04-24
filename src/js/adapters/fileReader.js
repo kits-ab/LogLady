@@ -13,18 +13,22 @@ const readLastLines = (filePath, numberOfLines) => {
 //find and save the index of the last newline characters
 const getLastNewlineIndex = filePath => {
   let lastNewlineIndex = 0;
-  fs.createReadStream(filePath)
-    .setEncoding('utf8')
-    .on('data', buffer => {
-      lastNewlineIndex += buffer.lastIndexOf('\n');
-    })
-    .on('end', () => {
+  let readStream = fs.createReadStream(filePath).setEncoding('utf8');
+
+  readStream.on('data', buffer => {
+    lastNewlineIndex += buffer.lastIndexOf('\n');
+  });
+  readStream.on('error', err => {
+    throw new Error(err);
+  });
+  return new Promise((resolve, reject) => {
+    readStream.on('end', () => {
       console.log('lastNewlineIndex: ', lastNewlineIndex);
-    })
-    .on('error', err => {
-      throw new Error(err);
+      resolve(lastNewlineIndex);
     });
-  return lastNewlineIndex;
+  }).then(lastNewlineIndex => {
+    return lastNewlineIndex;
+  });
 };
 
 const formatLinesFromBuffer = _buffer => {
@@ -47,7 +51,7 @@ const startWatcher = (filePath, lastNewlineIndex) => {
     readStreamFromLastIndex.on('data', buffer => {
       lastNewlineIndex += buffer.lastIndexOf('\n');
       let lines = formatLinesFromBuffer(buffer);
-
+      // console.log(lines);
       fileReaderEvents.emit('liveLines', lines);
     });
   });
@@ -65,12 +69,12 @@ const stopWatcher = filePath => {
 };
 
 const readLinesLive = filePath => {
-  //begin by reading and emitting the last 10 lines
   readLastLines(filePath, 10).then(lines => {
     fileReaderEvents.emit('liveLines', lines.slice(0, lines.lastIndexOf('\n')));
   });
-  let lastNewlineIndex = getLastNewlineIndex(filePath);
-  startWatcher(filePath, lastNewlineIndex);
+  getLastNewlineIndex(filePath).then(lastNewlineIndex => {
+    startWatcher(filePath, lastNewlineIndex);
+  });
 };
 
 const getNumberOfLines = filePath => {
