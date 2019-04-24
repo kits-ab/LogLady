@@ -8,7 +8,6 @@ const getLiveLines = (event, _argObj) => {
   fileReader.fileReaderEvents.on('liveLines', lines => {
     action.type = 'liveLines';
     action.data = lines;
-    // console.log(lines);
 
     event.sender.send('backendMessages', action);
   });

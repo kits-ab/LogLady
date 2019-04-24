@@ -18,10 +18,10 @@ class App extends Component {
   render() {
     return (
       <RootContainer>
-        <TopPanel dispatch={store.dispatch} />
-        <TabSettings dispatch={store.dispatch} />
+        <TopPanel />
+        <TabSettings />
         <LogViewer />
-        <Statusbar dispatch={store.dispatch} />
+        <Statusbar />
       </RootContainer>
     );
   }

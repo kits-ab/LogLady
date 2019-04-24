@@ -53,7 +53,8 @@ const mapStateToProps = state => {
   return {
     tailSwitch: state.topPanelReducer.tailSwitch,
     filterInput: state.topPanelReducer.filterInput,
-    highlightInput: state.topPanelReducer.highlightInput
+    highlightInput: state.topPanelReducer.highlightInput,
+    openFiles: state.menuReducer.openFiles
   };
 };
 

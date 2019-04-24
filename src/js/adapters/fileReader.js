@@ -2,8 +2,8 @@ const fs = require('fs');
 const lastLines = require('read-last-lines');
 const nthLine = require('nthline');
 const { EventEmitter } = require('events');
-const fileReaderEvents = new EventEmitter();
 
+const fileReaderEvents = new EventEmitter();
 let watchers = [];
 
 const readLastLines = (filePath, numberOfLines) => {
@@ -60,6 +60,7 @@ const stopWatcher = filePath => {
   try {
     watchers[filePath].close();
     delete watchers[filePath];
+    fileReaderEvents.removeAllListeners('liveLines');
     return 'successfully closed'; //if we want to send a confirmation to the frontend.
   } catch (err) {
     return err;
@@ -69,9 +70,9 @@ const stopWatcher = filePath => {
 const readLinesLive = filePath => {
   readLastLines(filePath, 10).then(lines => {
     fileReaderEvents.emit('liveLines', lines.slice(0, lines.lastIndexOf('\n')));
-  });
-  getLastNewlineIndex(filePath).then(lastNewlineIndex => {
-    startWatcher(filePath, lastNewlineIndex);
+    getLastNewlineIndex(filePath).then(lastNewlineIndex => {
+      startWatcher(filePath, lastNewlineIndex);
+    });
   });
 };
 
