@@ -1,7 +1,1 @@
-1
-2
-3
-this is a long line
-4
-this is another long line
-5
+this is the content

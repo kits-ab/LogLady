@@ -4,6 +4,8 @@ const nthLine = require('nthline');
 const { EventEmitter } = require('events');
 const fileReaderEvents = new EventEmitter();
 
+let watchers = [];
+
 const readLastLines = (filePath, numberOfLines) => {
   return lastLines.read(filePath, numberOfLines);
 };
@@ -24,8 +26,6 @@ const getLastNewlineIndex = filePath => {
       console.log('lastNewlineIndex: ', lastNewlineIndex);
       resolve(lastNewlineIndex);
     });
-  }).then(lastNewlineIndex => {
-    return lastNewlineIndex;
   });
 };
 
@@ -40,7 +40,7 @@ const formatLinesFromBuffer = _buffer => {
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
 const startWatcher = (filePath, lastNewlineIndex) => {
-  fs.watch(filePath, (event, filename) => {
+  let watcher = fs.watch(filePath, (event, filename) => {
     let readStreamFromLastIndex = fs
       .createReadStream(filePath, {
         start: lastNewlineIndex
@@ -53,6 +53,17 @@ const startWatcher = (filePath, lastNewlineIndex) => {
       fileReaderEvents.emit('liveLines', lines);
     });
   });
+  watchers[filePath] = watcher;
+};
+
+const stopWatcher = filePath => {
+  try {
+    watchers[filePath].close();
+    delete watchers[filePath];
+    return 'successfully closed'; //if we want to send a confirmation to the frontend.
+  } catch (err) {
+    return err;
+  }
 };
 
 const readLinesLive = filePath => {
@@ -126,5 +137,6 @@ module.exports = {
   readNthLines: readNthLines,
   readLinesLive: readLinesLive,
   fileReaderEvents: fileReaderEvents,
-  getFileSizeInBytes: getFileSizeInBytes
+  getFileSizeInBytes: getFileSizeInBytes,
+  stopWatcher: stopWatcher
 };

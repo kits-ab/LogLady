@@ -45,6 +45,10 @@ const getFileSize = (event, _argObj) => {
     });
 };
 
+const stopWatcher = (event, _argObj) => {
+  fileReader.stopWatcher(_argObj.filePath);
+};
+
 ipcMain.on('frontendMessages', (event, _argObj) => {
   switch (_argObj.function) {
     case 'liveLines':
@@ -58,6 +62,9 @@ ipcMain.on('frontendMessages', (event, _argObj) => {
       break;
     case 'nthLines':
       getNthLines(event, _argObj);
+      break;
+    case 'stopWatcher':
+      stopWatcher(event, _argObj);
       break;
     default:
   }
