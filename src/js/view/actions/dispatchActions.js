@@ -32,42 +32,42 @@ export const handleHighlightColor = (dispatch, data) => {
 };
 
 export const handleCloseFile = dispatch => {
-  let functionsArray = [
-    'menu_open',
-    'liveLines',
-    'nthLines',
-    'numberOfLines',
-    'fileSize'
-  ];
-  functionsArray.map(_function => {
-    dispatch({
-      type: _function,
-      data:
-        _function === 'menu_open'
-          ? 'clearOpenFiles'
-          : _function === 'liveLines'
-          ? 'clearLines'
-          : ''
-    });
+  // let functionsArray = [
+  //   'menu_open',
+  //   'liveLines',
+  //   'nthLines',
+  //   'numberOfLines',
+  //   'fileSize'
+  // ];
+  // functionsArray.map(_function => {
+  //   dispatch({
+  //     type: _function,
+  //     data:
+  //       _function === 'menu_open'
+  //         ? 'clearOpenFiles'
+  //         : _function === 'liveLines'
+  //         ? 'clearLines'
+  //         : ''
+  //   });
+  // });
+  dispatch({
+    type: 'menu_open',
+    data: 'clearOpenFiles'
   });
-  // dispatch({
-  //   type: 'menu_open',
-  //   data: 'clearOpenFiles'
-  // });
-  // dispatch({
-  //   type: 'liveLines',
-  //   data: 'clearLines'
-  // });
-  // dispatch({
-  //   type: 'nthLines',
-  //   data: ''
-  // });
-  // dispatch({
-  //   type: 'numberOfLines',
-  //   data: ''
-  // });
-  // dispatch({
-  //   type: 'fileSize',
-  //   data: ''
-  // });
+  dispatch({
+    type: 'liveLines',
+    data: 'clearLines'
+  });
+  dispatch({
+    type: 'nthLines',
+    data: ''
+  });
+  dispatch({
+    type: 'numberOfLines',
+    data: ''
+  });
+  dispatch({
+    type: 'fileSize',
+    data: ''
+  });
 };
