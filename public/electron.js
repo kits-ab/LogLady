@@ -25,7 +25,8 @@ const windowStateKeeper = windowName => {
       x: undefined,
       y: undefined,
       width: 1000,
-      height: 800
+      height: 800,
+      darkTheme: true
     };
   };
   const saveState = () => {
