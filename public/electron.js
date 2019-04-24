@@ -16,7 +16,7 @@ let mainWindow;
 
 const windowStateKeeper = windowName => {
   let window, windowState;
-  function setBounds() {
+  const setBounds = () => {
     if (appConfig.has(`windowState.${windowName}`)) {
       windowState = appConfig.get(`windowState.${windowName}`);
       return;
@@ -27,7 +27,7 @@ const windowStateKeeper = windowName => {
       width: 1000,
       height: 800
     };
-  }
+  };
   const saveState = () => {
     if (!windowState.isMaximized) {
       windowState = window.getBounds();
