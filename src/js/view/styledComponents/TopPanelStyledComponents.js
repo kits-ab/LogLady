@@ -86,3 +86,14 @@ export const Tail = styled.div`
     color: white;
   }
 `;
+
+export const OpenFileButton = styled.button`
+  height: 27px;
+  width: 70px;
+  margin-top: 10px;
+  color: white;
+  background: gray;
+  border-radius: 4px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8);
+  outline: none;
+`;
