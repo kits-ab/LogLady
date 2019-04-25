@@ -8,7 +8,7 @@ Run `npm test` to run tests.
 
 Run `npm run lint` to check for code errors
 
-Run  `npm run electron-dev` to run application in developer mode with live update
+Run  `npm run dev` to run application in developer mode with live update
 
 (Node version used: `8.4.0`, others (newer versions) may work as well.)
 

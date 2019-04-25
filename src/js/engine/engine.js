@@ -1,56 +1,70 @@
 const fileReader = require('../adapters/fileReader');
 const { ipcMain } = require('electron');
 
-ipcMain.on('getTime', (event, time) => {
-  setInterval(() => {
-    let time = Date.now();
-    event.sender.send('theTime', time);
-  }, 1000);
-});
+let action = {};
 
-ipcMain.on('getLiveLines', (event, argObj) => {
-  fileReader.readLinesLive(argObj.filePath);
+const getLiveLines = (event, _argObj) => {
+  fileReader.readLinesLive(_argObj.filePath);
   fileReader.fileReaderEvents.on('liveLines', lines => {
-    // console.log('live engine.js: ', lines);
-    event.sender.send('liveLines', lines);
+    action.type = 'liveLines';
+    action.data = lines;
+
+    event.sender.send('backendMessages', action);
   });
-});
+};
 
-ipcMain.once('getLastLines', (event, lastLines) => {
+const getNthLines = (event, _argObj) => {
   fileReader
-    .readLastLines(lastLines.filePath, lastLines.numberOfLines)
+    .readNthLines(_argObj.filePath, _argObj.lineNumber, _argObj.numberOfLines)
     .then(lines => {
-      // console.log(lines);
-      event.sender.send('lastLines', lines);
+      action.type = 'nthLines';
+      action.data = lines;
+      event.sender.send('backendMessages', action);
     });
-});
+};
 
-ipcMain.once('getNthLines', (event, nthLines) => {
-  fileReader
-    .readNthLines(
-      nthLines.filePath,
-      nthLines.lineNumber,
-      nthLines.numberOfLines
-    )
-    .then(lines => {
-      // console.log(lines);
-      event.sender.send('nthLines', lines);
-    });
-});
-
-ipcMain.once('getNumberOfLines', (event, numberOfLines) => {
-  fileReader.getNumberOfLines(numberOfLines.filePath).then(lines => {
-    event.sender.send('numberOfLines', lines);
+const getNumberOfLines = (event, _argObj) => {
+  fileReader.getNumberOfLines(_argObj.filePath).then(lines => {
+    action.type = 'numberOfLines';
+    action.data = lines;
+    event.sender.send('backendMessages', action);
   });
-});
+};
 
-ipcMain.once('getFileSize', (event, argObj) => {
+const getFileSize = (event, _argObj) => {
   fileReader
-    .getFileSizeInBytes(argObj.filePath)
+    .getFileSizeInBytes(_argObj.filePath)
     .then(size => {
-      event.sender.send('fileSize', size);
+      action.type = 'fileSize';
+      action.data = size;
+      event.sender.send('backendMessages', action);
     })
     .catch(err => {
       event.sender.send('error', err);
     });
+};
+
+const stopWatcher = (event, _argObj) => {
+  fileReader.stopWatcher(_argObj.filePath);
+};
+
+ipcMain.on('frontendMessages', (event, _argObj) => {
+  switch (_argObj.function) {
+    case 'liveLines':
+      getLiveLines(event, _argObj);
+      break;
+    case 'numberOfLines':
+      getNumberOfLines(event, _argObj);
+      break;
+    case 'fileSize':
+      getFileSize(event, _argObj);
+      break;
+    case 'nthLines':
+      getNthLines(event, _argObj);
+      break;
+    case 'stopWatcher':
+      stopWatcher(event, _argObj);
+      break;
+    default:
+  }
 });

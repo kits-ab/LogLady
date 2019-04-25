@@ -4,7 +4,7 @@ const { dialog } = require('electron');
 const handleMenuItemClicked = _ipc => {
   return (type, data) => {
     _ipc.send('filePath', data);
-    _ipc.send('app_store', { type: `menu_${type}`, data: data });
+    _ipc.send('backendMessages', { type: `menu_${type}`, data: data });
   };
 };
 
@@ -21,16 +21,18 @@ const createMenu = ipc => {
       ]
     },
     {
-      label: 'Log',
+      label: 'File',
       submenu: [
         {
-          label: 'Open...',
+          label: 'Open file...',
+          accelerator: 'CmdOrCtrl+O',
           click() {
             dialog.showOpenDialog(
               {
-                properties: ['openFile', 'multiSelections']
+                properties: ['openFile']
               },
               filePath => {
+                if (filePath === undefined) return;
                 menuItemClicked('open', filePath);
               }
             );

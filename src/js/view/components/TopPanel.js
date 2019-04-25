@@ -1,51 +1,61 @@
 import * as TopPanelSC from '../styledComponents/TopPanelStyledComponents';
 import React from 'react';
+import {
+  handleFilterInput,
+  handleHighlightInput,
+  handleTailSwitch
+} from '../actions/dispatchActions';
+import { connect } from 'react-redux';
 
 class TopPanel extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeSwitch: true
-    };
-  }
-
-  handleActiveSwitch = () => {
-    this.setState({ activeSwitch: !this.state.activeSwitch });
-    this.props.activeTail();
-  };
-
   render() {
     return (
-      <TopPanelSC.AppBar>
+      <TopPanelSC.TopPanel>
         <p>LogLady</p>
         <TopPanelSC.TextFieldInput
           placeholder="filter"
-          value={this.props.filterInputFieldValue}
-          onChange={this.props.filterInputField}
+          value={this.props.filterInput}
+          onChange={e => {
+            handleFilterInput(this.props.dispatch, e.target.value);
+          }}
           type="text"
         />
 
         <TopPanelSC.TextFieldInput
           placeholder="highlight"
-          value={this.props.higlightInputFieldValue}
-          onChange={this.props.higlightInputField}
+          value={this.props.highlightInput}
+          onChange={e => {
+            handleHighlightInput(this.props.dispatch, e.target.value);
+          }}
           type="text"
         />
 
         <TopPanelSC.Tail>
-          <span>Tail: </span>
+          <span>Tail:</span>
 
           <TopPanelSC.TailSwitch>
             <input
               type="checkbox"
-              checked={this.state.activeSwitch}
-              onChange={this.handleActiveSwitch}
+              checked={this.props.tailSwitch}
+              onChange={() => {
+                handleTailSwitch(this.props.dispatch);
+              }}
             />
             <span />
           </TopPanelSC.TailSwitch>
         </TopPanelSC.Tail>
-      </TopPanelSC.AppBar>
+      </TopPanelSC.TopPanel>
     );
   }
 }
-export default TopPanel;
+
+const mapStateToProps = state => {
+  return {
+    tailSwitch: state.topPanelReducer.tailSwitch,
+    filterInput: state.topPanelReducer.filterInput,
+    highlightInput: state.topPanelReducer.highlightInput,
+    openFiles: state.menuReducer.openFiles
+  };
+};
+
+export default connect(mapStateToProps)(TopPanel);

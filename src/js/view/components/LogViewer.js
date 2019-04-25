@@ -1,30 +1,19 @@
 import React from 'react';
-import { findMatches } from './lineFilter_helper';
+import { findMatches } from './helpers/lineFilterHelper';
 import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
-
+import { connect } from 'react-redux';
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      lineFilterText: '',
-      autoScroll: true
-    };
-
     this.liveLinesContainer = React.createRef();
   }
 
   createLineArray = () => {
     const lineArray = [];
-    lineArray.push(...this.props.lines.split('\n'));
-    const matchArray = findMatches(this.props.filterInputFieldValue, lineArray);
+    lineArray.push(...this.props.liveLines.split('\n'));
+    const matchArray = findMatches(this.props.filterInput, lineArray);
 
     return matchArray;
-  };
-
-  componentDidUpdate = () => {
-    if (this.state.autoScroll !== this.props.activeTail) {
-      this.handleAutoScroll();
-    }
   };
 
   componentDidMount = () => {
@@ -33,19 +22,8 @@ class LogViewer extends React.Component {
     containerObserver.observe(this.liveLinesContainer.current, observerConfig);
   };
 
-  handleAutoScroll = () => {
-    !this.state.autoScroll &&
-      this.liveLinesContainer.current.scrollTo(
-        0,
-        this.liveLinesContainer.current.scrollHeight
-      );
-    this.setState({
-      autoScroll: !this.state.autoScroll
-    });
-  };
-
   scrollToBottom = () => {
-    if (this.state.autoScroll) {
+    if (this.props.tailSwitch) {
       this.liveLinesContainer.current.scrollTo(
         0,
         this.liveLinesContainer.current.scrollHeight
@@ -53,30 +31,41 @@ class LogViewer extends React.Component {
     }
   };
 
+  setHighlightColor = line => {
+    return line.match(new RegExp(this.props.highlightInput, 'gi')) &&
+      this.props.highlightInput
+      ? { background: this.props.highlightColor }
+      : {};
+  };
+
   render() {
-    const lines = this.props.lines && this.createLineArray();
+    const lines = this.props.liveLines && this.createLineArray();
     return (
+      // <div style={{ height: '100vh' }}>
       <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
         {lines &&
           lines.map((line, i) => {
             return (
-              <p
-                style={
-                  line.match(
-                    new RegExp(this.props.higlightInputFieldValue, 'gi')
-                  ) && this.props.higlightInputFieldValue
-                    ? { background: this.props.highlightColorInput }
-                    : {}
-                }
-                key={i}
-              >
+              <p style={this.setHighlightColor(line)} key={i}>
                 {line}
               </p>
             );
           })}
       </LogViewerSC.TextContainer>
+      // </div>
     );
   }
 }
 
-export default LogViewer;
+const mapStateToProps = state => {
+  return {
+    filterInput: state.topPanelReducer.filterInput,
+    highlightInput: state.topPanelReducer.highlightInput,
+    highlightColor: state.settingsReducer.highlightColor,
+    liveLines: state.logViewerReducer.liveLines,
+    nthLines: state.logViewerReducer.nthLines,
+    tailSwitch: state.topPanelReducer.tailSwitch
+  };
+};
+
+export default connect(mapStateToProps)(LogViewer);
