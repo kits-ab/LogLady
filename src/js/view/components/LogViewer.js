@@ -2,6 +2,7 @@ import React from 'react';
 import { findMatches } from './helpers/lineFilterHelper';
 import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
+import { closeFile } from './helpers/handleFileHelper';
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
@@ -41,9 +42,16 @@ class LogViewer extends React.Component {
   render() {
     const lines = this.props.liveLines && this.createLineArray();
     return (
-      // <div style={{ height: '100vh' }}>
       <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
-        <LogViewerSC.CloseFileButton />
+        <LogViewerSC.CloseFileButton
+          openFiles={this.props.openFiles}
+          onClick={() => {
+            closeFile(
+              this.props.dispatch,
+              this.props.openFiles ? this.props.openFiles : ''
+            );
+          }}
+        />
         {lines &&
           lines.map((line, i) => {
             return (
@@ -53,7 +61,6 @@ class LogViewer extends React.Component {
             );
           })}
       </LogViewerSC.TextContainer>
-      // </div>
     );
   }
 }
@@ -65,7 +72,8 @@ const mapStateToProps = state => {
     highlightColor: state.settingsReducer.highlightColor,
     liveLines: state.logViewerReducer.liveLines,
     nthLines: state.logViewerReducer.nthLines,
-    tailSwitch: state.topPanelReducer.tailSwitch
+    tailSwitch: state.topPanelReducer.tailSwitch,
+    openFiles: state.menuReducer.openFiles
   };
 };
 

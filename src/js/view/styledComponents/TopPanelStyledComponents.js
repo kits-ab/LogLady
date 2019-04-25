@@ -47,7 +47,7 @@ export const TailSwitch = styled.label`
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: lightgrey;
+    background-color: #222;
     -webkit-transition: 0.4s;
     transition: 0.4s;
     border-radius: 34px;
@@ -59,14 +59,14 @@ export const TailSwitch = styled.label`
     width: 22.8px;
     left: 1px;
     bottom: 1.3px;
-    background-color: ivory;
+    background-color: #808080;
     -webkit-transition: 0.4s;
     transition: 0.4s;
     border-radius: 50%;
   }
 
   input:checked + span {
-    background-color: #222;
+    background-color: ivory;
   }
   input:checked + span:before {
     -webkit-transform: translateX(22.8px);
