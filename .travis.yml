@@ -5,7 +5,7 @@ os: osx
 script:
   - npm run lint
   - npm test
-  - npm run pack
+  - npm run electron-pack
 branches:
   only:
     - master
