@@ -1,15 +1,31 @@
 const { Menu } = require('electron');
 const { dialog } = require('electron');
 
-const handleMenuItemClicked = _ipc => {
-  return (type, data) => {
-    _ipc.send('filePath', data);
-    _ipc.send('backendMessages', { type: `menu_${type}`, data: data });
-  };
+let ipc;
+
+const setIpc = _ipc => {
+  ipc = _ipc;
+};
+
+const handleMenuItemClicked = (type, data) => {
+  ipc.send('backendMessages', { type: `menu_${type}`, data: data });
+};
+
+const handleShowOpenDialog = () => {
+  dialog.showOpenDialog(
+    {
+      properties: ['openFile']
+    },
+    filePath => {
+      if (filePath === undefined) return;
+      handleMenuItemClicked('open', filePath);
+    }
+  );
 };
 
 const createMenu = ipc => {
-  const menuItemClicked = handleMenuItemClicked(ipc);
+  // const menuItemClicked = handleMenuItemClicked(ipc);
+  setIpc(ipc);
   const template = [
     {
       label: 'LogLady',
@@ -27,15 +43,7 @@ const createMenu = ipc => {
           label: 'Open file...',
           accelerator: 'CmdOrCtrl+O',
           click() {
-            dialog.showOpenDialog(
-              {
-                properties: ['openFile']
-              },
-              filePath => {
-                if (filePath === undefined) return;
-                menuItemClicked('open', filePath);
-              }
-            );
+            handleShowOpenDialog();
           }
         }
       ]
@@ -107,4 +115,7 @@ const createMenu = ipc => {
   return Menu.buildFromTemplate(template);
 };
 
-module.exports = { createMenu: createMenu };
+module.exports = {
+  createMenu: createMenu,
+  handleShowOpenDialog: handleShowOpenDialog
+};
