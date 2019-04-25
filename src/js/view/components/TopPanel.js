@@ -6,12 +6,19 @@ import {
   handleTailSwitch
 } from '../actions/dispatchActions';
 import { connect } from 'react-redux';
-
+import { showOpenDialog } from './helpers/handleFileHelper';
 class TopPanel extends React.Component {
   render() {
     return (
       <TopPanelSC.TopPanel>
         <p>LogLady</p>
+        <TopPanelSC.OpenFileButton
+          onClick={() => {
+            showOpenDialog();
+          }}
+        >
+          Open file
+        </TopPanelSC.OpenFileButton>
         <TopPanelSC.TextFieldInput
           placeholder="filter"
           value={this.props.filterInput}

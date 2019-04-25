@@ -1,5 +1,6 @@
 const fileReader = require('../adapters/fileReader');
 const { ipcMain } = require('electron');
+const menu = require('../electron/menu');
 
 let action = {};
 
@@ -64,6 +65,9 @@ ipcMain.on('frontendMessages', (event, _argObj) => {
       break;
     case 'stopWatcher':
       stopWatcher(event, _argObj);
+      break;
+    case 'showOpenDialog':
+      menu.handleShowOpenDialog();
       break;
     default:
   }
