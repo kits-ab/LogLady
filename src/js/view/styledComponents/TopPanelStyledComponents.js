@@ -25,6 +25,10 @@ export const TextFieldInput = styled.input`
   ::-webkit-input-placeholder {
     color: #ccc;
   }
+  :focus {
+    border: 0.5px solid white;
+    outline: none;
+  }
 `;
 
 export const TailSwitch = styled.label`
