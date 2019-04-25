@@ -25,8 +25,7 @@ const windowStateKeeper = windowName => {
       x: undefined,
       y: undefined,
       width: 1000,
-      height: 800,
-      darkTheme: true
+      height: 800
     };
   };
   const saveState = () => {
@@ -60,7 +59,8 @@ const createWindow = () => {
     x: mainWindowStateKeeper.x,
     y: mainWindowStateKeeper.y,
     width: mainWindowStateKeeper.width,
-    height: mainWindowStateKeeper.height
+    height: mainWindowStateKeeper.height,
+    darkTheme: true
   };
   mainWindow = new BrowserWindow(windowOptions);
   mainWindowStateKeeper.track(mainWindow);
