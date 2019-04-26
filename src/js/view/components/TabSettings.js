@@ -5,7 +5,6 @@ import {
   handleHighlightColor
 } from '../actions/dispatchActions';
 import * as TabSettingsSC from '../styledComponents/TabSettingsStyledComponents';
-import { CloseFileButton } from '../styledComponents/LogViewerStyledComponents';
 
 const close = require('../../../resources/close.png');
 const { Component } = require('react');
