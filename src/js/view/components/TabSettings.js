@@ -24,7 +24,7 @@ class TabSettings extends Component {
             }}
           />
         </TabSettingsSC.HighlightContainer>
-        <TabSettingsSC.CloseButton
+        <TabSettingsSC.CloseSettingsButton
           onClick={() => {
             handleShowSettings(this.props.dispatch);
           }}
