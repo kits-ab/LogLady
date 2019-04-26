@@ -6,7 +6,7 @@ export const TopPanel = styled.div`
   display: flex;
   flex-direction: row;
   position: fixed;
-  z-index: 1;
+  z-index: 2;
 
   top: 0;
   p {

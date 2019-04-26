@@ -9,6 +9,7 @@ export const Settings = styled.div`
   color: #222;
   background: #ccc;
   justify-content: space-between;
+  z-index: 1;
 `;
 
 export const HighlightContainer = styled.div`
@@ -18,9 +19,32 @@ export const HighlightContainer = styled.div`
   }
 `;
 
-export const CloseButton = styled.img`
-  float: right;
-  width: 17px;
-  margin: 27px 37px 0 0;
-  height: 17px;
+export const CloseSettingsButton = styled.button`
+  position: fixed;
+  margin-top: 30px;
+  margin-left: calc(100% - 47px);
+  display: block;
+  box-sizing: border-box;
+  width: 27px;
+  height: 27px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #808080;
+  border-radius: 100%;
+  outline: none;
+  background: -webkit-linear-gradient(
+      -45deg,
+      transparent 48%,
+      transparent 46%,
+      #808080 46%,
+      #808080 56%,
+      transparent 56%,
+      transparent 100%
+    ),
+    -webkit-linear-gradient(45deg, transparent 48%, transparent 46%, #808080 46%, #808080
+          56%, transparent 56%);
+  background-color: ivory;
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0);
+  transition: all 0.3s ease;
+  z-index: 1;
 `;
