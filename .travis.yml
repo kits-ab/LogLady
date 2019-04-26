@@ -12,6 +12,8 @@ branches:
     - develop
 deploy:
   provider: releases
+  api_key:
+    secure: euLb8PYutOT+b3wssd4K4sxrYTJv24it0cnVDPFyx0OB3pGZg7JlEr5MTR7IfSVY4fTUkfVzbTZrNuJdohsr0qPI5gyv+RUHhaRtmbrdF0+5tKFEPsGV6mljEjGvCxUw3YgdZz5Yv+gw31VaDkZ5pBkwBCsiC/jaby0F0rOq0vYUi8hrG+E3EMa4KAIruQoKurYE3eN4Wq6I8lWPegOZx5aXSEI8UYkJ6CGFKEvzD6gOhwjRsi+Z2FVdFZ8IPligmanx3MEOFi1GwHyT12kMri3L4JrposktWkKKy3Vtkn2jvlR5JOXeou9UYjYHrQBOM+ho81+/G1jHiH9D3eVgWBqMEupj/y+AQd5T9UnzE6EVlxVH8m0x27eCLO1QUFEHahxReZ2p0GmimueXic+Vhr8NIbaQMFvqlq3p8bOTkTGHm7DeOXtirey3mLP9kzow3mc1k6AE3FS7xTjn/OEu/ADR0jDcFTYuC9KzEhQPtUG8h9nHH2MK3slXbvqg0zXOPEOMPya3s0EtElOFeSBAm7EBqxS1qKImK5UbL4uVG1orcY71hF68ROy3Wcp/2qWd63QhC3yue0F6zArqVd219xUGcknq+8xtHTT4gQBBd22Y39m5f4ZijMor6Oua0CooUAsoiwyyUpQb/gUVjTpcn/7OAUbBwQpmHxD4x2/JcdA=
   file:
     - 'dist/loglady 1.0.0.AppImage'
     - 'dist/loglady-1.0.0.dmg'
