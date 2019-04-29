@@ -32,10 +32,34 @@ class LogViewer extends React.Component {
     }
   };
 
+  setTextColorForHighlight = () => {
+    switch (this.props.highlightColor) {
+      case '#b80000':
+        return '#eeefea';
+      case '#db3e00':
+        return '#eeefea';
+      case '#008b02':
+        return '#eeefea';
+      case '#006b76':
+        return '#eeefea';
+      case '#1273de':
+        return '#eeefea';
+      case '#004dcf':
+        return '#eeefea';
+      case '#5300eb':
+        return '#eeefea';
+      default:
+        return '#222';
+    }
+  };
+
   setHighlightColor = line => {
     return line.match(new RegExp(this.props.highlightInput, 'gi')) &&
       this.props.highlightInput
-      ? { background: this.props.highlightColor }
+      ? {
+          background: this.props.highlightColor,
+          color: this.setTextColorForHighlight()
+        }
       : {};
   };
 
