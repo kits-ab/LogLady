@@ -2,7 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as StatusBarSC from '../styledComponents/StatusBarStyledComponents';
 import { handleShowSettings } from '../actions/dispatchActions';
-import { getFormattedFileSize } from './helpers/StatusBarHelper';
+import {
+  getFormattedFileSize,
+  getFormattedFilePath
+} from './helpers/StatusBarHelper';
 const settings = require('../../../resources/settings.png');
 
 class StatusBar extends React.Component {
@@ -17,7 +20,12 @@ class StatusBar extends React.Component {
           alt="settings"
         />
         <ul>
-          <li>Path: {this.props.openFiles ? this.props.openFiles[0] : null}</li>
+          <li>
+            Path:{' '}
+            {this.props.openFiles
+              ? getFormattedFilePath(this.props.openFiles)
+              : null}
+          </li>
           <li>Lines:{this.props.numberOfLines}</li>
           <li>Size: {getFormattedFileSize(this.props.fileSize)}</li>
         </ul>

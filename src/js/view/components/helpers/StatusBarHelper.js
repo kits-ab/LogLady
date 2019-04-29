@@ -11,3 +11,12 @@ export const getFormattedFileSize = fileSize => {
     return `${0} bytes`;
   }
 };
+
+export const getFormattedFilePath = openFiles => {
+  const splitFilepath = openFiles[0].split('/');
+  let fileName;
+  for (let i = 0; i < splitFilepath.length; i++) {
+    fileName = splitFilepath[i];
+  }
+  return fileName;
+};
