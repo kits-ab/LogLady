@@ -60,6 +60,8 @@ const createWindow = () => {
     y: mainWindowStateKeeper.y,
     width: mainWindowStateKeeper.width,
     height: mainWindowStateKeeper.height,
+    minWidth: 600,
+    minHeight: 125,
     darkTheme: true
   };
   mainWindow = new BrowserWindow(windowOptions);
