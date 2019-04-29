@@ -23,7 +23,6 @@ export const Line = styled.div`
   }};
 `;
 
-setTimeout(() => {}, 5000);
 export const CloseFileButton = styled.button`
   position: fixed;
   margin-top: 10px;
