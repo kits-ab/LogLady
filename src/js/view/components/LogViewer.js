@@ -4,7 +4,6 @@ import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
 import TextHighlightRegex from './TextHighlightRegex';
-import Color from 'color';
 
 class LogViewer extends React.Component {
   constructor(props) {
