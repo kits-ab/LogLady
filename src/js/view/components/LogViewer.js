@@ -4,6 +4,7 @@ import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
 import reactStringReplace from 'react-string-replace';
+import Color from 'color';
 
 class LogViewer extends React.Component {
   constructor(props) {
@@ -36,6 +37,7 @@ class LogViewer extends React.Component {
 
   hardcodedTheme = () => {
     return {
+      stripe: '#',
       line: {
         background: '#0f31bc',
         color: 'white'
@@ -68,6 +70,20 @@ class LogViewer extends React.Component {
     return <span style={theme.line}>{this.highlightMatches(line, theme)}</span>;
   };
 
+  stripe = (i, color) => {
+    return {
+      background:
+        i & 1
+          ? color
+          : Color(color)
+              .darken(0.5)
+              .hex(),
+      paddingTop: '1em',
+      paddingBottom: '1em',
+      paddingLeft: '1em'
+    };
+  };
+
   render() {
     const lines = this.props.liveLines && this.createLineArray();
     return (
@@ -84,11 +100,11 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <p key={i}>
+              <div key={i} style={this.stripe(i, '#222')}>
                 {this.hasMatch(line, this.props.highlightInput)
                   ? this.highlightLine(line, this.hardcodedTheme())
                   : line}
-              </p>
+              </div>
             );
           })}
       </LogViewerSC.TextContainer>
