@@ -4,6 +4,7 @@ import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
 import TextHighlightRegex from './TextHighlightRegex';
+import Color from 'color';
 
 class LogViewer extends React.Component {
   constructor(props) {
@@ -34,23 +35,37 @@ class LogViewer extends React.Component {
     }
   };
 
-  textStyle = () => {
+  styleHighlightedText = backgroundColor => {
+    const matchingTextColor = {
+      '#b80000': '#eeefea',
+      '#db3e00': '#eeefea',
+      '#008b02': '#eeefea',
+      '#006b76': '#eeefea',
+      '#1273de': '#eeefea',
+      '#004dcf': '#eeefea',
+      '#5300eb': '#eeefea',
+      default: '#222'
+    };
+
+    const textColor = matchingTextColor[backgroundColor];
+
     return {
-      background: this.props.highlightColor,
-      color: this.props.highlightColor
+      background: backgroundColor,
+      color: textColor ? textColor : matchingTextColor.default
     };
   };
 
-  matchStyle = () => {
+  styleHighlightedMatch = () => {
     return {
       background: 'yellow',
+      opacity: '0.5',
       color: 'black',
       fontWeight: 'bold'
     };
   };
 
-  hasMatch = (line, match) => {
-    return match && line.match(new RegExp(match, 'i'));
+  hasMatch = (line, regex) => {
+    return regex && line.match(new RegExp(regex, 'i'));
   };
 
   render() {
@@ -73,8 +88,8 @@ class LogViewer extends React.Component {
                 {this.hasMatch(line, this.props.highlightInput) ? (
                   <TextHighlightRegex
                     text={line}
-                    textStyle={this.textStyle()}
-                    matchStyle={this.matchStyle()}
+                    style={this.styleHighlightedText(this.props.highlightColor)}
+                    matchStyle={this.styleHighlightedMatch()}
                     regex={this.props.highlightInput}
                   />
                 ) : (

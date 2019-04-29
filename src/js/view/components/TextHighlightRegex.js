@@ -29,7 +29,7 @@ class TextHighlightRegex extends React.Component {
         this.props.matchStyle,
         this.props.regex
       ),
-      this.props.textStyle
+      this.props.style
     );
   }
 }
