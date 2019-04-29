@@ -25,7 +25,8 @@ const windowStateKeeper = windowName => {
       x: undefined,
       y: undefined,
       width: 1000,
-      height: 800
+      height: 800,
+      show: false
     };
   };
   const saveState = () => {
@@ -62,7 +63,8 @@ const createWindow = () => {
     height: mainWindowStateKeeper.height,
     minWidth: 600,
     minHeight: 125,
-    darkTheme: true
+    darkTheme: true,
+    show: false
   };
   mainWindow = new BrowserWindow(windowOptions);
   mainWindowStateKeeper.track(mainWindow);
@@ -71,6 +73,11 @@ const createWindow = () => {
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../build/index.html')}`
   );
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
