@@ -34,35 +34,6 @@ class LogViewer extends React.Component {
     }
   };
 
-  styleHighlightedText = backgroundColor => {
-    const matchingTextColor = {
-      '#b80000': '#eeefea',
-      '#db3e00': '#eeefea',
-      '#008b02': '#eeefea',
-      '#006b76': '#eeefea',
-      '#1273de': '#eeefea',
-      '#004dcf': '#eeefea',
-      '#5300eb': '#eeefea',
-      default: '#222'
-    };
-
-    const textColor = matchingTextColor[backgroundColor];
-
-    return {
-      background: backgroundColor,
-      color: textColor ? textColor : matchingTextColor.default
-    };
-  };
-
-  styleHighlightedMatch = () => {
-    return {
-      background: 'yellow',
-      opacity: '0.5',
-      color: 'black',
-      fontWeight: 'bold'
-    };
-  };
-
   hasMatch = (line, regex) => {
     return regex && line.match(new RegExp(regex, 'i'));
   };
@@ -83,18 +54,17 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <div key={i} className="log-line">
+              <LogViewerSC.Line key={i} row={i} color="#222">
                 {this.hasMatch(line, this.props.highlightInput) ? (
                   <TextHighlightRegex
                     text={line}
-                    style={this.styleHighlightedText(this.props.highlightColor)}
-                    matchStyle={this.styleHighlightedMatch()}
+                    color={this.props.highlightColor}
                     regex={this.props.highlightInput}
                   />
                 ) : (
                   line
                 )}
-              </div>
+              </LogViewerSC.Line>
             );
           })}
       </LogViewerSC.TextContainer>

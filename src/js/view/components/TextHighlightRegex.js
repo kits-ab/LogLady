@@ -1,19 +1,15 @@
 import React from 'react';
 import reactStringReplace from 'react-string-replace';
+import * as TextHighlightRegexSC from '../styledComponents/TextHighlightRegexStyledComponents';
 
 class TextHighlightRegex extends React.Component {
-  constructor(props) {
-    super(props);
-    debugger;
-  }
-
-  highlightMatches = (text, style, regex) => {
+  highlightMatches = (text, regex) => {
     const group = '(' + regex + ')'; //Parenthesis required for reactStringReplace to work properly
     return reactStringReplace(text, new RegExp(group, 'gi'), (match, i) => {
       return (
-        <span key={i} style={style}>
+        <TextHighlightRegexSC.HighlightMatch key={i}>
           {match}
-        </span>
+        </TextHighlightRegexSC.HighlightMatch>
       );
     });
   };
@@ -23,13 +19,10 @@ class TextHighlightRegex extends React.Component {
   };
 
   render() {
-    return this.highlightText(
-      this.highlightMatches(
-        this.props.text,
-        this.props.matchStyle,
-        this.props.regex
-      ),
-      this.props.style
+    return (
+      <TextHighlightRegexSC.HighlightText color={this.props.color}>
+        {this.highlightMatches(this.props.text, this.props.regex)}
+      </TextHighlightRegexSC.HighlightText>
     );
   }
 }
