@@ -3,6 +3,8 @@ import { findMatches } from './helpers/lineFilterHelper';
 import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
+import reactStringReplace from 'react-string-replace';
+
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
@@ -32,11 +34,43 @@ class LogViewer extends React.Component {
     }
   };
 
-  setHighlightColor = line => {
-    return line.match(new RegExp(this.props.highlightInput, 'gi')) &&
-      this.props.highlightInput
-      ? { background: this.props.highlightColor }
-      : {};
+  lineHighlightStyle = () => {
+    return {
+      background: '#0f31bc',
+      color: 'white'
+    };
+  };
+
+  matchHighlightStyle = () => {
+    return {
+      background: 'yellow',
+      color: 'black',
+      fontWeight: 'bold'
+    };
+  };
+
+  hasMatch = line => {
+    const regex = new RegExp(this.props.highlightInput, 'i');
+    return line.match(regex);
+  };
+
+  highlightMatches = line => {
+    const regex = new RegExp('(' + this.props.highlightInput + ')', 'gi'); //Regexp needs to be in a regexp group for reactStringReplace to work
+    return reactStringReplace(line, regex, (match, i) => {
+      return (
+        <span key={i} style={this.matchHighlightStyle()}>
+          {match}
+        </span>
+      );
+    });
+  };
+
+  highlightLine = line => {
+    return (
+      <span style={this.lineHighlightStyle()}>
+        {this.highlightMatches(line)}
+      </span>
+    );
   };
 
   render() {
@@ -55,8 +89,10 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <p style={this.setHighlightColor(line)} key={i}>
-                {line}
+              <p key={i}>
+                {this.hasMatch(line) && this.props.highlightInput
+                  ? this.highlightLine(line)
+                  : line}
               </p>
             );
           })}
