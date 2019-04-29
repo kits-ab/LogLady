@@ -83,7 +83,7 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <p key={i}>
+              <div key={i} className="log-line">
                 {this.hasMatch(line, this.props.highlightInput) ? (
                   <TextHighlightRegex
                     text={line}
@@ -94,7 +94,7 @@ class LogViewer extends React.Component {
                 ) : (
                   line
                 )}
-              </p>
+              </div>
             );
           })}
       </LogViewerSC.TextContainer>

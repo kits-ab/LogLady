@@ -9,6 +9,9 @@ export const TextContainer = styled.div`
   width: calc(100vw - 12px);
   postition: fixed;
   margin: 55px 0 10px 5px;
+  .log-line {
+    white-space: nowrap;
+  }
 `;
 
 setTimeout(() => {}, 5000);
