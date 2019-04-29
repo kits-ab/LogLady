@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Color from 'color';
 
 export const TextContainer = styled.div`
   overflow: auto;
@@ -9,6 +10,17 @@ export const TextContainer = styled.div`
   width: calc(100vw - 12px);
   postition: fixed;
   margin: 55px 0 10px 5px;
+`;
+
+export const Line = styled.div`
+  white-space: nowrap;
+  background: ${props => {
+    return props.row & 1
+      ? props.color
+      : Color(props.color)
+          .darken(0.3)
+          .hex();
+  }};
 `;
 
 setTimeout(() => {}, 5000);
