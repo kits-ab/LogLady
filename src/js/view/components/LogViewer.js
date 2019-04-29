@@ -3,7 +3,7 @@ import { findMatches } from './helpers/lineFilterHelper';
 import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
-import reactStringReplace from 'react-string-replace';
+import TextHighlightRegex from './TextHighlightRegex';
 
 class LogViewer extends React.Component {
   constructor(props) {
@@ -34,38 +34,23 @@ class LogViewer extends React.Component {
     }
   };
 
-  hardcodedTheme = () => {
+  textStyle = () => {
     return {
-      line: {
-        background: '#0f31bc',
-        color: 'white'
-      },
-      match: {
-        background: 'yellow',
-        color: 'black',
-        fontWeight: 'bold'
-      }
+      background: this.props.highlightColor,
+      color: this.props.highlightColor
+    };
+  };
+
+  matchStyle = () => {
+    return {
+      background: 'yellow',
+      color: 'black',
+      fontWeight: 'bold'
     };
   };
 
   hasMatch = (line, match) => {
     return match && line.match(new RegExp(match, 'i'));
-  };
-
-  highlightMatches = (line, theme) => {
-    const group = '(' + this.props.highlightInput + ')'; //Parenthesis required for reactStringReplace to work properly
-    const regex = new RegExp(group, 'gi');
-    return reactStringReplace(line, regex, (match, i) => {
-      return (
-        <span key={i} style={theme.match}>
-          {match}
-        </span>
-      );
-    });
-  };
-
-  highlightLine = (line, theme) => {
-    return <span style={theme.line}>{this.highlightMatches(line, theme)}</span>;
   };
 
   render() {
@@ -85,9 +70,16 @@ class LogViewer extends React.Component {
           lines.map((line, i) => {
             return (
               <p key={i}>
-                {this.hasMatch(line, this.props.highlightInput)
-                  ? this.highlightLine(line, this.hardcodedTheme())
-                  : line}
+                {this.hasMatch(line, this.props.highlightInput) ? (
+                  <TextHighlightRegex
+                    text={line}
+                    textStyle={this.textStyle()}
+                    matchStyle={this.matchStyle()}
+                    regex={this.props.highlightInput}
+                  />
+                ) : (
+                  line
+                )}
               </p>
             );
           })}
