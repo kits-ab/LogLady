@@ -34,18 +34,17 @@ class LogViewer extends React.Component {
     }
   };
 
-  lineHighlightStyle = () => {
+  hardcodedTheme = () => {
     return {
-      background: '#0f31bc',
-      color: 'white'
-    };
-  };
-
-  matchHighlightStyle = () => {
-    return {
-      background: 'yellow',
-      color: 'black',
-      fontWeight: 'bold'
+      line: {
+        background: '#0f31bc',
+        color: 'white'
+      },
+      match: {
+        background: 'yellow',
+        color: 'black',
+        fontWeight: 'bold'
+      }
     };
   };
 
@@ -53,24 +52,20 @@ class LogViewer extends React.Component {
     return match && line.match(new RegExp(match, 'i'));
   };
 
-  highlightMatches = line => {
+  highlightMatches = (line, theme) => {
     const group = '(' + this.props.highlightInput + ')'; //Parenthesis required for reactStringReplace to work properly
     const regex = new RegExp(group, 'gi');
     return reactStringReplace(line, regex, (match, i) => {
       return (
-        <span key={i} style={this.matchHighlightStyle()}>
+        <span key={i} style={theme.match}>
           {match}
         </span>
       );
     });
   };
 
-  highlightLine = line => {
-    return (
-      <span style={this.lineHighlightStyle()}>
-        {this.highlightMatches(line)}
-      </span>
-    );
+  highlightLine = (line, theme) => {
+    return <span style={theme.line}>{this.highlightMatches(line, theme)}</span>;
   };
 
   render() {
@@ -91,7 +86,7 @@ class LogViewer extends React.Component {
             return (
               <p key={i}>
                 {this.hasMatch(line, this.props.highlightInput)
-                  ? this.highlightLine(line)
+                  ? this.highlightLine(line, this.hardcodedTheme())
                   : line}
               </p>
             );
