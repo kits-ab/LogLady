@@ -3,8 +3,8 @@ import { findMatches } from './helpers/lineFilterHelper';
 import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
-import reactStringReplace from 'react-string-replace';
 import Color from 'color';
+import TextHighlightRegex from './TextHighlightRegex';
 
 class LogViewer extends React.Component {
   constructor(props) {
@@ -35,39 +35,37 @@ class LogViewer extends React.Component {
     }
   };
 
-  hardcodedTheme = () => {
+  styleHighlightedText = backgroundColor => {
+    const matchingTextColor = {
+      '#b80000': '#eeefea',
+      '#db3e00': '#eeefea',
+      '#008b02': '#eeefea',
+      '#006b76': '#eeefea',
+      '#1273de': '#eeefea',
+      '#004dcf': '#eeefea',
+      '#5300eb': '#eeefea',
+      default: '#222'
+    };
+
+    const textColor = matchingTextColor[backgroundColor];
+
     return {
-      stripe: '#',
-      line: {
-        background: '#0f31bc',
-        color: 'white'
-      },
-      match: {
-        background: 'yellow',
-        color: 'black',
-        fontWeight: 'bold'
-      }
+      background: backgroundColor,
+      color: textColor ? textColor : matchingTextColor.default
     };
   };
 
-  hasMatch = (line, match) => {
-    return match && line.match(new RegExp(match, 'i'));
+  styleHighlightedMatch = () => {
+    return {
+      background: 'yellow',
+      opacity: '0.5',
+      color: 'black',
+      fontWeight: 'bold'
+    };
   };
 
-  highlightMatches = (line, theme) => {
-    const group = '(' + this.props.highlightInput + ')'; //Parenthesis required for reactStringReplace to work properly
-    const regex = new RegExp(group, 'gi');
-    return reactStringReplace(line, regex, (match, i) => {
-      return (
-        <span key={i} style={theme.match}>
-          {match}
-        </span>
-      );
-    });
-  };
-
-  highlightLine = (line, theme) => {
-    return <span style={theme.line}>{this.highlightMatches(line, theme)}</span>;
+  hasMatch = (line, regex) => {
+    return regex && line.match(new RegExp(regex, 'i'));
   };
 
   stripe = (i, color) => {
@@ -77,10 +75,7 @@ class LogViewer extends React.Component {
           ? color
           : Color(color)
               .darken(0.5)
-              .hex(),
-      paddingTop: '1em',
-      paddingBottom: '1em',
-      paddingLeft: '1em'
+              .hex()
     };
   };
 
@@ -100,11 +95,18 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <div key={i} style={this.stripe(i, '#222')}>
-                {this.hasMatch(line, this.props.highlightInput)
-                  ? this.highlightLine(line, this.hardcodedTheme())
-                  : line}
-              </div>
+              <p key={i} style={this.stripe(i, '#222')}>
+                {this.hasMatch(line, this.props.highlightInput) ? (
+                  <TextHighlightRegex
+                    text={line}
+                    style={this.styleHighlightedText(this.props.highlightColor)}
+                    matchStyle={this.styleHighlightedMatch()}
+                    regex={this.props.highlightInput}
+                  />
+                ) : (
+                  line
+                )}
+              </p>
             );
           })}
       </LogViewerSC.TextContainer>
