@@ -79,9 +79,13 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <p style={this.setHighlightColor(line)} key={i}>
+              <div
+                className="log-line"
+                style={this.setHighlightColor(line)}
+                key={i}
+              >
                 {line}
-              </p>
+              </div>
             );
           })}
       </LogViewerSC.TextContainer>
