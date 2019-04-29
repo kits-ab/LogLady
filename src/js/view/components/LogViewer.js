@@ -49,13 +49,13 @@ class LogViewer extends React.Component {
     };
   };
 
-  hasMatch = line => {
-    const regex = new RegExp(this.props.highlightInput, 'i');
-    return line.match(regex);
+  hasMatch = (line, match) => {
+    return match && line.match(new RegExp(match, 'i'));
   };
 
   highlightMatches = line => {
-    const regex = new RegExp('(' + this.props.highlightInput + ')', 'gi'); //Regexp needs to be in a regexp group for reactStringReplace to work
+    const group = '(' + this.props.highlightInput + ')'; //Parenthesis required for reactStringReplace to work properly
+    const regex = new RegExp(group, 'gi');
     return reactStringReplace(line, regex, (match, i) => {
       return (
         <span key={i} style={this.matchHighlightStyle()}>
@@ -90,7 +90,7 @@ class LogViewer extends React.Component {
           lines.map((line, i) => {
             return (
               <p key={i}>
-                {this.hasMatch(line) && this.props.highlightInput
+                {this.hasMatch(line, this.props.highlightInput)
                   ? this.highlightLine(line)
                   : line}
               </p>
