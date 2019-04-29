@@ -8,6 +8,8 @@ const engine = require('../src/js/engine/engine');
 const menu = require('../src/js/electron/menu');
 const { Menu } = require('electron');
 const appConfig = require('electron-settings');
+const { IpcMain } = require('electron');
+
 updater.init();
 
 console.log(updater.version);
@@ -28,6 +30,7 @@ const windowStateKeeper = windowName => {
       height: 800
     };
   };
+
   const saveState = () => {
     if (!windowState.isMaximized) {
       windowState = window.getBounds();
@@ -35,13 +38,16 @@ const windowStateKeeper = windowName => {
     windowState.isMaximized = window.isMaximized();
     appConfig.set(`windowState.${windowName}`, windowState);
   };
+
   const track = win => {
     window = win;
     ['resize', 'move', 'close'].forEach(event => {
       win.on(event, saveState);
     });
   };
+
   setBounds();
+
   return {
     x: windowState.x,
     y: windowState.y,
@@ -64,6 +70,7 @@ const createWindow = () => {
     minHeight: 125,
     darkTheme: true
   };
+
   mainWindow = new BrowserWindow(windowOptions);
   mainWindowStateKeeper.track(mainWindow);
   mainWindow.loadURL(
@@ -71,7 +78,10 @@ const createWindow = () => {
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../build/index.html')}`
   );
-  mainWindow.on('closed', () => {
+  mainWindow.on('close', () => {
+    let argObj = {};
+    argObj.type = 'saveState';
+    mainWindow.webContents.send('backendMessages', argObj);
     mainWindow = null;
   });
   Menu.setApplicationMenu(menu.createMenu(mainWindow.webContents));
@@ -79,14 +89,18 @@ const createWindow = () => {
 
 app.on('ready', createWindow);
 
-app.on('window-all-closed', () => {
-  // if (process.platform !== 'darwin') {
-  app.quit();
-  // }
-});
-
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
 });
+
+const quitApplication = () => {
+  // if (process.platform !== 'darwin') {
+  app.quit();
+  // }
+};
+
+module.exports = {
+  quitApplication: quitApplication
+};

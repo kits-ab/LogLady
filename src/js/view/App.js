@@ -8,11 +8,13 @@ import { ipcListener } from './ipcListener';
 import * as ipcPublisher from './ipcPublisher';
 import Statusbar from './components/StatusBar';
 import { RootContainer } from './styledComponents/AppStyledComponents';
+import { loadStateFromDisk } from './configurations/configureStore';
 const React = require('react');
 const { Component } = require('react');
 
 const store = createStore(reducers);
 ipcListener(store.dispatch);
+loadStateFromDisk(store);
 
 class App extends Component {
   render() {

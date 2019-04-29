@@ -1,4 +1,5 @@
 import { sendRequestToBackend } from './ipcPublisher';
+import { saveStateToDisk } from './configurations/configureStore';
 const { ipcRenderer } = window.require('electron');
 
 export const ipcListener = (dispatch, state) => {
@@ -20,7 +21,9 @@ export const ipcListener = (dispatch, state) => {
         sendRequestToBackend(argObj);
         argObj.function = 'fileSize';
         sendRequestToBackend(argObj);
-
+        break;
+      case 'saveState':
+        saveStateToDisk();
         break;
       default:
         dispatch({

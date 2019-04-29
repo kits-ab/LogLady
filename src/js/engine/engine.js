@@ -1,6 +1,7 @@
 const fileReader = require('../adapters/fileReader');
 const { ipcMain } = require('electron');
 const menu = require('../electron/menu');
+const { quitApplication } = require('../../../public/electron');
 
 let action = {};
 
@@ -68,6 +69,13 @@ ipcMain.on('frontendMessages', (event, _argObj) => {
       break;
     case 'showOpenDialog':
       menu.handleShowOpenDialog();
+      break;
+    case 'saveState':
+      if (fileReader.saveStateToDisk(_argObj.reduxStateValue) === 'success') {
+        quitApplication();
+      }
+      break;
+    case 'loadState':
       break;
     default:
   }
