@@ -7,10 +7,11 @@ export const TopPanel = styled.div`
   flex-direction: row;
   position: fixed;
   z-index: 2;
+  align-items: center;
 
   top: 0;
   p {
-    margin: 12px 28px 0 28px;
+    margin: 0 28px 0 28px;
     color: white;
   }
 `;
@@ -36,7 +37,7 @@ export const TailSwitch = styled.label`
   display: inline-block;
   width: 48px;
   height: 25px;
-  margin: 10px 20px;
+  margin: 0 20px;
 
   input {
     opacity: 0;
@@ -62,7 +63,7 @@ export const TailSwitch = styled.label`
     height: 22.8px;
     width: 22.8px;
     left: 1px;
-    bottom: 1.3px;
+    bottom: 0.5px;
     background-color: #808080;
     -webkit-transition: 0.4s;
     transition: 0.4s;

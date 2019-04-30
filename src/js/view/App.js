@@ -18,7 +18,7 @@ class App extends Component {
   render() {
     return (
       <RootContainer>
-        {this.props.openFiles ? (
+        {this.props.openFiles && this.props.openFiles[0] ? (
           <div>
             <TopPanel />
             <TabSettings />

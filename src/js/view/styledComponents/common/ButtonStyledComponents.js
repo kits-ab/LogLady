@@ -4,7 +4,6 @@ export const OpenFileButton = styled.button`
   height: 27px;
   min-width: 100px;
   width: 100px;
-  margin-top: 10px;
   color: white;
   background: gray;
   border-radius: 4px;

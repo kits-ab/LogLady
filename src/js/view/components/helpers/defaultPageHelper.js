@@ -1,5 +1,3 @@
 export const osSpecificKeyBindings = () => {
-  return `Open File: ${
-    window.navigator.platform.match('mac') ? 'cmd' : 'ctrl'
-  } + O`;
+  return `${window.navigator.platform.startsWith('Mac') ? 'cmd' : 'ctrl'}`;
 };
