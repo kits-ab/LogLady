@@ -22,3 +22,10 @@ export const getFormattedFilePath = openFiles => {
     return fileName;
   });
 };
+
+export const ifToLongFileName = filePath => {
+  if (filePath.length > 50) {
+    return '...';
+  }
+  return filePath;
+};

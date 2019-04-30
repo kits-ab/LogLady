@@ -5,7 +5,8 @@ import * as StatusBarSC from '../styledComponents/StatusBarStyledComponents';
 import { handleShowSettings } from '../actions/dispatchActions';
 import {
   getFormattedFileSize,
-  getFormattedFilePath
+  getFormattedFilePath,
+  ifToLongFileName
 } from './helpers/StatusBarHelper';
 const settings = require('../../../resources/settings.png');
 
@@ -27,7 +28,13 @@ class StatusBar extends React.Component {
 
         <ul>
           <ReactTooltip />
-          <li data-tip={this.props.openFiles ? this.props.openFiles[0] : null}>
+          <li
+            data-tip={
+              this.props.openFiles
+                ? ifToLongFileName(this.props.openFiles[0])
+                : null
+            }
+          >
             Path:{' '}
             {this.props.openFiles
               ? getFormattedFilePath(this.props.openFiles)
