@@ -8,6 +8,14 @@ import {
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
 class TopPanel extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      filterInput: '',
+      highlightInput: '',
+      tailOn: true
+    };
+  }
   render() {
     return (
       <TopPanelSC.TopPanel>
@@ -21,8 +29,9 @@ class TopPanel extends React.Component {
         </TopPanelSC.OpenFileButton>
         <TopPanelSC.TextFieldInput
           placeholder="filter"
-          value={this.props.filterInput}
+          value={this.state.filterInput}
           onChange={e => {
+            this.setState({ filterInput: e.target.value });
             handleFilterInput(this.props.dispatch, e.target.value);
           }}
           type="text"
@@ -30,8 +39,9 @@ class TopPanel extends React.Component {
 
         <TopPanelSC.TextFieldInput
           placeholder="highlight"
-          value={this.props.highlightInput}
+          value={this.state.highlightInput}
           onChange={e => {
+            this.setState({ highlightInput: e.target.value });
             handleHighlightInput(this.props.dispatch, e.target.value);
           }}
           type="text"
@@ -43,9 +53,14 @@ class TopPanel extends React.Component {
           <TopPanelSC.TailSwitch>
             <input
               type="checkbox"
-              checked={this.props.tailSwitch}
+              checked={this.state.tailOn}
+              ref="tailSwitch"
               onChange={() => {
-                handleTailSwitch(this.props.dispatch);
+                this.setState({ tailOn: this.refs.tailSwitch.checked });
+                handleTailSwitch(
+                  this.props.dispatch,
+                  this.refs.tailSwitch.checked
+                );
               }}
             />
             <span />
@@ -58,9 +73,6 @@ class TopPanel extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    tailSwitch: state.topPanelReducer.tailSwitch,
-    filterInput: state.topPanelReducer.filterInput,
-    highlightInput: state.topPanelReducer.highlightInput,
     openFiles: state.menuReducer.openFiles
   };
 };

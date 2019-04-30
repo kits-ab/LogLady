@@ -4,9 +4,10 @@ export const handleShowSettings = dispatch => {
   });
 };
 
-export const handleTailSwitch = dispatch => {
+export const handleTailSwitch = (dispatch, data) => {
   dispatch({
-    type: 'tailSwitch'
+    type: 'tailSwitch',
+    data
   });
 };
 
@@ -28,6 +29,13 @@ export const handleHighlightColor = (dispatch, data) => {
   dispatch({
     type: 'highlightColor',
     data: data
+  });
+};
+
+export const handleWrapLineSetting = (dispatch, data) => {
+  dispatch({
+    type: 'wrapLineSetting',
+    data
   });
 };
 

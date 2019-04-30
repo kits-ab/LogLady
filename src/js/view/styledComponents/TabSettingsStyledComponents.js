@@ -8,18 +8,19 @@ export const Settings = styled.div`
   position: fixed;
   color: #222;
   background: #ccc;
-  justify-content: space-between;
+  justify-content: flex-start;
   z-index: 1;
 `;
 
-export const HighlightContainer = styled.div`
+export const Setting = styled.div`
+  justify-content: center;
   padding: 10px;
   p {
     margin: 10px 0 5px 40px;
   }
 `;
 
-export const CloseSettingsButton = styled.button`
+export const CloseButton = styled.button`
   position: fixed;
   margin-top: 30px;
   margin-left: calc(100% - 47px);

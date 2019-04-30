@@ -1,6 +1,10 @@
 import React from 'react';
 import { findMatches } from './helpers/lineFilterHelper';
-import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
+import {
+  TextContainer,
+  CloseFileButton,
+  Line
+} from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
 import TextHighlightRegex from './TextHighlightRegex';
@@ -41,8 +45,8 @@ class LogViewer extends React.Component {
   render() {
     const lines = this.props.liveLines && this.createLineArray();
     return (
-      <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
-        <LogViewerSC.CloseFileButton
+      <TextContainer ref={this.liveLinesContainer}>
+        <CloseFileButton
           openFiles={this.props.openFiles}
           onClick={() => {
             closeFile(
@@ -54,7 +58,12 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <LogViewerSC.Line key={i} row={i} color="#222">
+              <Line
+                key={i}
+                row={i}
+                wrap={this.props.wrapLineOn ? 'true' : undefined}
+                color="#222"
+              >
                 {this.hasMatch(line, this.props.highlightInput) ? (
                   <TextHighlightRegex
                     text={line}
@@ -64,10 +73,10 @@ class LogViewer extends React.Component {
                 ) : (
                   line
                 )}
-              </LogViewerSC.Line>
+              </Line>
             );
           })}
-      </LogViewerSC.TextContainer>
+      </TextContainer>
     );
   }
 }
@@ -77,6 +86,7 @@ const mapStateToProps = state => {
     filterInput: state.topPanelReducer.filterInput,
     highlightInput: state.topPanelReducer.highlightInput,
     highlightColor: state.settingsReducer.highlightColor,
+    wrapLineOn: state.settingsReducer.wrapLineOn,
     liveLines: state.logViewerReducer.liveLines,
     nthLines: state.logViewerReducer.nthLines,
     tailSwitch: state.topPanelReducer.tailSwitch,

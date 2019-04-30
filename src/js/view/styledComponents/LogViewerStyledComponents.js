@@ -13,7 +13,9 @@ export const TextContainer = styled.div`
 `;
 
 export const Line = styled.div`
-  white-space: nowrap;
+  white-space: ${props => {
+    return props.wrap ? 'normal' : 'nowrap';
+  }};
   background: ${props => {
     return props.row & 1
       ? props.color
