@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import ReactToolTip from 'react-tooltip';
 import * as StatusBarSC from '../styledComponents/StatusBarStyledComponents';
 import { handleShowSettings } from '../actions/dispatchActions';
 import {
@@ -10,6 +11,9 @@ const settings = require('../../../resources/settings.png');
 
 class StatusBar extends React.Component {
   render() {
+    let test = 'tooltip';
+    console.log(this.props.openFiles);
+
     return (
       <StatusBarSC.Statusbar>
         <StatusBarSC.SettingIcon
@@ -19,8 +23,10 @@ class StatusBar extends React.Component {
           }}
           alt="settings"
         />
+
         <ul>
-          <li>
+          <ReactToolTip />
+          <li data-tip={test}>
             Path:{' '}
             {this.props.openFiles
               ? getFormattedFilePath(this.props.openFiles)

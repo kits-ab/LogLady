@@ -14,9 +14,11 @@ export const getFormattedFileSize = fileSize => {
 
 export const getFormattedFilePath = openFiles => {
   const splitFilepath = openFiles[0].split('/');
-  let fileName;
-  for (let i = 0; i < splitFilepath.length; i++) {
-    fileName = splitFilepath[i];
-  }
-  return fileName;
+  return splitFilepath.map((data, i, splitFilepath) => {
+    let fileName;
+    if (splitFilepath.length === i + 1) {
+      fileName = data;
+    }
+    return fileName;
+  });
 };
