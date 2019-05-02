@@ -61,7 +61,10 @@ const createWindow = () => {
     height: mainWindowStateKeeper.height,
     minWidth: 600,
     minHeight: 125,
-    darkTheme: true
+    darkTheme: true,
+    webPreferences: {
+      devTools: isDev ? true : false
+    }
   };
   mainWindow = new BrowserWindow(windowOptions);
   mainWindowStateKeeper.track(mainWindow);
