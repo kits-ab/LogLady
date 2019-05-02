@@ -84,12 +84,13 @@
       "target": "dmg"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "./public/icons/icon_256x256.ico"
     },
     "linux": {
       "category": "Development",
       "target": "AppImage",
-      "icon": "./icon/icon_256x256.png"
+      "icon": "./public/icons/icon_256x256.png"
     },
     "directories": {
       "buildResources": "assets"
