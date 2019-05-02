@@ -35,7 +35,7 @@ class StatusBar extends React.Component {
                 : null
             }
           >
-            Path:{' '}
+            File:{' '}
             {this.props.openFiles && this.props.openFiles[0]
               ? getFileName(this.props.openFiles)
               : null}
