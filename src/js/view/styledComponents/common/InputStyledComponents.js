@@ -4,7 +4,6 @@ export const TextFieldInputContainer = styled.input`
   height: 20px;
   background: #444;
   color: white;
-  width: 1px;
 
   ::-webkit-input-placeholder {
     text-align: center;
