@@ -14,6 +14,9 @@ class LogViewer extends React.Component {
   constructor(props) {
     super(props);
     this.liveLinesContainer = React.createRef();
+    this.state = {
+      scrollOffset: 0
+    };
   }
 
   createLineArray = () => {
@@ -56,7 +59,7 @@ class LogViewer extends React.Component {
             );
           }}
         />
-        <Log>
+        <Log ref="log">
           {lines &&
             lines.map((line, i) => {
               return (

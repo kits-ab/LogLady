@@ -17,9 +17,12 @@ export const TopPanelItem = styled.div`
 `;
 
 export const TopPanelItemText = styled.div`
-  display: flex;
   padding: 0px 8px;
   color: white;
+`;
+
+export const TopPanelItemFiller = styled.div`
+  flex: 1;
 `;
 
 export const FollowSetting = styled.div`

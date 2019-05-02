@@ -5,13 +5,16 @@ export const LogViewContainer = styled.div`
   overflow: auto;
   flex: 1;
   border: 1px solid white;
-  width: 100%;
   color: #ccc;
   background: #444;
+  min-width: 0;
 `;
 
 export const Log = styled.div`
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  display: inline-block;
 
   div:nth-child(even) {
     background: #444;
@@ -25,9 +28,18 @@ export const Log = styled.div`
 `;
 
 export const LogLine = styled.div`
-  white-space: ${props => {
-    return props.wrap ? 'normal' : 'nowrap';
-  }};
+  min-width: 0;
+
+  ${props => {
+    return props.wrap
+      ? `
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;`
+      : 'white-space: nowrap;';
+  }}
 `;
 
 export const CloseFileButton = styled.button`
