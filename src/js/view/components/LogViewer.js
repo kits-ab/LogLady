@@ -54,7 +54,7 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <LogViewerSC.Line key={i} row={i} color="#222">
+              <LogViewerSC.Line key={i} row={i}>
                 {this.hasMatch(line, this.props.highlightInput) ? (
                   <TextHighlightRegex
                     text={line}

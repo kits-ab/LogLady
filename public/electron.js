@@ -55,7 +55,6 @@ const windowStateKeeper = windowName => {
 const createWindow = () => {
   const mainWindowStateKeeper = windowStateKeeper('main');
   const windowOptions = {
-    title: 'LogLady Main',
     x: mainWindowStateKeeper.x,
     y: mainWindowStateKeeper.y,
     width: mainWindowStateKeeper.width,
