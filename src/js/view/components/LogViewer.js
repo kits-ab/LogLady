@@ -3,7 +3,8 @@ import { findMatches } from './helpers/lineFilterHelper';
 import {
   LogViewContainer,
   CloseFileButton,
-  Line
+  Log,
+  LogLine
 } from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
@@ -55,26 +56,27 @@ class LogViewer extends React.Component {
             );
           }}
         />
-        {lines &&
-          lines.map((line, i) => {
-            return (
-              <Line
-                key={i}
-                row={i}
-                wrap={this.props.wrapLineOn ? 'true' : undefined}
-              >
-                {this.hasMatch(line, this.props.highlightInput) ? (
-                  <TextHighlightRegex
-                    text={line}
-                    color={this.props.highlightColor}
-                    regex={this.props.highlightInput}
-                  />
-                ) : (
-                  line
-                )}
-              </Line>
-            );
-          })}
+        <Log>
+          {lines &&
+            lines.map((line, i) => {
+              return (
+                <LogLine
+                  key={i}
+                  wrap={this.props.wrapLineOn ? 'true' : undefined}
+                >
+                  {this.hasMatch(line, this.props.highlightInput) ? (
+                    <TextHighlightRegex
+                      text={line}
+                      color={this.props.highlightColor}
+                      regex={this.props.highlightInput}
+                    />
+                  ) : (
+                    line
+                  )}
+                </LogLine>
+              );
+            })}
+        </Log>
       </LogViewContainer>
     );
   }

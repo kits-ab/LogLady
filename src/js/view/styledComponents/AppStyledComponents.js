@@ -4,6 +4,7 @@ export const RootContainer = styled.div`
   display: flex;
   height: 100vh;
   max-height: 100vh;
+  width: 100%;
   overflow: hidden;
 `;
 

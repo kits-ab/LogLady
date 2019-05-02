@@ -10,16 +10,23 @@ export const LogViewContainer = styled.div`
   background: #444;
 `;
 
-export const Line = styled.div`
+export const Log = styled.div`
+  width: 100%;
+
+  div:nth-child(even) {
+    background: #444;
+  }
+
+  div:nth-child(odd) {
+    background: ${Color('#444')
+      .darken(0.3)
+      .hex()};
+  }
+`;
+
+export const LogLine = styled.div`
   white-space: ${props => {
     return props.wrap ? 'normal' : 'nowrap';
-  }};
-  background: ${props => {
-    return props.row & 1
-      ? '#444'
-      : Color('#444')
-          .darken(0.3)
-          .hex();
   }};
 `;
 
