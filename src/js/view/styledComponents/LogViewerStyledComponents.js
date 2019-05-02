@@ -29,7 +29,8 @@ export const Log = styled.div`
 
 export const LogLine = styled.div`
   min-width: 0;
-
+  display: inline-block;
+  width: 100%;
   ${props => {
     return props.wrap
       ? `
