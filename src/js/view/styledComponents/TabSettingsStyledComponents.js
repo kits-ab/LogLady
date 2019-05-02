@@ -13,11 +13,18 @@ export const Settings = styled.div`
 `;
 
 export const Setting = styled.div`
-  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: stretch;
   padding: 10px;
   p {
     margin: 10px 0 5px 40px;
   }
+`;
+
+export const SettingTitle = styled.div`
+  padding: 5px;
 `;
 
 export const CloseButton = styled.button`

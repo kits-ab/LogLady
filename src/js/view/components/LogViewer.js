@@ -58,7 +58,11 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <Line key={i} row={i} wrap={this.props.wrapLineOn}>
+              <Line
+                key={i}
+                row={i}
+                wrap={this.props.wrapLineOn ? 'true' : undefined}
+              >
                 {this.hasMatch(line, this.props.highlightInput) ? (
                   <TextHighlightRegex
                     text={line}

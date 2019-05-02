@@ -1,7 +1,8 @@
 import {
   TopPanelContainer,
   TopPanelItem,
-  FollowSetting
+  FollowSetting,
+  TopPanelItemText
 } from 'js/view/styledComponents/TopPanelStyledComponents';
 import { OpenFileButton } from 'js/view/styledComponents/common/ButtonStyledComponents';
 import { TextFieldInput } from 'js/view/components/common/input';
@@ -19,7 +20,7 @@ class TopPanel extends React.Component {
     return (
       <TopPanelContainer>
         <TopPanelItem>
-          <p>LogLady</p>
+          <TopPanelItemText>LogLady</TopPanelItemText>
         </TopPanelItem>
         <TopPanelItem>
           <OpenFileButton
@@ -30,8 +31,9 @@ class TopPanel extends React.Component {
             Open file
           </OpenFileButton>
         </TopPanelItem>
-        <TopPanelItem />
-        <TextFieldInput placeholder="filter" onChange={handleFilterInput} />
+        <TopPanelItem>
+          <TextFieldInput placeholder="filter" onChange={handleFilterInput} />
+        </TopPanelItem>
         <TopPanelItem>
           <TextFieldInput
             placeholder="highlight"
@@ -42,7 +44,7 @@ class TopPanel extends React.Component {
           <FollowSetting>
             <SwitchButton checked onChange={handleTailSwitch} />
           </FollowSetting>
-          <p>Follow</p>
+          <TopPanelItemText>Follow</TopPanelItemText>
         </TopPanelItem>
       </TopPanelContainer>
     );

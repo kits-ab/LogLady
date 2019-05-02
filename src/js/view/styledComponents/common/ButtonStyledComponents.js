@@ -11,12 +11,11 @@ export const OpenFileButton = styled.button`
   outline: none;
 `;
 
-export const Switch = styled.label`
+export const SwitchButtonContainer = styled.label`
   position: relative;
   display: inline-block;
   width: 48px;
   height: 25px;
-  margin: 0 20px;
 
   input {
     opacity: 0;

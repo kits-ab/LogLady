@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import { GithubPicker } from 'react-color';
+import { SwitchButton } from 'js/view/components/common/buttons';
 import {
   handleShowSettings,
   handleHighlightColor,
@@ -8,7 +9,8 @@ import {
 import {
   Settings,
   Setting,
-  CloseButton
+  CloseButton,
+  SettingTitle
 } from '../styledComponents/TabSettingsStyledComponents';
 
 const close = require('../../../resources/close.png');
@@ -20,7 +22,7 @@ class TabSettings extends Component {
     return this.props.showSettings ? (
       <Settings>
         <Setting>
-          <p>Color for highlights</p>
+          <SettingTitle>Color for highlights</SettingTitle>
           <GithubPicker
             color={this.props.highlightColor}
             triangle={'hide'}
@@ -30,17 +32,8 @@ class TabSettings extends Component {
           />
         </Setting>
         <Setting>
-          <p>Wrap Lines</p>
-          <input
-            type="checkbox"
-            ref="wrapLineCheckBox"
-            onClick={e => {
-              handleWrapLineSetting(
-                this.props.dispatch,
-                this.refs.wrapLineCheckBox.checked
-              );
-            }}
-          />
+          <SettingTitle>Wrap Lines</SettingTitle>
+          <SwitchButton onChange={handleWrapLineSetting} />
         </Setting>
         <CloseButton
           onClick={() => {

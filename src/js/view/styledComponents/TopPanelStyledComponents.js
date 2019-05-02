@@ -7,22 +7,26 @@ export const TopPanelContainer = styled.div`
   flex-direction: row;
   position: fixed;
   z-index: 2;
-  align-items: center;
-  justify-content: space-evenly;
+  align-items: stretch;
+  justify-content: start;
   top: 0;
-  p {
-    margin: 0 28px 0 28px;
-    color: white;
-  }
 `;
 
 export const TopPanelItem = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: center;
   padding: 8px;
+`;
+
+export const TopPanelItemText = styled.div`
+  display: flex;
+  padding: 0px 8px;
+  color: white;
 `;
 
 export const FollowSetting = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: center;
 `;
