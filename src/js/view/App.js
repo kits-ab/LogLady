@@ -1,42 +1,36 @@
 import TabSettings from './components/TabSettings';
 import LogViewer from './components/LogViewer';
 import TopPanel from './components/TopPanel';
-import { createStore } from 'redux';
-import { Provider } from 'react-redux';
-import reducers from './reducers/index.js';
-import { ipcListener } from './ipcListener';
-import * as ipcPublisher from './ipcPublisher';
+import DefaultPage from './components/DefaultPage';
 import Statusbar from './components/StatusBar';
 import { RootContainer } from './styledComponents/AppStyledComponents';
-import { loadStateFromDisk } from './configurations/configureStore';
+import { connect } from 'react-redux';
 const React = require('react');
 const { Component } = require('react');
-
-const store = createStore(reducers);
-ipcListener(store.dispatch);
-loadStateFromDisk(store);
 
 class App extends Component {
   render() {
     return (
       <RootContainer>
-        <TopPanel />
-        <TabSettings />
-        <LogViewer />
-        <Statusbar />
+        {this.props.openFiles && this.props.openFiles[0] ? (
+          <div>
+            <TopPanel />
+            <TabSettings />
+            <LogViewer />
+            <Statusbar />
+          </div>
+        ) : (
+          <DefaultPage />
+        )}
       </RootContainer>
     );
   }
 }
 
-class AppContainer extends React.Component {
-  render() {
-    return (
-      <Provider store={store}>
-        <App send={ipcPublisher} />
-      </Provider>
-    );
-  }
-}
+const mapStateToProps = state => {
+  return {
+    openFiles: state.menuReducer.openFiles
+  };
+};
 
-export default AppContainer;
+export default connect(mapStateToProps)(App);

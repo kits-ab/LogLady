@@ -1,4 +1,5 @@
 const fileReader = require('./fileReader');
+const path = require('path');
 
 it('reads a file and prints content to console', done => {
   fileReader

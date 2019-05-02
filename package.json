@@ -1,6 +1,6 @@
 {
   "name": "loglady",
-  "version": "v0.0.2-easterEdition",
+  "version": "v0.0.2",
   "description": "Log file viewer",
   "author": "lalala",
   "homepage": "./",
@@ -22,7 +22,9 @@
     "react-redux": "^7.0.1",
     "react-scripts": "^2.1.8",
     "react-split-pane": "^0.1.87",
+    "react-string-replace": "^0.4.4",
     "react-test-renderer": "^16.8.4",
+    "react-tooltip": "^3.10.0",
     "read-last-lines": "^1.6.0",
     "redux": "^4.0.1",
     "styled-components": "^4.1.3",

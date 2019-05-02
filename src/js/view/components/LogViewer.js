@@ -3,6 +3,8 @@ import { findMatches } from './helpers/lineFilterHelper';
 import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
+import TextHighlightRegex from './TextHighlightRegex';
+
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
@@ -32,11 +34,8 @@ class LogViewer extends React.Component {
     }
   };
 
-  setHighlightColor = line => {
-    return line.match(new RegExp(this.props.highlightInput, 'gi')) &&
-      this.props.highlightInput
-      ? { background: this.props.highlightColor }
-      : {};
+  hasMatch = (line, regex) => {
+    return regex && line.match(new RegExp(regex, 'i'));
   };
 
   render() {
@@ -55,9 +54,17 @@ class LogViewer extends React.Component {
         {lines &&
           lines.map((line, i) => {
             return (
-              <p style={this.setHighlightColor(line)} key={i}>
-                {line}
-              </p>
+              <LogViewerSC.Line key={i} row={i}>
+                {this.hasMatch(line, this.props.highlightInput) ? (
+                  <TextHighlightRegex
+                    text={line}
+                    color={this.props.highlightColor}
+                    regex={this.props.highlightInput}
+                  />
+                ) : (
+                  line
+                )}
+              </LogViewerSC.Line>
             );
           })}
       </LogViewerSC.TextContainer>

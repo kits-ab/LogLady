@@ -60,14 +60,16 @@ const windowStateKeeper = windowName => {
 const createWindow = () => {
   const mainWindowStateKeeper = windowStateKeeper('main');
   const windowOptions = {
-    title: 'LogLady Main',
     x: mainWindowStateKeeper.x,
     y: mainWindowStateKeeper.y,
     width: mainWindowStateKeeper.width,
     height: mainWindowStateKeeper.height,
     minWidth: 600,
     minHeight: 125,
-    darkTheme: true
+    darkTheme: true,
+    webPreferences: {
+      devTools: isDev ? true : false
+    }
   };
 
   mainWindow = new BrowserWindow(windowOptions);

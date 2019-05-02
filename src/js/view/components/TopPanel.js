@@ -1,4 +1,5 @@
 import * as TopPanelSC from '../styledComponents/TopPanelStyledComponents';
+import { OpenFileButton } from '../styledComponents/common/ButtonStyledComponents';
 import React from 'react';
 import {
   handleFilterInput,
@@ -12,13 +13,13 @@ class TopPanel extends React.Component {
     return (
       <TopPanelSC.TopPanel>
         <p>LogLady</p>
-        <TopPanelSC.OpenFileButton
+        <OpenFileButton
           onClick={() => {
             showOpenDialog();
           }}
         >
           Open file
-        </TopPanelSC.OpenFileButton>
+        </OpenFileButton>
         <TopPanelSC.TextFieldInput
           placeholder="filter"
           value={this.props.filterInput}
