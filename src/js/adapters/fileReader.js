@@ -105,10 +105,8 @@ const readFile = filePath => {
   return new Promise((resolve, reject) => {
     fs.readFile(filePath, 'utf8', (err, data) => {
       if (err) {
-        console.log('err: ', err, 'type of err: ', typeof err);
         reject(err);
       } else {
-        console.log('read data: ', data);
         resolve(data);
       }
     });
@@ -138,13 +136,6 @@ const getFileSizeInBytes = async filePath => {
 };
 
 const saveStateToDisk = _reduxStateValue => {
-  console.log(
-    'userData: ',
-    app.getPath('userData'),
-    'state: ',
-    _reduxStateValue
-  );
-
   fs.writeFile(reduxStateFile, _reduxStateValue, err => {
     if (err) {
       throw err;

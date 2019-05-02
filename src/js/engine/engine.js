@@ -50,8 +50,10 @@ const stopWatcher = (event, _argObj) => {
 };
 
 const loadStateFromDisk = event => {
-  fileReader.loadStateFromDisk().then(response => {
-    event.sender.send('loadState', response);
+  fileReader.loadStateFromDisk().then(_data => {
+    action.type = 'loadState';
+    action.data = _data;
+    event.sender.send('backendMessages', action);
   });
 };
 

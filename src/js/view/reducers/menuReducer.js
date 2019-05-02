@@ -10,8 +10,7 @@ export const menuReducer = (state = {}, action) => {
               : [action.data[0]]
             : []
       };
-    case 'loadState':
-      console.log(action.data);
+    case 'menuReducerRestore':
       return { ...action.data };
     default:
       return state;
