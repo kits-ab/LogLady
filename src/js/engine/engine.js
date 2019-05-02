@@ -1,7 +1,6 @@
 const fileReader = require('../adapters/fileReader');
 const { ipcMain } = require('electron');
 const menu = require('../electron/menu');
-const { quitApplication } = require('../../../public/electron');
 
 let action = {};
 
@@ -50,6 +49,12 @@ const stopWatcher = (event, _argObj) => {
   fileReader.stopWatcher(_argObj.filePath);
 };
 
+const loadStateFromDisk = event => {
+  fileReader.loadStateFromDisk().then(response => {
+    event.sender.send('loadState', response);
+  });
+};
+
 ipcMain.on('frontendMessages', (event, _argObj) => {
   switch (_argObj.function) {
     case 'liveLines':
@@ -71,11 +76,10 @@ ipcMain.on('frontendMessages', (event, _argObj) => {
       menu.handleShowOpenDialog();
       break;
     case 'saveState':
-      if (fileReader.saveStateToDisk(_argObj.reduxStateValue) === 'success') {
-        quitApplication();
-      }
+      fileReader.saveStateToDisk(_argObj.reduxStateValue);
       break;
     case 'loadState':
+      loadStateFromDisk(event);
       break;
     default:
   }

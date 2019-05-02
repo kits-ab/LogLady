@@ -25,6 +25,12 @@ export const ipcListener = (dispatch, state) => {
       case 'saveState':
         saveStateToDisk();
         break;
+      case 'loadState':
+        dispatch({
+          type: action.type,
+          data: action.data
+        });
+        break;
       default:
         dispatch({
           type: action.type,

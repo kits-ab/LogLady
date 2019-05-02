@@ -8,7 +8,6 @@ const engine = require('../src/js/engine/engine');
 const menu = require('../src/js/electron/menu');
 const { Menu } = require('electron');
 const appConfig = require('electron-settings');
-const { IpcMain } = require('electron');
 
 updater.init();
 
@@ -82,7 +81,10 @@ const createWindow = () => {
     let argObj = {};
     argObj.type = 'saveState';
     mainWindow.webContents.send('backendMessages', argObj);
+  });
+  mainWindow.on('closed', () => {
     mainWindow = null;
+    quitApplication();
   });
   Menu.setApplicationMenu(menu.createMenu(mainWindow.webContents));
 };
