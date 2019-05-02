@@ -64,7 +64,8 @@ const createWindow = () => {
     darkTheme: true,
     webPreferences: {
       devTools: isDev ? true : false
-    }
+    },
+    icon: path.join(__dirname, './icon/icon_256x256.png')
   };
   mainWindow = new BrowserWindow(windowOptions);
   mainWindowStateKeeper.track(mainWindow);
