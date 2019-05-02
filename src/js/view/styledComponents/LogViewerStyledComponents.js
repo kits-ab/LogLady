@@ -1,14 +1,13 @@
 import styled from 'styled-components';
 import Color from 'color';
 
-export const TextContainer = styled.div`
+export const LogViewContainer = styled.div`
   overflow: auto;
-  height: calc(100vh - 93px);
+  flex: 1;
   border: 1px solid white;
+  width: 100%;
   color: #ccc;
-  width: calc(100vw - 12px);
-  postition: fixed;
-  margin: 55px 0 10px 5px;
+  background: #444;
 `;
 
 export const Line = styled.div`

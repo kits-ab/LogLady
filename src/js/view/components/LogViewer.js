@@ -1,7 +1,7 @@
 import React from 'react';
 import { findMatches } from './helpers/lineFilterHelper';
 import {
-  TextContainer,
+  LogViewContainer,
   CloseFileButton,
   Line
 } from '../styledComponents/LogViewerStyledComponents';
@@ -45,7 +45,7 @@ class LogViewer extends React.Component {
   render() {
     const lines = this.props.liveLines && this.createLineArray();
     return (
-      <TextContainer ref={this.liveLinesContainer}>
+      <LogViewContainer ref={this.liveLinesContainer}>
         <CloseFileButton
           openFiles={this.props.openFiles}
           onClick={() => {
@@ -75,7 +75,7 @@ class LogViewer extends React.Component {
               </Line>
             );
           })}
-      </TextContainer>
+      </LogViewContainer>
     );
   }
 }

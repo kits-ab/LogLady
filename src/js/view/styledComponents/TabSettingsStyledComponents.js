@@ -3,13 +3,10 @@ import styled from 'styled-components';
 export const Settings = styled.div`
   display: flex;
   flex-direction: row;
-  width: 100vw;
-  margin-top: 30px;
-  position: fixed;
+  width: 100%;
   color: #222;
   background: #ccc;
   justify-content: flex-start;
-  z-index: 1;
 `;
 
 export const Setting = styled.div`

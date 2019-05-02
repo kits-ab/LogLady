@@ -5,11 +5,8 @@ export const TopPanelContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
-  position: fixed;
-  z-index: 2;
   align-items: stretch;
   justify-content: start;
-  top: 0;
 `;
 
 export const TopPanelItem = styled.div`

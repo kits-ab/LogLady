@@ -3,7 +3,10 @@ import LogViewer from './components/LogViewer';
 import TopPanel from './components/TopPanel';
 import DefaultPage from './components/DefaultPage';
 import Statusbar from './components/StatusBar';
-import { RootContainer } from './styledComponents/AppStyledComponents';
+import {
+  RootContainer,
+  LogPage
+} from 'js/view/styledComponents/AppStyledComponents';
 import { connect } from 'react-redux';
 const React = require('react');
 const { Component } = require('react');
@@ -13,12 +16,12 @@ class App extends Component {
     return (
       <RootContainer>
         {this.props.openFiles && this.props.openFiles[0] ? (
-          <div>
+          <LogPage>
             <TopPanel />
             <TabSettings />
             <LogViewer />
             <Statusbar />
-          </div>
+          </LogPage>
         ) : (
           <DefaultPage />
         )}
