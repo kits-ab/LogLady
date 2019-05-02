@@ -1,20 +1,27 @@
 import styled from 'styled-components';
+import Color from 'color';
 
 export const TextContainer = styled.div`
   overflow: auto;
   height: calc(100vh - 93px);
   border: 1px solid white;
-  background: #222;
   color: #ccc;
   width: calc(100vw - 12px);
   postition: fixed;
   margin: 55px 0 10px 5px;
-  .log-line {
-    white-space: nowrap;
-  }
 `;
 
-setTimeout(() => {}, 5000);
+export const Line = styled.div`
+  white-space: nowrap;
+  background: ${props => {
+    return props.row & 1
+      ? '#444'
+      : Color('#444')
+          .darken(0.3)
+          .hex();
+  }};
+`;
+
 export const CloseFileButton = styled.button`
   position: fixed;
   margin-top: 10px;
