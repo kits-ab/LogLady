@@ -1,17 +1,38 @@
+import React from 'react';
 import styled from 'styled-components';
+import { connect } from 'react-redux';
+class SwitchButton extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      checked: this.props.checked
+    };
+  }
 
-export const OpenFileButton = styled.button`
-  height: 27px;
-  min-width: 100px;
-  width: 100px;
-  color: white;
-  background: gray;
-  border-radius: 4px;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8);
-  outline: none;
-`;
+  render() {
+    return (
+      <SwitchContainer>
+        <input
+          type="checkbox"
+          checked={this.state.checked}
+          ref="checkbox"
+          onChange={() => {
+            this.setState({ checked: this.refs.checkbox.checked });
+            this.props.onChange(
+              this.props.dispatch,
+              this.refs.checkbox.checked
+            );
+          }}
+        />
+        <span />
+      </SwitchContainer>
+    );
+  }
+}
 
-export const Switch = styled.label`
+export default connect()(SwitchButton);
+
+const SwitchContainer = styled.label`
   position: relative;
   display: inline-block;
   width: 48px;

@@ -1,73 +1,50 @@
-import * as TopPanelSC from '../styledComponents/TopPanelStyledComponents';
-import { OpenFileButton } from '../styledComponents/common/ButtonStyledComponents';
+import {
+  TopPanelContainer,
+  TopPanelItem,
+  FollowSetting
+} from 'js/view/styledComponents/TopPanelStyledComponents';
+import { OpenFileButton } from 'js/view/styledComponents/common/ButtonStyledComponents';
+import { TextFieldInput } from 'js/view/components/common/input';
+import { SwitchButton } from 'js/view/components/common/buttons';
 import React from 'react';
 import {
   handleFilterInput,
   handleHighlightInput,
   handleTailSwitch
-} from '../actions/dispatchActions';
+} from 'js/view/actions/dispatchActions';
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
 class TopPanel extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      filterInput: '',
-      highlightInput: '',
-      tailOn: true
-    };
-  }
   render() {
     return (
-      <TopPanelSC.TopPanel>
-        <p>LogLady</p>
-        <OpenFileButton
-          onClick={() => {
-            showOpenDialog();
-          }}
-        >
-          Open file
-        </OpenFileButton>
-        <TopPanelSC.TextFieldInput
-          placeholder="filter"
-          value={this.state.filterInput}
-          onChange={e => {
-            this.setState({ filterInput: e.target.value });
-            handleFilterInput(this.props.dispatch, e.target.value);
-          }}
-          type="text"
-        />
-
-        <TopPanelSC.TextFieldInput
-          placeholder="highlight"
-          value={this.state.highlightInput}
-          onChange={e => {
-            this.setState({ highlightInput: e.target.value });
-            handleHighlightInput(this.props.dispatch, e.target.value);
-          }}
-          type="text"
-        />
-
-        <TopPanelSC.Tail>
-          <span>Tail:</span>
-
-          <TopPanelSC.TailSwitch>
-            <input
-              type="checkbox"
-              checked={this.state.tailOn}
-              ref="tailSwitch"
-              onChange={() => {
-                this.setState({ tailOn: this.refs.tailSwitch.checked });
-                handleTailSwitch(
-                  this.props.dispatch,
-                  this.refs.tailSwitch.checked
-                );
-              }}
-            />
-            <span />
-          </TopPanelSC.TailSwitch>
-        </TopPanelSC.Tail>
-      </TopPanelSC.TopPanel>
+      <TopPanelContainer>
+        <TopPanelItem>
+          <p>LogLady</p>
+        </TopPanelItem>
+        <TopPanelItem>
+          <OpenFileButton
+            onClick={() => {
+              showOpenDialog();
+            }}
+          >
+            Open file
+          </OpenFileButton>
+        </TopPanelItem>
+        <TopPanelItem />
+        <TextFieldInput placeholder="filter" onChange={handleFilterInput} />
+        <TopPanelItem>
+          <TextFieldInput
+            placeholder="highlight"
+            onChange={handleHighlightInput}
+          />
+        </TopPanelItem>
+        <TopPanelItem>
+          <FollowSetting>
+            <SwitchButton checked onChange={handleTailSwitch} />
+          </FollowSetting>
+          <p>Follow</p>
+        </TopPanelItem>
+      </TopPanelContainer>
     );
   }
 }
