@@ -25,8 +25,7 @@ const windowStateKeeper = windowName => {
       x: undefined,
       y: undefined,
       width: 1000,
-      height: 800,
-      show: false
+      height: 800
     };
   };
   const saveState = () => {
@@ -56,7 +55,6 @@ const windowStateKeeper = windowName => {
 const createWindow = () => {
   const mainWindowStateKeeper = windowStateKeeper('main');
   const windowOptions = {
-    title: 'LogLady Main',
     x: mainWindowStateKeeper.x,
     y: mainWindowStateKeeper.y,
     width: mainWindowStateKeeper.width,
@@ -64,19 +62,31 @@ const createWindow = () => {
     minWidth: 600,
     minHeight: 125,
     darkTheme: true,
-    show: false
+    show: false,
+    backgroundColor: '#222'
   };
+
+  let loadingWindow = new BrowserWindow(windowOptions);
+
   mainWindow = new BrowserWindow(windowOptions);
   mainWindowStateKeeper.track(mainWindow);
-  mainWindow.loadURL(
-    isDev
-      ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../build/index.html')}`
-  );
 
-  mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
+  loadingWindow.once('show', () => {
+    mainWindow.once('ready-to-show', () => {
+      loadingWindow.hide();
+      mainWindow.show(true);
+      loadingWindow.close();
+    });
+    mainWindow.loadURL(
+      isDev
+        ? 'http://localhost:3000'
+        : `file://${path.join(__dirname, '../build/index.html')}`
+    );
   });
+  loadingWindow.loadURL(
+    `file://${path.join(__dirname, '../src/resources/loadingSpinner.html')}`
+  );
+  loadingWindow.show();
 
   mainWindow.on('closed', () => {
     mainWindow = null;
