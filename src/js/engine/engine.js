@@ -25,11 +25,18 @@ const getNthLines = (event, _argObj) => {
 };
 
 const getNumberOfLines = (event, _argObj) => {
-  fileReader.getNumberOfLines(_argObj.filePath).then(lines => {
-    action.type = 'numberOfLines';
-    action.data = lines;
-    event.sender.send('backendMessages', action);
-  });
+  fileReader
+    .getNumberOfLines(_argObj.filePath)
+    .then(lines => {
+      action.type = 'numberOfLines';
+      action.data = lines;
+      event.sender.send('backendMessages', action);
+    })
+    .catch(err => {
+      action.type = 'backendError';
+      action.data = err;
+      event.sender.send('backendMessages', action);
+    });
 };
 
 const getFileSize = (event, _argObj) => {

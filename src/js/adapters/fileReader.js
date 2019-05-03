@@ -11,7 +11,9 @@ const fileReaderEvents = new EventEmitter();
 let watchers = [];
 
 const readLastLines = (filePath, numberOfLines) => {
-  return lastLines.read(filePath, numberOfLines);
+  return lastLines.read(filePath, numberOfLines).catch(err => {
+    throw err;
+  });
 };
 
 //find and save the index of the last newline characters
@@ -23,7 +25,7 @@ const getLastNewlineIndex = filePath => {
     lastNewlineIndex += buffer.lastIndexOf('\n');
   });
   readStream.on('error', err => {
-    throw new Error(err);
+    throw err;
   });
   return new Promise((resolve, reject) => {
     readStream.on('end', () => {
@@ -72,12 +74,23 @@ const stopWatcher = filePath => {
 };
 
 const readLinesLive = filePath => {
-  readLastLines(filePath, 10).then(lines => {
-    fileReaderEvents.emit('liveLines', lines.slice(0, lines.lastIndexOf('\n')));
-    getLastNewlineIndex(filePath).then(lastNewlineIndex => {
-      startWatcher(filePath, lastNewlineIndex);
+  readLastLines(filePath, 10)
+    .then(lines => {
+      fileReaderEvents.emit(
+        'liveLines',
+        lines.slice(0, lines.lastIndexOf('\n'))
+      );
+      getLastNewlineIndex(filePath)
+        .then(lastNewlineIndex => {
+          startWatcher(filePath, lastNewlineIndex);
+        })
+        .catch(err => {
+          throw err;
+        });
+    })
+    .catch(err => {
+      console.log(err);
     });
-  });
 };
 
 const getNumberOfLines = filePath => {
