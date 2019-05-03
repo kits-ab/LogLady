@@ -1,4 +1,3 @@
-import { sendRequestToBackend } from './ipcPublisher';
 import {
   saveStateToDisk,
   populateStore
@@ -21,6 +20,11 @@ export const ipcListener = (dispatch, state) => {
         break;
       case 'loadState':
         populateStore(JSON.parse(action.data));
+        break;
+      case 'backendError':
+        //handle errors in the future
+        // alert('Error occured. ', action.data);
+        console.log('Error from the backend: ', action.data);
         break;
       default:
         dispatch({

@@ -89,7 +89,7 @@ const readLinesLive = filePath => {
         });
     })
     .catch(err => {
-      console.log(err);
+      console.log('error in readLinesLive: ', err);
     });
 };
 
@@ -141,10 +141,10 @@ const readNthLines = async (filePath, lineNumber, numberOfLines) => {
 
 const getFileSizeInBytes = async filePath => {
   try {
-    const fileSizeInBytes = fs.statSync(filePath).size;
+    const fileSizeInBytes = await fs.statSync(filePath).size;
     return fileSizeInBytes;
-  } catch (e) {
-    throw new Error(e);
+  } catch (err) {
+    throw err;
   }
 };
 

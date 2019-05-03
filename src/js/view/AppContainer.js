@@ -10,7 +10,7 @@ const React = require('react');
 const store = createStore(reducers);
 ipcListener(store.dispatch);
 setStore(store);
-loadStateFromDisk(store);
+loadStateFromDisk();
 
 class AppContainer extends React.Component {
   render() {

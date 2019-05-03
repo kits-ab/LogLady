@@ -9,7 +9,6 @@ const getLiveLines = (event, _argObj) => {
   fileReader.fileReaderEvents.on('liveLines', lines => {
     action.type = 'liveLines';
     action.data = lines;
-
     event.sender.send('backendMessages', action);
   });
 };
@@ -21,6 +20,9 @@ const getNthLines = (event, _argObj) => {
       action.type = 'nthLines';
       action.data = lines;
       event.sender.send('backendMessages', action);
+    })
+    .catch(err => {
+      sendErrorToFrontend(event, err);
     });
 };
 
@@ -33,9 +35,7 @@ const getNumberOfLines = (event, _argObj) => {
       event.sender.send('backendMessages', action);
     })
     .catch(err => {
-      action.type = 'backendError';
-      action.data = err;
-      event.sender.send('backendMessages', action);
+      sendErrorToFrontend(event, err);
     });
 };
 
@@ -48,7 +48,7 @@ const getFileSize = (event, _argObj) => {
       event.sender.send('backendMessages', action);
     })
     .catch(err => {
-      event.sender.send('error', err);
+      sendErrorToFrontend(event, err);
     });
 };
 
@@ -57,11 +57,23 @@ const stopWatcher = (event, _argObj) => {
 };
 
 const loadStateFromDisk = event => {
-  fileReader.loadStateFromDisk().then(_data => {
-    action.type = 'loadState';
-    action.data = _data;
-    event.sender.send('backendMessages', action);
-  });
+  fileReader
+    .loadStateFromDisk()
+    .then(_data => {
+      console.log('data: ', _data);
+      action.type = 'loadState';
+      action.data = _data;
+      event.sender.send('backendMessages', action);
+    })
+    .catch(err => {
+      sendErrorToFrontend(event, err);
+    });
+};
+
+const sendErrorToFrontend = (event, err) => {
+  action.type = 'backendError';
+  action.data = err;
+  event.sender.send('backendMessages', action);
 };
 
 ipcMain.on('frontendMessages', (event, _argObj) => {
