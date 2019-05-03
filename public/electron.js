@@ -64,8 +64,8 @@ const createWindow = () => {
     y: mainWindowStateKeeper.y,
     width: mainWindowStateKeeper.width,
     height: mainWindowStateKeeper.height,
-    minWidth: 600,
-    minHeight: 125,
+    minWidth: 450,
+    minHeight: 145,
     darkTheme: true,
     webPreferences: {
       devTools: isDev ? true : false
