@@ -81,7 +81,8 @@
     ],
     "mac": {
       "category": "Utility",
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "./public/icons/mac"
     },
     "win": {
       "target": "nsis",
