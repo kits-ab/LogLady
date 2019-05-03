@@ -5,7 +5,9 @@ const { EventEmitter } = require('events');
 const app = require('electron').app;
 const path = require('path');
 
-const reduxStateFile = path.join(app.getPath('userData'), 'reduxState.json');
+const reduxStateFile = () => {
+  return path.join(app.getPath('userData'), 'reduxState.json');
+};
 
 const fileReaderEvents = new EventEmitter();
 let watchers = [];
@@ -149,7 +151,7 @@ const getFileSizeInBytes = async filePath => {
 };
 
 const saveStateToDisk = _reduxStateValue => {
-  fs.writeFile(reduxStateFile, _reduxStateValue, err => {
+  fs.writeFile(reduxStateFile(), _reduxStateValue, err => {
     if (err) {
       throw err;
     }
@@ -159,18 +161,19 @@ const saveStateToDisk = _reduxStateValue => {
 };
 
 const loadStateFromDisk = () => {
-  return readFile(reduxStateFile);
+  return readFile(reduxStateFile());
 };
 
 module.exports = {
-  readFile: readFile,
-  readLastLines: readLastLines,
-  getNumberOfLines: getNumberOfLines,
-  readNthLines: readNthLines,
-  readLinesLive: readLinesLive,
-  fileReaderEvents: fileReaderEvents,
-  getFileSizeInBytes: getFileSizeInBytes,
-  stopWatcher: stopWatcher,
-  saveStateToDisk: saveStateToDisk,
-  loadStateFromDisk: loadStateFromDisk
+  readFile,
+  readLastLines,
+  getNumberOfLines,
+  readNthLines,
+  readLinesLive,
+  fileReaderEvents,
+  getFileSizeInBytes,
+  stopWatcher,
+  saveStateToDisk,
+  loadStateFromDisk,
+  formatLinesFromBuffer
 };
