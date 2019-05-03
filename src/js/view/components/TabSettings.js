@@ -7,7 +7,7 @@ import {
   handleWrapLineSetting
 } from '../actions/dispatchActions';
 import {
-  Settings,
+  TabSettingsContainer,
   Setting,
   CloseButton,
   SettingTitle
@@ -20,7 +20,7 @@ const React = require('react');
 class TabSettings extends Component {
   render() {
     return this.props.showSettings ? (
-      <Settings>
+      <TabSettingsContainer>
         <Setting>
           <SettingTitle>Color for highlights</SettingTitle>
           <GithubPicker
@@ -42,7 +42,7 @@ class TabSettings extends Component {
           src={close}
           alt="close"
         />
-      </Settings>
+      </TabSettingsContainer>
     ) : null;
   }
 }
