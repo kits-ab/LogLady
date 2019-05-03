@@ -1,29 +1,36 @@
 const { Menu } = require('electron');
 const { dialog } = require('electron');
+const { setIpc, handleShowOpenDialog } = require('./handleFilePaths');
 
-let ipc;
+// let ipc;
 
-const setIpc = _ipc => {
-  ipc = _ipc;
-};
+// const setIpc = _ipc => {
+//   ipc = _ipc;
+// };
 
-const handleMenuItemClicked = (type, data) => {
-  ipc.send('backendMessages', { type: `menu_${type}`, data: data });
-};
+// const handleMenuItemClicked = (type, data) => {
+//   ipc.send('backendMessages', { type: `menu_${type}`, data: data });
+// };
 
-const handleShowOpenDialog = () => {
-  dialog.showOpenDialog(
-    {
-      properties: ['openFile']
-    },
-    filePath => {
-      if (filePath === undefined) return;
-      handleMenuItemClicked('open', filePath);
-    }
-  );
-};
+// // bryt ut handleShowOpenDialog till egen fil
+// // gör function av recentFilePaths och exportera den också
+// // borde kunna komma åt den i electron.js då...
+// const recentFilePaths = [];
+// const handleShowOpenDialog = () => {
+//   dialog.showOpenDialog(
+//     {
+//       properties: ['openFile']
+//     },
+//     filePath => {
+//       if (filePath === undefined) return;
+//       handleMenuItemClicked('open', filePath);
+//       recentFilePaths.push(filePath);
+//       console.log('recent files', recentFilePaths);
+//     }
+//   );
+// };
 
-const createMenu = ipc => {
+const createMenu = (ipc, recentFilePaths) => {
   // const menuItemClicked = handleMenuItemClicked(ipc);
   setIpc(ipc);
   const template = [

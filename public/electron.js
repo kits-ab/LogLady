@@ -28,6 +28,7 @@ const windowStateKeeper = windowName => {
       height: 800
     };
   };
+
   const saveState = () => {
     if (!windowState.isMaximized) {
       windowState = window.getBounds();
@@ -35,12 +36,22 @@ const windowStateKeeper = windowName => {
     windowState.isMaximized = window.isMaximized();
     appConfig.set(`windowState.${windowName}`, windowState);
   };
+
+  // kolla var filePath kommer in för att fånga upp.
+  // När man har sagt/klickat "öppna" så ska den sparas i recent.
+  // Det äldsta objektet ska bort ur arrayen/objektet när man har nått sin gräns
+  // spara recent file i en array/objekt av (exempel) 3
+  // någon key value i appconfig (recentFilePaths)
+  // skicka ner som parameter till menu.js
+  // i menu.js loopa igenom objektet/arrayen med paths och skriv in recent
+
   const track = win => {
     window = win;
     ['resize', 'move', 'close'].forEach(event => {
       win.on(event, saveState);
     });
   };
+
   setBounds();
   return {
     x: windowState.x,
