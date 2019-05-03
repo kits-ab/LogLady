@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Settings = styled.div`
+export const TabSettingsContainer = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
