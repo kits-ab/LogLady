@@ -1,10 +1,17 @@
 import { connect } from 'react-redux';
 import { GithubPicker } from 'react-color';
+import { SwitchButton } from 'js/view/components/common/buttons';
 import {
   handleShowSettings,
-  handleHighlightColor
+  handleHighlightColor,
+  handleWrapLineSetting
 } from '../actions/dispatchActions';
-import * as TabSettingsSC from '../styledComponents/TabSettingsStyledComponents';
+import {
+  TabSettingsContainer,
+  Setting,
+  CloseButton,
+  SettingTitle
+} from '../styledComponents/TabSettingsStyledComponents';
 
 const close = require('../../../resources/close.png');
 const { Component } = require('react');
@@ -13,9 +20,9 @@ const React = require('react');
 class TabSettings extends Component {
   render() {
     return this.props.showSettings ? (
-      <TabSettingsSC.Settings>
-        <TabSettingsSC.HighlightContainer>
-          <p>Color for highlights</p>
+      <TabSettingsContainer>
+        <Setting>
+          <SettingTitle>Color for highlights</SettingTitle>
           <GithubPicker
             color={this.props.highlightColor}
             triangle={'hide'}
@@ -23,15 +30,19 @@ class TabSettings extends Component {
               handleHighlightColor(this.props.dispatch, e.hex);
             }}
           />
-        </TabSettingsSC.HighlightContainer>
-        <TabSettingsSC.CloseSettingsButton
+        </Setting>
+        <Setting>
+          <SettingTitle>Wrap Lines</SettingTitle>
+          <SwitchButton onChange={handleWrapLineSetting} />
+        </Setting>
+        <CloseButton
           onClick={() => {
             handleShowSettings(this.props.dispatch);
           }}
           src={close}
           alt="close"
         />
-      </TabSettingsSC.Settings>
+      </TabSettingsContainer>
     ) : null;
   }
 }

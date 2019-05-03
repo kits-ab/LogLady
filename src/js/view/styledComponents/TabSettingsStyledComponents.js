@@ -1,25 +1,30 @@
 import styled from 'styled-components';
 
-export const Settings = styled.div`
+export const TabSettingsContainer = styled.div`
   display: flex;
   flex-direction: row;
-  width: 100vw;
-  margin-top: 30px;
-  position: fixed;
+  width: 100%;
   color: #222;
   background: #ccc;
-  justify-content: space-between;
-  z-index: 1;
+  justify-content: flex-start;
 `;
 
-export const HighlightContainer = styled.div`
+export const Setting = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: stretch;
   padding: 10px;
   p {
     margin: 10px 0 5px 40px;
   }
 `;
 
-export const CloseSettingsButton = styled.button`
+export const SettingTitle = styled.div`
+  padding: 5px;
+`;
+
+export const CloseButton = styled.button`
   position: fixed;
   margin-top: 30px;
   margin-left: calc(100% - 47px);
