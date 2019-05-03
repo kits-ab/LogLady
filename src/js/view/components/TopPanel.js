@@ -1,67 +1,60 @@
-import * as TopPanelSC from '../styledComponents/TopPanelStyledComponents';
-import { OpenFileButton } from '../styledComponents/common/ButtonStyledComponents';
+import {
+  TopPanelContainer,
+  TopPanelItem,
+  FollowSetting,
+  TopPanelItemText,
+  TopPanelItemFiller
+} from 'js/view/styledComponents/TopPanelStyledComponents';
+import { OpenFileButton } from 'js/view/styledComponents/common/ButtonStyledComponents';
+import { TextFieldInput } from 'js/view/components/common/input';
+import { SwitchButton } from 'js/view/components/common/buttons';
 import React from 'react';
 import {
   handleFilterInput,
   handleHighlightInput,
   handleTailSwitch
-} from '../actions/dispatchActions';
+} from 'js/view/actions/dispatchActions';
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
 class TopPanel extends React.Component {
   render() {
     return (
-      <TopPanelSC.TopPanel>
-        <p>LogLady</p>
-        <OpenFileButton
-          onClick={() => {
-            showOpenDialog();
-          }}
-        >
-          Open file
-        </OpenFileButton>
-        <TopPanelSC.TextFieldInput
-          placeholder="filter"
-          value={this.props.filterInput}
-          onChange={e => {
-            handleFilterInput(this.props.dispatch, e.target.value);
-          }}
-          type="text"
-        />
-
-        <TopPanelSC.TextFieldInput
-          placeholder="highlight"
-          value={this.props.highlightInput}
-          onChange={e => {
-            handleHighlightInput(this.props.dispatch, e.target.value);
-          }}
-          type="text"
-        />
-
-        <TopPanelSC.Tail>
-          <span>Tail:</span>
-
-          <TopPanelSC.TailSwitch>
-            <input
-              type="checkbox"
-              checked={this.props.tailSwitch}
-              onChange={() => {
-                handleTailSwitch(this.props.dispatch);
-              }}
-            />
-            <span />
-          </TopPanelSC.TailSwitch>
-        </TopPanelSC.Tail>
-      </TopPanelSC.TopPanel>
+      <TopPanelContainer>
+        <TopPanelItem>
+          <TopPanelItemText>LogLady</TopPanelItemText>
+        </TopPanelItem>
+        <TopPanelItem>
+          <OpenFileButton
+            onClick={() => {
+              showOpenDialog();
+            }}
+          >
+            Open file
+          </OpenFileButton>
+        </TopPanelItem>
+        <TopPanelItem>
+          <TextFieldInput placeholder="filter" onChange={handleFilterInput} />
+        </TopPanelItem>
+        <TopPanelItem>
+          <TextFieldInput
+            placeholder="highlight"
+            onChange={handleHighlightInput}
+          />
+        </TopPanelItem>
+        <TopPanelItemFiller />
+        <TopPanelItem>
+          <FollowSetting>
+            <SwitchButton checked onChange={handleTailSwitch} />
+          </FollowSetting>
+          <TopPanelItemText>Follow</TopPanelItemText>
+        </TopPanelItem>
+      </TopPanelContainer>
     );
   }
 }
 
 const mapStateToProps = state => {
   return {
-    tailSwitch: state.topPanelReducer.tailSwitch,
-    filterInput: state.topPanelReducer.filterInput,
-    highlightInput: state.topPanelReducer.highlightInput,
     openFiles: state.menuReducer.openFiles
   };
 };
