@@ -1,17 +1,48 @@
 import styled from 'styled-components';
+import Color from 'color';
 
-export const TextContainer = styled.div`
+export const LogViewContainer = styled.div`
   overflow: auto;
-  height: calc(100vh - 93px);
+  flex: 1;
   border: 1px solid white;
-  background: #222;
   color: #ccc;
-  width: calc(100vw - 12px);
-  postition: fixed;
-  margin: 55px 0 10px 5px;
+  background: #444;
+  min-width: 0;
 `;
 
-setTimeout(() => {}, 5000);
+export const Log = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  display: inline-block;
+
+  div:nth-child(even) {
+    background: #444;
+  }
+
+  div:nth-child(odd) {
+    background: ${Color('#444')
+      .darken(0.3)
+      .hex()};
+  }
+`;
+
+export const LogLine = styled.div`
+  min-width: 0;
+  display: inline-block;
+  width: 100%;
+  ${props => {
+    return props.wrap
+      ? `
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;`
+      : 'white-space: nowrap;';
+  }}
+`;
+
 export const CloseFileButton = styled.button`
   position: fixed;
   margin-top: 10px;
