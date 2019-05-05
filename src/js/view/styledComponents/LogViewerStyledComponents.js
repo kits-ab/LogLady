@@ -15,7 +15,6 @@ export const LogViewContainer = styled.div`
 export const Log = styled.div`
   min-width: 100%;
   width: 100%;
-  display: inline-block;
   overflow: auto;
   div {
     display: inline-block;
