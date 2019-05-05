@@ -15,9 +15,6 @@ class LogViewer extends React.Component {
   constructor(props) {
     super(props);
     this.windowedList = React.createRef();
-    this.state = {
-      lines: []
-    };
   }
 
   createLineArray = (lines, filter) => {
@@ -33,16 +30,14 @@ class LogViewer extends React.Component {
   };
 
   scrollToBottom = () => {
-    this.windowedList.current.scrollTo(this.state.lines.length - 1);
+    this.windowedList.current.scrollAround(this.props.liveLines.length);
   };
 
   componentDidUpdate() {
-    if (this.props.tailSwitch) {
-      this.scrollToBottom();
-    }
+    if (this.props.tailSwitch) this.scrollToBottom();
   }
 
-  renderItem = lines => {
+  itemRenderer = lines => {
     return (i, key) => {
       return (
         <LogLine
@@ -65,9 +60,10 @@ class LogViewer extends React.Component {
   };
 
   render() {
-    this.lines =
+    let lines =
       this.props.liveLines &&
       this.createLineArray(this.props.liveLines, this.props.filterInput);
+
     return (
       <LogViewContainer>
         <CloseFileButton
@@ -81,9 +77,9 @@ class LogViewer extends React.Component {
         />
         <Log>
           <WindowedList
-            itemRenderer={this.renderItem(this.state.lines)}
-            length={this.state.lines.length}
-            type="variable"
+            itemRenderer={this.itemRenderer(lines)}
+            length={lines.length}
+            type="uniform"
             ref={this.windowedList}
           />
         </Log>

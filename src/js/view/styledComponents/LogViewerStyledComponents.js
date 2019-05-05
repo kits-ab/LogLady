@@ -14,18 +14,15 @@ export const LogViewContainer = styled.div`
 
 export const Log = styled.div`
   min-width: 100%;
+  width: 100%;
   display: inline-block;
   overflow: auto;
-  flex: 1;
-`;
-
-export const LogAnchor = styled.div`
-  overflow-anchor: auto;
-  height: 1px;
+  div {
+    display: inline-block;
+  }
 `;
 
 export const LogLine = styled.div`
-  display: inline-block;
   min-width: 100%;
   width: 100%;
 
