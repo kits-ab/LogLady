@@ -2,35 +2,35 @@ import styled from 'styled-components';
 import Color from 'color';
 
 export const LogViewContainer = styled.div`
-  overflow: auto;
+  display: flex;
   flex: 1;
   border: 1px solid white;
   color: #ccc;
   background: #444;
+  max-height: 100%;
   min-width: 0;
 `;
 
 export const Log = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+  min-width: 100%;
   display: inline-block;
-
-  div:nth-child(even) {
-    background: #444;
-  }
-
-  div:nth-child(odd) {
-    background: ${Color('#444')
-      .darken(0.3)
-      .hex()};
-  }
+  overflow: auto;
+  flex: 1;
 `;
 
 export const LogLine = styled.div`
-  min-width: 0;
   display: inline-block;
+  min-width: 100%;
   width: 100%;
+
+  background: ${props => {
+    const color = '#444';
+    return props.index & 1
+      ? color
+      : Color(color)
+          .darken(0.3)
+          .hex();
+  }};
   ${props => {
     return props.wrap
       ? `
@@ -40,7 +40,7 @@ export const LogLine = styled.div`
     /* Instead use this non-standard one: */
     word-break: break-word;`
       : 'white-space: nowrap;';
-  }}
+  }};
 `;
 
 export const CloseFileButton = styled.button`

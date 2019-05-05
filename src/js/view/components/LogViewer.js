@@ -9,13 +9,13 @@ import {
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
 import TextHighlightRegex from './TextHighlightRegex';
+import WindowedList from 'react-windowed-list';
 
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.liveLinesContainer = React.createRef();
     this.state = {
-      scrollOffset: 0
+      lines: []
     };
   }
 
@@ -27,27 +27,44 @@ class LogViewer extends React.Component {
     return matchArray;
   };
 
-  componentDidMount = () => {
-    const containerObserver = new MutationObserver(this.scrollToBottom);
-    const observerConfig = { childList: true };
-    containerObserver.observe(this.liveLinesContainer.current, observerConfig);
+  scrollToBottom = () => {
+    this.outerList.scrollTo(0, this.outerList.scrollHeight);
   };
 
-  scrollToBottom = () => {
+  componentDidUpdate() {
     if (this.props.tailSwitch) {
-      this.liveLinesContainer.current.scrollTo(
-        0,
-        this.liveLinesContainer.current.scrollHeight
-      );
+      this.scrollToBottom();
     }
-  };
+  }
 
   hasMatch = (line, regex) => {
     return regex && line.match(new RegExp(regex, 'i'));
   };
 
+  renderItem = lines => {
+    return (i, key) => {
+      return (
+        <LogLine
+          key={key}
+          index={i}
+          wrap={this.props.wrapLineOn ? 'true' : undefined}
+        >
+          {this.hasMatch(lines[i], this.props.highlightInput) ? (
+            <TextHighlightRegex
+              text={lines[i]}
+              color={this.props.highlightColor}
+              regex={this.props.highlightInput}
+            />
+          ) : (
+            lines[i]
+          )}
+        </LogLine>
+      );
+    };
+  };
+
   render() {
-    const lines = this.props.liveLines && this.createLineArray();
+    this.lines = this.props.liveLines && this.createLineArray();
     return (
       <LogViewContainer ref={this.liveLinesContainer}>
         <CloseFileButton
@@ -59,26 +76,20 @@ class LogViewer extends React.Component {
             );
           }}
         />
-        <Log ref="log">
-          {lines &&
-            lines.map((line, i) => {
-              return (
-                <LogLine
-                  key={i}
-                  wrap={this.props.wrapLineOn ? 'true' : undefined}
-                >
-                  {this.hasMatch(line, this.props.highlightInput) ? (
-                    <TextHighlightRegex
-                      text={line}
-                      color={this.props.highlightColor}
-                      regex={this.props.highlightInput}
-                    />
-                  ) : (
-                    line
-                  )}
-                </LogLine>
-              );
-            })}
+        <Log
+          ref={el => {
+            this.outerList = el;
+          }}
+        >
+          <WindowedList
+            itemRenderer={this.renderItem(this.lines)}
+            pageSize={10}
+            length={this.lines.length}
+            ref={el => {
+              this.list = el;
+            }}
+            type="variable"
+          />
         </Log>
       </LogViewContainer>
     );
