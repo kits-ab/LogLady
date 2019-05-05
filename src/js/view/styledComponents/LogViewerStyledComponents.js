@@ -8,6 +8,7 @@ export const LogViewContainer = styled.div`
   color: #ccc;
   background: #444;
   max-height: 100%;
+  overflow-anchor: none;
   min-width: 0;
 `;
 
@@ -16,6 +17,11 @@ export const Log = styled.div`
   display: inline-block;
   overflow: auto;
   flex: 1;
+`;
+
+export const LogAnchor = styled.div`
+  overflow-anchor: auto;
+  height: 1px;
 `;
 
 export const LogLine = styled.div`

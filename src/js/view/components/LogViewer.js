@@ -9,26 +9,31 @@ import {
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
 import TextHighlightRegex from './TextHighlightRegex';
-import WindowedList from 'react-windowed-list';
+import WindowedList from 'react-list';
 
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
+    this.windowedList = React.createRef();
     this.state = {
       lines: []
     };
   }
 
-  createLineArray = () => {
+  createLineArray = (lines, filter) => {
     const lineArray = [];
-    lineArray.push(...this.props.liveLines.split('\n'));
-    const matchArray = findMatches(this.props.filterInput, lineArray);
+    lineArray.push(...lines.split('\n'));
+    const matchArray = findMatches(filter, lineArray);
 
     return matchArray;
   };
 
+  hasMatch = (line, regex) => {
+    return regex && line.match(new RegExp(regex, 'i'));
+  };
+
   scrollToBottom = () => {
-    this.outerList.scrollTo(0, this.outerList.scrollHeight);
+    this.windowedList.current.scrollTo(this.state.lines.length - 1);
   };
 
   componentDidUpdate() {
@@ -36,10 +41,6 @@ class LogViewer extends React.Component {
       this.scrollToBottom();
     }
   }
-
-  hasMatch = (line, regex) => {
-    return regex && line.match(new RegExp(regex, 'i'));
-  };
 
   renderItem = lines => {
     return (i, key) => {
@@ -64,9 +65,11 @@ class LogViewer extends React.Component {
   };
 
   render() {
-    this.lines = this.props.liveLines && this.createLineArray();
+    this.lines =
+      this.props.liveLines &&
+      this.createLineArray(this.props.liveLines, this.props.filterInput);
     return (
-      <LogViewContainer ref={this.liveLinesContainer}>
+      <LogViewContainer>
         <CloseFileButton
           openFiles={this.props.openFiles}
           onClick={() => {
@@ -76,19 +79,12 @@ class LogViewer extends React.Component {
             );
           }}
         />
-        <Log
-          ref={el => {
-            this.outerList = el;
-          }}
-        >
+        <Log>
           <WindowedList
-            itemRenderer={this.renderItem(this.lines)}
-            pageSize={10}
-            length={this.lines.length}
-            ref={el => {
-              this.list = el;
-            }}
+            itemRenderer={this.renderItem(this.state.lines)}
+            length={this.state.lines.length}
             type="variable"
+            ref={this.windowedList}
           />
         </Log>
       </LogViewContainer>
