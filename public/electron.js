@@ -65,11 +65,15 @@ const createWindow = () => {
     webPreferences: {
       devTools: isDev ? true : false
     },
-    show: false  
+    show: false
   };
 
-  const loadWindowOptions = {...windowOptions,     frame: false,
-    transparent: true}
+  const loadWindowOptions = {
+    ...windowOptions,
+    frame: false,
+    transparent: true,
+    resizable: false
+  };
 
   let loadingWindow = new BrowserWindow(loadWindowOptions);
 
