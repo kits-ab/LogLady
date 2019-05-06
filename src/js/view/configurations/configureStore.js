@@ -28,14 +28,12 @@ export const populateStore = _savedStates => {
       data: _reducer[1]
     });
     if (_reducer[0] === 'menuReducer') {
-      console.log('initializing file yo...');
       initializeOpenFile(_reducer[1].openFiles[0]);
     }
   });
 };
 
 export const initializeOpenFile = filePath => {
-  console.log('initialize open file.....');
   argObj.filePath = filePath;
   argObj.numberOfLines = 5;
   argObj.lineNumber = 10;
