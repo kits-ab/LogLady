@@ -15,6 +15,10 @@ class LogViewer extends React.Component {
   constructor(props) {
     super(props);
     this.windowedList = React.createRef();
+    this.state = {
+      scrollOffset: 0,
+      escapeRegexPrefix: '学生'
+    };
   }
 
   createLineArray = (lines, filter) => {
@@ -37,7 +41,23 @@ class LogViewer extends React.Component {
     if (this.props.tailSwitch) this.scrollToBottom();
   }
 
-  itemRenderer = lines => {
+  parseRegexInput = (input, escapeRegexPrefix) => {
+    if (!input) return '';
+
+    if (input.startsWith(escapeRegexPrefix))
+      return input
+        .slice(escapeRegexPrefix.length)
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    try {
+      new RegExp(input);
+      return input;
+    } catch (e) {
+      return '';
+    }
+  };
+
+  itemRenderer = (lines, regexInput) => {
     return (i, key) => {
       return (
         <LogLine
@@ -45,11 +65,11 @@ class LogViewer extends React.Component {
           index={i}
           wrap={this.props.wrapLineOn ? 'true' : undefined}
         >
-          {this.hasMatch(lines[i], this.props.highlightInput) ? (
+          {this.hasMatch(lines[i], regexInput) ? (
             <TextHighlightRegex
               text={lines[i]}
               color={this.props.highlightColor}
-              regex={this.props.highlightInput}
+              regex={regexInput}
             />
           ) : (
             lines[i]
@@ -60,9 +80,14 @@ class LogViewer extends React.Component {
   };
 
   render() {
-    let lines =
+    const lines =
       this.props.liveLines &&
       this.createLineArray(this.props.liveLines, this.props.filterInput);
+
+    const regexInput = this.parseRegexInput(
+      this.props.highlightInput,
+      this.state.escapeRegexPrefix
+    );
 
     return (
       <LogViewContainer>
@@ -77,7 +102,7 @@ class LogViewer extends React.Component {
         />
         <Log>
           <WindowedList
-            itemRenderer={this.itemRenderer(lines)}
+            itemRenderer={this.itemRenderer(lines, regexInput)}
             length={lines.length}
             type="uniform"
             ref={this.windowedList}
