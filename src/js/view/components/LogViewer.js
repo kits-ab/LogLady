@@ -39,8 +39,7 @@ class LogViewer extends React.Component {
     if (this.props.tailSwitch) {
       this.liveLinesContainer.current.scroll({
         top: this.liveLinesContainer.current.scrollHeight,
-        left: 0,
-        behavior: 'smooth'
+        left: 0
       });
     }
   };
