@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const TextFieldInputContainer = styled.input`
   height: 20px;
-  background: #444;
+  background: #666;
   color: white;
 
   ::-webkit-input-placeholder {

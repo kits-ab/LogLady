@@ -14,10 +14,10 @@
     <style>
       .container {
         width: 100%;
-        background: #222;
         display: flex;
         height: 100vh;
         justify-content: center;
+        overflow: hidden;
       }
       .loader {
         border: 8px solid #444444;
@@ -28,8 +28,11 @@
         -webkit-animation: spin 2s linear infinite;
         animation: spin 2s linear infinite;
         align-self: center;
+        overflow: hidden;
       }
-
+body {
+  overflow: hidden;
+}
       @-webkit-keyframes spin {
         0% {
           -webkit-transform: rotate(0deg);
