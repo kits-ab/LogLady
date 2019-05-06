@@ -45,7 +45,7 @@ export const CloseFileButton = styled.button`
   margin-top: 10px;
   margin-left: calc(100% - 52px);
   display: ${props => {
-    return props.openFiles ? (props.openFiles[0] ? 'block' : 'none') : 'none';
+    return props.openFiles && props.openFiles[0] ? 'block' : 'none';
   }};
   box-sizing: border-box;
   width: 27px;
@@ -70,6 +70,7 @@ export const CloseFileButton = styled.button`
   opacity: 0.3;
   box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0);
   transition: all 0.3s ease;
+  z-index: 1;
 
   &:hover {
     opacity: 1;
