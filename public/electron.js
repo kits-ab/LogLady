@@ -66,11 +66,18 @@ const createWindow = () => {
       devTools: isDev ? true : false
     },
     icon: path.join(__dirname, './icons/png/256x256.png'),
-    show: false,
+    show: false
+  };
+
+  const loadWindowOptions = {
+    ...windowOptions,
+    frame: false,
+    transparent: true,
+    resizable: false,
     backgroundColor: '#222'
   };
 
-  let loadingWindow = new BrowserWindow(windowOptions);
+  let loadingWindow = new BrowserWindow(loadWindowOptions);
 
   mainWindow = new BrowserWindow(windowOptions);
   mainWindowStateKeeper.track(mainWindow);
