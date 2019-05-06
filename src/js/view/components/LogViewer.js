@@ -21,12 +21,8 @@ class LogViewer extends React.Component {
     };
   }
 
-  createLineArray = (lines, filter) => {
-    const lineArray = [];
-    lineArray.push(...lines.split('\n'));
-    const matchArray = findMatches(filter, lineArray);
-
-    return matchArray;
+  applyFilter = (lines, filter) => {
+    return findMatches(filter, lines);
   };
 
   hasMatch = (line, regex) => {
@@ -82,7 +78,7 @@ class LogViewer extends React.Component {
   render() {
     const lines =
       this.props.liveLines &&
-      this.createLineArray(this.props.liveLines, this.props.filterInput);
+      this.applyFilter(this.props.liveLines, this.props.filterInput);
 
     const regexInput = this.parseRegexInput(
       this.props.highlightInput,
