@@ -37,10 +37,11 @@ class LogViewer extends React.Component {
 
   scrollToBottom = () => {
     if (this.props.tailSwitch) {
-      this.liveLinesContainer.current.scrollTo(
-        0,
-        this.liveLinesContainer.current.scrollHeight
-      );
+      this.liveLinesContainer.current.scroll({
+        top: this.liveLinesContainer.current.scrollHeight,
+        left: 0,
+        behavior: 'smooth'
+      });
     }
   };
 
