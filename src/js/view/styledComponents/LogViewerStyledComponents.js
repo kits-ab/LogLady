@@ -14,17 +14,14 @@ export const LogViewContainer = styled.div`
 
 export const Log = styled.div`
   min-width: 100%;
-  width: 100%;
   overflow: auto;
   div {
     display: inline-block;
+    min-width: 100%;
   }
 `;
 
 export const LogLine = styled.div`
-  min-width: 100%;
-  width: 100%;
-
   background: ${props => {
     const color = '#444';
     return props.index & 1
