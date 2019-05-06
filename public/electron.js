@@ -37,10 +37,10 @@ const windowStateKeeper = windowName => {
     appConfig.set(`windowState.${windowName}`, windowState);
   };
 
-  // kolla var filePath kommer in för att fånga upp.
+  // kolla var filePath kommer in för att fånga upp. (showopendialog)
   // När man har sagt/klickat "öppna" så ska den sparas i recent.
   // Det äldsta objektet ska bort ur arrayen/objektet när man har nått sin gräns
-  // spara recent file i en array/objekt av (exempel) 3
+  // spara recent file i en array/objekt av (exempel) 10
   // någon key value i appconfig (recentFilePaths)
   // skicka ner som parameter till menu.js
   // i menu.js loopa igenom objektet/arrayen med paths och skriv in recent
