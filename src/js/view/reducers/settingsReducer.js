@@ -15,6 +15,8 @@ export const settingsReducer = (state = initialState, action) => {
         ...state,
         highlightColor: action.data
       };
+    case 'settingsReducerRestore':
+      return { ...action.data };
     case 'wrapLineSetting':
       return {
         ...state,

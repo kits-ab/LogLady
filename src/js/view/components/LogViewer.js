@@ -14,6 +14,7 @@ class LogViewer extends React.Component {
   constructor(props) {
     super(props);
     this.liveLinesContainer = React.createRef();
+    this.logLines = React.createRef();
     this.state = {
       scrollOffset: 0,
       escapeRegexPrefix: '学生'
@@ -31,15 +32,15 @@ class LogViewer extends React.Component {
   componentDidMount = () => {
     const containerObserver = new MutationObserver(this.scrollToBottom);
     const observerConfig = { childList: true };
-    containerObserver.observe(this.liveLinesContainer.current, observerConfig);
+    containerObserver.observe(this.logLines.current, observerConfig);
   };
 
   scrollToBottom = () => {
     if (this.props.tailSwitch) {
-      this.liveLinesContainer.current.scrollTo(
-        0,
-        this.liveLinesContainer.current.scrollHeight
-      );
+      this.liveLinesContainer.current.scroll({
+        top: this.liveLinesContainer.current.scrollHeight,
+        left: 0
+      });
     }
   };
 
@@ -80,7 +81,7 @@ class LogViewer extends React.Component {
             );
           }}
         />
-        <Log ref="log">
+        <Log ref={this.logLines}>
           {lines &&
             lines.map((line, i) => {
               return (
