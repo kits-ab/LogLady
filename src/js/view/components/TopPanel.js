@@ -33,12 +33,17 @@ class TopPanel extends React.Component {
           </OpenFileButton>
         </TopPanelItem>
         <TopPanelItem>
-          <TextFieldInput placeholder="filter" onChange={handleFilterInput} />
+          <TextFieldInput
+            placeholder="filter"
+            onChange={handleFilterInput}
+            value={this.props.filterInput}
+          />
         </TopPanelItem>
         <TopPanelItem>
           <TextFieldInput
             placeholder="highlight"
             onChange={handleHighlightInput}
+            value={this.props.highlightInput}
           />
         </TopPanelItem>
         <TopPanelItemFiller />
@@ -61,7 +66,9 @@ class TopPanel extends React.Component {
 const mapStateToProps = state => {
   return {
     openFiles: state.menuReducer.openFiles,
-    tailSwitch: state.topPanelReducer.tailSwitch
+    tailSwitch: state.topPanelReducer.tailSwitch,
+    filterInput: state.topPanelReducer.filterInput,
+    highlightInput: state.topPanelReducer.highlightInput
   };
 };
 

@@ -1,4 +1,5 @@
 const fileReader = require('./fileReader');
+const path = require('path');
 
 it('reads a file and prints content to console', done => {
   fileReader
@@ -11,4 +12,10 @@ it('reads a file and prints content to console', done => {
       console.log(err);
       done();
     });
+});
+
+it('should format lines from buffer', () => {
+  const res = fileReader.formatLinesFromBuffer('\nhej\nhej2\n');
+  const expectedRes = 'hej\nhej2';
+  expect(res).toEqual(expectedRes);
 });
