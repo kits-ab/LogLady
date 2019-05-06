@@ -81,14 +81,17 @@
     ],
     "mac": {
       "category": "Utility",
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "./public/icons/mac/icon.icns"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "./public/icons/win/icon.ico"
     },
     "linux": {
       "category": "Development",
-      "target": "AppImage"
+      "target": "AppImage",
+      "icon": "./public/icons/png"
     },
     "directories": {
       "buildResources": "assets"

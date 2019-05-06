@@ -15,7 +15,8 @@ class LogViewer extends React.Component {
     super(props);
     this.liveLinesContainer = React.createRef();
     this.state = {
-      scrollOffset: 0
+      scrollOffset: 0,
+      escapeRegexPrefix: '学生'
     };
   }
 
@@ -42,12 +43,32 @@ class LogViewer extends React.Component {
     }
   };
 
+  parseRegexInput = (input, escapeRegexPrefix) => {
+    if (!input) return '';
+
+    if (input.startsWith(escapeRegexPrefix))
+      return input
+        .slice(escapeRegexPrefix.length)
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    try {
+      new RegExp(input);
+      return input;
+    } catch (e) {
+      return '';
+    }
+  };
+
   hasMatch = (line, regex) => {
     return regex && line.match(new RegExp(regex, 'i'));
   };
 
   render() {
     const lines = this.props.liveLines && this.createLineArray();
+    const regexInput = this.parseRegexInput(
+      this.props.highlightInput,
+      this.state.escapeRegexPrefix
+    );
     return (
       <LogViewContainer ref={this.liveLinesContainer}>
         <CloseFileButton
@@ -67,11 +88,11 @@ class LogViewer extends React.Component {
                   key={i}
                   wrap={this.props.wrapLineOn ? 'true' : undefined}
                 >
-                  {this.hasMatch(line, this.props.highlightInput) ? (
+                  {this.hasMatch(line, regexInput) ? (
                     <TextHighlightRegex
                       text={line}
                       color={this.props.highlightColor}
-                      regex={this.props.highlightInput}
+                      regex={regexInput}
                     />
                   ) : (
                     line
