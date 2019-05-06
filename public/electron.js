@@ -65,11 +65,13 @@ const createWindow = () => {
     webPreferences: {
       devTools: isDev ? true : false
     },
-    show: false,
-    backgroundColor: '#222'
+    show: false  
   };
 
-  let loadingWindow = new BrowserWindow(windowOptions);
+  const loadWindowOptions = {...windowOptions,     frame: false,
+    transparent: true}
+
+  let loadingWindow = new BrowserWindow(loadWindowOptions);
 
   mainWindow = new BrowserWindow(windowOptions);
   mainWindowStateKeeper.track(mainWindow);
