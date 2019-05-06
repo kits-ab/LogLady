@@ -65,15 +65,33 @@ const createWindow = () => {
     webPreferences: {
       devTools: isDev ? true : false
     },
-    icon: path.join(__dirname, './icons/png/256x256.png')
+    icon: path.join(__dirname, './icons/png/256x256.png'),
+    show: false,
+    backgroundColor: '#222'
   };
+
+  let loadingWindow = new BrowserWindow(windowOptions);
+
   mainWindow = new BrowserWindow(windowOptions);
   mainWindowStateKeeper.track(mainWindow);
-  mainWindow.loadURL(
-    isDev
-      ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../build/index.html')}`
+
+  loadingWindow.once('show', () => {
+    mainWindow.once('ready-to-show', () => {
+      loadingWindow.hide();
+      mainWindow.show(true);
+      loadingWindow.close();
+    });
+    mainWindow.loadURL(
+      isDev
+        ? 'http://localhost:3000'
+        : `file://${path.join(__dirname, '../build/index.html')}`
+    );
+  });
+  loadingWindow.loadURL(
+    `file://${path.join(__dirname, '../src/resources/loadingSpinner.html')}`
   );
+  loadingWindow.show();
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
