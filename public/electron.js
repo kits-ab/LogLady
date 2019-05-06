@@ -65,6 +65,7 @@ const createWindow = () => {
     webPreferences: {
       devTools: isDev ? true : false
     },
+    icon: path.join(__dirname, './icons/png/256x256.png'),
     show: false
   };
 
@@ -72,7 +73,8 @@ const createWindow = () => {
     ...windowOptions,
     frame: false,
     transparent: true,
-    resizable: false
+    resizable: false,
+    backgroundColor: '#222'
   };
 
   let loadingWindow = new BrowserWindow(loadWindowOptions);
