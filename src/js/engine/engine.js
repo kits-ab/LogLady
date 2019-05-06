@@ -60,7 +60,6 @@ const loadStateFromDisk = event => {
   fileReader
     .loadStateFromDisk()
     .then(_data => {
-      console.log('data: ', _data);
       action.type = 'loadState';
       action.data = _data;
       event.sender.send('backendMessages', action);
