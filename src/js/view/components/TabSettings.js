@@ -35,7 +35,9 @@ class TabSettings extends Component {
           <SettingTitle>Wrap Lines</SettingTitle>
           <SwitchButton
             checked={this.props.wrapLineOn}
-            onChange={handleWrapLineOn(this.props.dispatch)}
+            onChange={() => {
+              handleWrapLineOn(this.props.dispatch);
+            }}
           />
         </Setting>
         <CloseButton
@@ -54,7 +56,7 @@ const mapStateToProps = state => {
   return {
     showSettings: state.settingsReducer.showSettings,
     highlightColor: state.settingsReducer.highlightColor,
-    wrapLineOn: state.menuReducer.wrapLineOn
+    wrapLineOn: state.settingsReducer.wrapLineOn
   };
 };
 
