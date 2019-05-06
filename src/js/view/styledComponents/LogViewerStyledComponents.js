@@ -35,9 +35,7 @@ export const LogLine = styled.div`
       ? `
     overflow-wrap: break-word;
     word-wrap: break-word;
-    word-break: break-all;
-    /* Instead use this non-standard one: */
-    word-break: break-word;`
+    word-break: break-all;`
       : 'white-space: nowrap;';
   }};
 `;
