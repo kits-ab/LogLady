@@ -8,7 +8,7 @@ class TextHighlightRegex extends React.Component {
     let input = text;
 
     // read until no more matches
-    while ((result = regex.exec(input))) {
+    while (input && (result = regex.exec(input))) {
       const textBeforeMatch = input.slice(0, result.index);
       const match = result[0];
 
@@ -22,7 +22,7 @@ class TextHighlightRegex extends React.Component {
       }
 
       //update input without the text added
-      input = input.slice(textBeforeMatch.length + match.length);
+      input = input.slice(Math.max(1, textBeforeMatch.length + match.length));
     }
 
     //add the text after the last match
