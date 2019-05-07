@@ -49,7 +49,12 @@ class TopPanel extends React.Component {
         <TopPanelItemFiller />
         <TopPanelItem>
           <FollowSetting>
-            <SwitchButton checked onChange={handleTailSwitch} />
+            <SwitchButton
+              checked={this.props.tailSwitch}
+              onChange={() => {
+                handleTailSwitch(this.props.dispatch);
+              }}
+            />
           </FollowSetting>
           <TopPanelItemText>Follow</TopPanelItemText>
         </TopPanelItem>
@@ -61,6 +66,7 @@ class TopPanel extends React.Component {
 const mapStateToProps = state => {
   return {
     openFiles: state.menuReducer.openFiles,
+    tailSwitch: state.topPanelReducer.tailSwitch,
     filterInput: state.topPanelReducer.filterInput,
     highlightInput: state.topPanelReducer.highlightInput
   };
