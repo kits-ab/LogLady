@@ -1,5 +1,6 @@
 const { Menu } = require('electron');
 const { dialog } = require('electron');
+const engine = require('../engine/engine');
 
 let webContents;
 
@@ -30,6 +31,11 @@ const handleRecentFiles = filePath => {
     recentFilesObject.pop();
   }
   createMenu();
+  engine.saveRecentFilesToDisk(JSON.stringify(recentFilesObject));
+};
+
+const setRecentFiles = _recentFiles => {
+  recentFilesObject = JSON.parse(_recentFiles);
 };
 
 const getRecentFiles = () => {
@@ -137,7 +143,15 @@ const setWebContents = _webContents => {
 };
 
 const createMenu = () => {
-  Menu.setApplicationMenu(createTemplate());
+  engine
+    .loadRecentFilesFromDisk()
+    .then(_recentFiles => {
+      setRecentFiles(_recentFiles);
+      Menu.setApplicationMenu(createTemplate());
+    })
+    .catch(err => {
+      console.log('ERROR IN MENU: ', err);
+    });
 };
 
 module.exports = {

@@ -1,6 +1,5 @@
 const fileReader = require('../adapters/fileReader');
 const { ipcMain } = require('electron');
-const menu = require('../electron/menu');
 
 let action = {};
 
@@ -75,8 +74,17 @@ const sendErrorToFrontend = (event, err) => {
   event.sender.send('backendMessages', action);
 };
 
+const saveRecentFilesToDisk = _recentFiles => {
+  console.log('inside engine.');
+  fileReader.saveRecentFilesToDisk(_recentFiles);
+};
+
+const loadRecentFilesFromDisk = () => {
+  return fileReader.loadRecentFilesFromDisk();
+};
+
 ipcMain.on('frontendMessages', (event, _argObj) => {
-  switch (_argObj.function) {
+  switch (_argObj._function) {
     case 'liveLines':
       getLiveLines(event, _argObj);
       break;
@@ -104,3 +112,10 @@ ipcMain.on('frontendMessages', (event, _argObj) => {
     default:
   }
 });
+
+module.exports = {
+  saveRecentFilesToDisk,
+  loadRecentFilesFromDisk
+};
+
+const menu = require('../electron/menu');
