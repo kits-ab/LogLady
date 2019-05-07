@@ -31,6 +31,12 @@ export const handleHighlightColor = (dispatch, data) => {
   });
 };
 
+export const handleWrapLineOn = dispatch => {
+  dispatch({
+    type: 'wrapLineOn'
+  });
+};
+
 export const handleCloseFile = dispatch => {
   // let functionsArray = [
   //   'menu_open',

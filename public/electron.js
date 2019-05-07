@@ -8,6 +8,7 @@ const engine = require('../src/js/engine/engine');
 const menu = require('../src/js/electron/menu');
 const { Menu } = require('electron');
 const appConfig = require('electron-settings');
+
 updater.init();
 
 console.log(updater.version);
@@ -53,6 +54,7 @@ const windowStateKeeper = windowName => {
   };
 
   setBounds();
+
   return {
     x: windowState.x,
     y: windowState.y,
@@ -70,36 +72,72 @@ const createWindow = () => {
     y: mainWindowStateKeeper.y,
     width: mainWindowStateKeeper.width,
     height: mainWindowStateKeeper.height,
-    minWidth: 600,
-    minHeight: 125,
+    minWidth: 450,
+    minHeight: 145,
     darkTheme: true,
     webPreferences: {
       devTools: isDev ? true : false
-    }
+    },
+    icon: path.join(__dirname, './icons/png/256x256.png'),
+    show: false
   };
+
+  const loadWindowOptions = {
+    ...windowOptions,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    backgroundColor: '#222'
+  };
+
+  let loadingWindow = new BrowserWindow(loadWindowOptions);
+
   mainWindow = new BrowserWindow(windowOptions);
   mainWindowStateKeeper.track(mainWindow);
-  mainWindow.loadURL(
-    isDev
-      ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../build/index.html')}`
+
+  loadingWindow.once('show', () => {
+    mainWindow.once('ready-to-show', () => {
+      loadingWindow.hide();
+      mainWindow.show(true);
+      loadingWindow.close();
+    });
+    mainWindow.loadURL(
+      isDev
+        ? 'http://localhost:3000'
+        : `file://${path.join(__dirname, '../build/index.html')}`
+    );
+  });
+  loadingWindow.loadURL(
+    `file://${path.join(__dirname, '../src/resources/loadingSpinner.html')}`
   );
+  mainWindow.on('close', () => {
+    let argObj = {};
+    argObj.type = 'saveState';
+    mainWindow.webContents.send('backendMessages', argObj);
+  });
+  loadingWindow.show();
+
   mainWindow.on('closed', () => {
     mainWindow = null;
+    quitApplication();
   });
   Menu.setApplicationMenu(menu.createMenu(mainWindow.webContents));
 };
 
 app.on('ready', createWindow);
 
-app.on('window-all-closed', () => {
-  // if (process.platform !== 'darwin') {
-  app.quit();
-  // }
-});
-
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
 });
+
+const quitApplication = () => {
+  // if (process.platform !== 'darwin') {
+  app.quit();
+  // }
+};
+
+module.exports = {
+  quitApplication: quitApplication
+};

@@ -15,6 +15,8 @@ export const topPanelReducer = (state = { tailSwitch: true }, action) => {
         ...state,
         highlightInput: action.data
       };
+    case 'topPanelReducerRestore':
+      return { ...action.data };
     default:
       return state;
   }

@@ -1,6 +1,7 @@
 const initialState = {
   showSettings: false,
-  highlightColor: 'red'
+  highlightColor: 'red',
+  wrapLineOn: false
 };
 export const settingsReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -13,6 +14,13 @@ export const settingsReducer = (state = initialState, action) => {
       return {
         ...state,
         highlightColor: action.data
+      };
+    case 'settingsReducerRestore':
+      return { ...action.data };
+    case 'wrapLineOn':
+      return {
+        ...state,
+        wrapLineOn: !state.wrapLineOn
       };
     default:
       return state;

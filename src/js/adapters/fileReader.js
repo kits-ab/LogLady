@@ -2,12 +2,20 @@ const fs = require('fs');
 const lastLines = require('read-last-lines');
 const nthLine = require('nthline');
 const { EventEmitter } = require('events');
+const app = require('electron').app;
+const path = require('path');
+
+const reduxStateFile = () => {
+  return path.join(app.getPath('userData'), 'reduxState.json');
+};
 
 const fileReaderEvents = new EventEmitter();
 let watchers = [];
 
 const readLastLines = (filePath, numberOfLines) => {
-  return lastLines.read(filePath, numberOfLines);
+  return lastLines.read(filePath, numberOfLines).catch(err => {
+    throw err;
+  });
 };
 
 //find and save the index of the last newline characters
@@ -19,7 +27,7 @@ const getLastNewlineIndex = filePath => {
     lastNewlineIndex += buffer.lastIndexOf('\n');
   });
   readStream.on('error', err => {
-    throw new Error(err);
+    throw err;
   });
   return new Promise((resolve, reject) => {
     readStream.on('end', () => {
@@ -68,12 +76,23 @@ const stopWatcher = filePath => {
 };
 
 const readLinesLive = filePath => {
-  readLastLines(filePath, 10).then(lines => {
-    fileReaderEvents.emit('liveLines', lines.slice(0, lines.lastIndexOf('\n')));
-    getLastNewlineIndex(filePath).then(lastNewlineIndex => {
-      startWatcher(filePath, lastNewlineIndex);
+  readLastLines(filePath, 10)
+    .then(lines => {
+      fileReaderEvents.emit(
+        'liveLines',
+        lines.slice(0, lines.lastIndexOf('\n'))
+      );
+      getLastNewlineIndex(filePath)
+        .then(lastNewlineIndex => {
+          startWatcher(filePath, lastNewlineIndex);
+        })
+        .catch(err => {
+          throw err;
+        });
+    })
+    .catch(err => {
+      console.log('error in readLinesLive: ', err);
     });
-  });
 };
 
 const getNumberOfLines = filePath => {
@@ -97,9 +116,9 @@ const getNumberOfLines = filePath => {
   });
 };
 
-const readFile = (filePath, enc) => {
+const readFile = filePath => {
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, enc, (err, data) => {
+    fs.readFile(filePath, 'utf8', (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -124,20 +143,37 @@ const readNthLines = async (filePath, lineNumber, numberOfLines) => {
 
 const getFileSizeInBytes = async filePath => {
   try {
-    const fileSizeInBytes = fs.statSync(filePath).size;
+    const fileSizeInBytes = await fs.statSync(filePath).size;
     return fileSizeInBytes;
-  } catch (e) {
-    throw new Error(e);
+  } catch (err) {
+    throw err;
   }
 };
 
+const saveStateToDisk = _reduxStateValue => {
+  fs.writeFile(reduxStateFile(), _reduxStateValue, err => {
+    if (err) {
+      throw err;
+    }
+    console.log('LogLady: state has been succefully saved to disk.');
+    return 'success';
+  });
+};
+
+const loadStateFromDisk = () => {
+  return readFile(reduxStateFile());
+};
+
 module.exports = {
-  readFile: readFile,
-  readLastLines: readLastLines,
-  getNumberOfLines: getNumberOfLines,
-  readNthLines: readNthLines,
-  readLinesLive: readLinesLive,
-  fileReaderEvents: fileReaderEvents,
-  getFileSizeInBytes: getFileSizeInBytes,
-  stopWatcher: stopWatcher
+  readFile,
+  readLastLines,
+  getNumberOfLines,
+  readNthLines,
+  readLinesLive,
+  fileReaderEvents,
+  getFileSizeInBytes,
+  stopWatcher,
+  saveStateToDisk,
+  loadStateFromDisk,
+  formatLinesFromBuffer
 };

@@ -1,16 +1,12 @@
 import styled from 'styled-components';
 
 export const Statusbar = styled.div`
-  bottom: 0;
+  display: flex;
+  flex-direction: row;
   height: 30px;
   width: 100%;
   border-top: 2px solid #e6e6e6;
-  position: fixed;
-  right: 0;
-  left: 0;
   background-color: darkgrey;
-  display: flex;
-  flex-direction: row;
 
   ul {
     list-style: none;
@@ -19,7 +15,6 @@ export const Statusbar = styled.div`
   }
 
   li {
-    margin-top: -5px;
     padding-right: 10px;
     display: inline-block;
     font-size: 15px;
