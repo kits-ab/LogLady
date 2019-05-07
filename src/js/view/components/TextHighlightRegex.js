@@ -4,8 +4,8 @@ import * as TextHighlightRegexSC from '../styledComponents/TextHighlightRegexSty
 
 class TextHighlightRegex extends React.Component {
   highlightMatches = (text, regex) => {
-    const group = '(' + regex + ')'; //Parenthesis required for reactStringReplace to work properly
-    return reactStringReplace(text, new RegExp(group, 'gi'), (match, i) => {
+    //Parenthesis required for reactStringReplace to work properly
+    return reactStringReplace(text, regex, (match, i) => {
       return (
         <TextHighlightRegexSC.HighlightMatch key={i}>
           {match}
