@@ -7,26 +7,28 @@ class TextHighlightRegex extends React.Component {
     let result;
     let input = text;
 
+    // read until no more matches
     while ((result = regex.exec(input))) {
-      const nomatch = input.slice(0, result.index);
+      const textBeforeMatch = input.slice(0, result.index);
       const match = result[0];
 
-      if (!nomatch && array.length > 0) {
+      //if textBeforeMatch is '' it means there was no characters between this match and the previous match, so append it to the previous match
+      if (!textBeforeMatch && array.length > 0) {
         array[array.length - 1].highlight += match;
       } else {
-        array.push(nomatch);
+        //normal text are strings and higlighted items are wrapped in an object so that we can see what text got highlighted later
+        array.push(textBeforeMatch);
         array.push({ highlight: match });
       }
 
-      input = input.slice(nomatch.length + match.length);
+      //update input without the text added
+      input = input.slice(textBeforeMatch.length + match.length);
     }
 
+    //add the text after the last match
     array.push(input.slice(0));
 
-    console.log(array);
-    return array.map((x, i) => {
-      return x.highlight ? this.toHighlightElement(x.highlight, i) : x;
-    });
+    return array;
   };
 
   toHighlightElement = (text, i) => {
@@ -40,7 +42,11 @@ class TextHighlightRegex extends React.Component {
   render() {
     return (
       <TextHighlightRegexSC.HighlightText color={this.props.color}>
-        {this.highlightMatches(this.props.text, this.props.regex)}
+        {this.highlightMatches(this.props.text, this.props.regex).map(
+          (x, i) => {
+            return x.highlight ? this.toHighlightElement(x.highlight, i) : x;
+          }
+        )}
       </TextHighlightRegexSC.HighlightText>
     );
   }
