@@ -78,8 +78,7 @@ const createWindow = () => {
     ...windowOptions,
     frame: false,
     transparent: true,
-    resizable: false,
-    backgroundColor: '#222'
+    resizable: false
   };
 
   let loadingWindow = new BrowserWindow(loadWindowOptions);
