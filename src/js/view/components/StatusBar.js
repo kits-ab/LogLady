@@ -5,7 +5,6 @@ import * as StatusBarSC from '../styledComponents/StatusBarStyledComponents';
 import { handleShowSettings } from '../actions/dispatchActions';
 import {
   getFormattedFileSize,
-  getFileName,
   getFormattedFilePath
 } from './helpers/StatusBarHelper';
 const settings = require('../../../resources/settings.png');
