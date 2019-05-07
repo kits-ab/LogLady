@@ -9,40 +9,32 @@ import {
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
 import TextHighlightRegex from './TextHighlightRegex';
+import WindowedList from 'react-list';
 
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.liveLinesContainer = React.createRef();
-    this.logLines = React.createRef();
+    this.windowedList = React.createRef();
     this.state = {
-      scrollOffset: 0,
       escapeRegexPrefix: '学生'
     };
   }
 
-  createLineArray = () => {
-    const lineArray = [];
-    lineArray.push(...this.props.liveLines.split('\n'));
-    const matchArray = findMatches(this.props.filterInput, lineArray);
-
-    return matchArray;
+  applyFilter = (lines, filter) => {
+    return !filter ? lines : findMatches(filter, lines);
   };
 
-  componentDidMount = () => {
-    const containerObserver = new MutationObserver(this.scrollToBottom);
-    const observerConfig = { childList: true };
-    containerObserver.observe(this.logLines.current, observerConfig);
+  hasMatch = (line, regex) => {
+    return line.search(regex) !== -1;
   };
 
   scrollToBottom = () => {
-    if (this.props.tailSwitch) {
-      this.liveLinesContainer.current.scroll({
-        top: this.liveLinesContainer.current.scrollHeight,
-        left: 0
-      });
-    }
+    this.windowedList.current.scrollAround(this.props.liveLines.length);
   };
+
+  componentDidUpdate() {
+    if (this.props.tailSwitch) this.scrollToBottom();
+  }
 
   parseRegexInput = (input, escapeRegexPrefix) => {
     if (!input) return '';
@@ -60,18 +52,42 @@ class LogViewer extends React.Component {
     }
   };
 
-  hasMatch = (line, regex) => {
-    return regex && line.match(new RegExp(regex, 'i'));
+  itemRenderer = (lines, regex) => {
+    return (i, key) => {
+      return (
+        <LogLine
+          key={key}
+          index={i}
+          wrap={this.props.wrapLineOn ? 'true' : undefined}
+        >
+          {regex && this.hasMatch(lines[i], regex) ? (
+            <TextHighlightRegex
+              text={lines[i]}
+              color={this.props.highlightColor}
+              regex={regex}
+            />
+          ) : (
+            lines[i]
+          )}
+        </LogLine>
+      );
+    };
   };
 
   render() {
-    const lines = this.props.liveLines && this.createLineArray();
+    const lines =
+      this.props.liveLines &&
+      this.applyFilter(this.props.liveLines, this.props.filterInput);
+
     const regexInput = this.parseRegexInput(
       this.props.highlightInput,
       this.state.escapeRegexPrefix
     );
+
+    const regex = !regexInput ? undefined : new RegExp('(' + regexInput + ')');
+
     return (
-      <LogViewContainer ref={this.liveLinesContainer}>
+      <LogViewContainer>
         <CloseFileButton
           openFiles={this.props.openFiles}
           onClick={() => {
@@ -81,26 +97,13 @@ class LogViewer extends React.Component {
             );
           }}
         />
-        <Log ref={this.logLines}>
-          {lines &&
-            lines.map((line, i) => {
-              return (
-                <LogLine
-                  key={i}
-                  wrap={this.props.wrapLineOn ? 'true' : undefined}
-                >
-                  {this.hasMatch(line, regexInput) ? (
-                    <TextHighlightRegex
-                      text={line}
-                      color={this.props.highlightColor}
-                      regex={regexInput}
-                    />
-                  ) : (
-                    line
-                  )}
-                </LogLine>
-              );
-            })}
+        <Log>
+          <WindowedList
+            itemRenderer={this.itemRenderer(lines, regex)}
+            length={lines.length}
+            type="uniform"
+            ref={this.windowedList}
+          />
         </Log>
       </LogViewContainer>
     );

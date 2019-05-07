@@ -1,28 +1,32 @@
 import React from 'react';
-import reactStringReplace from 'react-string-replace';
 import * as TextHighlightRegexSC from '../styledComponents/TextHighlightRegexStyledComponents';
 
 class TextHighlightRegex extends React.Component {
-  highlightMatches = (text, regexInput) => {
-    const regex = new RegExp(regexInput, 'gi');
-    let matches = text.match(regex);
-    let unmatches = text.split(regex);
-
+  highlightMatches = (text, regex) => {
     let array = [];
-    let currentMatch = '';
-    for (let i = 0; i < matches.length; i++) {
-      if (unmatches[i] === '') {
-        currentMatch += matches[i];
+    let result;
+    let input = text;
+
+    while ((result = regex.exec(input))) {
+      const nomatch = input.slice(0, result.index);
+      const match = result[0];
+
+      if (!nomatch && array.length > 0) {
+        array[array.length - 1].highlight += match;
       } else {
-        array.push(this.toHighlightElement(currentMatch, i));
-        array.push(unmatches[i]);
+        array.push(nomatch);
+        array.push({ highlight: match });
       }
+
+      input = input.slice(nomatch.length + match.length);
     }
 
-    array.push(this.toHighlightElement(currentMatch, unmatches.length - 1));
-    array.push(unmatches[unmatches.length - 1]);
+    array.push(input.slice(0));
 
-    return array;
+    console.log(array);
+    return array.map((x, i) => {
+      return x.highlight ? this.toHighlightElement(x.highlight, i) : x;
+    });
   };
 
   toHighlightElement = (text, i) => {
