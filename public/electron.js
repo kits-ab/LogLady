@@ -6,7 +6,6 @@ const isDev = require('electron-is-dev');
 const updater = require('electron-simple-updater');
 const engine = require('../src/js/engine/engine');
 const menu = require('../src/js/electron/menu');
-const { Menu } = require('electron');
 const appConfig = require('electron-settings');
 
 updater.init();
@@ -37,14 +36,6 @@ const windowStateKeeper = windowName => {
     windowState.isMaximized = window.isMaximized();
     appConfig.set(`windowState.${windowName}`, windowState);
   };
-
-  // kolla var filePath kommer in för att fånga upp. (showopendialog)
-  // När man har sagt/klickat "öppna" så ska den sparas i recent.
-  // Det äldsta objektet ska bort ur arrayen/objektet när man har nått sin gräns
-  // spara recent file i en array/objekt av (exempel) 10
-  // någon key value i appconfig (recentFilePaths)
-  // skicka ner som parameter till menu.js
-  // i menu.js loopa igenom objektet/arrayen med paths och skriv in recent
 
   const track = win => {
     window = win;
@@ -121,11 +112,8 @@ const createWindow = () => {
     mainWindow = null;
     quitApplication();
   });
-  Menu.setApplicationMenu(menu.createMenu(mainWindow.webContents));
-
-  setInterval(() => {
-    Menu.setApplicationMenu(menu.createMenu(mainWindow.webContents));
-  }, 2000);
+  menu.setWebContents(mainWindow.webContents);
+  menu.createMenu();
 };
 
 app.on('ready', createWindow);
@@ -143,5 +131,5 @@ const quitApplication = () => {
 };
 
 module.exports = {
-  quitApplication: quitApplication
+  quitApplication
 };

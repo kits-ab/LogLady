@@ -1,45 +1,42 @@
 const { Menu } = require('electron');
 const { dialog } = require('electron');
-const {
-  setIpc,
-  handleShowOpenDialog,
-  getRecentFiles
-} = require('./handleFilePaths');
 
-/****** Flyttat till handleFilePaths.js ******/
-// let ipc;
+let webContents;
 
-// const setIpc = _ipc => {
-//   ipc = _ipc;
-// };
+const handleMenuItemClicked = (type, data) => {
+  webContents.send('backendMessages', { type: `menu_${type}`, data: data });
+};
 
-// const handleMenuItemClicked = (type, data) => {
-//   ipc.send('backendMessages', { type: `menu_${type}`, data: data });
-// };
+const handleShowOpenDialog = () => {
+  dialog.showOpenDialog(
+    {
+      properties: ['openFile']
+    },
+    filePath => {
+      if (filePath === undefined) return;
+      handleMenuItemClicked('open', filePath);
+      handleRecentFiles(filePath[0]);
+    }
+  );
+};
 
-// // bryt ut handleShowOpenDialog till egen fil
-// // gör function av recentFilePaths och exportera den också
-// // borde kunna komma åt den i electron.js då...
-// const recentFilePaths = [];
-// const handleShowOpenDialog = () => {
-//   dialog.showOpenDialog(
-//     {
-//       properties: ['openFile']
-//     },
-//     filePath => {
-//       if (filePath === undefined) return;
-//       handleMenuItemClicked('open', filePath);
-//       recentFilePaths.push(filePath);
-//       console.log('recent files', recentFilePaths);
-//     }
-//   );
-// };
-/****** Flyttat till handleFilePaths.js ******/
+let recentFilesObject = [];
+const handleRecentFiles = filePath => {
+  recentFilesObject = recentFilesObject.filter(file => {
+    return file !== filePath;
+  });
+  recentFilesObject.unshift(filePath);
+  if (recentFilesObject.length > 3) {
+    recentFilesObject.pop();
+  }
+  createMenu();
+};
 
-// skicka med recentFilePaths så att man kan skriva ut dem i menyn.
-const createMenu = ipc => {
-  // const menuItemClicked = handleMenuItemClicked(ipc);
-  setIpc(ipc);
+const getRecentFiles = () => {
+  return recentFilesObject;
+};
+
+const createTemplate = () => {
   const template = [
     {
       label: 'LogLady',
@@ -61,7 +58,7 @@ const createMenu = ipc => {
           }
         },
         {
-          label: 'Open Recent',
+          label: 'Open recent...',
           submenu: getRecentFiles().map(file => {
             return { label: file };
           })
@@ -135,7 +132,16 @@ const createMenu = ipc => {
   return Menu.buildFromTemplate(template);
 };
 
+const setWebContents = _webContents => {
+  webContents = _webContents;
+};
+
+const createMenu = () => {
+  Menu.setApplicationMenu(createTemplate());
+};
+
 module.exports = {
-  createMenu: createMenu,
-  handleShowOpenDialog: handleShowOpenDialog
+  handleShowOpenDialog,
+  setWebContents,
+  createMenu
 };
