@@ -18,7 +18,7 @@ const handleShowOpenDialog = () => {
     filePath => {
       if (filePath === undefined) return;
       handleMenuItemClicked('open', filePath);
-      handleRecentFiles(filePath);
+      handleRecentFiles(filePath[0]);
       //   recentFilePaths.push(filePath);
       //   console.log('recent files', recentFilePaths);
     }
@@ -31,23 +31,27 @@ const handleShowOpenDialog = () => {
 // begränsa hur många element som kan finnas (tex max 10)
 // lista ut hur man ska kunna få objektet till det sparade windowsatatet i electron.js
 
-const recentFilesObject = [];
-const handleRecentFiles = recentFiles => {
-  recentFilesObject.push(recentFiles);
-  // recentFilesObject.map((data, i) => {
-  //   if (recentFilesObject.includes(data)) {
-  //     // recentFilesObject.splice(i);
-  //     recentFilesObject.push(recentFiles);
-  //   }
-  //   console.log(data);
-  // });
-  if (recentFilesObject.length > 10) {
+let recentFilesObject = [];
+const handleRecentFiles = filePath => {
+  recentFilesObject = recentFilesObject.filter(file => {
+    return file !== filePath;
+  });
+  recentFilesObject.push(filePath);
+  if (recentFilesObject.length > 3) {
     recentFilesObject.shift();
   }
-  console.log(recentFilesObject);
+  // console.log(recentFilesObject);
+  // return recentFilesObject;
+};
+
+const getRecentFiles = () => {
+  console.log('get recent files', recentFilesObject);
+
+  return recentFilesObject;
 };
 
 module.exports = {
-  setIpc: setIpc,
-  handleShowOpenDialog: handleShowOpenDialog
+  setIpc,
+  handleShowOpenDialog,
+  getRecentFiles: getRecentFiles
 };

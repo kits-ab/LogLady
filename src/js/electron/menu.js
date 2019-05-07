@@ -1,6 +1,10 @@
 const { Menu } = require('electron');
 const { dialog } = require('electron');
-const { setIpc, handleShowOpenDialog } = require('./handleFilePaths');
+const {
+  setIpc,
+  handleShowOpenDialog,
+  getRecentFiles
+} = require('./handleFilePaths');
 
 /****** Flyttat till handleFilePaths.js ******/
 // let ipc;
@@ -33,7 +37,7 @@ const { setIpc, handleShowOpenDialog } = require('./handleFilePaths');
 /****** Flyttat till handleFilePaths.js ******/
 
 // skicka med recentFilePaths så att man kan skriva ut dem i menyn.
-const createMenu = (ipc, recentFilePaths) => {
+const createMenu = ipc => {
   // const menuItemClicked = handleMenuItemClicked(ipc);
   setIpc(ipc);
   const template = [
@@ -55,6 +59,12 @@ const createMenu = (ipc, recentFilePaths) => {
           click() {
             handleShowOpenDialog();
           }
+        },
+        {
+          label: 'Open Recent',
+          submenu: getRecentFiles().map(file => {
+            return { label: file };
+          })
         }
       ]
     },

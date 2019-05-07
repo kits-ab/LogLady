@@ -122,6 +122,10 @@ const createWindow = () => {
     quitApplication();
   });
   Menu.setApplicationMenu(menu.createMenu(mainWindow.webContents));
+
+  setInterval(() => {
+    Menu.setApplicationMenu(menu.createMenu(mainWindow.webContents));
+  }, 2000);
 };
 
 app.on('ready', createWindow);
