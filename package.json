@@ -19,6 +19,7 @@
     "react": "^16.8.2",
     "react-color": "^2.17.0",
     "react-dom": "^16.8.2",
+    "react-list": "^0.8.11",
     "react-redux": "^7.0.1",
     "react-scripts": "^2.1.8",
     "react-split-pane": "^0.1.87",
