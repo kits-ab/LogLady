@@ -19,7 +19,7 @@ class TextFieldInput extends React.Component {
 
   sendDispatch = _.debounce(() => {
     this.props.onChange(this.props.dispatch, this.state.input);
-  }, 250);
+  }, 222);
 
   render() {
     return (
