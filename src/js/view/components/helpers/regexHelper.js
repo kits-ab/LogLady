@@ -1,3 +1,10 @@
+/**
+ * Returns an array of strings and matches grouped together (if they are adjacent) with order preserved
+ * Grouped matches are in the form of an object with one field group { group: ''}
+ * A returned array can look like the following ['The quick brown ', { group: 'fox something something' }, ' ran over something something']
+ * @param {string} text
+ * @param {RegExp} regex
+ */
 export const groupByMatches = (text, regex) => {
   let array = [];
   let result;
