@@ -1,5 +1,8 @@
 import React from 'react';
-import * as TextHighlightRegexSC from '../styledComponents/TextHighlightRegexStyledComponents';
+import {
+  HighlightText,
+  HighlightMatch
+} from '../styledComponents/TextHighlightRegexStyledComponents';
 
 class TextHighlightRegex extends React.Component {
   highlightMatches = (text, regex) => {
@@ -34,16 +37,12 @@ class TextHighlightRegex extends React.Component {
   };
 
   toHighlightElement = (text, i) => {
-    return (
-      <TextHighlightRegexSC.HighlightMatch key={i}>
-        {text}
-      </TextHighlightRegexSC.HighlightMatch>
-    );
+    return <HighlightMatch key={i}>{text}</HighlightMatch>;
   };
 
   render() {
     return (
-      <TextHighlightRegexSC.HighlightText color={this.props.color}>
+      <HighlightText color={this.props.color}>
         {this.highlightMatches(this.props.text, this.props.regex).map(
           (x, i) => {
             return x.highlight || x.highlight === ''
@@ -51,7 +50,7 @@ class TextHighlightRegex extends React.Component {
               : x;
           }
         )}
-      </TextHighlightRegexSC.HighlightText>
+      </HighlightText>
     );
   }
 }
