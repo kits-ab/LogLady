@@ -2,15 +2,15 @@ import { logViewerReducer } from './logViewerReducer';
 
 describe('logViewer reducers', () => {
   it('should return the initial state', () => {
-    const initialState = { liveLines: [], nthLines: '' };
+    const initialState = { liveLines: [] };
     const action = {
       type: undefined
     };
     expect(logViewerReducer(undefined, action)).toEqual(initialState);
   });
   it('should reset lines', () => {
-    const state = { liveLines: ['lalala', 'lililil'], nthLines: 'nice' };
-    const expectedState = { liveLines: [], nthLines: 'nice' };
+    const state = { liveLines: ['lalala', 'lililil'] };
+    const expectedState = { liveLines: [] };
     const action = {
       type: 'clearLines'
     };
@@ -19,8 +19,7 @@ describe('logViewer reducers', () => {
   it('should append lines to initial state', () => {
     const lines = 'hej1\nhej2\nhej3\n';
     const expectedState = {
-      liveLines: ['hej1', 'hej2', 'hej3', ''],
-      nthLines: ''
+      liveLines: ['hej1', 'hej2', 'hej3', '']
     };
     const action = {
       type: 'liveLines',
@@ -28,6 +27,18 @@ describe('logViewer reducers', () => {
     };
     expect(logViewerReducer(undefined, action)).toEqual(expectedState);
   });
-  it('should append lines to populated state', () => {});
-  //   it('should set nth lines', () => {});
+  it('should append lines to populated state', () => {
+    const lines = 'hej4\nhej5\n';
+    const state = {
+      liveLines: ['hej1', 'hej2', 'hej3', '']
+    };
+    const expectedState = {
+      liveLines: ['hej1', 'hej2', 'hej3', '', 'hej4', 'hej5', '']
+    };
+    const action = {
+      type: 'liveLines',
+      data: lines
+    };
+    expect(logViewerReducer(state, action)).toEqual(expectedState);
+  });
 });
