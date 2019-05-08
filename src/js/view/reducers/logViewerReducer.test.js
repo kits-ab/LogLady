@@ -3,10 +3,7 @@ import { logViewerReducer } from './logViewerReducer';
 describe('logViewer reducers', () => {
   it('should return the initial state', () => {
     const initialState = { liveLines: [] };
-    const action = {
-      type: undefined
-    };
-    expect(logViewerReducer(undefined, action)).toEqual(initialState);
+    expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
   it('should reset lines', () => {
     const state = { liveLines: ['lalala', 'lililil'] };
