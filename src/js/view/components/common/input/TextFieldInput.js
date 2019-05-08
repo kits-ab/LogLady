@@ -8,7 +8,6 @@ class TextFieldInput extends React.Component {
         placeholder={this.props.placeholder}
         value={this.props.value}
         onChange={e => {
-          this.setState({ text: e.target.value });
           this.props.onChange(this.props.dispatch, e.target.value);
         }}
         type="text"

@@ -1,3 +1,5 @@
+import { debounce } from 'lodash.debounce';
+
 export const handleShowSettings = dispatch => {
   dispatch({
     type: 'showSettings'
@@ -17,12 +19,12 @@ export const handleFilterInput = (dispatch, data) => {
   });
 };
 
-export const handleHighlightInput = (dispatch, data) => {
+export const handleHighlightInput = debounce((dispatch, data) => {
   dispatch({
     type: 'highlightInput',
     data: data
   });
-};
+}, 2000);
 
 export const handleHighlightColor = (dispatch, data) => {
   dispatch({
