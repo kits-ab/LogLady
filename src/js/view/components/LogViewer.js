@@ -25,7 +25,7 @@ class LogViewer extends React.Component {
   };
 
   hasMatch = (line, regex) => {
-    return line.test(regex);
+    return regex.test(line);
   };
 
   scrollToBottom = (el, list) => {
