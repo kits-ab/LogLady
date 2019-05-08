@@ -4,10 +4,9 @@ export const handleShowSettings = dispatch => {
   });
 };
 
-export const handleTailSwitch = (dispatch, data) => {
+export const handleTailSwitch = dispatch => {
   dispatch({
-    type: 'tailSwitch',
-    data
+    type: 'tailSwitch'
   });
 };
 
@@ -32,39 +31,20 @@ export const handleHighlightColor = (dispatch, data) => {
   });
 };
 
-export const handleWrapLineSetting = (dispatch, data) => {
+export const handleWrapLineOn = dispatch => {
   dispatch({
-    type: 'wrapLineSetting',
-    data
+    type: 'wrapLineOn'
   });
 };
 
 export const handleCloseFile = dispatch => {
-  // let functionsArray = [
-  //   'menu_open',
-  //   'liveLines',
-  //   'nthLines',
-  //   'numberOfLines',
-  //   'fileSize'
-  // ];
-  // functionsArray.map(_function => {
-  //   dispatch({
-  //     type: _function,
-  //     data:
-  //       _function === 'menu_open'
-  //         ? 'clearOpenFiles'
-  //         : _function === 'liveLines'
-  //         ? 'clearLines'
-  //         : ''
-  //   });
-  // });
   dispatch({
     type: 'menu_open',
     data: 'clearOpenFiles'
   });
   dispatch({
-    type: 'liveLines',
-    data: 'clearLines'
+    type: 'clearLines',
+    data: ''
   });
   dispatch({
     type: 'nthLines',

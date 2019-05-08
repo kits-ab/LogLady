@@ -3,7 +3,7 @@ export const topPanelReducer = (state = { tailSwitch: true }, action) => {
     case 'tailSwitch':
       return {
         ...state,
-        tailSwitch: action.data
+        tailSwitch: !state.tailSwitch
       };
     case 'filterInput':
       return {
@@ -15,6 +15,8 @@ export const topPanelReducer = (state = { tailSwitch: true }, action) => {
         ...state,
         highlightInput: action.data
       };
+    case 'topPanelReducerRestore':
+      return { ...action.data };
     default:
       return state;
   }

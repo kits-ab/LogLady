@@ -1,4 +1,8 @@
-import { sendRequestToBackend } from './ipcPublisher';
+import {
+  saveStateToDisk,
+  populateStore
+} from './configurations/configureStore';
+import { initializeOpenFile } from './configurations/configureStore';
 const { ipcRenderer } = window.require('electron');
 
 export const ipcListener = (dispatch, state) => {
@@ -9,18 +13,18 @@ export const ipcListener = (dispatch, state) => {
           type: action.type,
           data: action.data
         });
-        let argObj = {};
-        argObj.filePath = action.data[0];
-        argObj.numberOfLines = 5;
-        argObj.lineNumber = 10;
-
-        argObj.function = 'liveLines';
-        sendRequestToBackend(argObj);
-        argObj.function = 'numberOfLines';
-        sendRequestToBackend(argObj);
-        argObj.function = 'fileSize';
-        sendRequestToBackend(argObj);
-
+        initializeOpenFile(action.data[0]);
+        break;
+      case 'saveState':
+        saveStateToDisk();
+        break;
+      case 'loadState':
+        populateStore(JSON.parse(action.data));
+        break;
+      case 'backendError':
+        //handle errors in the future
+        // alert('Error occured. ', action.data);
+        console.log('Error from the backend: ', action.data);
         break;
       default:
         dispatch({

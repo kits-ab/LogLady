@@ -4,7 +4,7 @@ import { SwitchButton } from 'js/view/components/common/buttons';
 import {
   handleShowSettings,
   handleHighlightColor,
-  handleWrapLineSetting
+  handleWrapLineOn
 } from '../actions/dispatchActions';
 import {
   TabSettingsContainer,
@@ -33,7 +33,12 @@ class TabSettings extends Component {
         </Setting>
         <Setting>
           <SettingTitle>Wrap Lines</SettingTitle>
-          <SwitchButton onChange={handleWrapLineSetting} />
+          <SwitchButton
+            checked={this.props.wrapLineOn}
+            onChange={() => {
+              handleWrapLineOn(this.props.dispatch);
+            }}
+          />
         </Setting>
         <CloseButton
           onClick={() => {
@@ -50,7 +55,8 @@ class TabSettings extends Component {
 const mapStateToProps = state => {
   return {
     showSettings: state.settingsReducer.showSettings,
-    highlightColor: state.settingsReducer.highlightColor
+    highlightColor: state.settingsReducer.highlightColor,
+    wrapLineOn: state.settingsReducer.wrapLineOn
   };
 };
 

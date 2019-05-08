@@ -15,10 +15,12 @@ export const settingsReducer = (state = initialState, action) => {
         ...state,
         highlightColor: action.data
       };
-    case 'wrapLineSetting':
+    case 'settingsReducerRestore':
+      return { ...action.data };
+    case 'wrapLineOn':
       return {
         ...state,
-        wrapLineOn: action.data
+        wrapLineOn: !state.wrapLineOn
       };
     default:
       return state;
