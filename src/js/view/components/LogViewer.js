@@ -44,7 +44,6 @@ class LogViewer extends React.Component {
       return input
         .slice(escapeRegexPrefix.length)
         .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
     try {
       new RegExp(input);
       return input;
