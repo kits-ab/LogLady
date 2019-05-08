@@ -3,7 +3,6 @@ import {
   HighlightText,
   HighlightMatch
 } from '../styledComponents/TextHighlightRegexStyledComponents';
-
 import { groupByMatches } from 'js/view/components/helpers/regexHelper';
 
 class TextHighlightRegex extends React.Component {
