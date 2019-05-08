@@ -4,16 +4,16 @@ export const DefaultPageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
   width: 100vw;
+  height: 100vh;
   color: #ccc;
   overflow: hidden;
   background: #222;
 `;
 
 export const LogLadyLogo = styled.img`
-  height: 512px;
   width: 512px;
+  height: 512px;
 `;
 
 export const WelcomeText = styled.div`
