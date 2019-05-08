@@ -4,7 +4,7 @@ export const findMatches = (lineFilterInput, lineArray) => {
       const regex = new RegExp(lineFilterInput, 'gi');
       return line.match(regex);
     } catch (e) {
-      return '';
+      return false;
     }
   });
 };
