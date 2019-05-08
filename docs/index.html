@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>LogLady</title>
+
+    <style>
+      body {
+        background: #262626;
+        height: 100%;
+        margin: 0;
+        font-family: Menlo, 'Courier New', Courier, monospace;
+        line-height: 1.5em;
+      }
+
+      a {
+        color: #e5e5e5;
+        text-decoration: none;
+      }
+      a:hover {
+        color: #ab0f78;
+      }
+
+      .start-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        height: 600px;
+        color: #e5e5e5;
+        width: 100vw;
+      }
+
+      .content-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #e5e5e5;
+        color: #3a3a39;
+      }
+
+      .logLady-logo {
+        width: 550px;
+        align-self: center;
+        margin-right: 50px;
+      }
+
+      .download-box {
+        width: 400px;
+        align-self: center;
+      }
+
+      .info-what {
+        width: 700px;
+        align-self: center;
+      }
+
+      .info-how {
+        width: 700px;
+        align-self: center;
+      }
+
+      .btn {
+        padding: 0.9em 1.25em;
+        color: #ab0f78;
+        background: transparent;
+        border: solid 3px #ab0f78;
+        border-radius: 0.3em;
+        font-family: 'Courier New', Courier, monospace;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 50px;
+        width: 220px;
+        text-align: center;
+        align-self: center;
+        margin-top: 50px;
+      }
+
+      .btn:hover {
+        color: #e5e5e5;
+        border: solid 3px #e5e5e5;
+      }
+
+      footer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .links {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        margin-bottom: 30px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="start-container">
+      <img class="logLady-logo" src="../src/resources/loglady.png" alt="Logo" />
+
+      <div class="download-box">
+        <p>
+          statements (why to use)
+        </p>
+        <p>Download</p>
+        >
+        <!-- kolla os och 'highlighta' os-spec nedladdningslänk (visa även de andra)-->
+        <a
+          href="https://github.com/kits-ab/LogLady/releases/download/v0.0.21-dark/loglady-1.0.0.dmg"
+          >For mac
+        </a>
+        <a
+          href="https://github.com/kits-ab/LogLady/releases/download/v0.0.21-dark/loglady.1.0.0.AppImage"
+          >For Linux
+        </a>
+        <a
+          href="https://github.com/kits-ab/LogLady/releases/download/v0.0.21-dark/loglady.Setup.1.0.0.exe"
+          >For windows</a
+        >
+      </div>
+    </div>
+    <div class="content-container">
+      <div class="info-what">
+        <h3>What is LogLady?</h3>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam. Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+          enim ad minim veniam.
+        </p>
+
+        <p>Electron, node, react</p>
+        <p>Cross-platform (mac, Linux, Windows)</p>
+        <p>Open source (gitHub)</p>
+      </div>
+      <div class="info-how">
+        <h3>How to use</h3>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam. Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+          enim ad minim veniam.
+        </p>
+        <video
+          width="700"
+          loop
+          autoplay
+          muted
+          src="../src/resources/loglady.mov"
+          type="video/mp4"
+        ></video>
+
+        <p>screenshot on features and some text</p>
+      </div>
+    </div>
+
+    <footer>
+      <a class="btn" href="https://github.com/kits-ab/LogLady"
+        >View source code on Github</a
+      >
+
+      <div class="links">
+        <a href="https://github.com/kits-ab/LogLady/graphs/contributors"
+          >About us</a
+        >
+        <a href="https://kits.se/">Kits</a>
+        <a href="https://github.com/kits-ab/LogLady/releases">Releases</a>
+      </div>
+    </footer>
+  </body>
+</html>
