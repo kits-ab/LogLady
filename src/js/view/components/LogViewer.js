@@ -10,7 +10,6 @@ import { closeFile } from './helpers/handleFileHelper';
 import TextHighlightRegex from './TextHighlightRegex';
 import WindowedList from 'react-list';
 import {
-  createRegexOrUndefined,
   isEscapedRegexString,
   escapeRegexString,
   filterByRegex
@@ -35,6 +34,8 @@ class LogViewer extends React.Component {
   }
 
   parseRegex = (input, escapePrefix) => {
+    if (!input) return undefined;
+
     const regexString = isEscapedRegexString(input, escapePrefix)
       ? escapeRegexString(input, escapePrefix)
       : input;
