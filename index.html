@@ -150,21 +150,24 @@
         <p>
           Making logs bearable again!
         </p>
-        <button
-          class="download-btn"
-          id="download-btn"
-          onclick="downloadApplication()"
-        >
+        <button class="download-btn" id="download-btn">
           <script>
+            const macLink =
+              "https://github.com/kits-ab/LogLady/releases/download/v0.0.21-dark/loglady-1.0.0.dmg";
+            const linuxLink =
+              "https://github.com/kits-ab/LogLady/releases/download/v0.0.21-dark/loglady.1.0.0.AppImage";
+            const windowsLink =
+              "https://github.com/kits-ab/LogLady/releases/download/v0.0.21-dark/loglady.Setup.1.0.0.exe";
+            const downloadButton = document.getElementById("download-btn");
             if (navigator.platform.startsWith("Mac")) {
-              document.getElementById("download-btn").innerHTML =
-                "Download for Mac";
+              downloadButton.innerHTML = "Download for Mac";
+              downloadButton.onclick = () => (location.href = macLink);
             } else if (navigator.platform.startsWith("Linux")) {
-              document.getElementById("download-btn").innerHTML =
-                "Download for Linux";
+              downloadButton.innerHTML = "Download for Linux";
+              downloadButton.onclick = () => (location.href = linuxLink);
             } else {
-              document.getElementById("download-btn").innerHTML =
-                "Download for Windows";
+              downloadButton.innerHTML = "Download for Windows";
+              downloadButton.onclick = () => (location.href = windowsLink);
             }
           </script>
         </button>
@@ -226,9 +229,6 @@
       </div>
     </footer>
 
-    <script>
-      console.log(window.navigator);
-      downloadApplication;
-    </script>
+    <script></script>
   </body>
 </html>
