@@ -1,49 +1,94 @@
 import React from 'react';
 import { findMatches } from './helpers/lineFilterHelper';
-import * as LogViewerSC from '../styledComponents/LogViewerStyledComponents';
+import {
+  LogViewContainer,
+  CloseFileButton,
+  Log,
+  LogLine
+} from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
+import TextHighlightRegex from './TextHighlightRegex';
+import WindowedList from 'react-list';
+
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.liveLinesContainer = React.createRef();
+    this.windowedList = React.createRef();
+    this.state = {
+      escapeRegexPrefix: '学生'
+    };
   }
 
-  createLineArray = () => {
-    const lineArray = [];
-    lineArray.push(...this.props.liveLines.split('\n'));
-    const matchArray = findMatches(this.props.filterInput, lineArray);
-
-    return matchArray;
+  applyFilter = (lines, filter) => {
+    return !filter ? lines : findMatches(filter, lines);
   };
 
-  componentDidMount = () => {
-    const containerObserver = new MutationObserver(this.scrollToBottom);
-    const observerConfig = { childList: true };
-    containerObserver.observe(this.liveLinesContainer.current, observerConfig);
+  hasMatch = (line, regex) => {
+    return regex.test(line);
   };
 
-  scrollToBottom = () => {
-    if (this.props.tailSwitch) {
-      this.liveLinesContainer.current.scrollTo(
-        0,
-        this.liveLinesContainer.current.scrollHeight
-      );
+  scrollToBottom = (el, list) => {
+    el.scrollAround(list.length);
+  };
+
+  componentDidUpdate() {
+    if (this.props.tailSwitch)
+      this.scrollToBottom(this.windowedList.current, this.props.liveLines);
+  }
+
+  parseRegexInput = (input, escapeRegexPrefix) => {
+    if (!input) return '';
+
+    if (input.startsWith(escapeRegexPrefix))
+      return input
+        .slice(escapeRegexPrefix.length)
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    try {
+      new RegExp(input);
+      return input;
+    } catch (e) {
+      return '';
     }
   };
 
-  setHighlightColor = line => {
-    return line.match(new RegExp(this.props.highlightInput, 'gi')) &&
-      this.props.highlightInput
-      ? { background: this.props.highlightColor }
-      : {};
+  itemRenderer = (lines, regex) => {
+    return (i, key) => {
+      return (
+        <LogLine
+          key={key}
+          index={i}
+          wrap={this.props.wrapLineOn ? 'true' : undefined}
+        >
+          {regex && this.hasMatch(lines[i], regex) ? (
+            <TextHighlightRegex
+              text={lines[i]}
+              color={this.props.highlightColor}
+              regex={regex}
+            />
+          ) : (
+            lines[i]
+          )}
+        </LogLine>
+      );
+    };
   };
 
   render() {
-    const lines = this.props.liveLines && this.createLineArray();
+    const lines =
+      this.props.liveLines &&
+      this.applyFilter(this.props.liveLines, this.props.filterInput);
+
+    const regexInput = this.parseRegexInput(
+      this.props.highlightInput,
+      this.state.escapeRegexPrefix
+    );
+
+    const regex = !regexInput ? undefined : new RegExp('(' + regexInput + ')');
+
     return (
-      <LogViewerSC.TextContainer ref={this.liveLinesContainer}>
-        <LogViewerSC.CloseFileButton
+      <LogViewContainer>
+        <CloseFileButton
           openFiles={this.props.openFiles}
           onClick={() => {
             closeFile(
@@ -52,15 +97,15 @@ class LogViewer extends React.Component {
             );
           }}
         />
-        {lines &&
-          lines.map((line, i) => {
-            return (
-              <p style={this.setHighlightColor(line)} key={i}>
-                {line}
-              </p>
-            );
-          })}
-      </LogViewerSC.TextContainer>
+        <Log>
+          <WindowedList
+            itemRenderer={this.itemRenderer(lines, regex)}
+            length={lines.length}
+            type="uniform"
+            ref={this.windowedList}
+          />
+        </Log>
+      </LogViewContainer>
     );
   }
 }
@@ -70,6 +115,7 @@ const mapStateToProps = state => {
     filterInput: state.topPanelReducer.filterInput,
     highlightInput: state.topPanelReducer.highlightInput,
     highlightColor: state.settingsReducer.highlightColor,
+    wrapLineOn: state.settingsReducer.wrapLineOn,
     liveLines: state.logViewerReducer.liveLines,
     nthLines: state.logViewerReducer.nthLines,
     tailSwitch: state.topPanelReducer.tailSwitch,
