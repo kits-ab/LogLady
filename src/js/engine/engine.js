@@ -60,8 +60,12 @@ const loadStateFromDisk = event => {
   fileReader
     .loadStateFromDisk()
     .then(_data => {
-      action.type = 'loadState';
-      action.data = _data;
+      if (JSON.parse(_data).menuReducer.openFiles.length < 1) {
+        sendErrorToFrontend(event, 'noReduxStateFile');
+      } else {
+        action.type = 'loadState';
+        action.data = _data;
+      }
       event.sender.send('backendMessages', action);
     })
     .catch(err => {
