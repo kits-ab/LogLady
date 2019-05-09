@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="shortcut icon" href="./src/resources/icon.ico" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
@@ -14,7 +14,7 @@
         background: #262626;
         height: 100%;
         margin: 0;
-        font-family: Menlo, 'Courier New', Courier, monospace;
+        font-family: Menlo, "Courier New", Courier, monospace;
         line-height: 1.5em;
       }
 
@@ -78,7 +78,7 @@
         background: transparent;
         border: solid 3px #ab0f78;
         border-radius: 0.3em;
-        font-family: 'Courier New', Courier, monospace;
+        font-family: "Courier New", Courier, monospace;
         cursor: pointer;
         font-size: 14px;
         font-weight: 600;
@@ -92,6 +92,32 @@
       .btn:hover {
         color: #e5e5e5;
         border: solid 3px #e5e5e5;
+      }
+
+      .download-btn {
+        padding: 0.9em 1.25em;
+        color: #ab0f78;
+        background: transparent;
+        border: solid 3px #ab0f78;
+        border-radius: 0.3em;
+        font-family: "Courier New", Courier, monospace;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 50px;
+        width: 220px;
+        text-align: center;
+        align-self: center;
+        margin-top: 50px;
+      }
+
+      .download-btn:hover {
+        color: #e5e5e5;
+        border: solid 3px #e5e5e5;
+      }
+
+      .download-btn:focus {
+        outline: none;
       }
 
       footer {
@@ -111,15 +137,31 @@
 
   <body>
     <div class="start-container">
-      <img class="logLady-logo" src="../src/resources/loglady.png" alt="Logo" />
+      <img class="logLady-logo" src="./src/resources/loglady.png" alt="Logo" />
 
       <div class="download-box">
         <p>
-          statements (why to use)
+          Making logs bearable again!
         </p>
-        <p>Download</p>
+        <button
+          class="download-btn"
+          id="download-btn"
+          onclick="downloadApplication()"
         >
-        <!-- kolla os och 'highlighta' os-spec nedladdningslänk (visa även de andra)-->
+          <script>
+            if (navigator.platform.startsWith("Mac")) {
+              document.getElementById("download-btn").innerHTML =
+                "Download for Mac";
+            } else if (navigator.platform.startsWith("Linux")) {
+              document.getElementById("download-btn").innerHTML =
+                "Download for Linux";
+            } else {
+              document.getElementById("download-btn").innerHTML =
+                "Download for Windows";
+            }
+          </script>
+        </button>
+
         <a
           href="https://github.com/kits-ab/LogLady/releases/download/v0.0.21-dark/loglady-1.0.0.dmg"
           >For mac
@@ -138,47 +180,31 @@
       <div class="info-what">
         <h3>What is LogLady?</h3>
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam. Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-          enim ad minim veniam.
+          LogLady is an open-source cross-platform application for managing
+          logfiles. Written in electron.js.
         </p>
-
-        <p>Electron, node, react</p>
-        <p>Cross-platform (mac, Linux, Windows)</p>
-        <p>Open source (gitHub)</p>
       </div>
       <div class="info-how">
         <h3>How to use</h3>
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam. Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-          enim ad minim veniam.
+          Simple download and install. Open file and let LogLady read it.
         </p>
         <video
           width="700"
           loop
           autoplay
           muted
-          src="../src/resources/loglady.mov"
+          src="./src/resources/loglady.mov"
           type="video/mp4"
         ></video>
 
-        <p>screenshot on features and some text</p>
         <p>You can follow the log in real time</p>
-        <img
-          class="img-follow"
-          src="../src/resources/Follow.png"
-          alt="Follow"
-        />
+        <img class="img-follow" src="./src/resources/Follow.png" alt="Follow" />
 
         <p>You can filter and highlight on whatever you want in your file</p>
         <img
           class="img-highlightAndFilter"
-          src="../src/resources/highlightAndFilter.png"
+          src="./src/resources/highlightAndFilter.png"
           alt="highlightAndFilter"
         />
       </div>
@@ -197,5 +223,10 @@
         <a href="https://github.com/kits-ab/LogLady/releases">Releases</a>
       </div>
     </footer>
+
+    <script>
+      console.log(window.navigator);
+      downloadApplication;
+    </script>
   </body>
 </html>
