@@ -42,9 +42,6 @@ describe('settingsReducer', () => {
 
     expect(settingsReducer(initialState, action)).toEqual(expectedState);
   });
-  it('should replace state ', () => {
-    //expect(settingsReducer()).toEqual(initialState);
-  });
   it('should toggle wrapLineOn ', () => {
     const expectedState = {
       ...initialState,
