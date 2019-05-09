@@ -6,20 +6,28 @@ class TextFieldInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      input: ''
+      input: this.props.value,
+      value: this.props.value
     };
   }
 
+  debounceOnChange = _.debounce(text => {
+    this.props.onTextChange && this.props.onTextChange(text);
+  }, this.props.debounce);
+
   handleOnChange = event => {
-    this.setState({
-      input: event.target.value
-    });
-    this.sendDispatch();
+    this.setState({ input: event.target.value });
+    this.debounceOnChange(event.target.value);
   };
 
-  sendDispatch = _.debounce(() => {
-    this.props.onChange(this.props.dispatch, this.state.input);
-  }, 222);
+  componentDidUpdate() {
+    if (this.state.value !== this.props.value) {
+      this.setState({
+        input: this.props.value,
+        value: this.props.value
+      });
+    }
+  }
 
   render() {
     return (

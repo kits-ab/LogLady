@@ -14,9 +14,7 @@ class TextHighlightRegex extends React.Component {
     return (
       <HighlightText color={this.props.color}>
         {groupByMatches(this.props.text, this.props.regex).map((x, i) => {
-          return x.group || x.group === ''
-            ? this.toHighlightElement(x.group, i)
-            : x;
+          return x.matched ? this.toHighlightElement(x.text, i) : x.text;
         })}
       </HighlightText>
     );
