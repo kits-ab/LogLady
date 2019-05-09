@@ -84,7 +84,9 @@ class LogViewer extends React.Component {
       this.state.escapeRegexPrefix
     );
 
-    const regex = !regexInput ? undefined : new RegExp('(' + regexInput + ')');
+    const regex = !regexInput
+      ? undefined
+      : new RegExp('(' + regexInput + ')', 'i');
 
     return (
       <LogViewContainer>
