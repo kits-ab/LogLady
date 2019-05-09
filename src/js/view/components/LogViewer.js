@@ -25,15 +25,16 @@ class LogViewer extends React.Component {
   };
 
   hasMatch = (line, regex) => {
-    return line.search(regex) !== -1;
+    return regex.test(line);
   };
 
-  scrollToBottom = () => {
-    this.windowedList.current.scrollAround(this.props.liveLines.length);
+  scrollToBottom = (el, list) => {
+    el.scrollAround(list.length);
   };
 
   componentDidUpdate() {
-    if (this.props.tailSwitch) this.scrollToBottom();
+    if (this.props.tailSwitch)
+      this.scrollToBottom(this.windowedList.current, this.props.liveLines);
   }
 
   parseRegexInput = (input, escapeRegexPrefix) => {
@@ -43,7 +44,6 @@ class LogViewer extends React.Component {
       return input
         .slice(escapeRegexPrefix.length)
         .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
     try {
       new RegExp(input);
       return input;

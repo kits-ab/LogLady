@@ -1,4 +1,4 @@
-const initialState = { liveLines: [], nthLines: '' };
+const initialState = { liveLines: [] };
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'clearLines':
@@ -10,11 +10,6 @@ export const logViewerReducer = (state = initialState, action) => {
       return {
         ...state,
         liveLines: [...state.liveLines, ...action.data.split('\n')]
-      };
-    case 'nthLines':
-      return {
-        ...state,
-        nthLines: action.data
       };
     default:
       return state;
