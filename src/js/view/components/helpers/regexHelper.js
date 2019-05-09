@@ -1,7 +1,6 @@
 /**
- * Returns an array of strings and matches grouped together (if they are adjacent) with order preserved
- * Grouped matches are in the form of an object with one field group { group: ''}
- * A returned array can look like the following ['The quick brown ', { group: 'fox something something' }, ' ran over something something']
+ * Returns an array of matched and unmatched objects (if they are adjacent) with order preserved
+ * A returned array can look like the following [{matched: false, text: 'The quick brown '},  {matched: true, text: ' jumped over the fox something something'}, {matched: false, text: ' and haha'}]
  * @param {string} string
  * @param {RegExp} regex
  */
@@ -19,11 +18,13 @@ export const groupByMatches = (string, regex) => {
 
     //if textBeforeMatch is '' it means there was no characters between this match and the previous match, so append it to the previous match
     if (!textBeforeMatch && array.length > 0) {
-      array[array.length - 1].group += match;
+      array[array.length - 1].text += match;
     } else if (match) {
       //normal text are strings and higlighted items are wrapped in an object so that we can see what text got highlighted later
-      array.push(textBeforeMatch);
-      array.push({ group: match });
+      if (textBeforeMatch)
+        array.push({ matched: false, text: textBeforeMatch });
+
+      array.push({ matched: true, text: match });
     } else {
       break; //can't do much if it matches ''
     }
@@ -33,7 +34,7 @@ export const groupByMatches = (string, regex) => {
   }
 
   //add the text after the last match
-  array.push(input.slice(0));
+  if (input) array.push({ matched: false, text: input });
 
   return array;
 };
