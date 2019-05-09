@@ -75,7 +75,6 @@ const sendErrorToFrontend = (event, err) => {
 };
 
 const saveRecentFilesToDisk = _recentFiles => {
-  console.log('inside engine.');
   fileReader.saveRecentFilesToDisk(_recentFiles);
 };
 

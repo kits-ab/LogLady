@@ -3,6 +3,7 @@ const { dialog } = require('electron');
 const engine = require('../engine/engine');
 
 let webContents;
+let recentFilesObject = [];
 
 const handleMenuItemClicked = (type, data) => {
   webContents.send('backendMessages', { type: `menu_${type}`, data: data });
@@ -21,7 +22,6 @@ const handleShowOpenDialog = () => {
   );
 };
 
-let recentFilesObject = [];
 const handleRecentFiles = filePath => {
   recentFilesObject = recentFilesObject.filter(file => {
     return file !== filePath;
@@ -30,8 +30,8 @@ const handleRecentFiles = filePath => {
   if (recentFilesObject.length > 3) {
     recentFilesObject.pop();
   }
-  createMenu();
   engine.saveRecentFilesToDisk(JSON.stringify(recentFilesObject));
+  createMenu();
 };
 
 const setRecentFiles = _recentFiles => {
@@ -150,7 +150,11 @@ const createMenu = () => {
       Menu.setApplicationMenu(createTemplate());
     })
     .catch(err => {
-      console.log('ERROR IN MENU: ', err);
+      let action = {};
+      action.type = 'backendError';
+      action.data = err;
+      webContents.send('backendMessages', action);
+      Menu.setApplicationMenu(createTemplate());
     });
 };
 

@@ -169,7 +169,6 @@ const loadStateFromDisk = () => {
 };
 
 const saveRecentFilesToDisk = _recentFiles => {
-  console.log('inside fileReader: ', _recentFiles);
   fs.writeFile(recentFiles(), _recentFiles, err => {
     if (err) {
       throw err;
