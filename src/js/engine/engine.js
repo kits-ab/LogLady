@@ -83,7 +83,7 @@ const loadRecentFilesFromDisk = () => {
 };
 
 ipcMain.on('frontendMessages', (event, _argObj) => {
-  switch (_argObj._function) {
+  switch (_argObj.function) {
     case 'liveLines':
       getLiveLines(event, _argObj);
       break;
