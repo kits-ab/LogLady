@@ -38,7 +38,11 @@ class LogViewer extends React.Component {
     const regexString = isEscapedRegexString(input, escapePrefix)
       ? escapeRegexString(input, escapePrefix)
       : input;
-    return createRegexOrUndefined(regexString, 'i');
+    try {
+      return new RegExp(regexString, 'i');
+    } catch (e) {
+      return undefined;
+    }
   };
 
   itemRenderer = (lines, regex) => {

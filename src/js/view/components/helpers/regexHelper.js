@@ -39,23 +39,10 @@ export const groupByMatches = (string, regex) => {
 };
 
 /**
- * Attempts to create and return a Regexp or returns undefined if it's a faulty RegExp
- * An empty string is considered a faulty RegExp
+ * Returns true if the string is considered escaped, and should be treated as normal text
  * @param {string} string
- * @param {string} options
+ * @param {string} escapePrefix
  */
-export const createRegexOrUndefined = (string, options) => {
-  if (!string) return undefined;
-
-  try {
-    let regex = new RegExp(string, options);
-    return regex;
-  } catch (e) {
-    //Treat invalid regexes as empty
-    return undefined;
-  }
-};
-
 export const isEscapedRegexString = (string, escapePrefix) => {
   return string.startsWith(escapePrefix);
 };
