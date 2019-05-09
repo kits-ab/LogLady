@@ -2,13 +2,15 @@
  * Returns an array of strings and matches grouped together (if they are adjacent) with order preserved
  * Grouped matches are in the form of an object with one field group { group: ''}
  * A returned array can look like the following ['The quick brown ', { group: 'fox something something' }, ' ran over something something']
- * @param {string} text
+ * @param {string} string
  * @param {RegExp} regex
  */
-export const groupByMatches = (text, regex) => {
+export const groupByMatches = (string, regex) => {
+  if (!regex) return [string];
+
   let array = [];
   let result;
-  let input = text;
+  let input = string;
 
   // read until no more matches
   while (input && (result = regex.exec(input))) {
@@ -34,4 +36,50 @@ export const groupByMatches = (text, regex) => {
   array.push(input.slice(0));
 
   return array;
+};
+
+/**
+ * Attempts to create and return a Regexp or returns undefined if it's a faulty RegExp
+ * An empty string is considered a faulty RegExp
+ * @param {string} string
+ * @param {string} options
+ */
+export const createRegexOrUndefined = (string, options) => {
+  if (!string) return undefined;
+
+  try {
+    let regex = new RegExp(string, options);
+    return regex;
+  } catch (e) {
+    //Treat invalid regexes as empty
+    return undefined;
+  }
+};
+
+export const isEscapedRegexString = (string, escapePrefix) => {
+  return string.startsWith(escapePrefix);
+};
+
+/**
+ * Removes escape prefix from string and escapes all special regex characters
+ * @param {string} string
+ * @param {string} escapePrefix
+ */
+export const escapeRegexString = (string, escapePrefix) => {
+  return string
+    .slice(escapePrefix.length)
+    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); //Escape all special characters
+};
+
+/**
+ * Filters each string in a list by a regex
+ * @param {string[]} strings
+ * @param {RegExp} regex
+ */
+export const filterByRegex = (strings, regex) => {
+  if (!regex) return strings;
+
+  return strings.filter(string => {
+    return regex.test(string);
+  });
 };

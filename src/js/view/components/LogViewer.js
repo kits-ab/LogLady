@@ -1,5 +1,4 @@
 import React from 'react';
-import { findMatches } from './helpers/lineFilterHelper';
 import {
   LogViewContainer,
   CloseFileButton,
@@ -10,23 +9,21 @@ import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
 import TextHighlightRegex from './TextHighlightRegex';
 import WindowedList from 'react-list';
+import {
+  createRegexOrUndefined,
+  isEscapedRegexString,
+  escapeRegexString,
+  filterByRegex
+} from 'js/view/components/helpers/regexHelper.js';
 
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
     this.windowedList = React.createRef();
     this.state = {
-      escapeRegexPrefix: '学生'
+      escapeRegexSequence: '@'
     };
   }
-
-  applyFilter = (lines, filter) => {
-    return !filter ? lines : findMatches(filter, lines);
-  };
-
-  hasMatch = (line, regex) => {
-    return regex.test(line);
-  };
 
   scrollToBottom = (el, list) => {
     el.scrollAround(list.length);
@@ -37,19 +34,11 @@ class LogViewer extends React.Component {
       this.scrollToBottom(this.windowedList.current, this.props.liveLines);
   }
 
-  parseRegexInput = (input, escapeRegexPrefix) => {
-    if (!input) return '';
-
-    if (input.startsWith(escapeRegexPrefix))
-      return input
-        .slice(escapeRegexPrefix.length)
-        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    try {
-      new RegExp(input);
-      return input;
-    } catch (e) {
-      return '';
-    }
+  parseRegex = (input, escapePrefix) => {
+    const regexString = isEscapedRegexString(input, escapePrefix)
+      ? escapeRegexString(input, escapePrefix)
+      : input;
+    return createRegexOrUndefined(regexString, 'i');
   };
 
   itemRenderer = (lines, regex) => {
@@ -60,7 +49,7 @@ class LogViewer extends React.Component {
           index={i}
           wrap={this.props.wrapLineOn ? 'true' : undefined}
         >
-          {regex && this.hasMatch(lines[i], regex) ? (
+          {regex && regex.test(lines[i], regex) ? (
             <TextHighlightRegex
               text={lines[i]}
               color={this.props.highlightColor}
@@ -75,16 +64,15 @@ class LogViewer extends React.Component {
   };
 
   render() {
-    const lines =
-      this.props.liveLines &&
-      this.applyFilter(this.props.liveLines, this.props.filterInput);
-
-    const regexInput = this.parseRegexInput(
+    const highlightRegex = this.parseRegex(
       this.props.highlightInput,
-      this.state.escapeRegexPrefix
+      this.state.escapeRegexSequence
     );
-
-    const regex = !regexInput ? undefined : new RegExp('(' + regexInput + ')');
+    const filterRegex = this.parseRegex(
+      this.props.filterInput,
+      this.state.escapeRegexSequence
+    );
+    const lines = filterByRegex(this.props.liveLines, filterRegex);
 
     return (
       <LogViewContainer>
@@ -99,7 +87,7 @@ class LogViewer extends React.Component {
         />
         <Log>
           <WindowedList
-            itemRenderer={this.itemRenderer(lines, regex)}
+            itemRenderer={this.itemRenderer(lines, highlightRegex)}
             length={lines.length}
             type="uniform"
             ref={this.windowedList}
