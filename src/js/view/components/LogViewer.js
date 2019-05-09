@@ -10,9 +10,8 @@ import { closeFile } from './helpers/handleFileHelper';
 import TextHighlightRegex from './TextHighlightRegex';
 import WindowedList from 'react-list';
 import {
-  isEscapedRegexString,
-  escapeRegexString,
-  filterByRegex
+  filterByRegex,
+  parseRegex
 } from 'js/view/components/helpers/regexHelper.js';
 
 class LogViewer extends React.Component {
@@ -32,19 +31,6 @@ class LogViewer extends React.Component {
     if (this.props.tailSwitch)
       this.scrollToBottom(this.windowedList.current, this.props.liveLines);
   }
-
-  parseRegex = (input, escapePrefix) => {
-    if (!input) return undefined;
-
-    const regexString = isEscapedRegexString(input, escapePrefix)
-      ? escapeRegexString(input, escapePrefix)
-      : input;
-    try {
-      return new RegExp(regexString, 'i');
-    } catch (e) {
-      return undefined;
-    }
-  };
 
   itemRenderer = (lines, regex) => {
     return (i, key) => {
@@ -69,11 +55,11 @@ class LogViewer extends React.Component {
   };
 
   render() {
-    const highlightRegex = this.parseRegex(
+    const highlightRegex = parseRegex(
       this.props.highlightInput,
       this.state.escapeRegexSequence
     );
-    const filterRegex = this.parseRegex(
+    const filterRegex = parseRegex(
       this.props.filterInput,
       this.state.escapeRegexSequence
     );

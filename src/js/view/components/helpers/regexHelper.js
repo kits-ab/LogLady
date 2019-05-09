@@ -45,7 +45,7 @@ export const groupByMatches = (string, regex) => {
  * @param {string} escapePrefix
  */
 export const isEscapedRegexString = (string, escapePrefix) => {
-  return string.startsWith(escapePrefix);
+  return string && escapePrefix && string.startsWith(escapePrefix);
 };
 
 /**
@@ -56,7 +56,7 @@ export const isEscapedRegexString = (string, escapePrefix) => {
 export const escapeRegexString = (string, escapePrefix) => {
   return string
     .slice(escapePrefix.length)
-    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); //Escape all special characters
+    .replace(/[.*+?^${}()=!:<>\-|[\]\\]/g, '\\$&'); //Escape all special characters
 };
 
 /**
@@ -70,4 +70,25 @@ export const filterByRegex = (strings, regex) => {
   return strings.filter(string => {
     return regex.test(string);
   });
+};
+
+/**
+ * Parses an input and creates a regex, the input can be escaped if the string starts with the escapePrefix
+ * If the input is empty or is unable to create a RegExp, undefined is returned
+ * The created RegExp is by default case insensitive
+ * @param {string} input
+ * @param {string} escapePrefix
+ */
+export const parseRegex = (input, escapePrefix) => {
+  const regexString = isEscapedRegexString(input, escapePrefix)
+    ? escapeRegexString(input, escapePrefix)
+    : input;
+
+  if (!regexString) return undefined;
+
+  try {
+    return new RegExp(regexString, 'i');
+  } catch (e) {
+    return undefined;
+  }
 };

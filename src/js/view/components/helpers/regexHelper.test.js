@@ -2,10 +2,10 @@ import {
   groupByMatches,
   isEscapedRegexString,
   escapeRegexString,
-  filterByRegex
+  parseRegex
 } from './regexHelper';
 
-describe('regex helper', () => {
+describe('groupByMatches', () => {
   it('should match the whole string', () => {
     const string = 'The quick brown fox jumps over the lazy dog.';
     const regex = /./;
@@ -44,18 +44,85 @@ describe('regex helper', () => {
 
     expect(groupByMatches(string, regex)).toEqual(expectedResult);
   });
+});
 
-  it('should show as escapedString', () => {
+describe('isEscapedRegexString', () => {
+  it('should show as escaped regex string when starting string with escape sequence', () => {
     const string = '@helloimnormaltext';
     const escapeSequence = '@';
 
     expect(isEscapedRegexString(string, escapeSequence)).toEqual(true);
   });
 
-  it('should show as nonescapedString', () => {
+  it('should not show as escaped regex string on empty escape sequence', () => {
+    const string = 'helloimnormaltext';
+    const escapeSequence = '';
+
+    expect(!!isEscapedRegexString(string, escapeSequence)).toEqual(false);
+  });
+
+  it('should not show as escaped regex string on wrong escape sequence', () => {
     const string = '@helloimnormaltext';
     const escapeSequence = '%';
 
     expect(isEscapedRegexString(string, escapeSequence)).toEqual(false);
+  });
+});
+
+describe('escapeRegexString', () => {
+  it('should escape regex characters and remove escapeSequence', () => {
+    const string = '@. \\ + * ? [ ^ ] $ ( ) { } = ! < > | : -';
+    const escapeSequence = '@';
+    const expectedResult =
+      '\\. \\\\ \\+ \\* \\? \\[ \\^ \\] \\$ \\( \\) \\{ \\} \\= \\! \\< \\> \\| \\: \\-';
+
+    expect(escapeRegexString(string, escapeSequence)).toEqual(expectedResult);
+  });
+});
+
+describe('parseRegex', () => {
+  it('should fail to create regex when supplied a faulty regex', () => {
+    const string = '\\';
+    const escapeSequence = '@';
+    const expectedResult = undefined;
+
+    expect(parseRegex(string, escapeSequence)).toEqual(expectedResult);
+  });
+
+  it('should succeed to create regex when supplied a simple regex', () => {
+    const string = 'asdSDFASDFnvnio';
+    const expectedResult = /asdSDFASDFnvnio/i;
+
+    expect(parseRegex(string, undefined)).toEqual(expectedResult);
+  });
+
+  it('should succeed to create regex when supplied an escaped faulty regex', () => {
+    const string = '@\\';
+    const escapeSequence = '@';
+    const expectedResult = /\\/i;
+
+    expect(parseRegex(string, escapeSequence)).toEqual(expectedResult);
+  });
+
+  it('should be case insensitive', () => {
+    const string = 'a';
+    const expectedResult = /a/i;
+
+    expect(parseRegex(string, undefined)).toEqual(expectedResult);
+  });
+
+  it('should fail to create regex when supplied an empty string', () => {
+    const string = '';
+    const expectedResult = undefined;
+
+    expect(parseRegex(string, undefined)).toEqual(expectedResult);
+  });
+
+  it('should fail to create regex when supplied only the escape sequence', () => {
+    const string = '@';
+    const escapeSequence = '@';
+    const expectedResult = undefined;
+
+    expect(parseRegex(string, escapeSequence)).toEqual(expectedResult);
   });
 });
