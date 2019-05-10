@@ -10,8 +10,8 @@ import { closeFile } from './helpers/handleFileHelper';
 import TextHighlightRegex from './TextHighlightRegex';
 import WindowedList from 'react-list';
 import {
-  filterByRegex,
-  parseRegex
+  filterByRegExp,
+  parseRegExp
 } from 'js/view/components/helpers/regexHelper.js';
 
 class LogViewer extends React.Component {
@@ -55,15 +55,15 @@ class LogViewer extends React.Component {
   };
 
   render() {
-    const highlightRegex = parseRegex(
+    const highlightRegex = parseRegExp(
       this.props.highlightInput,
       this.state.escapeRegexSequence
     );
-    const filterRegex = parseRegex(
+    const filterRegex = parseRegExp(
       this.props.filterInput,
       this.state.escapeRegexSequence
     );
-    const lines = filterByRegex(this.props.liveLines, filterRegex);
+    const lines = filterByRegExp(this.props.liveLines, filterRegex);
 
     return (
       <LogViewContainer>
