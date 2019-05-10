@@ -148,7 +148,7 @@ describe('parseRegExp', () => {
 });
 
 describe('filterByRegExp', () => {
-  test('should return matching word', () => {
+  it('should return matching word', () => {
     const regex = /hej/;
     const stringArray = ['hej', 'test', 'match', 'stop'];
 
