@@ -60,7 +60,7 @@ describe('isEscapedRegExpString', () => {
     const string = 'helloimnormaltext';
     const escapeSequence = '';
 
-    expect(!!isEscapedRegExpString(string, escapeSequence)).toEqual(false);
+    expect(isEscapedRegExpString(string, escapeSequence)).toEqual(false);
   });
 
   it('should not show as escaped regex string on wrong escape sequence', () => {
