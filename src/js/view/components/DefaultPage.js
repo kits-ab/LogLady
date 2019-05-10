@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from 'resources/log_lady3.png';
+import logo from 'resources/logdady_alpha.png';
 import {
   DefaultPageContainer,
   WelcomeText,

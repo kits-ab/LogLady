@@ -63,7 +63,7 @@ const createWindow = () => {
     y: mainWindowStateKeeper.y,
     width: mainWindowStateKeeper.width,
     height: mainWindowStateKeeper.height,
-    minWidth: 450,
+    minWidth: 575,
     minHeight: 145,
     darkTheme: true,
     webPreferences: {
@@ -77,8 +77,7 @@ const createWindow = () => {
     ...windowOptions,
     frame: false,
     transparent: true,
-    resizable: false,
-    backgroundColor: '#222'
+    resizable: false
   };
 
   let loadingWindow = new BrowserWindow(loadWindowOptions);
