@@ -6,7 +6,6 @@ const isDev = require('electron-is-dev');
 const updater = require('electron-simple-updater');
 const engine = require('../src/js/engine/engine');
 const menu = require('../src/js/electron/menu');
-const { Menu } = require('electron');
 const appConfig = require('electron-settings');
 
 updater.init();
@@ -112,7 +111,8 @@ const createWindow = () => {
     mainWindow = null;
     quitApplication();
   });
-  Menu.setApplicationMenu(menu.createMenu(mainWindow.webContents));
+  menu.setWebContents(mainWindow.webContents);
+  menu.createMenu();
 };
 
 app.on('ready', createWindow);
@@ -130,5 +130,5 @@ const quitApplication = () => {
 };
 
 module.exports = {
-  quitApplication: quitApplication
+  quitApplication
 };

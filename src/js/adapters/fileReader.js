@@ -9,6 +9,10 @@ const reduxStateFile = () => {
   return path.join(app.getPath('userData'), 'reduxState.json');
 };
 
+const recentFiles = () => {
+  return path.join(app.getPath('userData'), 'recentFiles.json');
+};
+
 const fileReaderEvents = new EventEmitter();
 let watchers = [];
 
@@ -164,6 +168,20 @@ const loadStateFromDisk = () => {
   return readFile(reduxStateFile());
 };
 
+const saveRecentFilesToDisk = _recentFiles => {
+  fs.writeFile(recentFiles(), _recentFiles, err => {
+    if (err) {
+      throw err;
+    }
+    console.log('LogLady: recent files have been succefully saved to disk.');
+    return 'success';
+  });
+};
+
+const loadRecentFilesFromDisk = () => {
+  return readFile(recentFiles());
+};
+
 module.exports = {
   readFile,
   readLastLines,
@@ -175,5 +193,7 @@ module.exports = {
   stopWatcher,
   saveStateToDisk,
   loadStateFromDisk,
-  formatLinesFromBuffer
+  formatLinesFromBuffer,
+  saveRecentFilesToDisk,
+  loadRecentFilesFromDisk
 };

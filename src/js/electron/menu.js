@@ -1,14 +1,12 @@
 const { Menu } = require('electron');
 const { dialog } = require('electron');
+const engine = require('../engine/engine');
 
-let ipc;
-
-const setIpc = _ipc => {
-  ipc = _ipc;
-};
+let webContents;
+let recentFilesObject = [];
 
 const handleMenuItemClicked = (type, data) => {
-  ipc.send('backendMessages', { type: `menu_${type}`, data: data });
+  webContents.send('backendMessages', { type: `menu_${type}`, data: data });
 };
 
 const handleShowOpenDialog = () => {
@@ -19,13 +17,32 @@ const handleShowOpenDialog = () => {
     filePath => {
       if (filePath === undefined) return;
       handleMenuItemClicked('open', filePath);
+      handleRecentFiles(filePath[0]);
     }
   );
 };
 
-const createMenu = ipc => {
-  // const menuItemClicked = handleMenuItemClicked(ipc);
-  setIpc(ipc);
+const handleRecentFiles = filePath => {
+  recentFilesObject = recentFilesObject.filter(file => {
+    return file !== filePath;
+  });
+  recentFilesObject.unshift(filePath);
+  if (recentFilesObject.length > 3) {
+    recentFilesObject.pop();
+  }
+  engine.saveRecentFilesToDisk(JSON.stringify(recentFilesObject));
+  createMenu();
+};
+
+const setRecentFiles = _recentFiles => {
+  recentFilesObject = JSON.parse(_recentFiles);
+};
+
+const getRecentFiles = () => {
+  return recentFilesObject;
+};
+
+const createTemplate = () => {
   const template = [
     {
       label: 'LogLady',
@@ -45,6 +62,12 @@ const createMenu = ipc => {
           click() {
             handleShowOpenDialog();
           }
+        },
+        {
+          label: 'Open recent...',
+          submenu: getRecentFiles().map(file => {
+            return { label: file };
+          })
         }
       ]
     },
@@ -115,7 +138,28 @@ const createMenu = ipc => {
   return Menu.buildFromTemplate(template);
 };
 
+const setWebContents = _webContents => {
+  webContents = _webContents;
+};
+
+const createMenu = () => {
+  engine
+    .loadRecentFilesFromDisk()
+    .then(_recentFiles => {
+      setRecentFiles(_recentFiles);
+      Menu.setApplicationMenu(createTemplate());
+    })
+    .catch(err => {
+      let action = {};
+      action.type = 'backendError';
+      action.data = err;
+      webContents.send('backendMessages', action);
+      Menu.setApplicationMenu(createTemplate());
+    });
+};
+
 module.exports = {
-  createMenu: createMenu,
-  handleShowOpenDialog: handleShowOpenDialog
+  handleShowOpenDialog,
+  setWebContents,
+  createMenu
 };
