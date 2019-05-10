@@ -3,6 +3,7 @@ import {
   isEscapedRegExpString,
   escapeRegExpString,
   parseRegExp,
+  filterByRegExp,
   removeRegExpEscapeSequence
 } from './regexHelper';
 
@@ -143,5 +144,14 @@ describe('parseRegExp', () => {
     const expectedResult = undefined;
 
     expect(parseRegExp(string, escapeSequence)).toEqual(expectedResult);
+  });
+});
+
+describe('filterByRegExp', () => {
+  test('should return matching word', () => {
+    const regex = /hej/;
+    const stringArray = ['hej', 'test', 'match', 'stop'];
+
+    expect(filterByRegExp(stringArray, regex)).toEqual(['hej']);
   });
 });
