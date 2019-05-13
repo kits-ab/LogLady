@@ -77,8 +77,7 @@ const createTemplate = () => {
       submenu: [
         isDev
           ? {
-              role: 'reload',
-              accelerator: 'CmdOrCtrl+R'
+              role: 'reload'
             }
           : {
               role: 'reload',
@@ -87,9 +86,7 @@ const createTemplate = () => {
             },
         isDev
           ? {
-              role: 'toggleDevTools',
-              accelerator:
-                process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I'
+              role: 'toggleDevTools'
             }
           : {
               role: 'toggleDevTools',
