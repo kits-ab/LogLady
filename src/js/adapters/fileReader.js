@@ -14,6 +14,7 @@ const recentFiles = () => {
 };
 
 const fileReaderEvents = new EventEmitter();
+fileReaderEvents.removeAllListeners('liveLines');
 let watchers = [];
 
 const readLastLines = (filePath, numberOfLines) => {
@@ -70,10 +71,14 @@ const startWatcher = (filePath, lastNewlineIndex) => {
 
 const stopWatcher = filePath => {
   try {
-    watchers[filePath].close();
-    delete watchers[filePath];
-    fileReaderEvents.removeAllListeners('liveLines');
-    return 'successfully closed'; //if we want to send a confirmation to the frontend.
+    if (filePath === 'initializing') {
+      fileReaderEvents.removeAllListeners('liveLines');
+    } else {
+      watchers[filePath].close();
+      delete watchers[filePath];
+      fileReaderEvents.removeAllListeners('liveLines');
+      return `successfully closed watcher on file ${filePath}`; //if we want to send a confirmation to the frontend.
+    }
   } catch (err) {
     return err;
   }
