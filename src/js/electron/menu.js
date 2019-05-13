@@ -1,6 +1,7 @@
 const { Menu } = require('electron');
 const { dialog } = require('electron');
 const engine = require('../engine/engine');
+const isDev = require('electron-is-dev');
 
 let webContents;
 let recentFilesObject = [];
@@ -74,24 +75,23 @@ const createTemplate = () => {
     {
       label: 'View',
       submenu: [
-        {
-          label: 'Reload',
-          accelerator: 'CmdOrCtrl+R',
-          click(item, focusedWindow) {
-            if (focusedWindow) focusedWindow.reload();
-          }
-        },
-        {
-          label: 'Toggle Developer Tools',
-          accelerator:
-            process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-          click(item, focusedWindow) {
-            if (focusedWindow) focusedWindow.webContents.toggleDevTools();
-          }
-        },
-        {
-          type: 'separator'
-        },
+        isDev
+          ? {
+              role: 'reload'
+            }
+          : {
+              role: 'reload',
+              visible: false,
+              enabled: false
+            },
+        isDev
+          ? {
+              role: 'toggleDevTools'
+            }
+          : {
+              role: 'toggleDevTools',
+              visible: false
+            },
         {
           role: 'resetzoom'
         },
