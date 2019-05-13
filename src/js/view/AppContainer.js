@@ -8,7 +8,7 @@ import { loadStateFromDisk, setStore } from './configurations/configureStore';
 const React = require('react');
 
 const store = createStore(reducers);
-ipcListener(store.dispatch);
+ipcListener(store);
 setStore(store);
 loadStateFromDisk();
 
