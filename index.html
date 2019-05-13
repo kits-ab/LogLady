@@ -29,9 +29,11 @@
       .start-container {
         display: flex;
         flex-direction: row;
-        justify-content: center;
         height: 600px;
         color: #ccc;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
       }
 
       .content-container {
@@ -40,31 +42,25 @@
         justify-content: center;
         background: #ccc;
         color: #222;
+        width: 100%;
       }
 
       .logLady-logo {
         width: 550px;
         align-self: center;
-        margin-right: 50px;
       }
-
-      .download-box {
-        width: 400px;
-        align-self: center;
-      }
-
       .info-what {
         width: 700px;
         align-self: center;
       }
 
       .info-how {
-        width: 700px;
         align-self: center;
+        width: 700px;
       }
 
       .img-highlightAndFilter {
-        width: 400px;
+        width: 100%;
         margin-bottom: 60px;
       }
       .img-follow {
@@ -138,14 +134,41 @@
         justify-content: space-evenly;
         margin-bottom: 30px;
       }
+
+      @media screen and (max-width: 800px) and (min-width: 300px) {
+        .start-container {
+          flex-flow: row wrap;
+          height: 100%;
+        }
+
+        .logLady-logo {
+          width: 100%;
+          margin-bottom: -50px;
+        }
+
+        .info-what {
+          width: 90%;
+          padding: 0px 15px;
+        }
+
+        .info-how {
+          width: 90%;
+          padding: 0px 15px;
+        }
+
+        .download-text {
+          width: 90%;
+          text-align: center;
+          margin-bottom: 50px;
+        }
+      }
     </style>
   </head>
 
   <body>
     <div class="start-container">
       <img class="logLady-logo" src="./src/resources/loglady.png" alt="Logo" />
-
-      <div class="download-box">
+      <div class="download-text ">
         <p>
           Making logs bearable!
         </p>
@@ -194,7 +217,8 @@
           Simple download and install. Open file and let LogLady read it.
         </p>
         <video
-          width="700"
+          width="100%"
+          playsinline
           loop
           autoplay
           muted
@@ -227,7 +251,5 @@
         <a href="https://github.com/kits-ab/LogLady/releases">Releases</a>
       </div>
     </footer>
-
-    <script></script>
   </body>
 </html>
