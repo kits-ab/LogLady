@@ -9,7 +9,8 @@ import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
 import {
   calculateSize,
-  calculateWrap
+  calculateWrap,
+  maxLength
 } from 'js/view/components/helpers/measureHelper';
 import TextHighlightRegex from './TextHighlightRegex';
 import WindowedList from 'react-list';
@@ -39,6 +40,8 @@ class LogViewer extends React.Component {
       this.scrollToBottom(this.windowedListRef.current);
     }
   }
+
+  updateSizes() {}
 
   itemRenderer = (lineWidth, lines, regex) => {
     return (i, key) => {
@@ -82,31 +85,26 @@ class LogViewer extends React.Component {
     const lines = filterByRegExp(this.props.liveLines, filterRegex);
 
     this.lastIndex = lines.length - 1;
+
     let charSize = [0, 0];
+
     if (this.rulerRef.current) {
       charSize = calculateSize('a', this.rulerRef.current);
     }
-    let lineWidth = 0;
-    let itemSizeGetter;
+
+    let lineWidth = this.logRef.current
+      ? this.logRef.current.clientWidth
+      : maxLength(lines) * charSize[0];
+
+    let itemSizeGetter = () => {
+      return charSize[0];
+    };
+
     if (this.props.wrapLineOn) {
       const sizes = lines.map(line => {
         return calculateWrap(charSize, line, this.logRef.current.clientWidth);
       });
       itemSizeGetter = this.itemSizeGetter(sizes);
-    } else {
-      itemSizeGetter = () => {
-        return charSize[0];
-      };
-    }
-
-    if (this.props.wrapLineOn && this.rulerRef.current) {
-      lineWidth = this.logRef.current.clientWidth;
-    } else if (this.rulerRef.current) {
-      let maxStringLength = lines.reduce((max, next) => {
-        return max > next.length ? max : next.length;
-      }, 0);
-
-      lineWidth = maxStringLength * charSize[1];
     }
 
     const itemRenderer = this.itemRenderer(lineWidth, lines, highlightRegex);
