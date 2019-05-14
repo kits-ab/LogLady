@@ -5,6 +5,11 @@ const { EventEmitter } = require('events');
 const app = require('electron').app;
 const path = require('path');
 
+let watchers = [];
+
+const fileReaderEvents = new EventEmitter();
+fileReaderEvents.removeAllListeners('liveLines');
+
 const reduxStateFile = () => {
   return path.join(app.getPath('userData'), 'reduxState.json');
 };
@@ -12,10 +17,6 @@ const reduxStateFile = () => {
 const recentFiles = () => {
   return path.join(app.getPath('userData'), 'recentFiles.json');
 };
-
-const fileReaderEvents = new EventEmitter();
-fileReaderEvents.removeAllListeners('liveLines');
-let watchers = [];
 
 const readLastLines = (filePath, numberOfLines) => {
   return lastLines.read(filePath, numberOfLines).catch(err => {
@@ -53,6 +54,9 @@ const formatLinesFromBuffer = _buffer => {
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
 const startWatcher = (filePath, lastNewlineIndex) => {
+  if (watchers[filePath] !== undefined) {
+    watchers[filePath].close();
+  }
   let watcher = fs.watch(filePath, (event, filename) => {
     let readStreamFromLastIndex = fs
       .createReadStream(filePath, {
@@ -62,7 +66,6 @@ const startWatcher = (filePath, lastNewlineIndex) => {
     readStreamFromLastIndex.on('data', buffer => {
       lastNewlineIndex += buffer.lastIndexOf('\n');
       let lines = formatLinesFromBuffer(buffer);
-      // console.log(lines);
       fileReaderEvents.emit('liveLines', lines);
     });
   });
