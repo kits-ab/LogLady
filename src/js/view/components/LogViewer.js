@@ -66,9 +66,18 @@ class LogViewer extends React.Component {
     };
   };
 
-  itemSizeGetter = sizes => {
+  itemSizeGetter = (lines, charSize, clientWidth) => {
+    const sizes = lines.map(line => {
+      return calculateWrap(charSize, line, clientWidth);
+    });
     return index => {
       return sizes[index];
+    };
+  };
+
+  constItemSizeGetter = size => {
+    return index => {
+      return size;
     };
   };
 
@@ -86,26 +95,18 @@ class LogViewer extends React.Component {
 
     this.lastIndex = lines.length - 1;
 
-    let charSize = [0, 0];
+    const charSize = this.rulerRef.current
+      ? calculateSize('a', this.rulerRef.current)
+      : [0, 0];
 
-    if (this.rulerRef.current) {
-      charSize = calculateSize('a', this.rulerRef.current);
-    }
+    const lineWidth =
+      this.logRef.current && this.props.wrapLineOn
+        ? this.logRef.current.clientWidth
+        : maxLength(lines) * charSize[1];
 
-    let lineWidth = this.logRef.current
-      ? this.logRef.current.clientWidth
-      : maxLength(lines) * charSize[0];
-
-    let itemSizeGetter = () => {
-      return charSize[0];
-    };
-
-    if (this.props.wrapLineOn) {
-      const sizes = lines.map(line => {
-        return calculateWrap(charSize, line, this.logRef.current.clientWidth);
-      });
-      itemSizeGetter = this.itemSizeGetter(sizes);
-    }
+    const itemSizeGetter = this.props.wrapLineOn
+      ? this.itemSizeGetter(lines, charSize, this.logRef.current.clientWidth)
+      : this.constItemSizeGetter(charSize[0]);
 
     const itemRenderer = this.itemRenderer(lineWidth, lines, highlightRegex);
 
