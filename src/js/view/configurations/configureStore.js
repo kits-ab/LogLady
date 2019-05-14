@@ -1,46 +1,56 @@
 import { sendRequestToBackend } from '../ipcPublisher';
 
-let argObj = {};
-let store;
-
-export const saveStateToDisk = () => {
-  let _state = store.getState();
-  delete _state.logInfoReducer;
-  delete _state.logViewerReducer;
-  argObj.function = 'saveState';
-  argObj.reduxStateValue = JSON.stringify(_state);
-  sendRequestToBackend(argObj);
-};
-
-export const loadStateFromDisk = () => {
-  argObj.function = 'loadState';
-  sendRequestToBackend(argObj);
-};
-
-export const setStore = _store => {
-  store = _store;
-};
-
-export const populateStore = _savedStates => {
-  Object.entries(_savedStates).forEach(_reducer => {
-    store.dispatch({
-      type: `${_reducer[0]}Restore`,
-      data: _reducer[1]
+export const configureStore = (store, send = sendRequestToBackend) => {
+  const saveStateToDisk = () => {
+    let _state = store.getState();
+    delete _state.logInfoReducer;
+    delete _state.logViewerReducer;
+    sendRequestToBackend({
+      function: 'saveState',
+      reduxStateValue: JSON.stringify(_state)
     });
-    if (_reducer[0] === 'menuReducer') {
-      initializeOpenFile(_reducer[1].openFiles[0]);
-    }
-  });
-};
+  };
 
-export const initializeOpenFile = filePath => {
-  argObj.filePath = filePath;
-  argObj.numberOfLines = 5;
-  argObj.lineNumber = 10;
-  argObj.function = 'liveLines';
-  sendRequestToBackend(argObj);
-  argObj.function = 'numberOfLines';
-  sendRequestToBackend(argObj);
-  argObj.function = 'fileSize';
-  sendRequestToBackend(argObj);
+  const loadStateFromDisk = () => {
+    sendRequestToBackend({ function: 'loadState' });
+  };
+
+  const populateStore = _savedStates => {
+    Object.entries(_savedStates).forEach(_reducer => {
+      store.dispatch({
+        type: `${_reducer[0]}Restore`,
+        data: _reducer[1]
+      });
+      if (_reducer[0] === 'menuReducer') {
+        initializeOpenFile(_reducer[1].openFiles[0]);
+      }
+    });
+  };
+
+  const initializeOpenFile = filePath => {
+    const args = {
+      filePath,
+      numberOfLines: 5,
+      lineNumber: 10
+    };
+    sendRequestToBackend({
+      ...args,
+      function: 'liveLines'
+    });
+    sendRequestToBackend({
+      ...args,
+      function: 'numberOfLines'
+    });
+    sendRequestToBackend({
+      ...args,
+      function: 'fileSize'
+    });
+  };
+
+  return {
+    saveStateToDisk,
+    loadStateFromDisk,
+    populateStore,
+    initializeOpenFile
+  };
 };

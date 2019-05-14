@@ -4,13 +4,14 @@ import reducers from './reducers/index.js';
 import { ipcListener } from './ipcListener';
 import * as ipcPublisher from './ipcPublisher';
 import App from './App';
-import { loadStateFromDisk, setStore } from './configurations/configureStore';
+import { configureStore } from './configurations/configureStore';
 const React = require('react');
 
 const store = createStore(reducers);
-ipcListener(store.dispatch);
-setStore(store);
-loadStateFromDisk();
+const publisher = configureStore(store);
+ipcListener(store.dispatch, publisher);
+
+publisher.loadStateFromDisk();
 
 class AppContainer extends React.Component {
   render() {
