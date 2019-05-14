@@ -7,6 +7,10 @@ import {
 } from '../styledComponents/LogViewerStyledComponents';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
+import {
+  calculateSize,
+  calculateWrap
+} from 'js/view/components/helpers/measureHelper';
 import TextHighlightRegex from './TextHighlightRegex';
 import WindowedList from 'react-list';
 import {
@@ -17,27 +21,32 @@ import {
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.windowedList = React.createRef();
+    this.logRef = React.createRef();
+    this.windowedListRef = React.createRef();
+    this.rulerRef = React.createRef();
     this.state = {
       escapeRegexSequence: '@'
     };
   }
 
-  scrollToBottom = (el, list) => {
-    el.scrollAround(list.length);
+  scrollToBottom = el => {
+    el.scrollAround(this.lastIndex);
   };
 
   componentDidUpdate() {
-    if (this.props.tailSwitch)
-      this.scrollToBottom(this.windowedList.current, this.props.liveLines);
+    if (this.props.tailSwitch) {
+      // this.scrollToBottom(this.logRef.current);
+      this.scrollToBottom(this.windowedListRef.current);
+    }
   }
 
-  itemRenderer = (lines, regex) => {
+  itemRenderer = (lineWidth, lines, regex) => {
     return (i, key) => {
       return (
         <LogLine
           key={key}
           index={i}
+          fixedWidth={lineWidth}
           wrap={this.props.wrapLineOn ? 'true' : undefined}
         >
           {regex && regex.test(lines[i], regex) ? (
@@ -54,6 +63,12 @@ class LogViewer extends React.Component {
     };
   };
 
+  itemSizeGetter = sizes => {
+    return index => {
+      return sizes[index];
+    };
+  };
+
   render() {
     const highlightRegex = parseRegExp(
       this.props.highlightInput,
@@ -63,7 +78,38 @@ class LogViewer extends React.Component {
       this.props.filterInput,
       this.state.escapeRegexSequence
     );
+
     const lines = filterByRegExp(this.props.liveLines, filterRegex);
+
+    this.lastIndex = lines.length - 1;
+    let charSize = [0, 0];
+    if (this.rulerRef.current) {
+      charSize = calculateSize('a', this.rulerRef.current);
+    }
+    let lineWidth = 0;
+    let itemSizeGetter;
+    if (this.props.wrapLineOn) {
+      const sizes = lines.map(line => {
+        return calculateWrap(charSize, line, this.logRef.current.clientWidth);
+      });
+      itemSizeGetter = this.itemSizeGetter(sizes);
+    } else {
+      itemSizeGetter = () => {
+        return charSize[0];
+      };
+    }
+
+    if (this.props.wrapLineOn && this.rulerRef.current) {
+      lineWidth = this.logRef.current.clientWidth;
+    } else if (this.rulerRef.current) {
+      let maxStringLength = lines.reduce((max, next) => {
+        return max > next.length ? max : next.length;
+      }, 0);
+
+      lineWidth = maxStringLength * charSize[1];
+    }
+
+    const itemRenderer = this.itemRenderer(lineWidth, lines, highlightRegex);
 
     return (
       <LogViewContainer>
@@ -76,12 +122,21 @@ class LogViewer extends React.Component {
             );
           }}
         />
-        <Log>
+        <Log ref={this.logRef}>
+          <LogLine
+            style={{
+              visibility: 'hidden',
+              minWidth: 0,
+              display: 'inline-block'
+            }}
+            ref={this.rulerRef}
+          />
           <WindowedList
-            itemRenderer={this.itemRenderer(lines, highlightRegex)}
+            ref={this.windowedListRef}
+            itemRenderer={itemRenderer}
+            itemSizeGetter={itemSizeGetter}
             length={lines.length}
-            type="uniform"
-            ref={this.windowedList}
+            type="variable"
           />
         </Log>
       </LogViewContainer>

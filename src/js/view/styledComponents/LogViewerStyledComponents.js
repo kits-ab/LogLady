@@ -16,7 +16,6 @@ export const Log = styled.div`
   min-width: 100%;
   overflow: auto;
   div {
-    display: inline-block;
     min-width: 100%;
   }
 `;
@@ -31,13 +30,17 @@ export const LogLine = styled.div`
           .hex();
   }};
   ${props => {
+    return props.fixedWidth ? 'width: ' + props.fixedWidth + 'px;' : '';
+  }}
+  ${props => {
     return props.wrap
       ? `
-    overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-all;`
       : 'white-space: nowrap;';
   }};
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
 `;
 
 export const CloseFileButton = styled.button`
