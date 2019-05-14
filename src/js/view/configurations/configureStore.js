@@ -5,14 +5,14 @@ export const configureStore = (store, send = sendRequestToBackend) => {
     let _state = store.getState();
     delete _state.logInfoReducer;
     delete _state.logViewerReducer;
-    sendRequestToBackend({
+    send({
       function: 'saveState',
       reduxStateValue: JSON.stringify(_state)
     });
   };
 
   const loadStateFromDisk = () => {
-    sendRequestToBackend({ function: 'loadState' });
+    send({ function: 'loadState' });
   };
 
   const populateStore = _savedStates => {
@@ -33,18 +33,15 @@ export const configureStore = (store, send = sendRequestToBackend) => {
       numberOfLines: 5,
       lineNumber: 10
     };
-    sendRequestToBackend({
+    send({
       ...args,
       function: 'liveLines'
     });
-    sendRequestToBackend({
+    send({
       ...args,
       function: 'numberOfLines'
     });
-    sendRequestToBackend({
-      ...args,
-      function: 'fileSize'
-    });
+    send({ ...args, function: 'fileSize' });
   };
 
   return {
