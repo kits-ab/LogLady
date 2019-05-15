@@ -17,11 +17,11 @@ class LogViewer extends React.Component {
   }
 
   render() {
-    const highlightRegex = parseRegExp(
+    const highlightRegExp = parseRegExp(
       this.props.highlightInput,
       this.state.escapeRegexSequence
     );
-    const filterRegex = parseRegExp(
+    const filterRegExp = parseRegExp(
       this.props.filterInput,
       this.state.escapeRegexSequence
     );
@@ -42,8 +42,8 @@ class LogViewer extends React.Component {
           wrapLines={this.props.wrapLineOn}
           scrollToBottom={this.props.tailSwitch}
           lines={this.props.liveLines}
-          highlightRegex={highlightRegex}
-          filterRegex={filterRegex}
+          highlightRegExp={highlightRegExp}
+          filterRegExp={filterRegExp}
         />
       </LogViewerContainer>
     );

@@ -8,64 +8,128 @@ import {
   calculateWrap,
   maxLength
 } from 'js/view/components/helpers/measureHelper';
+import _ from 'lodash';
 import TextHighlightRegex from './TextHighlightRegex';
 import WindowedList from 'react-list';
 import { filterByRegExp } from 'js/view/components/helpers/regexHelper.js';
+import { CachedTransformedList } from 'js/view/components/helpers/cacheHelper.js';
 
-class LogViewer extends React.Component {
+class LogViewerList extends React.Component {
   constructor(props) {
     super(props);
     this.logRef = React.createRef();
     this.windowedListRef = React.createRef();
     this.rulerRef = React.createRef();
+
+    const filterLines = (lines, { regex }) => {
+      return regex ? filterByRegExp(lines, regex) : lines;
+    };
+
+    const calculateSizes = (lines, { charSize, clientWidth }) => {
+      return lines.map(line => {
+        return calculateWrap(line, charSize, clientWidth);
+      });
+    };
+
+    this.state = {
+      cachedCharSize: [0, 0],
+      cachedLines: new CachedTransformedList(filterLines),
+      cachedLineHeights: new CachedTransformedList(calculateSizes)
+    };
   }
 
-  scrollToBottom = el => {
-    el.scrollAround(this.lastIndex);
-  };
+  componentDidMount() {
+    const cachedCharSize = calculateSize('W', this.rulerRef.current);
+
+    this.setState({
+      cachedCharSize: cachedCharSize
+    });
+
+    window.addEventListener('resize', this.debounceRefreshCachedLineHeights);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.debounceRefreshCachedLineHeights);
+  }
 
   componentDidUpdate() {
     if (this.props.scrollToBottom) {
-      this.scrollToBottom(this.windowedListRef.current);
+      this.scrollToBottom(
+        this.windowedListRef.current,
+        this.state.cachedLines.get().length - 1
+      );
     }
   }
 
-  componentWillUpdate() {}
+  componentWillUpdate(nextProps, nextState) {
+    const lines = nextProps.lines;
+    const charSize = nextState.cachedCharSize;
+    const clientWidth = this.logRef.current.clientWidth;
+    const filterArgs = { regex: nextProps.filterRegExp };
+    const sizeArgs = { charSize, clientWidth };
 
-  itemSizeGetter = (lines, charSize, clientWidth) => {
-    const sizes = lines.map(line => {
-      return calculateWrap(charSize, line, clientWidth);
-    });
+    if (this.props.filterRegExp !== nextProps.filterRegExp) {
+      this.refreshCaches(lines, filterArgs, sizeArgs);
+    } else {
+      this.updateCaches(lines, filterArgs, sizeArgs);
+    }
+  }
+
+  scrollToBottom = (el, index) => {
+    el.scrollAround(index);
+  };
+
+  updateCaches = (lines, filterArgs, sizeArgs) => {
+    this.state.cachedLines.update(lines, filterArgs);
+    this.state.cachedLineHeights.update(lines, sizeArgs);
+  };
+
+  debounceRefreshCachedLineHeights = _.debounce(() => {
+    const charSize = this.state.cachedCharSize;
+    const clientWidth = this.logRef.current.clientWidth;
+    const cachedLines = this.state.cachedLines;
+    const cachedLineHeights = this.state.cachedLineHeights;
+
+    cachedLineHeights.reset();
+    cachedLineHeights.update(cachedLines.get(), { charSize, clientWidth });
+  }, 222);
+
+  refreshCaches = (lines, filterArgs, sizeArgs) => {
+    const cachedLines = this.state.cachedLines;
+    const cachedLineHeights = this.state.cachedLineHeights;
+
+    cachedLines.reset();
+    cachedLineHeights.reset();
+    cachedLines.update(lines, filterArgs);
+    cachedLineHeights.update(cachedLines.get(), sizeArgs);
+  };
+
+  wrapItemSizeGetter = sizes => {
     return index => {
       return sizes[index];
     };
   };
 
-  constItemSizeGetter = size => {
+  noWrapItemSizeGetter = size => {
     return index => {
       return size;
     };
   };
 
   render() {
-    const lines = filterByRegExp(this.props.lines, this.props.filterRegex);
-
-    this.lastIndex = lines.length - 1;
-    const highlightRegex = this.props.highlightRegex;
+    const highlightRegExp = this.props.highlightRegExp;
     const wrapLines = this.props.wrapLines;
     const highlightColor = this.props.highlightColor;
-    const charSize = this.rulerRef.current
-      ? calculateSize('a', this.rulerRef.current)
-      : [0, 0];
-
+    const lines = this.state.cachedLines.get();
+    const sizes = this.state.cachedLineHeights.get();
     const lineWidth =
       this.logRef.current && this.props.wrapLines
         ? this.logRef.current.clientWidth
-        : maxLength(lines) * charSize[1];
+        : maxLength(lines) * this.state.cachedCharSize[1];
 
     const itemSizeGetter = this.props.wrapLines
-      ? this.itemSizeGetter(lines, charSize, this.logRef.current.clientWidth)
-      : this.constItemSizeGetter(charSize[0]);
+      ? this.wrapItemSizeGetter(sizes)
+      : this.noWrapItemSizeGetter(this.state.cachedCharSize[0]);
 
     return (
       <LogViewerListContainer ref={this.logRef}>
@@ -89,11 +153,11 @@ class LogViewer extends React.Component {
                 fixedHeight={itemSizeGetter(i)}
                 wrap={wrapLines ? 'true' : undefined}
               >
-                {highlightRegex && highlightRegex.test(lines[i]) ? (
+                {highlightRegExp && highlightRegExp.test(lines[i]) ? (
                   <TextHighlightRegex
                     text={lines[i]}
                     color={highlightColor}
-                    regex={highlightRegex}
+                    regex={highlightRegExp}
                   />
                 ) : (
                   lines[i]
@@ -110,4 +174,4 @@ class LogViewer extends React.Component {
   }
 }
 
-export default LogViewer;
+export default LogViewerList;
