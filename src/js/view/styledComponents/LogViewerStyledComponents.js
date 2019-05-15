@@ -1,7 +1,6 @@
 import styled from 'styled-components';
-import Color from 'color';
 
-export const LogViewContainer = styled.div`
+export const LogViewerContainer = styled.div`
   display: flex;
   flex: 1;
   border: 1px solid white;
@@ -10,37 +9,6 @@ export const LogViewContainer = styled.div`
   max-height: 100%;
   overflow-anchor: none;
   min-width: 0;
-`;
-
-export const Log = styled.div`
-  min-width: 100%;
-  overflow: auto;
-  div {
-    min-width: 100%;
-  }
-`;
-
-export const LogLine = styled.div`
-  background: ${props => {
-    const color = '#444';
-    return props.index & 1
-      ? color
-      : Color(color)
-          .darken(0.3)
-          .hex();
-  }};
-  ${props => {
-    return props.fixedWidth ? 'width: ' + props.fixedWidth + 'px;' : '';
-  }}
-  ${props => {
-    return props.wrap
-      ? `
-    word-wrap: break-word;
-    word-break: break-all;`
-      : 'white-space: nowrap;';
-  }};
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
 `;
 
 export const CloseFileButton = styled.button`
