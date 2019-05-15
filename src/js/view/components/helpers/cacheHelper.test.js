@@ -14,7 +14,7 @@ describe('CachedTransformedList', () => {
       const array = ['a', 'b', 'c'];
       const expectedResult = ['a', 'b', 'c'];
 
-      list.update(array);
+      list.diffAppend(array);
 
       expect(list.get()).toEqual(expectedResult);
     });
@@ -27,20 +27,20 @@ describe('CachedTransformedList', () => {
       const array = ['a', 'b', 'c'];
       const expectedResult = ['b', 'c'];
 
-      list.update(array);
+      list.diffAppend(array);
 
       expect(list.get()).toEqual(expectedResult);
     });
   });
 
-  describe('update', () => {
+  describe('diffAppend', () => {
     it('should append new elements', () => {
       const list = new CachedTransformedList();
-      list.update(['a']);
+      list.diffAppend(['a']);
       expect(list.get()).toEqual(['a']);
-      list.update(['a', 'b']);
+      list.diffAppend(['a', 'b']);
       expect(list.get()).toEqual(['a', 'b']);
-      list.update(['a', 'b', 'c']);
+      list.diffAppend(['a', 'b', 'c']);
       expect(list.get()).toEqual(['a', 'b', 'c']);
     });
     it('should apply function', () => {
@@ -55,7 +55,7 @@ describe('CachedTransformedList', () => {
       const array = [false, true, false, false, true];
       const expectedResult = f(array); // [true, true]
 
-      list.update(array);
+      list.diffAppend(array);
       expect(list.get()).toEqual(expectedResult);
     });
 
@@ -71,7 +71,7 @@ describe('CachedTransformedList', () => {
       const expectedResult = [2, 3, 4, 5, 6, 5, 4, 1000];
 
       array.forEach((_, i) => {
-        list.update(array.slice(0, i + 1));
+        list.diffAppend(array.slice(0, i + 1));
       });
 
       expect(list.get()).toEqual(expectedResult);
@@ -89,7 +89,7 @@ describe('CachedTransformedList', () => {
       const array = ['a', 'b', 'c', 'a', 'b', 'a', 'c', 'c', 'b'];
 
       array.forEach((_, i) => {
-        list.update(array.slice(0, i + 1));
+        list.diffAppend(array.slice(0, i + 1));
       });
 
       const expectedResult = ['a', 'b', 'a', 'b', 'a', 'b'];
@@ -103,8 +103,8 @@ describe('CachedTransformedList', () => {
       const array2 = ['q', 'h', 'c'];
       const expectedResult = ['a', 'b', 'c'];
 
-      list.update(array);
-      list.update(array2);
+      list.diffAppend(array);
+      list.diffAppend(array2);
 
       expect(list.get()).toEqual(expectedResult);
     });
@@ -115,7 +115,7 @@ describe('CachedTransformedList', () => {
       const list = new CachedTransformedList();
       const array = ['a', 'b'];
 
-      list.update(array);
+      list.diffAppend(array);
       list.reset();
 
       expect(list.get()).toEqual([]);
@@ -126,9 +126,9 @@ describe('CachedTransformedList', () => {
       const array = ['a', 'b', 'c'];
       const array2 = ['q', 'h'];
 
-      list.update(array);
+      list.diffAppend(array);
       list.reset();
-      list.update(array2);
+      list.diffAppend(array2);
 
       expect(list.get()).toEqual(array2);
     });

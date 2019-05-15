@@ -88,9 +88,12 @@ class LogViewerList extends React.Component {
   };
 
   updateCaches = (lines, filterArgs, sizeArgs) => {
-    this.state.cachedLines.update(lines, filterArgs);
-    this.state.cachedLineHeights.update(this.state.cachedLines.get(), sizeArgs);
-    this.state.cachedLongestLine.update(this.state.cachedLines.get());
+    this.state.cachedLines.diffAppend(lines, filterArgs);
+    this.state.cachedLineHeights.diffAppend(
+      this.state.cachedLines.get(),
+      sizeArgs
+    );
+    this.state.cachedLongestLine.diffReduce(this.state.cachedLines.get());
   };
 
   //The onResize function is debounced as the resize event occurs all the time while resizing the window
@@ -102,7 +105,7 @@ class LogViewerList extends React.Component {
     const cachedLineHeights = this.state.cachedLineHeights;
 
     cachedLineHeights.reset();
-    cachedLineHeights.update(cachedLines.get(), { charSize, clientWidth });
+    cachedLineHeights.diffAppend(cachedLines.get(), { charSize, clientWidth });
 
     this.setState({
       cachedCharSize: charSize,
@@ -117,10 +120,10 @@ class LogViewerList extends React.Component {
 
     cachedLines.reset();
     cachedLineHeights.reset();
-    cachedLines.update(lines, filterArgs);
-    cachedLineHeights.update(cachedLines.get(), sizeArgs);
+    cachedLines.diffAppend(lines, filterArgs);
+    cachedLineHeights.diffAppend(cachedLines.get(), sizeArgs);
     cachedLongestLine.reset();
-    cachedLongestLine.update(cachedLines.get());
+    cachedLongestLine.diffReduce(cachedLines.get());
   };
 
   wrapItemSizeGetter = sizes => {
