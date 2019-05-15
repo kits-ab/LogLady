@@ -1,3 +1,42 @@
+export class CachedReducedValue {
+  constructor(reducerFunc, startValue) {
+    this.startValue = startValue;
+    this.value = startValue;
+    this.baseLength = 0;
+    this.reducerFunc = reducerFunc;
+  }
+
+  /**
+   * Resets the cache and sets the value to the starting value
+   */
+  reset() {
+    this.value = this.startValue;
+    this.baseLength = 0;
+  }
+
+  /**
+   * Reduces the current value with all the new values
+   */
+  update(baseList, args) {
+    if (baseList.length <= this.baseLength) return;
+
+    this.value = [
+      this.value,
+      ...baseList.slice(Math.max(this.baseLength, 0))
+    ].reduce(this.reducerFunc(args));
+
+    this.baseLength = baseList.length;
+  }
+
+  /**
+   * Returns the reduced value
+   * @returns {object}
+   */
+  get() {
+    return this.value;
+  }
+}
+
 /**
  * CachedTransformedList is a cached list with that is transformed by some function (listFunc)
  * @param {function(object[], object)} listFunc

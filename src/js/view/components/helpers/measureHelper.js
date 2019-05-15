@@ -19,14 +19,3 @@ export const calculateSize = (text, ruler) => {
 export const calculateWrap = (text, [charHeight, charWidth], elementWidth) => {
   return Math.ceil((charWidth * [...text].length) / elementWidth) * charHeight;
 };
-
-/**
- * Returns the length of the longest string in a list
- * @param {string[]} list
- * @returns {Number} The length of the longest string
- */
-export const maxLength = list => {
-  return list.reduce((max, next) => {
-    return max > next.length ? max : next.length;
-  }, 0);
-};
