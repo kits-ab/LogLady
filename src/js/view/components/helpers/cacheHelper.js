@@ -1,20 +1,26 @@
 /**
- * new CachedTransformedList is a cached list with some function (listFunc)
- * applied to all elements in the list
+ * CachedTransformedList is a cached list with that is transformed by some function (listFunc)
  * @param {function(object[], object)} listFunc
  * @returns {object}
  */
-export const CachedTransformedList = listFunc => {
-  let transformedList = [];
-  let baseLength = 0;
+export class CachedTransformedList {
+  constructor(listFunc) {
+    this.transformedList = [];
+    this.baseLength = 0;
+    this.listFunc = listFunc
+      ? listFunc
+      : x => {
+          return x;
+        };
+  }
 
   /**
-   * Resets the list
+   * Clears the list of items
    */
-  const reset = () => {
-    transformedList = [];
-    baseLength = 0;
-  };
+  reset() {
+    this.transformedList = [];
+    this.baseLength = 0;
+  }
 
   /**
    * Updates the cached list with any new elements from the baseList, with the listFunc applied to the new elements
@@ -22,27 +28,24 @@ export const CachedTransformedList = listFunc => {
    * @param {object[]} baseList
    * @param {object} args
    */
-  const update = (baseList, args) => {
-    if (baseList.length <= baseLength) return;
+  update(baseList, args) {
+    if (baseList.length <= this.baseLength) return;
 
-    const newItems = listFunc(baseList.slice(Math.max(baseLength, 0)), args);
+    const newItems = this.listFunc(
+      baseList.slice(Math.max(this.baseLength, 0)),
+      args
+    );
 
-    transformedList.push(...newItems);
+    this.transformedList.push(...newItems);
 
-    baseLength = baseList.length;
-  };
+    this.baseLength = baseList.length;
+  }
 
   /**
    * Returns the transformed list
    * @returns {object[]}
    */
-  const get = () => {
-    return transformedList;
-  };
-
-  return {
-    update,
-    get,
-    reset
-  };
-};
+  get() {
+    return this.transformedList;
+  }
+}

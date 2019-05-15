@@ -39,17 +39,15 @@ class LogViewerList extends React.Component {
   }
 
   componentDidMount() {
-    const cachedCharSize = calculateSize('W', this.rulerRef.current);
-
     this.setState({
-      cachedCharSize: cachedCharSize
+      cachedCharSize: calculateSize('W', this.rulerRef.current)
     });
 
-    window.addEventListener('resize', this.debounceRefreshCachedLineHeights);
+    window.addEventListener('resize', this.onResize);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.debounceRefreshCachedLineHeights);
+    window.removeEventListener('resize', this.onResize);
   }
 
   componentDidUpdate() {
@@ -84,14 +82,20 @@ class LogViewerList extends React.Component {
     this.state.cachedLineHeights.update(lines, sizeArgs);
   };
 
-  debounceRefreshCachedLineHeights = _.debounce(() => {
-    const charSize = this.state.cachedCharSize;
+  //The onResize function is debounced as the resize event occurs all the time while resizing the window
+  onResize = _.debounce(() => {
+    //The line heights needs to be recalculated on a resize
+    const charSize = calculateSize('W', this.rulerRef.current);
     const clientWidth = this.logRef.current.clientWidth;
     const cachedLines = this.state.cachedLines;
     const cachedLineHeights = this.state.cachedLineHeights;
 
     cachedLineHeights.reset();
     cachedLineHeights.update(cachedLines.get(), { charSize, clientWidth });
+
+    this.setState({
+      cachedCharSize: charSize
+    }); //This also re-renders, so if this is removed make sure to re-render
   }, 222);
 
   refreshCaches = (lines, filterArgs, sizeArgs) => {
