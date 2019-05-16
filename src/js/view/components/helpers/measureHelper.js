@@ -11,12 +11,21 @@ export const calculateSize = (text, ruler) => {
 
 /**
  * Returns the height of text given a charSize and an elementWidth to wrap at
+ * Returns undefined if elementWidth is 0 or less, charHeight or charWidth are negative or if the charWidth is more than the elementWidth
  * @param {string} text
- * @param {Number[]} charSize [height, width]
- * @param {Number} elementWidth The width of where to wrap
+ * @param {Number[]} charSize [height, width] height and width needs to be positive, and width has to be lower than elementWidth
+ * @param {Number} elementWidth The width of where to wrap, needs to be positive
  * @returns {Number} The height of the text, if wrapped
  */
 export const calculateWrap = (text, [charHeight, charWidth], elementWidth) => {
+  if (
+    elementWidth <= 0 ||
+    charHeight < 0 ||
+    charWidth < 0 ||
+    charWidth > elementWidth
+  )
+    return undefined;
+
   return Math.ceil((charWidth * [...text].length) / elementWidth) * charHeight;
 };
 
@@ -26,6 +35,10 @@ export const calculateWraps = (lines, charSize, elementWidth) => {
   });
 };
 
+/**
+ * Works on any object that has a length, and objects that don't have lengths count as -Infinity, which in most if not all cases means ignoring them
+ */
 export const maxLengthReducer = (max, next) => {
-  return max > next.length ? max : next.length;
+  const length = next && next.length ? next.length : -Infinity;
+  return max > length ? max : length;
 };
