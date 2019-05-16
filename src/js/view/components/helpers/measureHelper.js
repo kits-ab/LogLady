@@ -19,3 +19,13 @@ export const calculateSize = (text, ruler) => {
 export const calculateWrap = (text, [charHeight, charWidth], elementWidth) => {
   return Math.ceil((charWidth * [...text].length) / elementWidth) * charHeight;
 };
+
+export const calculateWraps = (lines, charSize, elementWidth) => {
+  return lines.map(line => {
+    return calculateWrap(line, charSize, elementWidth);
+  });
+};
+
+export const maxLengthReducer = (max, next) => {
+  return max > next.length ? max : next.length;
+};

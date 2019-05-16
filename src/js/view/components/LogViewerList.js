@@ -5,7 +5,9 @@ import {
 } from '../styledComponents/LogViewerListStyledComponents';
 import {
   calculateSize,
-  calculateWrap
+  calculateWrap,
+  calculateWraps,
+  maxLengthReducer
 } from 'js/view/components/helpers/measureHelper';
 import _ from 'lodash';
 import TextHighlightRegex from './TextHighlightRegex';
@@ -23,27 +25,11 @@ class LogViewerList extends React.Component {
     this.windowedListRef = React.createRef();
     this.rulerRef = React.createRef();
 
-    const filterLines = (lines, regex) => {
-      return regex ? filterByRegExp(lines, regex) : lines;
-    };
-
-    const calculateSizes = (lines, charSize, clientWidth) => {
-      return lines.map(line => {
-        return calculateWrap(line, charSize, clientWidth);
-      });
-    };
-
-    const reduceLongestLine = () => {
-      return (max, next) => {
-        return max > next.length ? max : next.length;
-      };
-    };
-
     this.state = {
       cachedCharSize: [0, 0],
-      cachedLines: new CachedTransformedList(filterLines),
-      cachedLineHeights: new CachedTransformedList(calculateSizes),
-      cachedLongestLine: new CachedReducedValue(reduceLongestLine, 0),
+      cachedLines: new CachedTransformedList(filterByRegExp),
+      cachedLineHeights: new CachedTransformedList(calculateWraps),
+      cachedLongestLine: new CachedReducedValue(maxLengthReducer, 0),
       cachedClientWidth: 0
     };
   }

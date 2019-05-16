@@ -1,4 +1,79 @@
-import { CachedTransformedList } from './cacheHelper';
+import { CachedTransformedList, CachedReducedValue } from './cacheHelper';
+
+describe('CachedReducedValue', () => {
+  const maxFunc = (max, next) => {
+    return next > max ? next : max;
+  };
+
+  describe('get', () => {
+    it('should return start value', () => {
+      const value = new CachedReducedValue(null, 45);
+      const expectedResult = 45;
+
+      expect(value.get()).toEqual(expectedResult);
+    });
+
+    it('should return latest value', () => {
+      const value = new CachedReducedValue();
+      const array = ['a', 'b', 'c'];
+      const expectedResult = 'c';
+
+      value.diffReduce(array);
+
+      expect(value.get()).toEqual(expectedResult);
+    });
+  });
+
+  describe('diffReduce', () => {
+    it('should return max value', () => {
+      const value = new CachedReducedValue(maxFunc, 0);
+      const array = [1, 2, 4, 65, 8, 2, 2, 6];
+      const expectedResult = 65;
+
+      value.diffReduce(array);
+
+      expect(value.get()).toEqual(expectedResult);
+    });
+
+    it('should not reduce old elements', () => {
+      const value = new CachedReducedValue(maxFunc, 0);
+      const array = [1, 2];
+      const array2 = [65, 100, 1];
+      const expectedResult = 2;
+
+      value.diffReduce(array);
+      value.diffReduce(array2);
+
+      expect(value.get()).toEqual(expectedResult);
+    });
+  });
+
+  describe('reset', () => {
+    it('should return start value', () => {
+      const value = new CachedReducedValue(maxFunc, 1);
+      const array = [2, 3, 4, 5];
+      const expectedResult = 1;
+
+      value.diffReduce(array);
+      value.reset();
+
+      expect(value.get()).toEqual(expectedResult);
+    });
+
+    it('should be possible to add reduce new values after resetting value', () => {
+      const value = new CachedReducedValue();
+      const array = ['a', 'b', 'c'];
+      const array2 = ['q', 'h'];
+      const expectedResult = 'h';
+
+      value.diffReduce(array);
+      value.reset();
+      value.diffReduce(array2);
+
+      expect(value.get()).toEqual(expectedResult);
+    });
+  });
+});
 
 describe('CachedTransformedList', () => {
   describe('get', () => {
