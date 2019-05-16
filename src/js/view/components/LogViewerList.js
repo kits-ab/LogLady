@@ -50,7 +50,10 @@ class LogViewerList extends React.Component {
     const filterArgs = [nextProps.filterRegExp];
     const sizeArgs = [charSize, clientWidth];
 
-    if (this.props.filterRegExp !== nextProps.filterRegExp) {
+    if (
+      (this.props.filterRegExp || {}).source !==
+      (nextProps.filterRegExp || {}).source
+    ) {
       this.refreshCaches(lines, filterArgs, sizeArgs);
     } else {
       this.updateCaches(lines, filterArgs, sizeArgs);
