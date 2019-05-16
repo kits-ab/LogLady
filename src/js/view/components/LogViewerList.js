@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   LogViewerListContainer,
-  LogLine
+  LogLine,
+  LogLineRuler
 } from '../styledComponents/LogViewerListStyledComponents';
 import {
   calculateSize,
@@ -140,15 +141,7 @@ class LogViewerList extends React.Component {
 
     return (
       <LogViewerListContainer ref={this.logRef}>
-        <LogLine
-          style={{
-            visibility: 'hidden',
-            minWidth: 0,
-            position: 'absolute',
-            display: 'inline-block'
-          }}
-          ref={this.rulerRef}
-        />
+        <LogLineRuler ref={this.rulerRef} />
         <WindowedList
           ref={this.windowedListRef}
           itemRenderer={(i, key) => {

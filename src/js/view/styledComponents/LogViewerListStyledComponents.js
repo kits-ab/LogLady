@@ -32,3 +32,10 @@ export const LogLine = styled.div`
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 `;
+
+export const LogLineRuler = styled(LogLine)`
+  visibility: hidden;
+  min-width: 0px;
+  position: absolute;
+  display: inline-block;
+`;
