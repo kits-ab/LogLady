@@ -5,7 +5,6 @@ import {
 } from '../styledComponents/LogViewerListStyledComponents';
 import {
   calculateSize,
-  calculateWrap,
   calculateWraps,
   maxLengthReducer
 } from 'js/view/components/helpers/measureHelper';
@@ -39,11 +38,12 @@ class LogViewerList extends React.Component {
       cachedCharSize: calculateSize('W', this.rulerRef.current)
     });
 
-    window.addEventListener('resize', this.onResize);
+    this.resizeObserver = new ResizeObserver(this.onResize);
+    this.resizeObserver.observe(this.logRef.current);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.onResize);
+    this.resizeObserver.disconnect();
   }
 
   componentDidUpdate() {
