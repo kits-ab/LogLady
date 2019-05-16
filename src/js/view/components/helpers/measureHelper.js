@@ -39,6 +39,9 @@ export const calculateWraps = (lines, charSize, elementWidth) => {
  * Works on any object that has a length, and objects that don't have lengths count as -Infinity, which in most if not all cases means ignoring them
  */
 export const maxLengthReducer = (max, next) => {
-  const length = next && next.length ? next.length : -Infinity;
+  const length =
+    next && next.length && typeof next.length === 'number'
+      ? next.length
+      : -Infinity;
   return max > length ? max : length;
 };
