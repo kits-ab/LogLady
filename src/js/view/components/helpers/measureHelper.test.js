@@ -1,9 +1,4 @@
-import {
-  calculateSize,
-  calculateWrap,
-  calculateWraps,
-  maxLengthReducer
-} from './measureHelper';
+import { calculateWrap, maxLengthReducer } from './measureHelper';
 
 describe('calculateSize', () => {});
 describe('calculateWrap', () => {
