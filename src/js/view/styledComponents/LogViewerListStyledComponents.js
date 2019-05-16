@@ -7,6 +7,7 @@ export const LogViewerListContainer = styled.div`
 `;
 
 export const LogLine = styled.div`
+  min-width: 100%;
   background: ${props => {
     const color = '#444';
     return props.index & 1
