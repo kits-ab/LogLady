@@ -42,19 +42,6 @@ class LogViewerList extends React.Component {
     this.resizeObserver.observe(this.logRef.current);
   }
 
-  componentWillUnmount() {
-    this.resizeObserver.disconnect();
-  }
-
-  componentDidUpdate() {
-    if (this.props.scrollToBottom) {
-      this.scrollToBottom(
-        this.windowedListRef.current,
-        this.state.cachedLines.get().length - 1
-      );
-    }
-  }
-
   componentWillUpdate(nextProps, nextState) {
     const lines = nextProps.lines;
     const charSize = nextState.cachedCharSize;
@@ -67,6 +54,19 @@ class LogViewerList extends React.Component {
     } else {
       this.updateCaches(lines, filterArgs, sizeArgs);
     }
+  }
+
+  componentDidUpdate() {
+    if (this.props.scrollToBottom) {
+      this.scrollToBottom(
+        this.windowedListRef.current,
+        this.state.cachedLines.get().length - 1
+      );
+    }
+  }
+
+  componentWillUnmount() {
+    this.resizeObserver.disconnect();
   }
 
   scrollToBottom = (el, index) => {
