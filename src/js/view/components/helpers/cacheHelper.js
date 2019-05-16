@@ -1,3 +1,8 @@
+/**
+ * CachedReducedValue is a reducer that caches the latest reduced value and uses that as the start value to reduce further
+ * @param {Function} reducerFunc a reducer function (curr, next) => *
+ * @param {*} startValue the start value for the reduction function
+ */
 export class CachedReducedValue {
   constructor(reducerFunc, startValue) {
     this.startValue = startValue;
@@ -20,6 +25,8 @@ export class CachedReducedValue {
 
   /**
    * Reduces the elements between the baseLength and the baseList's length with the existing value
+   * If baseList is shorter, nothing happens
+   * @param {*[]} baseList
    */
   diffReduce(baseList) {
     if (baseList.length <= this.baseLength) return;
@@ -33,7 +40,7 @@ export class CachedReducedValue {
 
   /**
    * Returns the reduced value
-   * @returns {object}
+   * @returns {*}
    */
   get() {
     return this.value;
@@ -42,8 +49,7 @@ export class CachedReducedValue {
 
 /**
  * CachedTransformedList is a cached list with that is transformed by some function (listFunc)
- * @param {function(object[], object)} listFunc
- * @returns {object}
+ * @param {Function} listFunc of type (object[], ...args) => object[]
  */
 export class CachedTransformedList {
   constructor(listFunc) {
@@ -67,8 +73,9 @@ export class CachedTransformedList {
   /**
    * Transforms and appends the elements between the baseLength and the baseList's length to the internal list
    * Additional arguments are passed to listFunc
-   * @param {object[]} baseList
-   * @param {object} args
+   * If baseList is shorter, nothing happens
+   * @param {*[]} baseList
+   * @param {...*} args
    */
   diffAppend(baseList, ...args) {
     if (baseList.length <= this.baseLength) return;
@@ -82,7 +89,7 @@ export class CachedTransformedList {
 
   /**
    * Returns the transformed list
-   * @returns {object[]}
+   * @returns {*[]}
    */
   get() {
     return this.transformedList;
