@@ -15,14 +15,14 @@ export class CachedReducedValue {
   }
 
   /**
-   * Reducese the elements between the baseLength and the baseList's length with the existing value
-   * Extra arguments are bundled as an object and passed to the reducerFunc as the second parameter
+   * Reduces the elements between the baseLength and the baseList's length with the existing value
+   * Additional arguments are passed to reducerFunc
    */
-  diffReduce(baseList, args) {
+  diffReduce(baseList, ...args) {
     if (baseList.length <= this.baseLength) return;
 
     this.value = [this.value, ...baseList.slice(this.baseLength)].reduce(
-      this.reducerFunc(args)
+      this.reducerFunc(...args)
     );
 
     this.baseLength = baseList.length;
@@ -63,14 +63,14 @@ export class CachedTransformedList {
 
   /**
    * Transforms and appends the elements between the baseLength and the baseList's length to the internal list
-   * Extra arguments are bundled as an object and passed to the listFunc as the second parameter
+   * Additional arguments are passed to listFunc
    * @param {object[]} baseList
    * @param {object} args
    */
-  diffAppend(baseList, args) {
+  diffAppend(baseList, ...args) {
     if (baseList.length <= this.baseLength) return;
 
-    const newItems = this.listFunc(baseList.slice(this.baseLength), args);
+    const newItems = this.listFunc(baseList.slice(this.baseLength), ...args);
 
     this.transformedList.push(...newItems);
 

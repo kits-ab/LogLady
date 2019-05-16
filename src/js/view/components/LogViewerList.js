@@ -23,11 +23,11 @@ class LogViewerList extends React.Component {
     this.windowedListRef = React.createRef();
     this.rulerRef = React.createRef();
 
-    const filterLines = (lines, { regex }) => {
+    const filterLines = (lines, regex) => {
       return regex ? filterByRegExp(lines, regex) : lines;
     };
 
-    const calculateSizes = (lines, { charSize, clientWidth }) => {
+    const calculateSizes = (lines, charSize, clientWidth) => {
       return lines.map(line => {
         return calculateWrap(line, charSize, clientWidth);
       });
@@ -73,8 +73,8 @@ class LogViewerList extends React.Component {
     const lines = nextProps.lines;
     const charSize = nextState.cachedCharSize;
     const clientWidth = this.logRef.current.clientWidth;
-    const filterArgs = { regex: nextProps.filterRegExp };
-    const sizeArgs = { charSize, clientWidth };
+    const filterArgs = [nextProps.filterRegExp];
+    const sizeArgs = [charSize, clientWidth];
 
     if (this.props.filterRegExp !== nextProps.filterRegExp) {
       this.refreshCaches(lines, filterArgs, sizeArgs);
@@ -88,10 +88,10 @@ class LogViewerList extends React.Component {
   };
 
   updateCaches = (lines, filterArgs, sizeArgs) => {
-    this.state.cachedLines.diffAppend(lines, filterArgs);
+    this.state.cachedLines.diffAppend(lines, ...filterArgs);
     this.state.cachedLineHeights.diffAppend(
       this.state.cachedLines.get(),
-      sizeArgs
+      ...sizeArgs
     );
     this.state.cachedLongestLine.diffReduce(this.state.cachedLines.get());
   };
@@ -105,7 +105,7 @@ class LogViewerList extends React.Component {
     const cachedLineHeights = this.state.cachedLineHeights;
 
     cachedLineHeights.reset();
-    cachedLineHeights.diffAppend(cachedLines.get(), { charSize, clientWidth });
+    cachedLineHeights.diffAppend(cachedLines.get(), charSize, clientWidth);
 
     this.setState({
       cachedCharSize: charSize,
@@ -120,8 +120,8 @@ class LogViewerList extends React.Component {
 
     cachedLines.reset();
     cachedLineHeights.reset();
-    cachedLines.diffAppend(lines, filterArgs);
-    cachedLineHeights.diffAppend(cachedLines.get(), sizeArgs);
+    cachedLines.diffAppend(lines, ...filterArgs);
+    cachedLineHeights.diffAppend(cachedLines.get(), ...sizeArgs);
     cachedLongestLine.reset();
     cachedLongestLine.diffReduce(cachedLines.get());
   };
