@@ -95,7 +95,7 @@ class LogViewerList extends React.Component {
 
     this.setState({
       cachedCharSize: charSize,
-      cachedClientWidth: this.logRef.current.clientWidth
+      cachedClientWidth: clientWidth
     }); //This also re-renders, so if this is removed make sure to re-render
   }, 222);
 
