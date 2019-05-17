@@ -6,7 +6,7 @@ import {
 } from '../styledComponents/LogViewerListStyledComponents';
 import {
   calculateSize,
-  calculateWrap,
+  calculateWrappedHeight,
   maxLengthReducer
 } from 'js/view/components/helpers/measureHelper';
 import _ from 'lodash';
@@ -42,7 +42,7 @@ class LogViewerList extends React.Component {
       const key = next.length;
       if (map[key]) return map; // No need to recalculate
 
-      const height = calculateWrap(next, charSize, elementWidth);
+      const height = calculateWrappedHeight(next, charSize, elementWidth);
       const mapCopy = { ...map };
       mapCopy[key] = height;
       return mapCopy;
@@ -51,7 +51,7 @@ class LogViewerList extends React.Component {
 
   filterLinesFunc = regex => {
     return lines => {
-      return regex ? filterByRegExp(lines, regex) : lines;
+      return filterByRegExp(lines, regex);
     };
   };
 

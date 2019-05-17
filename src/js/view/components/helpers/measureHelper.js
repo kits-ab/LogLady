@@ -17,19 +17,25 @@ export const calculateSize = (text, ruler) => {
  * @param {Number} elementWidth The width of where to wrap, needs to be positive
  * @returns {Number} The height of the text, if wrapped
  */
-export const calculateWrap = (text, [charHeight, charWidth], elementWidth) => {
+export const calculateWrappedHeight = (
+  text,
+  [charHeight, charWidth],
+  elementWidth
+) => {
+  if (charWidth < 0 || charHeight < 0)
+    throw new Error('character size has negative values');
+
+  if (charWidth > elementWidth)
+    throw new Error('character width is wider than element width: ', {
+      charWidth: charWidth,
+      elementWidth: elementWidth
+    });
+
+  if (elementWidth <= 0)
+    throw new Error('element width is equal or less to 0: ', elementWidth);
+
   const usableWidth = elementWidth - (elementWidth % charWidth);
-
-  if (usableWidth <= 0 || charHeight < 0 || charWidth < 0 || elementWidth <= 0)
-    return undefined;
-
   return Math.ceil((charWidth * [...text].length) / usableWidth) * charHeight;
-};
-
-export const calculateWraps = (lines, charSize, elementWidth) => {
-  return lines.map(line => {
-    return calculateWrap(line, charSize, elementWidth);
-  });
 };
 
 /**

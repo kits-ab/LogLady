@@ -1,23 +1,35 @@
-import { calculateWrap, maxLengthReducer } from './measureHelper';
+import { calculateWrappedHeight, maxLengthReducer } from './measureHelper';
 
 describe('calculateSize', () => {});
-describe('calculateWrap', () => {
-  it('should be undefined if the width is 0', () => {
+describe('calculateWrappedHeight', () => {
+  it('should throw error if the width is 0', () => {
     const text = '';
     const charSize = [0, 0];
     const elementWidth = 0;
-    const expectedResult = undefined;
 
-    expect(calculateWrap(text, charSize, elementWidth)).toEqual(expectedResult);
+    expect(() => {
+      calculateWrappedHeight(text, charSize, elementWidth);
+    }).toThrow();
   });
 
-  it('should be undefined if the width is < 0', () => {
+  it('should throw error if the width is < 0', () => {
     const text = '';
     const charSize = [0, 0];
     const elementWidth = -1;
-    const expectedResult = undefined;
 
-    expect(calculateWrap(text, charSize, elementWidth)).toEqual(expectedResult);
+    expect(() => {
+      calculateWrappedHeight(text, charSize, elementWidth);
+    }).toThrow();
+  });
+
+  it('should throw error if the character width is higher than the elementWidth', () => {
+    const text = '123';
+    const charSize = [1, 100];
+    const elementWidth = 1;
+
+    expect(() => {
+      calculateWrappedHeight(text, charSize, elementWidth);
+    }).toThrow();
   });
 
   it('should be wrapped by width', () => {
@@ -26,7 +38,9 @@ describe('calculateWrap', () => {
     const elementWidth = 5;
     const expectedResult = 8;
 
-    expect(calculateWrap(text, charSize, elementWidth)).toEqual(expectedResult);
+    expect(calculateWrappedHeight(text, charSize, elementWidth)).toEqual(
+      expectedResult
+    );
   });
 
   it('should contain not full rows', () => {
@@ -35,16 +49,9 @@ describe('calculateWrap', () => {
     const elementWidth = 5;
     const expectedResult = 12;
 
-    expect(calculateWrap(text, charSize, elementWidth)).toEqual(expectedResult);
-  });
-
-  it('should be undefined if the charWidth is higher than the elementWidth', () => {
-    const text = '123';
-    const charSize = [1, 100];
-    const elementWidth = 1;
-    const expectedResult = undefined;
-
-    expect(calculateWrap(text, charSize, elementWidth)).toEqual(expectedResult);
+    expect(calculateWrappedHeight(text, charSize, elementWidth)).toEqual(
+      expectedResult
+    );
   });
 
   it('should be move down overflowing character to next line', () => {
@@ -53,7 +60,9 @@ describe('calculateWrap', () => {
     const elementWidth = 5;
     const expectedResult = 20;
 
-    expect(calculateWrap(text, charSize, elementWidth)).toEqual(expectedResult);
+    expect(calculateWrappedHeight(text, charSize, elementWidth)).toEqual(
+      expectedResult
+    );
   });
 });
 
