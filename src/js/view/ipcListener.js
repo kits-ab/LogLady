@@ -1,9 +1,16 @@
+import { closeFile } from './components/helpers/handleFileHelper';
 const { ipcRenderer } = window.require('electron');
 
-export const ipcListener = (dispatch, publisher) => {
+export const ipcListener = (store, publisher) => {
+  const dispatch = store.dispatch;
+  closeFile(dispatch, 'initializing');
+
   ipcRenderer.on('backendMessages', (event, action) => {
     switch (action.type) {
       case 'menu_open':
+        if (store.getState().menuReducer.openFiles) {
+          closeFile(dispatch, store.getState().menuReducer.openFiles[0]);
+        }
         dispatch({
           type: action.type,
           data: action.data

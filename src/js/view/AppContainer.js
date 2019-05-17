@@ -8,9 +8,9 @@ import { configureStore } from './configurations/configureStore';
 const React = require('react');
 
 const store = createStore(reducers);
-const publisher = configureStore(store);
-ipcListener(store.dispatch, publisher);
 
+const publisher = configureStore(store);
+ipcListener(store, publisher);
 publisher.loadStateFromDisk();
 
 class AppContainer extends React.Component {
