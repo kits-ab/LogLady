@@ -134,13 +134,11 @@ class LogViewerList extends React.Component {
     cachedLines.diffAppend(lines);
     cachedHeightsByLength.diffReduce(cachedLines.get());
     cachedLongestLine.diffReduce(cachedLines.get());
-    console.log(cachedLines.get());
-    console.log(cachedHeightsByLength.get());
   };
 
   wrapItemSizeGetter = (lines, sizes) => {
     return index => {
-      return lines[index] && sizes[lines[index].length];
+      return index < 0 ? 0 : sizes[lines[index].length];
     };
   };
 
@@ -174,6 +172,7 @@ class LogViewerList extends React.Component {
               <LogLine
                 key={key}
                 index={i}
+                minSize={0}
                 fixedWidth={lineWidth}
                 fixedHeight={itemSizeGetter(i)}
                 wrap={wrapLines ? 'true' : undefined}
