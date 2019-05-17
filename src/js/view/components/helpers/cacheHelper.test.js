@@ -1,10 +1,8 @@
 import { CachedTransformedList, CachedReducedValue } from './cacheHelper';
 
 describe('CachedReducedValue', () => {
-  const maxFunc = () => {
-    return (max, next) => {
-      return next > max ? next : max;
-    };
+  const maxFunc = (max, next) => {
+    return next > max ? next : max;
   };
 
   describe('get', () => {
@@ -45,23 +43,6 @@ describe('CachedReducedValue', () => {
 
       value.diffReduce(array);
       value.diffReduce(array2);
-
-      expect(value.get()).toEqual(expectedResult);
-    });
-
-    it('should pass arguments to function', () => {
-      const f = (...args) => {
-        return (prev, _next) => {
-          return [...prev, ...args];
-        };
-      };
-      const value = new CachedReducedValue(f, []);
-      const array = [0, 1, 2];
-      const expectedResult = [4, 5, 6, 8, 9, 6, 7, 5];
-
-      value.diffReduce(array.slice(0, 1), 4, 5, 6);
-      value.diffReduce(array.slice(0, 2), 8, 9);
-      value.diffReduce(array.slice(0, 3), 6, 7, 5);
 
       expect(value.get()).toEqual(expectedResult);
     });
@@ -199,21 +180,6 @@ describe('CachedTransformedList', () => {
 
       list.diffAppend(array);
       list.diffAppend(array2);
-
-      expect(list.get()).toEqual(expectedResult);
-    });
-
-    it('should pass arguments to function', () => {
-      const f = (_items, ...args) => {
-        return args;
-      };
-      const list = new CachedTransformedList(f);
-      const array = [0, 1, 2];
-      const expectedResult = [4, 5, 6, 8, 9, 6, 7, 5];
-
-      list.diffAppend(array.slice(0, 1), 4, 5, 6);
-      list.diffAppend(array.slice(0, 2), 8, 9);
-      list.diffAppend(array.slice(0, 3), 6, 7, 5);
 
       expect(list.get()).toEqual(expectedResult);
     });

@@ -25,28 +25,35 @@ class LogViewerList extends React.Component {
     this.windowedListRef = React.createRef();
     this.rulerRef = React.createRef();
 
-    const heightByLengthReducer = (charSize, elementWidth) => {
-      return (map, next) => {
-        const key = next.length;
-        if (map[key]) return map; // No need to recalculate
-
-        const height = calculateWrap(next, charSize, elementWidth);
-        const mapCopy = { ...map };
-        mapCopy[key] = height;
-        return mapCopy;
-      };
-    };
-
     this.state = {
       cachedCharSize: [0, 0],
-      cachedLines: new CachedTransformedList(filterByRegExp),
-      cachedHeightsByLength: new CachedReducedValue(heightByLengthReducer, {}),
-      cachedLongestLine: new CachedReducedValue(() => {
-        return maxLengthReducer;
-      }, 0),
+      cachedLines: new CachedTransformedList(this.filterLinesFunc()),
+      cachedHeightsByLength: new CachedReducedValue(
+        this.heightByLengthReduceFunc([0, 0], 1),
+        {}
+      ),
+      cachedLongestLine: new CachedReducedValue(maxLengthReducer, 0),
       cachedClientWidth: 0
     };
   }
+
+  heightByLengthReduceFunc = (charSize, elementWidth) => {
+    return (map, next) => {
+      const key = next.length;
+      if (map[key]) return map; // No need to recalculate
+
+      const height = calculateWrap(next, charSize, elementWidth);
+      const mapCopy = { ...map };
+      mapCopy[key] = height;
+      return mapCopy;
+    };
+  };
+
+  filterLinesFunc = regex => {
+    return lines => {
+      return regex ? filterByRegExp(lines, regex) : lines;
+    };
+  };
 
   componentDidMount() {
     this.setState({
@@ -70,7 +77,7 @@ class LogViewerList extends React.Component {
     ) {
       this.refreshCaches(lines, filterArgs, sizeArgs);
     } else {
-      this.updateCaches(lines, filterArgs, sizeArgs);
+      this.updateCaches(lines);
     }
   }
 
@@ -91,12 +98,9 @@ class LogViewerList extends React.Component {
     el.scrollAround(index);
   };
 
-  updateCaches = (lines, filterArgs, sizeArgs) => {
-    this.state.cachedLines.diffAppend(lines, ...filterArgs);
-    this.state.cachedHeightsByLength.diffReduce(
-      this.state.cachedLines.get(),
-      ...sizeArgs
-    );
+  updateCaches = lines => {
+    this.state.cachedLines.diffAppend(lines);
+    this.state.cachedHeightsByLength.diffReduce(this.state.cachedLines.get());
     this.state.cachedLongestLine.diffReduce(this.state.cachedLines.get());
   };
 
@@ -108,8 +112,10 @@ class LogViewerList extends React.Component {
     const cachedLines = this.state.cachedLines;
     const cachedHeightsByLength = this.state.cachedHeightsByLength;
 
-    cachedHeightsByLength.reset();
-    cachedHeightsByLength.diffReduce(cachedLines.get(), charSize, clientWidth);
+    cachedHeightsByLength.reset(
+      this.heightByLengthReduceFunc(charSize, clientWidth)
+    );
+    cachedHeightsByLength.diffReduce(cachedLines.get());
 
     this.setState({
       cachedCharSize: charSize,
@@ -122,13 +128,14 @@ class LogViewerList extends React.Component {
     const cachedHeightsByLength = this.state.cachedHeightsByLength;
     const cachedLongestLine = this.state.cachedLongestLine;
 
-    cachedLines.reset();
-    cachedHeightsByLength.reset();
+    cachedLines.reset(this.filterLinesFunc(...filterArgs));
+    cachedHeightsByLength.reset(this.heightByLengthReduceFunc(...sizeArgs), {});
     cachedLongestLine.reset();
-
-    cachedLines.diffAppend(lines, ...filterArgs);
-    cachedHeightsByLength.diffReduce(cachedLines.get(), ...sizeArgs);
+    cachedLines.diffAppend(lines);
+    cachedHeightsByLength.diffReduce(cachedLines.get());
     cachedLongestLine.diffReduce(cachedLines.get());
+    console.log(cachedLines.get());
+    console.log(cachedHeightsByLength.get());
   };
 
   wrapItemSizeGetter = (lines, sizes) => {
@@ -153,7 +160,6 @@ class LogViewerList extends React.Component {
       ? this.state.cachedClientWidth
       : this.state.cachedLongestLine.get() * this.state.cachedCharSize[1];
 
-    console.log(sizes.length);
     const itemSizeGetter = this.props.wrapLines
       ? this.wrapItemSizeGetter(lines, sizes)
       : this.noWrapItemSizeGetter(this.state.cachedCharSize[0]);

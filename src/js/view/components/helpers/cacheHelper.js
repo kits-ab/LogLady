@@ -5,23 +5,23 @@
  */
 export class CachedReducedValue {
   constructor(reducerFunc, startValue) {
-    this.startValue = startValue;
-    this.value = startValue;
-    this.baseLength = 0;
     this.reducerFunc = reducerFunc
       ? reducerFunc
-      : () => {
-          return (_, next) => {
-            return next;
-          };
+      : (_, next) => {
+          return next;
         };
+
+    this.reset(reducerFunc, startValue);
   }
 
   /**
    * Resets the cache and sets the value to the starting value
    */
-  reset() {
+  reset(reducerFunc, startValue) {
+    this.startValue = startValue !== undefined ? startValue : this.startValue;
     this.value = this.startValue;
+    this.reducerFunc =
+      reducerFunc !== undefined ? reducerFunc : this.reducerFunc;
     this.baseLength = 0;
   }
 
@@ -30,12 +30,12 @@ export class CachedReducedValue {
    * If baseList is shorter, nothing happens
    * @param {*[]} baseList
    */
-  diffReduce(baseList, ...args) {
+  diffReduce(baseList) {
     if (baseList.length <= this.baseLength) return;
 
     this.value = baseList
       .slice(this.baseLength)
-      .reduce(this.reducerFunc(...args), this.value);
+      .reduce(this.reducerFunc, this.value);
 
     this.baseLength = baseList.length;
   }
@@ -55,34 +55,34 @@ export class CachedReducedValue {
  */
 export class CachedTransformedList {
   constructor(listFunc) {
-    this.transformedList = [];
-    this.baseLength = 0;
     this.listFunc = listFunc
       ? listFunc
       : x => {
           return x;
         };
+
+    this.reset(listFunc);
   }
 
   /**
    * Clears the list of items
    */
-  reset() {
+  reset(listFunc) {
     this.transformedList = [];
+    this.listFunc = listFunc !== undefined ? listFunc : this.listFunc;
     this.baseLength = 0;
   }
 
   /**
    * Transforms and appends the elements between the baseLength and the baseList's length to the internal list
-   * Additional arguments are passed to listFunc
    * If baseList is shorter, nothing happens
    * @param {*[]} baseList
    * @param {...*} args
    */
-  diffAppend(baseList, ...args) {
+  diffAppend(baseList) {
     if (baseList.length <= this.baseLength) return;
 
-    const newItems = this.listFunc(baseList.slice(this.baseLength), ...args);
+    const newItems = this.listFunc(baseList.slice(this.baseLength));
 
     this.transformedList.push(...newItems);
 
