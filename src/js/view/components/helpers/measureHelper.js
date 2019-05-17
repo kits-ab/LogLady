@@ -18,15 +18,12 @@ export const calculateSize = (text, ruler) => {
  * @returns {Number} The height of the text, if wrapped
  */
 export const calculateWrap = (text, [charHeight, charWidth], elementWidth) => {
-  if (
-    elementWidth <= 0 ||
-    charHeight < 0 ||
-    charWidth < 0 ||
-    charWidth > elementWidth
-  )
+  const usableWidth = elementWidth - (elementWidth % charWidth);
+
+  if (usableWidth <= 0 || charHeight < 0 || charWidth < 0 || elementWidth <= 0)
     return undefined;
 
-  return Math.ceil((charWidth * [...text].length) / elementWidth) * charHeight;
+  return Math.ceil((charWidth * [...text].length) / usableWidth) * charHeight;
 };
 
 export const calculateWraps = (lines, charSize, elementWidth) => {

@@ -46,6 +46,15 @@ describe('calculateWrap', () => {
 
     expect(calculateWrap(text, charSize, elementWidth)).toEqual(expectedResult);
   });
+
+  it('should be move down overflowing character to next line', () => {
+    const text = '0123456789';
+    const charSize = [2, 3];
+    const elementWidth = 5;
+    const expectedResult = 20;
+
+    expect(calculateWrap(text, charSize, elementWidth)).toEqual(expectedResult);
+  });
 });
 
 describe('maxLengthReducer', () => {
