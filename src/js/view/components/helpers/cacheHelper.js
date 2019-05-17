@@ -10,8 +10,10 @@ export class CachedReducedValue {
     this.baseLength = 0;
     this.reducerFunc = reducerFunc
       ? reducerFunc
-      : (_, next) => {
-          return next;
+      : () => {
+          return (_, next) => {
+            return next;
+          };
         };
   }
 
@@ -28,12 +30,12 @@ export class CachedReducedValue {
    * If baseList is shorter, nothing happens
    * @param {*[]} baseList
    */
-  diffReduce(baseList) {
+  diffReduce(baseList, ...args) {
     if (baseList.length <= this.baseLength) return;
 
     this.value = baseList
       .slice(this.baseLength)
-      .reduce(this.reducerFunc, this.value);
+      .reduce(this.reducerFunc(...args), this.value);
 
     this.baseLength = baseList.length;
   }

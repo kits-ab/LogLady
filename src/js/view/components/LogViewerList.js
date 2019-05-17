@@ -6,7 +6,7 @@ import {
 } from '../styledComponents/LogViewerListStyledComponents';
 import {
   calculateSize,
-  calculateWraps,
+  calculateWrap,
   maxLengthReducer
 } from 'js/view/components/helpers/measureHelper';
 import _ from 'lodash';
@@ -25,11 +25,25 @@ class LogViewerList extends React.Component {
     this.windowedListRef = React.createRef();
     this.rulerRef = React.createRef();
 
+    const heightByLengthReducer = (charSize, elementWidth) => {
+      return (map, next) => {
+        const key = next.length;
+        if (map[key]) return map; // No need to recalculate
+
+        const height = calculateWrap(next, charSize, elementWidth);
+        const mapCopy = { ...map };
+        mapCopy[key] = height;
+        return mapCopy;
+      };
+    };
+
     this.state = {
       cachedCharSize: [0, 0],
       cachedLines: new CachedTransformedList(filterByRegExp),
-      cachedLineHeights: new CachedTransformedList(calculateWraps),
-      cachedLongestLine: new CachedReducedValue(maxLengthReducer, 0),
+      cachedHeightsByLength: new CachedReducedValue(heightByLengthReducer, {}),
+      cachedLongestLine: new CachedReducedValue(() => {
+        return maxLengthReducer;
+      }, 0),
       cachedClientWidth: 0
     };
   }
@@ -79,7 +93,7 @@ class LogViewerList extends React.Component {
 
   updateCaches = (lines, filterArgs, sizeArgs) => {
     this.state.cachedLines.diffAppend(lines, ...filterArgs);
-    this.state.cachedLineHeights.diffAppend(
+    this.state.cachedHeightsByLength.diffReduce(
       this.state.cachedLines.get(),
       ...sizeArgs
     );
@@ -92,10 +106,10 @@ class LogViewerList extends React.Component {
     const charSize = calculateSize('W', this.rulerRef.current);
     const clientWidth = this.logRef.current.clientWidth;
     const cachedLines = this.state.cachedLines;
-    const cachedLineHeights = this.state.cachedLineHeights;
+    const cachedHeightsByLength = this.state.cachedHeightsByLength;
 
-    cachedLineHeights.reset();
-    cachedLineHeights.diffAppend(cachedLines.get(), charSize, clientWidth);
+    cachedHeightsByLength.reset();
+    cachedHeightsByLength.diffReduce(cachedLines.get(), charSize, clientWidth);
 
     this.setState({
       cachedCharSize: charSize,
@@ -105,20 +119,21 @@ class LogViewerList extends React.Component {
 
   refreshCaches = (lines, filterArgs, sizeArgs) => {
     const cachedLines = this.state.cachedLines;
-    const cachedLineHeights = this.state.cachedLineHeights;
+    const cachedHeightsByLength = this.state.cachedHeightsByLength;
     const cachedLongestLine = this.state.cachedLongestLine;
 
     cachedLines.reset();
-    cachedLineHeights.reset();
-    cachedLines.diffAppend(lines, ...filterArgs);
-    cachedLineHeights.diffAppend(cachedLines.get(), ...sizeArgs);
+    cachedHeightsByLength.reset();
     cachedLongestLine.reset();
+
+    cachedLines.diffAppend(lines, ...filterArgs);
+    cachedHeightsByLength.diffReduce(cachedLines.get(), ...sizeArgs);
     cachedLongestLine.diffReduce(cachedLines.get());
   };
 
-  wrapItemSizeGetter = sizes => {
+  wrapItemSizeGetter = (lines, sizes) => {
     return index => {
-      return sizes[index];
+      return lines[index] && sizes[lines[index].length];
     };
   };
 
@@ -133,13 +148,14 @@ class LogViewerList extends React.Component {
     const wrapLines = this.props.wrapLines;
     const highlightColor = this.props.highlightColor;
     const lines = this.state.cachedLines.get();
-    const sizes = this.state.cachedLineHeights.get();
+    const sizes = this.state.cachedHeightsByLength.get();
     const lineWidth = this.props.wrapLines
       ? this.state.cachedClientWidth
       : this.state.cachedLongestLine.get() * this.state.cachedCharSize[1];
 
+    console.log(sizes.length);
     const itemSizeGetter = this.props.wrapLines
-      ? this.wrapItemSizeGetter(sizes)
+      ? this.wrapItemSizeGetter(lines, sizes)
       : this.noWrapItemSizeGetter(this.state.cachedCharSize[0]);
 
     return (
