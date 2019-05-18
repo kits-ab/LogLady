@@ -7,14 +7,14 @@ describe('CachedReducedValue', () => {
 
   describe('get', () => {
     it('should return start value', () => {
-      const value = new CachedReducedValue(null, 45);
+      const value = CachedReducedValue(undefined, 45);
       const expectedResult = 45;
 
       expect(value.get()).toEqual(expectedResult);
     });
 
     it('should return latest value', () => {
-      const value = new CachedReducedValue();
+      const value = CachedReducedValue();
       const array = ['a', 'b', 'c'];
       const expectedResult = 'c';
 
@@ -26,7 +26,7 @@ describe('CachedReducedValue', () => {
 
   describe('diffReduce', () => {
     it('should return max value', () => {
-      const value = new CachedReducedValue(maxFunc, 0);
+      const value = CachedReducedValue(maxFunc, 0);
       const array = [1, 2, 4, 65, 8, 2, 2, 6];
       const expectedResult = 65;
 
@@ -36,7 +36,7 @@ describe('CachedReducedValue', () => {
     });
 
     it('should not reduce old elements', () => {
-      const value = new CachedReducedValue(maxFunc, 0);
+      const value = CachedReducedValue(maxFunc, 0);
       const array = [1, 2];
       const array2 = [65, 100, 1];
       const expectedResult = 2;
@@ -50,7 +50,7 @@ describe('CachedReducedValue', () => {
 
   describe('reset', () => {
     it('should return start value', () => {
-      const value = new CachedReducedValue(maxFunc, 1);
+      const value = CachedReducedValue(maxFunc, 1);
       const array = [2, 3, 4, 5];
       const expectedResult = 1;
 
@@ -61,7 +61,7 @@ describe('CachedReducedValue', () => {
     });
 
     it('should be possible to add reduce new values after resetting value', () => {
-      const value = new CachedReducedValue();
+      const value = CachedReducedValue();
       const array = ['a', 'b', 'c'];
       const array2 = ['q', 'h'];
       const expectedResult = 'h';
@@ -78,14 +78,14 @@ describe('CachedReducedValue', () => {
 describe('CachedTransformedList', () => {
   describe('get', () => {
     it('should return empty list', () => {
-      const list = new CachedTransformedList();
+      const list = CachedTransformedList();
       const expectedResult = [];
 
       expect(list.get()).toEqual(expectedResult);
     });
 
     it('should return same list', () => {
-      const list = new CachedTransformedList();
+      const list = CachedTransformedList();
       const array = ['a', 'b', 'c'];
       const expectedResult = ['a', 'b', 'c'];
 
@@ -95,7 +95,7 @@ describe('CachedTransformedList', () => {
     });
 
     it('should return subset of list', () => {
-      const list = new CachedTransformedList(x => {
+      const list = CachedTransformedList(x => {
         return x.slice(1);
       });
 
@@ -110,7 +110,7 @@ describe('CachedTransformedList', () => {
 
   describe('diffAppend', () => {
     it('should append new elements', () => {
-      const list = new CachedTransformedList();
+      const list = CachedTransformedList();
       list.diffAppend(['a']);
       expect(list.get()).toEqual(['a']);
       list.diffAppend(['a', 'b']);
@@ -125,7 +125,7 @@ describe('CachedTransformedList', () => {
         });
       };
 
-      const list = new CachedTransformedList(f);
+      const list = CachedTransformedList(f);
 
       const array = [false, true, false, false, true];
       const expectedResult = f(array); // [true, true]
@@ -141,7 +141,7 @@ describe('CachedTransformedList', () => {
         });
       };
 
-      const list = new CachedTransformedList(f);
+      const list = CachedTransformedList(f);
       const array = [1, 2, 3, 4, 5, 4, 3, 999];
       const expectedResult = [2, 3, 4, 5, 6, 5, 4, 1000];
 
@@ -159,7 +159,7 @@ describe('CachedTransformedList', () => {
         });
       };
 
-      const list = new CachedTransformedList(f);
+      const list = CachedTransformedList(f);
 
       const array = ['a', 'b', 'c', 'a', 'b', 'a', 'c', 'c', 'b'];
 
@@ -173,7 +173,7 @@ describe('CachedTransformedList', () => {
     });
 
     it('should not update old elements', () => {
-      const list = new CachedTransformedList();
+      const list = CachedTransformedList();
       const array = ['a', 'b'];
       const array2 = ['q', 'h', 'c'];
       const expectedResult = ['a', 'b', 'c'];
@@ -187,7 +187,7 @@ describe('CachedTransformedList', () => {
 
   describe('reset', () => {
     it('should return empty list', () => {
-      const list = new CachedTransformedList();
+      const list = CachedTransformedList();
       const array = ['a', 'b'];
 
       list.diffAppend(array);
@@ -197,7 +197,7 @@ describe('CachedTransformedList', () => {
     });
 
     it('should be possible to add new elements after resetting list', () => {
-      const list = new CachedTransformedList();
+      const list = CachedTransformedList();
       const array = ['a', 'b', 'c'];
       const array2 = ['q', 'h'];
 
