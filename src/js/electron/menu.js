@@ -11,16 +11,15 @@ const handleMenuItemClicked = (type, data) => {
 };
 
 const handleShowOpenDialog = () => {
-  dialog.showOpenDialog(
-    {
-      properties: ['openFile']
-    },
-    filePath => {
-      if (filePath === undefined) return;
-      handleMenuItemClicked('open', filePath);
-      handleRecentFiles(filePath[0]);
-    }
-  );
+  const filePaths = dialog.showOpenDialog({
+    properties: ['openFile']
+  });
+
+  console.log(filePaths);
+
+  if (filePaths === undefined) return;
+  handleMenuItemClicked('open', filePaths);
+  handleRecentFiles(filePaths[0]);
 };
 
 const handleRecentFiles = filePath => {
