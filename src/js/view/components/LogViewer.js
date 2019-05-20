@@ -1,72 +1,33 @@
 import React from 'react';
 import {
-  LogViewContainer,
-  CloseFileButton,
-  Log,
-  LogLine
+  LogViewerContainer,
+  CloseFileButton
 } from '../styledComponents/LogViewerStyledComponents';
+import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
-import TextHighlightRegex from './TextHighlightRegex';
-import WindowedList from 'react-list';
-import {
-  filterByRegExp,
-  parseRegExp
-} from 'js/view/components/helpers/regexHelper.js';
+import { parseRegExp } from 'js/view/components/helpers/regexHelper.js';
 
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.windowedList = React.createRef();
     this.state = {
       escapeRegexSequence: '@'
     };
   }
 
-  scrollToBottom = (el, list) => {
-    el.scrollAround(list.length);
-  };
-
-  componentDidUpdate() {
-    if (this.props.tailSwitch)
-      this.scrollToBottom(this.windowedList.current, this.props.liveLines);
-  }
-
-  itemRenderer = (lines, regex) => {
-    return (i, key) => {
-      return (
-        <LogLine
-          key={key}
-          index={i}
-          wrap={this.props.wrapLineOn ? 'true' : undefined}
-        >
-          {regex && regex.test(lines[i], regex) ? (
-            <TextHighlightRegex
-              text={lines[i]}
-              color={this.props.highlightColor}
-              regex={regex}
-            />
-          ) : (
-            lines[i]
-          )}
-        </LogLine>
-      );
-    };
-  };
-
   render() {
-    const highlightRegex = parseRegExp(
+    const highlightRegExp = parseRegExp(
       this.props.highlightInput,
       this.state.escapeRegexSequence
     );
-    const filterRegex = parseRegExp(
+    const filterRegExp = parseRegExp(
       this.props.filterInput,
       this.state.escapeRegexSequence
     );
-    const lines = filterByRegExp(this.props.liveLines, filterRegex);
 
     return (
-      <LogViewContainer>
+      <LogViewerContainer>
         <CloseFileButton
           openFiles={this.props.openFiles}
           onClick={() => {
@@ -76,15 +37,15 @@ class LogViewer extends React.Component {
             );
           }}
         />
-        <Log>
-          <WindowedList
-            itemRenderer={this.itemRenderer(lines, highlightRegex)}
-            length={lines.length}
-            type="uniform"
-            ref={this.windowedList}
-          />
-        </Log>
-      </LogViewContainer>
+        <LogViewerList
+          highlightColor={this.props.highlightColor}
+          wrapLines={this.props.wrapLineOn}
+          scrollToBottom={this.props.tailSwitch}
+          lines={this.props.liveLines}
+          highlightRegExp={highlightRegExp}
+          filterRegExp={filterRegExp}
+        />
+      </LogViewerContainer>
     );
   }
 }
