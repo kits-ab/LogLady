@@ -24,7 +24,7 @@ function SnackBar(props) {
               hideSnackBar(props.dispatch, true);
             }}
           >
-            CLOSE
+            DISMISS
           </TextButton>
         </Container>
       </Layout>
