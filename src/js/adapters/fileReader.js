@@ -55,7 +55,6 @@ const formatLinesFromBuffer = _buffer => {
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
 const startWatcher = (sender, filePath, lastNewlineIndex) => {
-  console.log(lastNewlineIndex);
   if (watchers[filePath] !== undefined) {
     watchers[filePath].close();
   }
