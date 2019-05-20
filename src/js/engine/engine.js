@@ -3,79 +3,97 @@ const { ipcMain } = require('electron');
 
 let action = {};
 
-const getLiveLines = (event, _argObj) => {
-  fileReader.readLinesLive(_argObj.filePath);
-  fileReader.fileReaderEvents.on('liveLines', lines => {
-    action.type = 'liveLines';
-    action.data = lines;
-    event.sender.send('backendMessages', action);
-  });
+const openFile = async (sender, { filePath }) => {
+  try {
+    let lines = await fileReader.readNLastLines(filePath, 10);
+    sendLiveLinesToFrontend(sender, lines.slice(0, lines.lastIndexOf('\n')));
+    fileReader.followFile(sender, filePath);
+  } catch (err) {
+    sendErrorToFrontend(sender, "Couldn't open file", err);
+  }
 };
 
-const getNthLines = (event, _argObj) => {
+const getNthLines = (sender, { filePath, lineNumber, numberOfLines }) => {
   fileReader
-    .readNthLines(_argObj.filePath, _argObj.lineNumber, _argObj.numberOfLines)
+    .readNthLines(filePath, lineNumber, numberOfLines)
     .then(lines => {
       action.type = 'nthLines';
       action.data = lines;
-      event.sender.send('backendMessages', action);
+      sender.send('backendMessages', action);
     })
     .catch(err => {
-      sendErrorToFrontend(event, err);
+      sendErrorToFrontend(sender, "Couldn't read nth lines", err);
     });
 };
 
-const getNumberOfLines = (event, _argObj) => {
+const getNumberOfLines = (sender, { filePath }) => {
   fileReader
-    .getNumberOfLines(_argObj.filePath)
+    .getNumberOfLines(filePath)
     .then(lines => {
       action.type = 'numberOfLines';
       action.data = lines;
-      event.sender.send('backendMessages', action);
+      sender.send('backendMessages', action);
     })
     .catch(err => {
-      sendErrorToFrontend(event, err);
+      sendErrorToFrontend(sender, "Couldn't read number of lines", err);
     });
 };
 
-const getFileSize = (event, _argObj) => {
+const getFileSize = (sender, { filePath }) => {
   fileReader
-    .getFileSizeInBytes(_argObj.filePath)
+    .getFileSizeInBytes(filePath)
     .then(size => {
       action.type = 'fileSize';
       action.data = size;
-      event.sender.send('backendMessages', action);
+      sender.send('backendMessages', action);
     })
     .catch(err => {
-      sendErrorToFrontend(event, err);
+      sendErrorToFrontend(sender, "Couldn't read file size", err);
     });
 };
 
-const stopWatcher = (event, _argObj) => {
-  fileReader.stopWatcher(_argObj.filePath);
+const stopWatcher = ({ filePath }) => {
+  fileReader.stopWatcher(filePath);
 };
 
-const loadStateFromDisk = event => {
+const loadStateFromDisk = sender => {
   fileReader
     .loadStateFromDisk()
     .then(_data => {
       if (JSON.parse(_data).menuReducer.openFiles.length < 1) {
-        sendErrorToFrontend(event, 'noReduxStateFile');
+        sendErrorToFrontend(sender, 'noReduxStateFile');
       } else {
         action.type = 'loadState';
         action.data = _data;
       }
-      event.sender.send('backendMessages', action);
+      sender.send('backendMessages', action);
     })
     .catch(err => {
-      sendErrorToFrontend(event, err);
+      sendErrorToFrontend(
+        sender,
+        "Couldn't load previous state from disk",
+        err
+      );
     });
 };
 
-const sendErrorToFrontend = (event, err) => {
-  action.type = 'backendError';
-  action.data = err;
-  event.sender.send('backendMessages', action);
+const sendErrorToFrontend = (sender, message, err) => {
+  const action = {
+    type: 'error',
+    message: message,
+    error: err
+  };
+
+  sender.send('backendMessages', action);
+};
+
+const sendLiveLinesToFrontend = (sender, lines) => {
+  const action = {
+    type: 'liveLines',
+    data: lines
+  };
+
+  sender.send('backendMessages', action);
 };
 
 const saveRecentFilesToDisk = _recentFiles => {
@@ -87,21 +105,22 @@ const loadRecentFilesFromDisk = () => {
 };
 
 ipcMain.on('frontendMessages', (event, _argObj) => {
+  const sender = event.sender;
   switch (_argObj.function) {
     case 'liveLines':
-      getLiveLines(event, _argObj);
+      openFile(sender, _argObj);
       break;
     case 'numberOfLines':
-      getNumberOfLines(event, _argObj);
+      getNumberOfLines(sender, _argObj);
       break;
     case 'fileSize':
-      getFileSize(event, _argObj);
+      getFileSize(sender, _argObj);
       break;
     case 'nthLines':
-      getNthLines(event, _argObj);
+      getNthLines(sender, _argObj);
       break;
     case 'stopWatcher':
-      stopWatcher(event, _argObj);
+      stopWatcher(_argObj);
       break;
     case 'showOpenDialog':
       menu.handleShowOpenDialog();
@@ -110,7 +129,7 @@ ipcMain.on('frontendMessages', (event, _argObj) => {
       fileReader.saveStateToDisk(_argObj.reduxStateValue);
       break;
     case 'loadState':
-      loadStateFromDisk(event);
+      loadStateFromDisk(sender);
       break;
     default:
   }

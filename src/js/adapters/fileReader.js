@@ -18,9 +18,9 @@ const recentFiles = () => {
   return path.join(app.getPath('userData'), 'recentFiles.json');
 };
 
-const readLastLines = (filePath, numberOfLines) => {
-  return lastLines.read(filePath, numberOfLines).catch(err => {
-    throw err;
+const readNLastLines = (filePath, numberOfLines) => {
+  return lastLines.read(filePath, numberOfLines).then(lines => {
+    return lines.slice(0, lines.lastIndexOf('\n'));
   });
 };
 
@@ -32,13 +32,14 @@ const getLastNewlineIndex = filePath => {
   readStream.on('data', buffer => {
     lastNewlineIndex += buffer.lastIndexOf('\n');
   });
-  readStream.on('error', err => {
-    throw err;
-  });
+
   return new Promise((resolve, reject) => {
     readStream.on('end', () => {
-      console.log('lastNewlineIndex: ', lastNewlineIndex);
       resolve(lastNewlineIndex);
+    });
+
+    readStream.on('error', err => {
+      reject(err);
     });
   });
 };
@@ -53,11 +54,12 @@ const formatLinesFromBuffer = _buffer => {
 
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
-const startWatcher = (filePath, lastNewlineIndex) => {
+const startWatcher = (sender, filePath, lastNewlineIndex) => {
+  console.log(lastNewlineIndex);
   if (watchers[filePath] !== undefined) {
     watchers[filePath].close();
   }
-  let watcher = fs.watch(filePath, (event, filename) => {
+  let watcher = fs.watch(filePath, (_event, _filename) => {
     let readStreamFromLastIndex = fs
       .createReadStream(filePath, {
         start: lastNewlineIndex
@@ -65,8 +67,12 @@ const startWatcher = (filePath, lastNewlineIndex) => {
       .setEncoding('utf8');
     readStreamFromLastIndex.on('data', buffer => {
       lastNewlineIndex += buffer.lastIndexOf('\n');
-      let lines = formatLinesFromBuffer(buffer);
-      fileReaderEvents.emit('liveLines', lines);
+      const lines = formatLinesFromBuffer(buffer);
+      const action = {
+        type: 'liveLines',
+        data: lines
+      };
+      sender.send('backendMessages', action);
     });
   });
   watchers[filePath] = watcher;
@@ -87,24 +93,9 @@ const stopWatcher = filePath => {
   }
 };
 
-const readLinesLive = filePath => {
-  readLastLines(filePath, 10)
-    .then(lines => {
-      fileReaderEvents.emit(
-        'liveLines',
-        lines.slice(0, lines.lastIndexOf('\n'))
-      );
-      getLastNewlineIndex(filePath)
-        .then(lastNewlineIndex => {
-          startWatcher(filePath, lastNewlineIndex);
-        })
-        .catch(err => {
-          throw err;
-        });
-    })
-    .catch(err => {
-      console.log('error in readLinesLive: ', err);
-    });
+const followFile = async (sender, filePath) => {
+  const indexOfLastNewLine = await getLastNewlineIndex(filePath);
+  startWatcher(sender, filePath, indexOfLastNewLine);
 };
 
 const getNumberOfLines = filePath => {
@@ -192,10 +183,10 @@ const loadRecentFilesFromDisk = () => {
 
 module.exports = {
   readFile,
-  readLastLines,
+  readNLastLines,
   getNumberOfLines,
   readNthLines,
-  readLinesLive,
+  followFile,
   fileReaderEvents,
   getFileSizeInBytes,
   stopWatcher,

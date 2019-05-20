@@ -23,10 +23,8 @@ export const ipcListener = (store, publisher) => {
       case 'loadState':
         publisher.populateStore(JSON.parse(action.data));
         break;
-      case 'backendError':
-        //handle errors in the future
-        // alert('Error occured. ', action.data);
-        console.log('Error from the backend: ', action.data);
+      case 'error':
+        console.log('Error: ', action.message, ', ', action.error);
         break;
       default:
         dispatch({

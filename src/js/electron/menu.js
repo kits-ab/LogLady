@@ -151,7 +151,7 @@ const createMenu = () => {
     })
     .catch(err => {
       let action = {};
-      action.type = 'backendError';
+      action.type = 'error';
       action.data = err;
       webContents.send('backendMessages', action);
       Menu.setApplicationMenu(createTemplate());
