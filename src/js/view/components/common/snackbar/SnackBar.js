@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 export default function SnackBar(props) {
   const [show, setShow] = useState(false);
-  const ref = useRef();
 
   useEffect(() => {
     let timeout;
@@ -22,7 +21,6 @@ export default function SnackBar(props) {
 
   return (
     <SnackbarContainer
-      ref={ref}
       fade={props.fadeAfter > 0}
       color={props.color}
       className={show ? 'show' : 'hide'}
