@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SnackBarContainer } from 'js/view/styledComponents/common/SnackBarStyledComponents';
 
 export default function SnackBar(props) {
