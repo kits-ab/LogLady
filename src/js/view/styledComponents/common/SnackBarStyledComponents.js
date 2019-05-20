@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const SnackbarContainer = styled.div`
+export const SnackBarContainer = styled.div`
   position: absolute;
   min-width: 50%;
   visibility: hidden;
