@@ -21,7 +21,7 @@ export default function SnackBar(props) {
 
   return (
     <SnackbarContainer
-      fade={props.fadeAfter > 0}
+      fadeOut={props.fadeAfter > 0}
       color={props.color}
       className={show ? 'show' : 'hide'}
     >
@@ -52,7 +52,7 @@ const SnackbarContainer = styled.div`
 
   &.hide {
     ${props => {
-      return props.fade
+      return props.fadeOut
         ? `
     -webkit-animation: fadeout 1.5s;
     animation: fadeout 1.5s;
