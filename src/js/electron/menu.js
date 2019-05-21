@@ -10,6 +10,11 @@ const handleMenuItemClicked = (type, data) => {
   webContents.send('backendMessages', { type: `menu_${type}`, data: data });
 };
 
+const openFile = filePath => {
+  handleMenuItemClicked('open', [filePath]);
+  handleRecentFiles(filePath);
+};
+
 const handleShowOpenDialog = () => {
   dialog.showOpenDialog(
     {
@@ -17,8 +22,7 @@ const handleShowOpenDialog = () => {
     },
     filePath => {
       if (filePath === undefined) return;
-      handleMenuItemClicked('open', filePath);
-      handleRecentFiles(filePath[0]);
+      openFile(filePath[0]);
     }
   );
 };
@@ -67,7 +71,12 @@ const createTemplate = () => {
         {
           label: 'Open recent...',
           submenu: getRecentFiles().map(file => {
-            return { label: file };
+            return {
+              label: file,
+              click() {
+                openFile(file);
+              }
+            };
           })
         }
       ]
