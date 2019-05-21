@@ -1,6 +1,7 @@
 import {
   setLogSourceFile,
-  clearSources
+  clearSources,
+  showSnackBar
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 const { ipcRenderer } = window.require('electron');
@@ -20,6 +21,24 @@ const handleSourceOpened = (
   sendRequestToBackend(followSource);
 };
 
+const prettifyErrorMessage = (message, error) => {
+  switch (error.code) {
+    case 'EACCES':
+      return `${message} ${error.path} permission denied`;
+    case 'EISDIR':
+      return `${message} ${error.path} is a directory`;
+    case 'ENOENT':
+      return `${message} ${error.path} does not exist`;
+    default:
+      return message;
+  }
+};
+
+const handleError = (dispatch, { message, error }) => {
+  const errorMessage = prettifyErrorMessage(message, error);
+  showSnackBar(dispatch, errorMessage, 'error');
+};
+
 export const ipcListener = (store, publisher) => {
   const dispatch = store.dispatch;
 
@@ -35,7 +54,7 @@ export const ipcListener = (store, publisher) => {
         handleSourceOpened(dispatch, action);
         break;
       case 'error':
-        console.log('Error: ', action.message, ', ', action.error);
+        handleError(dispatch, action);
         break;
       case 'liveLines':
         dispatch({
