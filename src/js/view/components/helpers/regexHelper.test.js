@@ -103,7 +103,7 @@ describe('removeRegExpEscapeSequence', () => {
 
 describe('parseRegExp', () => {
   it('should fail to create regex when supplied a faulty regex', () => {
-    const string = '\\';
+    const string = '@\\';
     const escapeSequence = '@';
     const expectedResult = undefined;
 
@@ -117,8 +117,8 @@ describe('parseRegExp', () => {
     expect(parseRegExp(string, undefined)).toEqual(expectedResult);
   });
 
-  it('should succeed to create regex when supplied an escaped faulty regex', () => {
-    const string = '@\\';
+  it('should succeed to create regex when supplied a faulty regex as normal string', () => {
+    const string = '\\';
     const escapeSequence = '@';
     const expectedResult = /\\/i;
 

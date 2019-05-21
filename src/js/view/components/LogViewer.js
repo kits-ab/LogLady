@@ -18,9 +18,6 @@ class LogViewer extends React.Component {
   constructor(props) {
     super(props);
     this.windowedList = React.createRef();
-    this.state = {
-      escapeRegexSequence: '@'
-    };
   }
 
   scrollToBottom = (el, list) => {
@@ -55,14 +52,8 @@ class LogViewer extends React.Component {
   };
 
   render() {
-    const highlightRegex = parseRegExp(
-      this.props.highlightInput,
-      this.state.escapeRegexSequence
-    );
-    const filterRegex = parseRegExp(
-      this.props.filterInput,
-      this.state.escapeRegexSequence
-    );
+    const highlightRegex = parseRegExp(this.props.highlightInput);
+    const filterRegex = parseRegExp(this.props.filterInput);
     const lines = filterByRegExp(this.props.liveLines, filterRegex);
 
     return (
