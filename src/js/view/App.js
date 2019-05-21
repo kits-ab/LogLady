@@ -2,7 +2,8 @@ import TabSettings from './components/TabSettings';
 import LogViewer from './components/LogViewer';
 import TopPanel from './components/TopPanel';
 import DefaultPage from './components/DefaultPage';
-import Statusbar from './components/StatusBar';
+import StatusBar from './components/StatusBar';
+import SnackBar from './components/SnackBar';
 import {
   RootContainer,
   LogPage
@@ -20,7 +21,8 @@ class App extends Component {
             <TopPanel />
             <TabSettings />
             <LogViewer source={this.props.source} />
-            <Statusbar />
+            <StatusBar />
+            <SnackBar />
           </LogPage>
         ) : (
           <DefaultPage />

@@ -11,6 +11,23 @@ export const OpenFileButton = styled.button`
   outline: none;
 `;
 
+export const TextButton = styled.button`
+  border: none;
+  background-color: inherit;
+  color: ${props => {
+    return props.color ? props.color : '#222';
+  }};
+  padding: 14px 28px;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-block;
+  outline: none;
+
+  :hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+`;
+
 export const SwitchButtonContainer = styled.label`
   position: relative;
   display: inline-block;

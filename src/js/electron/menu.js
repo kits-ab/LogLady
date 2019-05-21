@@ -57,7 +57,12 @@ const createTemplate = () => {
         {
           label: 'Open recent...',
           submenu: getRecentFiles().map(file => {
-            return { label: file };
+            return {
+              label: file,
+              click() {
+                handleShowOpenDialog(file);
+              }
+            };
           })
         }
       ]
