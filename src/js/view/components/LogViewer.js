@@ -11,20 +11,13 @@ import { parseRegExp } from 'js/view/components/helpers/regexHelper.js';
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      escapeRegexSequence: '@'
-    };
+
+    this.windowedList = React.createRef();
   }
 
   render() {
-    const highlightRegExp = parseRegExp(
-      this.props.highlightInput,
-      this.state.escapeRegexSequence
-    );
-    const filterRegExp = parseRegExp(
-      this.props.filterInput,
-      this.state.escapeRegexSequence
-    );
+    const highlightRegExp = parseRegExp(this.props.highlightInput);
+    const filterRegExp = parseRegExp(this.props.filterInput);
 
     return (
       <LogViewerContainer>

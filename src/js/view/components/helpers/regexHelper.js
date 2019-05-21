@@ -95,15 +95,11 @@ export const filterByRegExp = (strings, regex) => {
  * @param {string} escapeSequence
  * @returns {RegExp | undefined} Returns a case insensitive RegExp or undefined if not possible
  */
-export const parseRegExp = (input, escapeSequence) => {
-  let regexString = input;
+export const parseRegExp = (input, escapeSequence = '@') => {
+  let regexString = escapeRegExpString(input);
 
   if (isEscapedRegExpString(input, escapeSequence)) {
-    let withoutEscapeSequence = removeRegExpEscapeSequence(
-      input,
-      escapeSequence
-    );
-    regexString = escapeRegExpString(withoutEscapeSequence);
+    regexString = removeRegExpEscapeSequence(input, escapeSequence);
   }
 
   if (!regexString) return undefined;
