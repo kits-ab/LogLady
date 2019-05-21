@@ -56,7 +56,7 @@ const windowStateKeeper = windowName => {
   };
 };
 
-const createWindow = () => {
+const createWindow = async () => {
   const mainWindowStateKeeper = windowStateKeeper('main');
   const windowOptions = {
     x: mainWindowStateKeeper.x,
@@ -112,6 +112,13 @@ const createWindow = () => {
     quitApplication();
   });
   menu.setWebContents(mainWindow.webContents);
+
+  try {
+    const recentFiles = await engine.loadRecentFilesFromDisk();
+    menu.setRecentFiles(recentFiles);
+  } catch (err) {
+    console.log("Couldn't load recent files, ", err);
+  }
   menu.createMenu();
 };
 

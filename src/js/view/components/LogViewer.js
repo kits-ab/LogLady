@@ -17,6 +17,8 @@ class LogViewer extends React.Component {
   }
 
   render() {
+    const lines = this.props.logs[this.props.source];
+
     const highlightRegExp = parseRegExp(
       this.props.highlightInput,
       this.state.escapeRegexSequence
@@ -29,11 +31,10 @@ class LogViewer extends React.Component {
     return (
       <LogViewerContainer>
         <CloseFileButton
-          openFiles={this.props.openFiles}
           onClick={() => {
             closeFile(
               this.props.dispatch,
-              this.props.openFiles ? this.props.openFiles : ''
+              this.props.source ? this.props.source : ''
             );
           }}
         />
@@ -41,7 +42,7 @@ class LogViewer extends React.Component {
           highlightColor={this.props.highlightColor}
           wrapLines={this.props.wrapLineOn}
           scrollToBottom={this.props.tailSwitch}
-          lines={this.props.liveLines}
+          lines={lines ? lines : []}
           highlightRegExp={highlightRegExp}
           filterRegExp={filterRegExp}
         />
@@ -56,10 +57,8 @@ const mapStateToProps = state => {
     highlightInput: state.topPanelReducer.highlightInput,
     highlightColor: state.settingsReducer.highlightColor,
     wrapLineOn: state.settingsReducer.wrapLineOn,
-    liveLines: state.logViewerReducer.liveLines,
-    nthLines: state.logViewerReducer.nthLines,
-    tailSwitch: state.topPanelReducer.tailSwitch,
-    openFiles: state.menuReducer.openFiles
+    logs: state.logViewerReducer.logs,
+    tailSwitch: state.topPanelReducer.tailSwitch
   };
 };
 

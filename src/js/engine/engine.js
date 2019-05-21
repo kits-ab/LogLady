@@ -1,99 +1,80 @@
 const fileReader = require('../adapters/fileReader');
 const { ipcMain } = require('electron');
+const { dialog } = require('electron');
+const ipcChannel = 'backendMessages';
 
-let action = {};
-
-const openFile = async (sender, { filePath }) => {
-  try {
-    let lines = await fileReader.readNLastLines(filePath, 10);
-    sendLiveLinesToFrontend(sender, lines.slice(0, lines.lastIndexOf('\n')));
-    fileReader.followFile(sender, filePath);
-  } catch (err) {
-    sendErrorToFrontend(sender, "Couldn't open file", err);
-  }
+const getFileInfo = filePath => {
+  // [filepath, numberOfLines, fileSize, history]
+  return Promise.all([
+    filePath,
+    fileReader.getNumberOfLines(filePath),
+    fileReader.getFileSizeInBytes(filePath),
+    fileReader.readNLastLines(filePath, 10)
+  ]);
 };
 
-const getNthLines = (sender, { filePath, lineNumber, numberOfLines }) => {
-  fileReader
-    .readNthLines(filePath, lineNumber, numberOfLines)
-    .then(lines => {
-      action.type = 'nthLines';
-      action.data = lines;
-      sender.send('backendMessages', action);
-    })
-    .catch(err => {
-      sendErrorToFrontend(sender, "Couldn't read nth lines", err);
-    });
+const sendSourceOpened = (
+  sender,
+  filePath,
+  numberOfLines,
+  fileSize,
+  history
+) => {
+  const action = {
+    type: 'sourceOpened',
+    filePath,
+    numberOfLines,
+    fileSize,
+    history
+  };
+
+  return sender.send(ipcChannel, action);
 };
 
-const getNumberOfLines = (sender, { filePath }) => {
-  fileReader
-    .getNumberOfLines(filePath)
-    .then(lines => {
-      action.type = 'numberOfLines';
-      action.data = lines;
-      sender.send('backendMessages', action);
-    })
-    .catch(err => {
-      sendErrorToFrontend(sender, "Couldn't read number of lines", err);
-    });
-};
+const handleFollowSource = (sender, filePath) => {
+  const onChange = lines => {
+    const action = {
+      type: 'liveLines',
+      filePath,
+      lines
+    };
 
-const getFileSize = (sender, { filePath }) => {
-  fileReader
-    .getFileSizeInBytes(filePath)
-    .then(size => {
-      action.type = 'fileSize';
-      action.data = size;
-      sender.send('backendMessages', action);
-    })
-    .catch(err => {
-      sendErrorToFrontend(sender, "Couldn't read file size", err);
-    });
-};
+    sender.send(ipcChannel, action);
+  };
 
-const stopWatcher = ({ filePath }) => {
-  fileReader.stopWatcher(filePath);
+  fileReader.followFile(filePath, onChange);
 };
 
 const loadStateFromDisk = sender => {
   fileReader
     .loadStateFromDisk()
     .then(_data => {
-      if (JSON.parse(_data).menuReducer.openFiles.length < 1) {
-        sendErrorToFrontend(sender, 'noReduxStateFile');
-      } else {
-        action.type = 'loadState';
-        action.data = _data;
+      const previousSource = JSON.parse(_data).menuReducer.openSources[0];
+
+      if (previousSource) {
+        openFile(sender, previousSource);
       }
-      sender.send('backendMessages', action);
+
+      const action = {
+        type: 'loadState',
+        data: _data
+      };
+
+      sender.send(ipcChannel, action);
     })
-    .catch(err => {
-      sendErrorToFrontend(
-        sender,
-        "Couldn't load previous state from disk",
-        err
-      );
-    });
+    .catch(sendBackError(sender, "Couldn't load previous state from disk"));
 };
 
-const sendErrorToFrontend = (sender, message, err) => {
-  const action = {
-    type: 'error',
-    message: message,
-    error: err
+const sendBackError = (sender, message) => {
+  return err => {
+    const action = {
+      type: 'error',
+      message: message,
+      error: err
+    };
+
+    sender.send(ipcChannel, action);
   };
-
-  sender.send('backendMessages', action);
-};
-
-const sendLiveLinesToFrontend = (sender, lines) => {
-  const action = {
-    type: 'liveLines',
-    data: lines
-  };
-
-  sender.send('backendMessages', action);
 };
 
 const saveRecentFilesToDisk = _recentFiles => {
@@ -104,26 +85,43 @@ const loadRecentFilesFromDisk = () => {
   return fileReader.loadRecentFilesFromDisk();
 };
 
-ipcMain.on('frontendMessages', (event, _argObj) => {
+const openFile = async (sender, filePath) => {
+  const fileInfo = await getFileInfo(filePath).catch(
+    sendBackError(sender, "Couldn't open file")
+  );
+
+  if (!fileInfo) return;
+
+  sendSourceOpened(sender, ...fileInfo);
+};
+
+const handleShowOpenDialog = async sender => {
+  dialog.showOpenDialog(
+    {
+      properties: ['openFile']
+    },
+    async filePaths => {
+      if (filePaths === undefined) return;
+
+      const filePath = filePaths[0];
+      await openFile(sender, filePath);
+      menu.handleRecentFiles(filePath);
+    }
+  );
+};
+
+ipcMain.on('frontendMessages', async (event, _argObj) => {
   const sender = event.sender;
   switch (_argObj.function) {
-    case 'liveLines':
-      openFile(sender, _argObj);
-      break;
-    case 'numberOfLines':
-      getNumberOfLines(sender, _argObj);
-      break;
-    case 'fileSize':
-      getFileSize(sender, _argObj);
-      break;
-    case 'nthLines':
-      getNthLines(sender, _argObj);
-      break;
-    case 'stopWatcher':
-      stopWatcher(_argObj);
-      break;
     case 'showOpenDialog':
-      menu.handleShowOpenDialog();
+      handleShowOpenDialog(sender);
+      break;
+    case 'followSource':
+      fileReader.stopAllWatchers();
+      handleFollowSource(sender, _argObj.filePath);
+      break;
+    case 'unfollowSource':
+      fileReader.stopWatcher(_argObj);
       break;
     case 'saveState':
       fileReader.saveStateToDisk(_argObj.reduxStateValue);

@@ -1,16 +1,20 @@
-const initialState = { liveLines: [] };
+const initialState = { logs: {} };
+
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'clearLines':
+    case 'clearAllLogs':
       return {
         ...state,
-        liveLines: []
+        logs: {}
       };
     case 'liveLines':
-      return {
-        ...state,
-        liveLines: [...state.liveLines, ...action.data.split('\n')]
-      };
+      const newLines = action.lines.split(/\r?\n/);
+      const newLogs = { ...state.logs };
+      const oldLog = state.logs[action.filePath];
+      newLogs[action.filePath] = oldLog ? [...oldLog, ...newLines] : newLines;
+
+      return { ...state, logs: newLogs };
+
     default:
       return state;
   }

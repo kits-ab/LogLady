@@ -54,7 +54,7 @@ const formatLinesFromBuffer = _buffer => {
 
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
-const startWatcher = (sender, filePath, lastNewlineIndex) => {
+const startWatcher = (filePath, lastNewlineIndex, onChange) => {
   if (watchers[filePath] !== undefined) {
     watchers[filePath].close();
   }
@@ -67,34 +67,33 @@ const startWatcher = (sender, filePath, lastNewlineIndex) => {
     readStreamFromLastIndex.on('data', buffer => {
       lastNewlineIndex += buffer.lastIndexOf('\n');
       const lines = formatLinesFromBuffer(buffer);
-      const action = {
-        type: 'liveLines',
-        data: lines
-      };
-      sender.send('backendMessages', action);
+      onChange(lines);
     });
   });
   watchers[filePath] = watcher;
 };
 
+const stopAllWatchers = () => {
+  for (var key in watchers) {
+    watchers[key].close();
+  }
+  watchers = {};
+};
+
 const stopWatcher = filePath => {
   try {
-    if (filePath === 'initializing') {
-      fileReaderEvents.removeAllListeners('liveLines');
-    } else {
-      watchers[filePath].close();
-      delete watchers[filePath];
-      fileReaderEvents.removeAllListeners('liveLines');
-      return `successfully closed watcher on file ${filePath}`; //if we want to send a confirmation to the frontend.
-    }
+    watchers[filePath].close();
+    delete watchers[filePath];
+    fileReaderEvents.removeAllListeners('liveLines');
+    return `successfully closed watcher on file ${filePath}`; //if we want to send a confirmation to the frontend.
   } catch (err) {
     return err;
   }
 };
 
-const followFile = async (sender, filePath) => {
+const followFile = async (filePath, onChange) => {
   const indexOfLastNewLine = await getLastNewlineIndex(filePath);
-  startWatcher(sender, filePath, indexOfLastNewLine);
+  startWatcher(filePath, indexOfLastNewLine, onChange);
 };
 
 const getNumberOfLines = filePath => {
@@ -189,6 +188,7 @@ module.exports = {
   fileReaderEvents,
   getFileSizeInBytes,
   stopWatcher,
+  stopAllWatchers,
   saveStateToDisk,
   loadStateFromDisk,
   formatLinesFromBuffer,

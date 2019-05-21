@@ -1,36 +1,51 @@
-import { closeFile } from './components/helpers/handleFileHelper';
+import {
+  setLogSourceFile,
+  clearSources
+} from 'js/view/actions/dispatchActions';
+import { sendRequestToBackend } from 'js/view/ipcPublisher';
 const { ipcRenderer } = window.require('electron');
+
+const handleSourceOpened = (
+  dispatch,
+  { filePath, numberOfLines, fileSize, history }
+) => {
+  clearSources(dispatch);
+  setLogSourceFile(dispatch, filePath, numberOfLines, fileSize, history);
+
+  const followSource = {
+    function: 'followSource',
+    filePath
+  };
+
+  sendRequestToBackend(followSource);
+};
 
 export const ipcListener = (store, publisher) => {
   const dispatch = store.dispatch;
-  closeFile(dispatch, 'initializing');
 
   ipcRenderer.on('backendMessages', (event, action) => {
     switch (action.type) {
-      case 'menu_open':
-        if (store.getState().menuReducer.openFiles) {
-          closeFile(dispatch, store.getState().menuReducer.openFiles[0]);
-        }
-        dispatch({
-          type: action.type,
-          data: action.data
-        });
-        publisher.initializeOpenFile(action.data[0]);
-        break;
       case 'saveState':
         publisher.saveStateToDisk();
         break;
       case 'loadState':
         publisher.populateStore(JSON.parse(action.data));
         break;
+      case 'sourceOpened':
+        handleSourceOpened(dispatch, action);
+        break;
       case 'error':
         console.log('Error: ', action.message, ', ', action.error);
         break;
-      default:
+      case 'liveLines':
         dispatch({
-          type: action.type,
-          data: action.data
+          type: 'liveLines',
+          filePath: action.filePath,
+          lines: action.lines
         });
+        break;
+      default:
+        console.log('Warning: Unrecognized message, ', action);
         break;
     }
   });

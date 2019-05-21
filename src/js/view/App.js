@@ -15,11 +15,11 @@ class App extends Component {
   render() {
     return (
       <RootContainer>
-        {this.props.openFiles && this.props.openFiles[0] ? (
+        {this.props.source ? (
           <LogPage>
             <TopPanel />
             <TabSettings />
-            <LogViewer />
+            <LogViewer source={this.props.source} />
             <Statusbar />
           </LogPage>
         ) : (
@@ -32,7 +32,7 @@ class App extends Component {
 
 const mapStateToProps = state => {
   return {
-    openFiles: state.menuReducer.openFiles
+    source: state.menuReducer.openSources[0]
   };
 };
 

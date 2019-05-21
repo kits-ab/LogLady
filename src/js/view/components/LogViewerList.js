@@ -106,6 +106,8 @@ class LogViewerList extends React.Component {
 
   //The onResize function is debounced as the resize event occurs all the time while resizing the window
   onResize = _.debounce(() => {
+    if (!this.rulerRef.current) return;
+
     //The line heights needs to be recalculated on a resize
     const charSize = calculateSize('W', this.rulerRef.current);
     const clientWidth = this.logRef.current.clientWidth;

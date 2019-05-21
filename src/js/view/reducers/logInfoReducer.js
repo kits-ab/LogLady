@@ -1,4 +1,6 @@
-export const logInfoReducer = (state = {}, action) => {
+const initialState = { numberOfLines: 0, fileSize: 0 };
+
+export const logInfoReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'numberOfLines':
       return {

@@ -37,15 +37,40 @@ export const handleWrapLineOn = dispatch => {
   });
 };
 
-export const handleCloseFile = dispatch => {
+export const setLogSourceFile = (
+  dispatch,
+  filePath,
+  numberOfLines,
+  fileSize,
+  history
+) => {
   dispatch({
-    type: 'menu_open',
-    data: 'clearOpenFiles'
+    type: 'setLogSource',
+    filePath
   });
+
   dispatch({
-    type: 'clearLines',
-    data: ''
+    type: 'liveLines',
+    filePath,
+    lines: history
   });
+
+  dispatch({
+    type: 'numberOfLines',
+    data: numberOfLines
+  });
+
+  dispatch({
+    type: 'fileSize',
+    data: fileSize
+  });
+};
+
+export const clearSources = dispatch => {
+  dispatch({
+    type: 'clearAllLogs'
+  });
+
   dispatch({
     type: 'nthLines',
     data: ''
