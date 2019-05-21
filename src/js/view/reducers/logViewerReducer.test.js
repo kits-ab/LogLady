@@ -5,7 +5,7 @@ describe('logViewer reducers', () => {
     const initialState = { logs: {} };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
-  it('should reset lines', () => {
+  it('should reset all logs', () => {
     const state = { logs: ['lalala', 'lililil'] };
     const expectedState = { logs: {} };
     const action = {
