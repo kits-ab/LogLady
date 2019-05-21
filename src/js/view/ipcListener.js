@@ -1,25 +1,27 @@
-import {
-  saveStateToDisk,
-  populateStore
-} from './configurations/configureStore';
-import { initializeOpenFile } from './configurations/configureStore';
+import { closeFile } from './components/helpers/handleFileHelper';
 const { ipcRenderer } = window.require('electron');
 
-export const ipcListener = (dispatch, state) => {
+export const ipcListener = (store, publisher) => {
+  const dispatch = store.dispatch;
+  closeFile(dispatch, 'initializing');
+
   ipcRenderer.on('backendMessages', (event, action) => {
     switch (action.type) {
       case 'menu_open':
+        if (store.getState().menuReducer.openFiles) {
+          closeFile(dispatch, store.getState().menuReducer.openFiles[0]);
+        }
         dispatch({
           type: action.type,
           data: action.data
         });
-        initializeOpenFile(action.data[0]);
+        publisher.initializeOpenFile(action.data[0]);
         break;
       case 'saveState':
-        saveStateToDisk();
+        publisher.saveStateToDisk();
         break;
       case 'loadState':
-        populateStore(JSON.parse(action.data));
+        publisher.populateStore(JSON.parse(action.data));
         break;
       case 'backendError':
         //handle errors in the future
