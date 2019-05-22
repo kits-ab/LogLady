@@ -16,7 +16,7 @@ describe('logviewer reducer', () => {
   it('should append lines to initial state', () => {
     const lines = 'hej1\nhej2\nhej3\n';
     const expectedState = {
-      logs: { test: ['hej1', 'hej2', 'hej3', ''] }
+      logs: { test: ['hej1', 'hej2', 'hej3'] }
     };
     const sourcePath = 'test';
 
@@ -32,10 +32,10 @@ describe('logviewer reducer', () => {
   it('should set log on source', () => {
     const log = 'hej4\nhej5\n';
     const state = {
-      logs: { test: ['hej1', 'hej2', 'hej3', ''] }
+      logs: { test: ['hej1', 'hej2', 'hej3'] }
     };
     const expectedState = {
-      logs: { test: ['hej4', 'hej5', ''] }
+      logs: { test: ['hej4', 'hej5'] }
     };
     const sourcePath = 'test';
     const action = {
@@ -47,10 +47,10 @@ describe('logviewer reducer', () => {
   it('should append lines to source', () => {
     const lines = 'hej4\nhej5\n';
     const state = {
-      logs: { test: ['hej1', 'hej2', 'hej3', ''] }
+      logs: { test: ['hej1', 'hej2', 'hej3'] }
     };
     const expectedState = {
-      logs: { test: ['hej1', 'hej2', 'hej3', '', 'hej4', 'hej5', ''] }
+      logs: { test: ['hej1', 'hej2', 'hej3', 'hej4', 'hej5'] }
     };
     const sourcePath = 'test';
     const action = {
