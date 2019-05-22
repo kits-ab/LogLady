@@ -11,10 +11,11 @@ const { ipcRenderer } = window.require('electron');
 const handleSourceOpened = (dispatch, { sourceType, ...rest }) => {
   switch (sourceType) {
     case 'FILE':
+      console.log(rest);
       handleFileOpened(dispatch, rest);
       break;
     default:
-      console.log('Unknown source type');
+      console.log('ipcListener.js: Unknown source type');
   }
 };
 

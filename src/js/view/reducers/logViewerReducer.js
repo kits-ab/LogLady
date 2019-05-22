@@ -1,11 +1,5 @@
 const initialState = { logs: {} };
 
-const formatLines = lines => {
-  return lines.split(/\r?\n/).filter(x => {
-    return x;
-  });
-};
-
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'LOGVIEWER_CLEAR':
@@ -15,17 +9,16 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     case 'LOGVIEWER_SET_LOG': {
       const { sourcePath, log } = action.data;
-      const newLogs = { ...state.logs };
-      newLogs[sourcePath] = formatLines(log);
+      const logs = { ...state.logs };
+      logs[sourcePath] = [...log];
 
-      return { ...state, logs: newLogs };
+      return { ...state, logs: logs };
     }
     case 'LOGVIEWER_ADD_LINES':
       const { sourcePath, lines } = action.data;
-      const newLines = formatLines(lines);
       const newLogs = { ...state.logs };
-      const oldLog = state.logs[sourcePath];
-      newLogs[sourcePath] = oldLog ? [...oldLog, ...newLines] : newLines;
+      const log = state.logs[sourcePath];
+      newLogs[sourcePath] = log ? [...log, ...lines] : [...lines];
 
       return { ...state, logs: newLogs };
 

@@ -19,8 +19,11 @@ const recentFiles = () => {
 };
 
 const readNLastLines = (filePath, numberOfLines) => {
-  return lastLines.read(filePath, numberOfLines).then(lines => {
-    return lines.slice(0, lines.lastIndexOf('\n'));
+  return lastLines.read(filePath, numberOfLines).then(buffer => {
+    const lines = buffer.split(/\r?\n/);
+    return lines.filter(x => {
+      return x !== '';
+    });
   });
 };
 
@@ -48,19 +51,16 @@ const startWatcher = (filePath, fromIndex, onChange, onError) => {
       .setEncoding('utf8');
 
     readStream.on('data', buffer => {
-      const lastNewLineIndex = buffer.lastIndexOf('\n');
-      if (lastNewLineIndex < 0) {
-        charsSinceLastLine += buffer;
-        currentIndex += buffer.length;
-        return;
-      }
+      currentIndex += buffer.length;
+      const lines = buffer.split(/\r?\n/);
+      lines[0] += charsSinceLastLine;
+      charsSinceLastLine = lines[lines.length - 1];
+      lines[lines.length - 1] = '';
 
-      const lines = charsSinceLastLine + buffer.slice(0, lastNewLineIndex);
-      const charsAfterLastLine = buffer.slice(lastNewLineIndex);
-
-      currentIndex += lastNewLineIndex;
-      charsSinceLastLine = charsAfterLastLine;
-      onChange(lines);
+      const filteredLines = lines.filter(x => {
+        return x !== '';
+      });
+      onChange(filteredLines);
     });
     readStream.on('error', error => {
       onError(error);
