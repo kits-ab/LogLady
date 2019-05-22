@@ -2,13 +2,13 @@ import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { clearSources } from '../../actions/dispatchActions';
 
 export const showOpenDialog = () => {
-  sendRequestToBackend({ function: 'showOpenDialog' });
+  sendRequestToBackend({ function: 'DIALOG_OPEN_SHOW' });
 };
 
 export const closeFile = (dispatch, _filePath) => {
   //send request to backend
   const argObj = {
-    function: 'unfollowSource',
+    function: 'SOURCE_UNFOLLOW',
     filePath: _filePath
   };
   sendRequestToBackend(argObj);

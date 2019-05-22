@@ -102,7 +102,7 @@ const createWindow = async () => {
   );
   mainWindow.on('close', () => {
     let argObj = {};
-    argObj.type = 'saveState';
+    argObj.type = '';
     mainWindow.webContents.send('backendMessages', argObj);
   });
   loadingWindow.show();

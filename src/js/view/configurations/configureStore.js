@@ -6,13 +6,13 @@ export const configureStore = (store, send = sendRequestToBackend) => {
     delete _state.logInfoReducer;
     delete _state.logViewerReducer;
     send({
-      function: 'saveState',
+      function: 'STATE_SAVE',
       reduxStateValue: JSON.stringify(_state)
     });
   };
 
   const loadStateFromDisk = () => {
-    send({ function: 'loadState' });
+    send({ function: 'STATE_LOAD' });
   };
 
   const populateStore = _savedStates => {
@@ -21,33 +21,12 @@ export const configureStore = (store, send = sendRequestToBackend) => {
         type: `${_reducer[0]}Restore`,
         data: _reducer[1]
       });
-      if (_reducer[0] === 'menuReducer') {
-        initializeOpenFile(_reducer[1].openFiles[0]);
-      }
     });
-  };
-
-  const initializeOpenFile = filePath => {
-    const args = {
-      filePath,
-      numberOfLines: 5,
-      lineNumber: 10
-    };
-    send({
-      ...args,
-      function: 'liveLines'
-    });
-    send({
-      ...args,
-      function: 'numberOfLines'
-    });
-    send({ ...args, function: 'fileSize' });
   };
 
   return {
     saveStateToDisk,
     loadStateFromDisk,
-    populateStore,
-    initializeOpenFile
+    populateStore
   };
 };

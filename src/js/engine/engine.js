@@ -21,7 +21,7 @@ const sendSourceOpened = (
   history
 ) => {
   const action = {
-    type: 'sourceOpened',
+    type: 'SOURCE_OPENED',
     filePath,
     numberOfLines,
     fileSize,
@@ -34,7 +34,7 @@ const sendSourceOpened = (
 const handleFollowSource = (sender, filePath) => {
   const onChange = lines => {
     const action = {
-      type: 'liveLines',
+      type: 'LINES_NEW',
       filePath,
       lines
     };
@@ -56,19 +56,19 @@ const loadStateFromDisk = sender => {
       }
 
       const action = {
-        type: 'loadState',
+        type: 'STATE_LOAD',
         data: _data
       };
 
       sender.send(ipcChannel, action);
     })
-    .catch(sendBackError(sender, "Couldn't load previous state from disk"));
+    .catch(sendError(sender, "Couldn't load previous state from disk"));
 };
 
-const sendBackError = (sender, message) => {
+const sendError = (sender, message) => {
   return err => {
     const action = {
-      type: 'error',
+      type: 'ERROR',
       message: message,
       error: err
     };
@@ -87,7 +87,7 @@ const loadRecentFilesFromDisk = () => {
 
 const openFile = async (sender, filePath) => {
   const fileInfo = await getFileInfo(filePath).catch(
-    sendBackError(sender, "Couldn't open file")
+    sendError(sender, "Couldn't open file")
   );
 
   if (!fileInfo) return;
@@ -113,20 +113,20 @@ const handleShowOpenDialog = async sender => {
 ipcMain.on('frontendMessages', async (event, _argObj) => {
   const sender = event.sender;
   switch (_argObj.function) {
-    case 'showOpenDialog':
+    case 'DIALOG_OPEN_SHOW':
       handleShowOpenDialog(sender);
       break;
-    case 'followSource':
+    case 'SOURCE_FOLLOW':
       fileReader.stopAllWatchers();
       handleFollowSource(sender, _argObj.filePath);
       break;
-    case 'unfollowSource':
+    case 'SOURCE_UNFOLLOW':
       fileReader.stopWatcher(_argObj);
       break;
-    case 'saveState':
+    case 'STATE_SAVE':
       fileReader.saveStateToDisk(_argObj.reduxStateValue);
       break;
-    case 'loadState':
+    case 'STATE_LOAD':
       loadStateFromDisk(sender);
       break;
     default:

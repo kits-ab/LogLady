@@ -16,11 +16,11 @@ class App extends Component {
   render() {
     return (
       <RootContainer>
-        {this.props.source ? (
+        {this.props.openSources && this.props.openSources[0] ? (
           <LogPage>
             <TopPanel />
             <TabSettings />
-            <LogViewer source={this.props.source} />
+            <LogViewer source={this.props.openSources[0]} />
             <StatusBar />
             <SnackBar />
           </LogPage>
@@ -34,7 +34,7 @@ class App extends Component {
 
 const mapStateToProps = state => {
   return {
-    source: state.menuReducer.openSources[0]
+    openSources: state.menuReducer.openSources
   };
 };
 

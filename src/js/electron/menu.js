@@ -9,7 +9,7 @@ const handleShowOpenDialog = () => {
   ipcMain.emit(
     'frontendMessages',
     { sender: webContents },
-    { function: 'showOpenDialog' }
+    { function: 'DIALOG_OPEN_SHOW' }
   );
 };
 

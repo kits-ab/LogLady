@@ -45,42 +45,44 @@ export const setLogSourceFile = (
   history
 ) => {
   dispatch({
-    type: 'setLogSource',
-    filePath
+    type: 'MENU_SET_SOURCE',
+    data: { filePath }
   });
 
   dispatch({
-    type: 'liveLines',
-    filePath,
-    lines: history
+    type: 'LOGVIEWER_ADD_LINES',
+    data: {
+      filePath,
+      lines: history
+    }
   });
 
   dispatch({
-    type: 'numberOfLines',
+    type: 'LOGINFO_SET_NUMBER_OF_LINES',
     data: numberOfLines
   });
 
   dispatch({
-    type: 'fileSize',
+    type: 'LOGINFO_SET_FILESIZE',
     data: fileSize
   });
 };
 
 export const clearSources = dispatch => {
   dispatch({
-    type: 'clearAllLogs'
+    type: 'LOGVIEWER_CLEAR'
   });
 
   dispatch({
-    type: 'nthLines',
+    type: 'MENU_CLEAR'
+  });
+
+  dispatch({
+    type: 'LOGINFO_SET_NUMBER_OF_LINES',
     data: ''
   });
   dispatch({
-    type: 'numberOfLines',
-    data: ''
-  });
-  dispatch({
-    type: 'fileSize',
+    type: 'LOGINFO_SET_FILESIZE',
     data: ''
   });
 };

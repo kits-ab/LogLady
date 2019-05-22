@@ -14,7 +14,7 @@ const handleSourceOpened = (
   setLogSourceFile(dispatch, filePath, numberOfLines, fileSize, history);
 
   const followSource = {
-    function: 'followSource',
+    function: 'SOURCE_FOLLOW',
     filePath
   };
 
@@ -42,25 +42,27 @@ const handleError = (dispatch, { message, error }) => {
 export const ipcListener = (store, publisher) => {
   const dispatch = store.dispatch;
 
-  ipcRenderer.on('backendMessages', (event, action) => {
+  ipcRenderer.on('backendMessages', (_event, action) => {
     switch (action.type) {
-      case 'saveState':
+      case 'STATE_SAVE':
         publisher.saveStateToDisk();
         break;
-      case 'loadState':
+      case 'STATE_LOAD':
         publisher.populateStore(JSON.parse(action.data));
         break;
-      case 'sourceOpened':
+      case 'SOURCE_OPENED':
         handleSourceOpened(dispatch, action);
         break;
-      case 'error':
+      case 'ERROR':
         handleError(dispatch, action);
         break;
-      case 'liveLines':
+      case 'LINES_NEW':
         dispatch({
-          type: 'liveLines',
-          filePath: action.filePath,
-          lines: action.lines
+          type: 'LOGVIEWER_ADD_LINES',
+          data: {
+            filePath: action.filePath,
+            lines: action.lines
+          }
         });
         break;
       default:

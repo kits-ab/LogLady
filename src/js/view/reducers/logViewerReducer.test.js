@@ -9,7 +9,7 @@ describe('logViewer reducers', () => {
     const state = { logs: ['lalala', 'lililil'] };
     const expectedState = { logs: {} };
     const action = {
-      type: 'clearAllLogs'
+      type: 'LOGVIEWER_CLEAR'
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
@@ -21,9 +21,11 @@ describe('logViewer reducers', () => {
     const filePath = 'test';
 
     const action = {
-      type: 'liveLines',
-      filePath,
-      lines
+      type: 'LOGVIEWER_ADD_LINES',
+      data: {
+        filePath,
+        lines
+      }
     };
     expect(logViewerReducer(undefined, action)).toEqual(expectedState);
   });
@@ -37,9 +39,8 @@ describe('logViewer reducers', () => {
     };
     const filePath = 'test';
     const action = {
-      type: 'liveLines',
-      filePath,
-      lines
+      type: 'LOGVIEWER_ADD_LINES',
+      data: { filePath, lines }
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
