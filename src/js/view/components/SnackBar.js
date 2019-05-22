@@ -8,15 +8,15 @@ import {
 import { connect } from 'react-redux';
 import CommonSnackBar from 'js/view/components/common/snackbar/SnackBar';
 
-function SnackBar(props) {
+const SnackBar = props => {
   return (
     <CommonSnackBar
-      key={props.snackBar.message + props.snackBar.level}
-      show={props.snackBar.show}
-      fadeAfter={props.snackBar.fadeAfter}
+      key={props.message + props.level}
+      show={props.show}
+      fadeAfter={props.fadeAfter}
     >
       <Layout row>
-        <Container grow>{props.snackBar.message}</Container>
+        <Container grow>{props.message}</Container>
         <Container>
           <TextButton
             color="#bb86fc"
@@ -30,11 +30,14 @@ function SnackBar(props) {
       </Layout>
     </CommonSnackBar>
   );
-}
+};
 
 const mapStateToProps = state => {
   return {
-    snackBar: state.snackBarReducer
+    message: state.snackBarReducer.message,
+    show: state.snackBarReducer.show,
+    fadeAfter: state.snackBarReducer.fadeAfter,
+    level: state.snackBarReducer.level
   };
 };
 

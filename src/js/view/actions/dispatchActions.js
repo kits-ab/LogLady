@@ -87,16 +87,20 @@ export const clearSources = dispatch => {
 
 export const hideSnackBar = (dispatch, instant) => {
   dispatch({
-    type: 'snackbar_hide',
-    instant: instant
+    type: 'SNACKBAR_HIDE',
+    data: {
+      instant
+    }
   });
 };
 
 export const showSnackBar = (dispatch, message, level, fadeAfter) => {
   dispatch({
-    type: 'snackbar_show_new',
-    message: message,
-    level: level,
-    fadeAfter: fadeAfter
+    type: 'SNACKBAR_SHOW_NEW',
+    data: {
+      message,
+      level,
+      fadeAfter
+    }
   });
 };
