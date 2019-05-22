@@ -44,10 +44,10 @@ export const ipcListener = (store, publisher) => {
 
   ipcRenderer.on('backendMessages', (_event, action) => {
     switch (action.type) {
-      case 'STATE_SAVE':
+      case 'QUIT':
         publisher.saveStateToDisk();
         break;
-      case 'STATE_LOAD':
+      case 'STATE_SET':
         publisher.populateStore(JSON.parse(action.data));
         break;
       case 'SOURCE_OPENED':

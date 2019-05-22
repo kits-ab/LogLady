@@ -56,7 +56,7 @@ const loadStateFromDisk = sender => {
       }
 
       const action = {
-        type: 'STATE_LOAD',
+        type: 'STATE_SET',
         data: _data
       };
 
