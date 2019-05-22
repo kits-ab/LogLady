@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SnackBarContainer } from 'js/view/styledComponents/common/SnackBarStyledComponents';
 
-export default function SnackBar(props) {
+const SnackBar = props => {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -28,4 +28,6 @@ export default function SnackBar(props) {
       {props.children}
     </SnackBarContainer>
   );
-}
+};
+
+export default SnackBar;

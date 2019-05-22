@@ -22,7 +22,8 @@ describe('snackbar reducer', () => {
       show: false
     };
     const action = {
-      type: 'snackbar_hide'
+      type: 'SNACKBAR_HIDE',
+      data: { instant: false }
     };
     expect(snackBarReducer(state, action)).toEqual(expectedResult);
   });
@@ -39,8 +40,8 @@ describe('snackbar reducer', () => {
       fadeAfter: 0
     };
     const action = {
-      type: 'snackbar_hide',
-      instant: true
+      type: 'SNACKBAR_HIDE',
+      data: { instant: true }
     };
     expect(snackBarReducer(state, action)).toEqual(expectedResult);
   });
@@ -61,8 +62,8 @@ describe('snackbar reducer', () => {
       ...content
     };
     const action = {
-      type: 'snackbar_show_new',
-      ...content
+      type: 'SNACKBAR_SHOW_NEW',
+      data: { ...content }
     };
     expect(snackBarReducer(state, action)).toEqual(expectedResult);
   });
