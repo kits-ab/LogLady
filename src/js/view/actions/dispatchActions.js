@@ -37,7 +37,7 @@ export const handleWrapLineOn = dispatch => {
   });
 };
 
-export const setLogSourceFile = (
+export const setFileSource = (
   dispatch,
   filePath,
   numberOfLines,
@@ -46,14 +46,14 @@ export const setLogSourceFile = (
 ) => {
   dispatch({
     type: 'MENU_SET_SOURCE',
-    data: { filePath }
+    data: { sourcePath: filePath }
   });
 
   dispatch({
-    type: 'LOGVIEWER_ADD_LINES',
+    type: 'LOGVIEWER_SET_LOG',
     data: {
-      filePath,
-      lines: history
+      sourcePath: filePath,
+      log: history
     }
   });
 
@@ -65,6 +65,12 @@ export const setLogSourceFile = (
   dispatch({
     type: 'LOGINFO_SET_FILESIZE',
     data: fileSize
+  });
+};
+
+export const clearAllLogs = dispatch => {
+  dispatch({
+    type: 'LOGVIEWER_CLEAR'
   });
 };
 
@@ -92,6 +98,16 @@ export const hideSnackBar = (dispatch, instant) => {
     type: 'SNACKBAR_HIDE',
     data: {
       instant
+    }
+  });
+};
+
+export const addNewLines = (dispatch, sourcePath, lines) => {
+  dispatch({
+    type: 'LOGVIEWER_ADD_LINES',
+    data: {
+      sourcePath,
+      lines
     }
   });
 };

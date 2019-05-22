@@ -32,6 +32,7 @@ class LogViewer extends React.Component {
           }}
         />
         <LogViewerList
+          key={this.props.source}
           highlightColor={this.props.highlightColor}
           wrapLines={this.props.wrapLineOn}
           scrollToBottom={this.props.tailSwitch}
@@ -44,14 +45,18 @@ class LogViewer extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = ({
+  topPanelReducer,
+  settingsReducer,
+  logViewerReducer
+}) => {
   return {
-    filterInput: state.topPanelReducer.filterInput,
-    highlightInput: state.topPanelReducer.highlightInput,
-    highlightColor: state.settingsReducer.highlightColor,
-    wrapLineOn: state.settingsReducer.wrapLineOn,
-    logs: state.logViewerReducer.logs,
-    tailSwitch: state.topPanelReducer.tailSwitch
+    filterInput: topPanelReducer.filterInput,
+    highlightInput: topPanelReducer.highlightInput,
+    highlightColor: settingsReducer.highlightColor,
+    wrapLineOn: settingsReducer.wrapLineOn,
+    logs: logViewerReducer.logs,
+    tailSwitch: topPanelReducer.tailSwitch
   };
 };
 

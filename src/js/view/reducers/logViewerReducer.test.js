@@ -1,6 +1,6 @@
 import { logViewerReducer } from './logViewerReducer';
 
-describe('logViewer reducers', () => {
+describe('logviewer reducer', () => {
   it('should return the initial state', () => {
     const initialState = { logs: {} };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
@@ -18,18 +18,33 @@ describe('logViewer reducers', () => {
     const expectedState = {
       logs: { test: ['hej1', 'hej2', 'hej3', ''] }
     };
-    const filePath = 'test';
+    const sourcePath = 'test';
 
     const action = {
       type: 'LOGVIEWER_ADD_LINES',
       data: {
-        filePath,
+        sourcePath,
         lines
       }
     };
     expect(logViewerReducer(undefined, action)).toEqual(expectedState);
   });
-  it('should append lines to populated state', () => {
+  it('should set log on source', () => {
+    const log = 'hej4\nhej5\n';
+    const state = {
+      logs: { test: ['hej1', 'hej2', 'hej3', ''] }
+    };
+    const expectedState = {
+      logs: { test: ['hej4', 'hej5', ''] }
+    };
+    const sourcePath = 'test';
+    const action = {
+      type: 'LOGVIEWER_SET_LOG',
+      data: { sourcePath, log }
+    };
+    expect(logViewerReducer(state, action)).toEqual(expectedState);
+  });
+  it('should append lines to source', () => {
     const lines = 'hej4\nhej5\n';
     const state = {
       logs: { test: ['hej1', 'hej2', 'hej3', ''] }
@@ -37,10 +52,10 @@ describe('logViewer reducers', () => {
     const expectedState = {
       logs: { test: ['hej1', 'hej2', 'hej3', '', 'hej4', 'hej5', ''] }
     };
-    const filePath = 'test';
+    const sourcePath = 'test';
     const action = {
       type: 'LOGVIEWER_ADD_LINES',
-      data: { filePath, lines }
+      data: { sourcePath, lines }
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });

@@ -101,8 +101,7 @@ const createWindow = async () => {
     `file://${path.join(__dirname, '../src/resources/loadingSpinner.html')}`
   );
   mainWindow.on('close', () => {
-    let argObj = {};
-    argObj.type = '';
+    const argObj = { type: 'QUIT' };
     mainWindow.webContents.send('backendMessages', argObj);
   });
   loadingWindow.show();

@@ -9,7 +9,7 @@ it('should return state at unknown type', () => {
 it('should set openSources to specified file', () => {
   const filePath = 'hey/ho/lets.go';
   const state = {};
-  const action = { type: 'MENU_SET_SOURCE', data: { filePath } };
+  const action = { type: 'MENU_SET_SOURCE', data: { sourcePath: filePath } };
   const expectedState = { openSources: [filePath] };
   expect(menuReducer(state, action)).toEqual(expectedState);
 });

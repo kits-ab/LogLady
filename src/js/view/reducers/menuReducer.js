@@ -6,8 +6,8 @@ export const menuReducer = (state = initialState, action) => {
       return { ...state, openSources: [] };
 
     case 'MENU_SET_SOURCE':
-      const { filePath } = action.data;
-      return { ...state, openSources: [filePath] };
+      const { sourcePath } = action.data;
+      return { ...state, openSources: [sourcePath] };
     case 'menuReducerRestore':
       return { ...initialState, ...action.data };
     default:

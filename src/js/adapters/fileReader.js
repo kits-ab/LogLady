@@ -24,26 +24,6 @@ const readNLastLines = (filePath, numberOfLines) => {
   });
 };
 
-//find and save the index of the last newline characters
-const getLastNewlineIndex = filePath => {
-  let lastNewlineIndex = 0;
-  let readStream = fs.createReadStream(filePath).setEncoding('utf8');
-
-  readStream.on('data', buffer => {
-    lastNewlineIndex += buffer.lastIndexOf('\n');
-  });
-
-  return new Promise((resolve, reject) => {
-    readStream.on('end', () => {
-      resolve(lastNewlineIndex);
-    });
-
-    readStream.on('error', err => {
-      reject(err);
-    });
-  });
-};
-
 const formatLinesFromBuffer = _buffer => {
   if (_buffer.split('\n')[0] === '') {
     return _buffer.slice(1, _buffer.lastIndexOf('\n'));
@@ -54,22 +34,39 @@ const formatLinesFromBuffer = _buffer => {
 
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
-const startWatcher = (filePath, lastNewlineIndex, onChange) => {
+const startWatcher = (filePath, fromIndex, onChange, onError) => {
+  let currentIndex = fromIndex;
+  let charsSinceLastLine = '';
   if (watchers[filePath] !== undefined) {
     watchers[filePath].close();
   }
   let watcher = fs.watch(filePath, (_event, _filename) => {
-    let readStreamFromLastIndex = fs
+    let readStream = fs
       .createReadStream(filePath, {
-        start: lastNewlineIndex
+        start: currentIndex
       })
       .setEncoding('utf8');
-    readStreamFromLastIndex.on('data', buffer => {
-      lastNewlineIndex += buffer.lastIndexOf('\n');
-      const lines = formatLinesFromBuffer(buffer);
+
+    readStream.on('data', buffer => {
+      const lastNewLineIndex = buffer.lastIndexOf('\n');
+      if (lastNewLineIndex < 0) {
+        charsSinceLastLine += buffer;
+        currentIndex += buffer.length;
+        return;
+      }
+
+      const lines = charsSinceLastLine + buffer.slice(0, lastNewLineIndex);
+      const charsAfterLastLine = buffer.slice(lastNewLineIndex);
+
+      currentIndex += lastNewLineIndex;
+      charsSinceLastLine = charsAfterLastLine;
       onChange(lines);
     });
+    readStream.on('error', error => {
+      onError(error);
+    });
   });
+
   watchers[filePath] = watcher;
 };
 
@@ -91,25 +88,28 @@ const stopWatcher = filePath => {
   }
 };
 
-const followFile = async (filePath, onChange) => {
-  const indexOfLastNewLine = await getLastNewlineIndex(filePath);
-  startWatcher(filePath, indexOfLastNewLine, onChange);
+const followFile = async (filePath, fromIndex, onChange, onError) => {
+  startWatcher(filePath, fromIndex, onChange, onError);
 };
 
 const getNumberOfLines = filePath => {
   return new Promise((resolve, reject) => {
     let lineCount = 0;
-    let idx = -1;
+    let lastLineEndIndex = 0;
+    let charsSinceLineCount = 0;
     fs.createReadStream(filePath)
-      .on('data', buffer => {
-        lineCount--;
-        do {
-          idx = buffer.indexOf(10, idx + 1);
-          lineCount++;
-        } while (idx !== -1);
+      .on('data', chunk => {
+        for (let i = 0; i < chunk.length; i++) {
+          charsSinceLineCount++;
+          if (chunk[i] === 10) {
+            lastLineEndIndex += charsSinceLineCount;
+            charsSinceLineCount = 0;
+            lineCount++;
+          }
+        }
       })
       .on('end', () => {
-        resolve(lineCount);
+        resolve([lineCount, lastLineEndIndex]);
       })
       .on('error', err => {
         reject(err);

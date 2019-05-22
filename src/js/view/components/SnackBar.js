@@ -16,7 +16,9 @@ const SnackBar = props => {
       fadeAfter={props.fadeAfter}
     >
       <Layout row>
-        <Container grow>{props.message}</Container>
+        <Container grow pr-2>
+          {props.message}
+        </Container>
         <Container>
           <TextButton
             color="#bb86fc"

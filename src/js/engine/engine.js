@@ -13,36 +13,54 @@ const getFileInfo = filePath => {
   ]);
 };
 
-const sendSourceOpened = (
+const sendFileOpened = (
   sender,
   filePath,
-  numberOfLines,
+  [lineCount, lastLineEndIndex],
   fileSize,
   history
 ) => {
   const action = {
     type: 'SOURCE_OPENED',
-    filePath,
-    numberOfLines,
-    fileSize,
-    history
+    data: {
+      sourceType: 'FILE',
+      filePath,
+      lineCount,
+      lastLineEndIndex,
+      fileSize,
+      history
+    }
   };
 
   return sender.send(ipcChannel, action);
 };
 
-const handleFollowSource = (sender, filePath) => {
+const handleFollowSource = (sender, { sourceType, ...rest }) => {
+  switch (sourceType) {
+    case 'FILE':
+      handleFollowFile(sender, rest);
+      break;
+    default:
+      sendError(sender, 'Unknown source type')({ code: 'CUSTOM' });
+  }
+};
+
+const handleFollowFile = (sender, { filePath, fromIndex }) => {
   const onChange = lines => {
     const action = {
       type: 'LINES_NEW',
-      filePath,
-      lines
+      data: {
+        sourcePath: filePath,
+        lines
+      }
     };
 
     sender.send(ipcChannel, action);
   };
 
-  fileReader.followFile(filePath, onChange);
+  const onError = sendError(sender, "Couldn't keep following source");
+
+  fileReader.followFile(filePath, fromIndex, onChange, onError);
 };
 
 const loadStateFromDisk = sender => {
@@ -66,11 +84,13 @@ const loadStateFromDisk = sender => {
 };
 
 const sendError = (sender, message) => {
-  return err => {
+  return error => {
     const action = {
       type: 'ERROR',
-      message: message,
-      error: err
+      data: {
+        message,
+        error
+      }
     };
 
     sender.send(ipcChannel, action);
@@ -92,7 +112,7 @@ const openFile = async (sender, filePath) => {
 
   if (!fileInfo) return;
 
-  sendSourceOpened(sender, ...fileInfo);
+  sendFileOpened(sender, ...fileInfo);
 };
 
 const handleShowOpenDialog = async sender => {
@@ -118,7 +138,7 @@ ipcMain.on('frontendMessages', async (event, _argObj) => {
       break;
     case 'SOURCE_FOLLOW':
       fileReader.stopAllWatchers();
-      handleFollowSource(sender, _argObj.filePath);
+      handleFollowSource(sender, _argObj.data);
       break;
     case 'SOURCE_UNFOLLOW':
       fileReader.stopWatcher(_argObj);

@@ -1,42 +1,48 @@
 import {
-  setLogSourceFile,
-  clearSources,
-  showSnackBar
+  setFileSource,
+  clearAllLogs,
+  showSnackBar,
+  addNewLines
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
+import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
 const { ipcRenderer } = window.require('electron');
 
-const handleSourceOpened = (
+const handleSourceOpened = (dispatch, { sourceType, ...rest }) => {
+  switch (sourceType) {
+    case 'FILE':
+      handleFileOpened(dispatch, rest);
+      break;
+    default:
+      console.log('Unknown source type');
+  }
+};
+
+const handleFileOpened = (
   dispatch,
-  { filePath, numberOfLines, fileSize, history }
+  { filePath, lineCount, lastLineEndIndex, fileSize, history }
 ) => {
-  clearSources(dispatch);
-  setLogSourceFile(dispatch, filePath, numberOfLines, fileSize, history);
+  clearAllLogs(dispatch);
+  setFileSource(dispatch, filePath, lineCount, fileSize, history);
 
   const followSource = {
     function: 'SOURCE_FOLLOW',
-    filePath
+    data: {
+      sourceType: 'FILE',
+      filePath,
+      fromIndex: lastLineEndIndex
+    }
   };
-
   sendRequestToBackend(followSource);
 };
 
-const prettifyErrorMessage = (message, error) => {
-  switch (error.code) {
-    case 'EACCES':
-      return `${message} ${error.path} permission denied`;
-    case 'EISDIR':
-      return `${message} ${error.path} is a directory`;
-    case 'ENOENT':
-      return `${message} ${error.path} does not exist`;
-    default:
-      return message;
-  }
+const handleNewLines = (dispatch, { sourcePath, lines }) => {
+  addNewLines(dispatch, sourcePath, lines);
 };
 
 const handleError = (dispatch, { message, error }) => {
   const errorMessage = prettifyErrorMessage(message, error);
-  showSnackBar(dispatch, errorMessage, 'error');
+  showSnackBar(dispatch, errorMessage, 'error', 20000);
 };
 
 export const ipcListener = (store, publisher) => {
@@ -51,19 +57,13 @@ export const ipcListener = (store, publisher) => {
         publisher.populateStore(JSON.parse(action.data));
         break;
       case 'SOURCE_OPENED':
-        handleSourceOpened(dispatch, action);
+        handleSourceOpened(dispatch, action.data);
         break;
       case 'ERROR':
-        handleError(dispatch, action);
+        handleError(dispatch, action.data);
         break;
       case 'LINES_NEW':
-        dispatch({
-          type: 'LOGVIEWER_ADD_LINES',
-          data: {
-            filePath: action.filePath,
-            lines: action.lines
-          }
-        });
+        handleNewLines(dispatch, action.data);
         break;
       default:
         console.log('Warning: Unrecognized message, ', action);
