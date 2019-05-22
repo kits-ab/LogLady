@@ -15,11 +15,16 @@ export const getFormattedFileSize = fileSize => {
 export const getFormattedFilePath = filePath => {
   const sign = signToSplit();
   const filePathToArray = filePath.split(sign);
-  
+
   if (filePathToArray.length > 4) {
     const shortFilePath = filePathToArray.slice(-3);
     return (
-      '...' + shortFilePath[0] + sign + shortFilePath[1] + sign + shortFilePath[2]
+      '...' +
+      shortFilePath[0] +
+      sign +
+      shortFilePath[1] +
+      sign +
+      shortFilePath[2]
     );
   }
   return filePath;
@@ -27,4 +32,4 @@ export const getFormattedFilePath = filePath => {
 
 const signToSplit = () => {
   return `${navigator.platform.startsWith('Win') ? '\\' : '/'}`;
-}
+};
