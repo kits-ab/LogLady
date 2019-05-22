@@ -59,3 +59,23 @@ export const handleCloseFile = dispatch => {
     data: ''
   });
 };
+
+export const hideSnackBar = (dispatch, instant) => {
+  dispatch({
+    type: 'SNACKBAR_HIDE',
+    data: {
+      instant
+    }
+  });
+};
+
+export const showSnackBar = (dispatch, message, level, fadeAfter) => {
+  dispatch({
+    type: 'SNACKBAR_SHOW_NEW',
+    data: {
+      message,
+      level,
+      fadeAfter
+    }
+  });
+};
