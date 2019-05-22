@@ -49,22 +49,22 @@ describe('groupByMatches', () => {
 });
 
 describe('isEscapedRegExpString', () => {
-  it('should show as escaped regex string when starting string with escape sequence', () => {
-    const string = '@helloimnormaltext';
+  it('should show as escaped text string when starting string with escape sequence', () => {
+    const string = '@.regex';
     const escapeSequence = '@';
 
     expect(isEscapedRegExpString(string, escapeSequence)).toEqual(true);
   });
 
-  it('should not show as escaped regex string on empty escape sequence', () => {
-    const string = 'helloimnormaltext';
+  it('should not show as escaped text string on empty escape sequence', () => {
+    const string = '.regex';
     const escapeSequence = '';
 
     expect(isEscapedRegExpString(string, escapeSequence)).toEqual(false);
   });
 
-  it('should not show as escaped regex string on wrong escape sequence', () => {
-    const string = '@helloimnormaltext';
+  it('should not show as escaped text string on wrong escape sequence', () => {
+    const string = '@.regex';
     const escapeSequence = '%';
 
     expect(isEscapedRegExpString(string, escapeSequence)).toEqual(false);
@@ -73,6 +73,7 @@ describe('isEscapedRegExpString', () => {
 
 describe('escapeRegExpString', () => {
   it('should escape regex characters and remove escapeSequence', () => {
+    //
     const string = '. \\ + * ? [ ^ ] $ ( ) { } = ! < > | : -';
     const expectedResult =
       '\\. \\\\ \\+ \\* \\? \\[ \\^ \\] \\$ \\( \\) \\{ \\} \\= \\! \\< \\> \\| \\: \\-';
@@ -102,7 +103,7 @@ describe('removeRegExpEscapeSequence', () => {
 
 describe('parseRegExp', () => {
   it('should fail to create regex when supplied a faulty regex', () => {
-    const string = '\\';
+    const string = '@\\';
     const escapeSequence = '@';
     const expectedResult = undefined;
 
@@ -116,8 +117,8 @@ describe('parseRegExp', () => {
     expect(parseRegExp(string, undefined)).toEqual(expectedResult);
   });
 
-  it('should succeed to create regex when supplied an escaped faulty regex', () => {
-    const string = '@\\';
+  it('should succeed to create regex when supplied a faulty regex as normal string', () => {
+    const string = '\\';
     const escapeSequence = '@';
     const expectedResult = /\\/i;
 
