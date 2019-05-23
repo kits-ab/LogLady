@@ -61,7 +61,7 @@ const startWatcher = (filePath, fromIndex, onChange, onError) => {
   if (process.platform === 'win32') {
     watcher = fs.watchFile(
       filePath,
-      { persistent: true, interval: 16 },
+      { persistent: true, interval: 100 },
       (_event, _filename) => {
         createReadStream(filePath, onChange, onError);
       }
