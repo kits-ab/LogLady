@@ -21,7 +21,7 @@ class App extends Component {
             <TopPanel />
             <TabSettings />
             <LogViewer source={this.props.openSources[0]} />
-            <StatusBar />
+            <StatusBar source={this.props.openSources[0]} />
           </LogPage>
         ) : (
           <DefaultPage />

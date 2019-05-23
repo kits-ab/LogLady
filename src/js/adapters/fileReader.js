@@ -1,7 +1,7 @@
 const fs = require('fs');
 const app = require('electron').app;
 const path = require('path');
-const createBackwardsReadStream = require('fs-backwards-stream');
+const createBackwardsStream = require('fs-backwards-stream');
 
 let watchers = [];
 
@@ -13,18 +13,18 @@ const recentFiles = () => {
   return path.join(app.getPath('userData'), 'recentFiles.json');
 };
 
-const formatLinesFromBuffer = _buffer => {
-  if (_buffer.split('\n')[0] === '') {
-    return _buffer.slice(1, _buffer.lastIndexOf('\n'));
-  } else {
-    return _buffer.slice(0, _buffer.lastIndexOf('\n'));
-  }
+const isNewLineByte = b => {
+  return b === 10;
+};
+
+const isReturnByte = b => {
+  return b === 13;
 };
 
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
-const startWatcher = (filePath, fromIndex, onChange, onError) => {
-  let currentIndex = fromIndex;
+const startWatcher = (filePath, startIndex, onChange, onError) => {
+  let currentIndex = startIndex;
   let unusedChars = '';
   if (watchers[filePath] !== undefined) {
     watchers[filePath].close();
@@ -78,28 +78,30 @@ const stopWatcher = filePath => {
   }
 };
 
-const followFile = async (filePath, fromIndex, onChange, onError) => {
-  startWatcher(filePath, fromIndex, onChange, onError);
+const followFile = (filePath, startIndex, onChange, onError) => {
+  startWatcher(filePath, startIndex, onChange, onError);
 };
 
 const readNLastLines = (filePath, numberOfLines, endIndex) => {
   return new Promise((resolve, reject) => {
     let unusedChars = '';
     let result = [];
-    const readStream = createBackwardsReadStream(filePath, { start: endIndex });
-    readStream
+    let backwardsStream = createBackwardsStream(filePath, {
+      start: endIndex - 1
+    });
+    backwardsStream
       .on('data', buffer => {
         const chunk = buffer.toString('utf-8');
-        const [lines, trailingChars] = formatChunk(chunk, unusedChars);
+        const [lines, trailingChars] = formatChunk(chunk, unusedChars, true);
         unusedChars = trailingChars;
         if (lines.length > 0) {
-          result.push(...lines);
-        }
-
-        if (result.length >= numberOfLines) {
-          resolve(result.slice(Math.max(0, result.length - numberOfLines)));
-          readStream.destroy();
-          return;
+          if (result.length + lines.length >= numberOfLines) {
+            const offset = lines.length - (numberOfLines - result.length);
+            result = [...lines.slice(Math.max(offset, 0)), ...result];
+            backwardsStream.emit('end');
+            return;
+          }
+          result = [...lines, ...result];
         }
       })
       .on('end', () => {
@@ -113,18 +115,16 @@ const readNLastLines = (filePath, numberOfLines, endIndex) => {
 
 const getLastNewLineIndex = (filePath, endIndex) => {
   let index = 0;
+  let result = endIndex;
 
   return new Promise((resolve, reject) => {
-    let readStream = createBackwardsReadStream(filePath, { start: endIndex });
-    readStream
+    let backwardsStream = createBackwardsStream(filePath, { start: endIndex });
+    backwardsStream
       .on('data', chunk => {
-        console.log('CHUNK: ', chunk.toString('utf-8'));
         for (let i = chunk.length - 1; i > 0; i--) {
-          if (chunk[i] === 10) {
-            console.log('I FOUND!', endIndex - (chunk.length - i + index));
-            resolve(endIndex - (chunk.length - i + index));
-            readStream.pause();
-            readStream = null;
+          if (isNewLineByte(chunk[i])) {
+            result = endIndex - (chunk.length - i + index);
+            backwardsStream.emit('end');
             return;
           }
         }
@@ -132,7 +132,7 @@ const getLastNewLineIndex = (filePath, endIndex) => {
         index += chunk.length;
       })
       .on('end', () => {
-        resolve(0);
+        resolve(result);
       })
       .on('error', error => {
         reject(error);
@@ -140,22 +140,21 @@ const getLastNewLineIndex = (filePath, endIndex) => {
   });
 };
 
+//This will count the lines until the end index, if the file is big this will take a lot of time!
 const getLineCount = (filePath, endIndex) => {
   return new Promise((resolve, reject) => {
     let lineCount = 0;
-    let endIndex = 0;
 
     fs.createReadStream(filePath, { end: endIndex })
-      .setEncoding('utf8')
       .on('data', chunk => {
         for (let i = 0; i < chunk.length; i++) {
-          if (chunk[i] === 10) lineCount++;
+          if (isNewLineByte(chunk[i])) lineCount++;
           else if (
             i + 1 < chunk.length &&
-            chunk[i] === 13 &&
-            chunk[i + 1] === 10
+            isReturnByte(chunk[i]) &&
+            isNewLineByte(chunk[i + 1]) === 10
           ) {
-            i++;
+            i++; //skip (i + 1) so it doesn't count twice
             lineCount++;
           }
         }
@@ -224,7 +223,6 @@ module.exports = {
   stopAllWatchers,
   saveStateToDisk,
   loadStateFromDisk,
-  formatLinesFromBuffer,
   saveRecentFilesToDisk,
   loadRecentFilesFromDisk
 };

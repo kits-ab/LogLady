@@ -5,25 +5,32 @@ const ipcChannel = 'backendMessages';
 
 const getFileInfo = async filePath => {
   const fileSize = await fileReader.getFileSizeInBytes(filePath);
-  console.log('FILESIZE: ', fileSize);
-  const endIndex = await fileReader.getLastNewLineIndex(filePath, fileSize);
+  const endIndex = fileReader.getLastNewLineIndex(filePath, fileSize);
 
-  console.log('ENDINDEX: ', endIndex);
-  // [numberOfLines, endIndex, fileSize, history]
-  return Promise.all([
-    fileReader.getLineCount(filePath, endIndex),
-    endIndex,
-    fileSize,
-    fileReader.readNLastLines(filePath, 10, endIndex)
-  ]);
+  // [endIndex, fileSize]
+  return Promise.all([fileSize, endIndex]);
+};
+
+const getFileHistory = (filePath, endIndex, numberOfLines) => {
+  return fileReader.readNLastLines(filePath, numberOfLines, endIndex);
+};
+
+const sendSourcePicked = (sender, sourcePath) => {
+  const action = {
+    type: 'SOURCE_PICKED',
+    data: {
+      sourcePath
+    }
+  };
+
+  sender.send(ipcChannel, action);
 };
 
 const sendFileOpened = async (
   sender,
   filePath,
-  lineCount,
-  endIndex,
   fileSize,
+  endIndex,
   history
 ) => {
   const action = {
@@ -31,9 +38,8 @@ const sendFileOpened = async (
     data: {
       sourceType: 'FILE',
       filePath,
-      lineCount,
-      endIndex,
       fileSize,
+      endIndex,
       history
     }
   };
@@ -42,13 +48,14 @@ const sendFileOpened = async (
 };
 
 const openFile = async (sender, filePath) => {
-  const fileInfo = await getFileInfo(filePath).catch(e => {
-    console.log(e);
-    sendError(sender, "Couldn't open file")(e);
-  });
-
-  if (!fileInfo) return;
-  sendFileOpened(sender, filePath, ...fileInfo);
+  try {
+    sendSourcePicked(sender, filePath);
+    const [fileSize, endIndex] = await getFileInfo(filePath);
+    const history = await getFileHistory(filePath, endIndex, 10);
+    sendFileOpened(sender, filePath, fileSize, endIndex, history);
+  } catch (error) {
+    sendError(sender, "Couldn't read file", error);
+  }
 };
 
 const saveRecentFilesToDisk = _recentFiles => {

@@ -1,4 +1,4 @@
-const initialState = { numberOfLines: 0, fileSize: 0 };
+const initialState = { numberOfLines: 0, fileSizes: {} };
 
 export const logInfoReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -8,9 +8,12 @@ export const logInfoReducer = (state = initialState, action) => {
         numberOfLines: action.data
       };
     case 'LOGINFO_SET_FILESIZE':
+      const { fileSize, filePath } = action.data;
+      const fileSizes = { ...state.fileSizes };
+      fileSizes[filePath] = fileSize;
       return {
         ...state,
-        fileSize: action.data
+        fileSizes
       };
     default:
       return state;
