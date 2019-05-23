@@ -40,7 +40,6 @@ const createReadStream = (_filePath, onChange, onError) => {
     .on('data', chunk => {
       currentIndex += chunk.length;
       const [lines, trailingChars] = formatChunk(chunk, unusedChars);
-      console.log('lines: ', lines);
       unusedChars = trailingChars;
       if (lines.length > 0) {
         onChange(lines);
@@ -60,8 +59,6 @@ const startWatcher = (filePath, fromIndex, onChange, onError) => {
   }
   let watcher;
   if (process.platform === 'win32') {
-    console.log('starting watchFile on windows...');
-
     watcher = fs.watchFile(
       filePath,
       { persistent: true, interval: 16 },
@@ -70,8 +67,6 @@ const startWatcher = (filePath, fromIndex, onChange, onError) => {
       }
     );
   } else {
-    console.log('starting watch on mac/linux');
-
     watcher = fs.watch(filePath, (_event, _filename) => {
       createReadStream(filePath, onChange, onError);
     });
