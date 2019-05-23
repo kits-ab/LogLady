@@ -4,6 +4,7 @@ const app = require('electron').app;
 const path = require('path');
 
 let watchers = [];
+let currentIndex;
 
 const reduxStateFile = () => {
   return path.join(app.getPath('userData'), 'reduxState.json');
@@ -30,32 +31,51 @@ const formatLinesFromBuffer = _buffer => {
   }
 };
 
+const createReadStream = (_filePath, onChange, onError) => {
+  let unusedChars = '';
+  fs.createReadStream(_filePath, {
+    start: currentIndex
+  })
+    .setEncoding('utf8')
+    .on('data', chunk => {
+      currentIndex += chunk.length;
+      const [lines, trailingChars] = formatChunk(chunk, unusedChars);
+      console.log('lines: ', lines);
+      unusedChars = trailingChars;
+      if (lines.length > 0) {
+        onChange(lines);
+      }
+    })
+    .on('error', error => {
+      onError(error);
+    });
+};
+
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
 const startWatcher = (filePath, fromIndex, onChange, onError) => {
-  let currentIndex = fromIndex;
-  let unusedChars = '';
+  currentIndex = fromIndex;
   if (watchers[filePath] !== undefined) {
     watchers[filePath].close();
   }
-  let watcher = fs.watch(filePath, (_event, _filename) => {
-    fs.createReadStream(filePath, {
-      start: currentIndex
-    })
-      .setEncoding('utf8')
-      .on('data', chunk => {
-        currentIndex += chunk.length;
-        const [lines, trailingChars] = formatChunk(chunk, unusedChars);
-        unusedChars = trailingChars;
-        if (lines.length > 0) {
-          onChange(lines);
-        }
-      })
-      .on('error', error => {
-        onError(error);
-      });
-  });
+  let watcher;
+  if (process.platform === 'win32') {
+    console.log('starting watchFile on windows...');
 
+    watcher = fs.watchFile(
+      filePath,
+      { persistent: true, interval: 16 },
+      (_event, _filename) => {
+        createReadStream(filePath, onChange, onError);
+      }
+    );
+  } else {
+    console.log('starting watch on mac/linux');
+
+    watcher = fs.watch(filePath, (_event, _filename) => {
+      createReadStream(filePath, onChange, onError);
+    });
+  }
   watchers[filePath] = watcher;
 };
 
@@ -69,7 +89,11 @@ const formatChunk = (chunk, prevChunkTrailingChars) => {
 };
 const stopAllWatchers = () => {
   for (var key in watchers) {
-    watchers[key].close();
+    if (process.platform === 'win32') {
+      fs.unwatchFile(key);
+    } else {
+      watchers[key].close();
+    }
   }
   watchers = {};
 };
