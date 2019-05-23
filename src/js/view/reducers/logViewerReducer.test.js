@@ -14,7 +14,7 @@ describe('logviewer reducer', () => {
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
   it('should append lines to initial state', () => {
-    const lines = 'hej1\nhej2\nhej3\n';
+    const lines = ['hej1', 'hej2', 'hej3'];
     const expectedState = {
       logs: { test: ['hej1', 'hej2', 'hej3'] }
     };
@@ -30,7 +30,7 @@ describe('logviewer reducer', () => {
     expect(logViewerReducer(undefined, action)).toEqual(expectedState);
   });
   it('should set log on source', () => {
-    const log = 'hej4\nhej5\n';
+    const log = ['hej4', 'hej5'];
     const state = {
       logs: { test: ['hej1', 'hej2', 'hej3'] }
     };
@@ -45,7 +45,7 @@ describe('logviewer reducer', () => {
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
   it('should append lines to source', () => {
-    const lines = 'hej4\nhej5\n';
+    const lines = ['hej4', 'hej5'];
     const state = {
       logs: { test: ['hej1', 'hej2', 'hej3'] }
     };

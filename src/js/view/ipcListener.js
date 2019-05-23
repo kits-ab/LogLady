@@ -11,7 +11,6 @@ const { ipcRenderer } = window.require('electron');
 const handleSourceOpened = (dispatch, { sourceType, ...rest }) => {
   switch (sourceType) {
     case 'FILE':
-      console.log(rest);
       handleFileOpened(dispatch, rest);
       break;
     default:
@@ -21,7 +20,7 @@ const handleSourceOpened = (dispatch, { sourceType, ...rest }) => {
 
 const handleFileOpened = (
   dispatch,
-  { filePath, lineCount, lastLineEndIndex, fileSize, history }
+  { filePath, lineCount, endIndex, fileSize, history }
 ) => {
   clearAllLogs(dispatch);
   setFileSource(dispatch, filePath, lineCount, fileSize, history);
@@ -31,7 +30,7 @@ const handleFileOpened = (
     data: {
       sourceType: 'FILE',
       filePath,
-      fromIndex: lastLineEndIndex
+      fromIndex: endIndex
     }
   };
   sendRequestToBackend(followSource);

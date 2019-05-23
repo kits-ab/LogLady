@@ -110,7 +110,6 @@ class LogViewerList extends React.Component {
 
     //The line heights needs to be recalculated on a resize
     const charSize = calculateSize('W', this.rulerRef.current);
-    console.log(charSize);
     const clientWidth = this.logRef.current.clientWidth;
     const cachedLines = this.state.cachedLines;
     const cachedHeightsByLength = this.state.cachedHeightsByLength;

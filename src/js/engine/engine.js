@@ -6,17 +6,16 @@ const ipcChannel = 'backendMessages';
 const getFileInfo = filePath => {
   // [filepath, numberOfLines, fileSize, history]
   return Promise.all([
-    filePath,
-    fileReader.getNumberOfLines(filePath),
-    fileReader.getFileSizeInBytes(filePath),
-    fileReader.readNLastLines(filePath, 10)
+    fileReader.getLinesInfo(filePath, 10),
+    fileReader.getFileSizeInBytes(filePath)
   ]);
 };
 
-const sendFileOpened = (
+const sendFileOpened = async (
   sender,
   filePath,
-  [lineCount, lastLineEndIndex],
+  lineCount,
+  endIndex,
   fileSize,
   history
 ) => {
@@ -26,13 +25,49 @@ const sendFileOpened = (
       sourceType: 'FILE',
       filePath,
       lineCount,
-      lastLineEndIndex,
+      endIndex,
       fileSize,
       history
     }
   };
 
-  return sender.send(ipcChannel, action);
+  sender.send(ipcChannel, action);
+};
+
+const openFile = async (sender, filePath) => {
+  const [[lineCount, endIndex, history], fileSize] = await getFileInfo(
+    filePath
+  ).catch(sendError(sender, "Couldn't open file"));
+
+  sendFileOpened(sender, filePath, lineCount, endIndex, fileSize, history);
+};
+
+const saveRecentFilesToDisk = _recentFiles => {
+  fileReader.saveRecentFilesToDisk(_recentFiles);
+};
+
+const loadRecentFilesFromDisk = () => {
+  return fileReader.loadRecentFilesFromDisk();
+};
+
+const loadStateFromDisk = sender => {
+  fileReader
+    .loadStateFromDisk()
+    .then(_data => {
+      const previousSource = JSON.parse(_data).menuReducer.openSources[0];
+
+      if (previousSource) {
+        openFile(sender, previousSource);
+      }
+
+      const action = {
+        type: 'STATE_SET',
+        data: _data
+      };
+
+      sender.send(ipcChannel, action);
+    })
+    .catch(sendError(sender, "Couldn't load previous state from disk"));
 };
 
 const handleFollowSource = (sender, { sourceType, ...rest }) => {
@@ -61,58 +96,6 @@ const handleFollowFile = (sender, { filePath, fromIndex }) => {
   const onError = sendError(sender, "Couldn't keep following source");
 
   fileReader.followFile(filePath, fromIndex, onChange, onError);
-};
-
-const loadStateFromDisk = sender => {
-  fileReader
-    .loadStateFromDisk()
-    .then(_data => {
-      const previousSource = JSON.parse(_data).menuReducer.openSources[0];
-
-      if (previousSource) {
-        openFile(sender, previousSource);
-      }
-
-      const action = {
-        type: 'STATE_SET',
-        data: _data
-      };
-
-      sender.send(ipcChannel, action);
-    })
-    .catch(sendError(sender, "Couldn't load previous state from disk"));
-};
-
-const sendError = (sender, message) => {
-  return error => {
-    const action = {
-      type: 'ERROR',
-      data: {
-        message,
-        error
-      }
-    };
-
-    sender.send(ipcChannel, action);
-  };
-};
-
-const saveRecentFilesToDisk = _recentFiles => {
-  fileReader.saveRecentFilesToDisk(_recentFiles);
-};
-
-const loadRecentFilesFromDisk = () => {
-  return fileReader.loadRecentFilesFromDisk();
-};
-
-const openFile = async (sender, filePath) => {
-  const fileInfo = await getFileInfo(filePath).catch(
-    sendError(sender, "Couldn't open file")
-  );
-
-  if (!fileInfo) return;
-
-  sendFileOpened(sender, ...fileInfo);
 };
 
 const handleShowOpenDialog = async sender => {
@@ -152,6 +135,20 @@ ipcMain.on('frontendMessages', async (event, _argObj) => {
     default:
   }
 });
+
+const sendError = (sender, message) => {
+  return error => {
+    const action = {
+      type: 'ERROR',
+      data: {
+        message,
+        error
+      }
+    };
+
+    sender.send(ipcChannel, action);
+  };
+};
 
 module.exports = {
   saveRecentFilesToDisk,
