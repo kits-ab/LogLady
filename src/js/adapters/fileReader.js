@@ -1,7 +1,7 @@
 const fs = require('fs');
-const lastLines = require('read-last-lines');
 const app = require('electron').app;
 const path = require('path');
+const createBackwardsReadStream = require('fs-backwards-stream');
 
 let watchers = [];
 
@@ -11,15 +11,6 @@ const reduxStateFile = () => {
 
 const recentFiles = () => {
   return path.join(app.getPath('userData'), 'recentFiles.json');
-};
-
-const readNLastLines = (filePath, numberOfLines) => {
-  return lastLines.read(filePath, numberOfLines).then(buffer => {
-    const lines = buffer.split(/\r?\n/);
-    return lines.filter(x => {
-      return x !== '';
-    });
-  });
 };
 
 const formatLinesFromBuffer = _buffer => {
@@ -59,14 +50,17 @@ const startWatcher = (filePath, fromIndex, onChange, onError) => {
   watchers[filePath] = watcher;
 };
 
-const formatChunk = (chunk, prevChunkTrailingChars) => {
+const formatChunk = (chunk, prevChunkTrailingChars, reverse = false) => {
   const lines = chunk.split(/\r?\n/);
-  lines[0] += prevChunkTrailingChars;
-  const trailingChars = lines[lines.length - 1];
-  lines.pop();
+  const start = reverse ? lines.length - 1 : 0;
+  const end = reverse ? 0 : lines.length - 1;
+  lines[start] += prevChunkTrailingChars;
+  const trailingChars = lines[end];
+  reverse ? lines.shift() : lines.pop();
 
   return [lines, trailingChars];
 };
+
 const stopAllWatchers = () => {
   for (var key in watchers) {
     watchers[key].close();
@@ -88,30 +82,86 @@ const followFile = async (filePath, fromIndex, onChange, onError) => {
   startWatcher(filePath, fromIndex, onChange, onError);
 };
 
-const getLinesInfo = (filePath, historyLength = 0) => {
+const readNLastLines = (filePath, numberOfLines, endIndex) => {
+  return new Promise((resolve, reject) => {
+    let unusedChars = '';
+    let result = [];
+    const readStream = createBackwardsReadStream(filePath, { start: endIndex });
+    readStream
+      .on('data', buffer => {
+        const chunk = buffer.toString('utf-8');
+        const [lines, trailingChars] = formatChunk(chunk, unusedChars);
+        unusedChars = trailingChars;
+        if (lines.length > 0) {
+          result.push(...lines);
+        }
+
+        if (result.length >= numberOfLines) {
+          resolve(result.slice(Math.max(0, result.length - numberOfLines)));
+          readStream.destroy();
+          return;
+        }
+      })
+      .on('end', () => {
+        resolve(result);
+      })
+      .on('error', err => {
+        reject(err);
+      });
+  });
+};
+
+const getLastNewLineIndex = (filePath, endIndex) => {
+  let index = 0;
+
+  return new Promise((resolve, reject) => {
+    let readStream = createBackwardsReadStream(filePath, { start: endIndex });
+    readStream
+      .on('data', chunk => {
+        console.log('CHUNK: ', chunk.toString('utf-8'));
+        for (let i = chunk.length - 1; i > 0; i--) {
+          if (chunk[i] === 10) {
+            console.log('I FOUND!', endIndex - (chunk.length - i + index));
+            resolve(endIndex - (chunk.length - i + index));
+            readStream.pause();
+            readStream = null;
+            return;
+          }
+        }
+
+        index += chunk.length;
+      })
+      .on('end', () => {
+        resolve(0);
+      })
+      .on('error', error => {
+        reject(error);
+      });
+  });
+};
+
+const getLineCount = (filePath, endIndex) => {
   return new Promise((resolve, reject) => {
     let lineCount = 0;
     let endIndex = 0;
-    let history = [];
-    let unusedChars = '';
 
-    fs.createReadStream(filePath)
+    fs.createReadStream(filePath, { end: endIndex })
       .setEncoding('utf8')
       .on('data', chunk => {
-        const [lines, trailingChars] = formatChunk(chunk, unusedChars);
-        unusedChars = trailingChars;
-
-        if (historyLength > 0) {
-          history.push(...lines);
-          history = history.slice(Math.max(history.length - historyLength, 0));
+        for (let i = 0; i < chunk.length; i++) {
+          if (chunk[i] === 10) lineCount++;
+          else if (
+            i + 1 < chunk.length &&
+            chunk[i] === 13 &&
+            chunk[i + 1] === 10
+          ) {
+            i++;
+            lineCount++;
+          }
         }
-
-        lineCount += lines.length;
-        endIndex += chunk.length;
       })
       .on('end', () => {
-        endIndex = endIndex - unusedChars.length;
-        resolve([lineCount, endIndex, history]);
+        resolve(lineCount);
       })
       .on('error', err => {
         reject(err);
@@ -131,13 +181,8 @@ const readFile = filePath => {
   });
 };
 
-const getFileSizeInBytes = async filePath => {
-  try {
-    const fileSizeInBytes = await fs.statSync(filePath).size;
-    return fileSizeInBytes;
-  } catch (err) {
-    throw err;
-  }
+const getFileSizeInBytes = filePath => {
+  return fs.statSync(filePath).size;
 };
 
 const saveStateToDisk = _reduxStateValue => {
@@ -171,9 +216,10 @@ const loadRecentFilesFromDisk = () => {
 module.exports = {
   readFile,
   readNLastLines,
-  getLinesInfo,
+  getLineCount,
   followFile,
   getFileSizeInBytes,
+  getLastNewLineIndex,
   stopWatcher,
   stopAllWatchers,
   saveStateToDisk,

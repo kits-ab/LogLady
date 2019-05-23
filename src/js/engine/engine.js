@@ -3,11 +3,18 @@ const { ipcMain } = require('electron');
 const { dialog } = require('electron');
 const ipcChannel = 'backendMessages';
 
-const getFileInfo = filePath => {
-  // [filepath, numberOfLines, fileSize, history]
+const getFileInfo = async filePath => {
+  const fileSize = await fileReader.getFileSizeInBytes(filePath);
+  console.log('FILESIZE: ', fileSize);
+  const endIndex = await fileReader.getLastNewLineIndex(filePath, fileSize);
+
+  console.log('ENDINDEX: ', endIndex);
+  // [numberOfLines, endIndex, fileSize, history]
   return Promise.all([
-    fileReader.getLinesInfo(filePath, 10),
-    fileReader.getFileSizeInBytes(filePath)
+    fileReader.getLineCount(filePath, endIndex),
+    endIndex,
+    fileSize,
+    fileReader.readNLastLines(filePath, 10, endIndex)
   ]);
 };
 
@@ -35,11 +42,13 @@ const sendFileOpened = async (
 };
 
 const openFile = async (sender, filePath) => {
-  const [[lineCount, endIndex, history], fileSize] = await getFileInfo(
-    filePath
-  ).catch(sendError(sender, "Couldn't open file"));
+  const fileInfo = await getFileInfo(filePath).catch(e => {
+    console.log(e);
+    sendError(sender, "Couldn't open file")(e);
+  });
 
-  sendFileOpened(sender, filePath, lineCount, endIndex, fileSize, history);
+  if (!fileInfo) return;
+  sendFileOpened(sender, filePath, ...fileInfo);
 };
 
 const saveRecentFilesToDisk = _recentFiles => {
