@@ -49,8 +49,8 @@ const sendFileOpened = async (
 
 const openFile = async (sender, filePath) => {
   try {
-    sendSourcePicked(sender, filePath);
     const [fileSize, endIndex] = await getFileInfo(filePath);
+    sendSourcePicked(sender, filePath);
     const history = await getFileHistory(filePath, endIndex, 10);
     sendFileOpened(sender, filePath, fileSize, endIndex, history);
   } catch (error) {
