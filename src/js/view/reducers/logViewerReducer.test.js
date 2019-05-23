@@ -1,40 +1,61 @@
 import { logViewerReducer } from './logViewerReducer';
 
-describe('logViewer reducers', () => {
+describe('logviewer reducer', () => {
   it('should return the initial state', () => {
-    const initialState = { liveLines: [] };
+    const initialState = { logs: {} };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
-  it('should reset lines', () => {
-    const state = { liveLines: ['lalala', 'lililil'] };
-    const expectedState = { liveLines: [] };
+  it('should reset all logs', () => {
+    const state = { logs: ['lalala', 'lililil'] };
+    const expectedState = { logs: {} };
     const action = {
-      type: 'clearLines'
+      type: 'LOGVIEWER_CLEAR'
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
   it('should append lines to initial state', () => {
-    const lines = 'hej1\nhej2\nhej3\n';
+    const lines = ['hej1', 'hej2', 'hej3'];
     const expectedState = {
-      liveLines: ['hej1', 'hej2', 'hej3', '']
+      logs: { test: ['hej1', 'hej2', 'hej3'] }
     };
+    const sourcePath = 'test';
+
     const action = {
-      type: 'liveLines',
-      data: lines
+      type: 'LOGVIEWER_ADD_LINES',
+      data: {
+        sourcePath,
+        lines
+      }
     };
     expect(logViewerReducer(undefined, action)).toEqual(expectedState);
   });
-  it('should append lines to populated state', () => {
-    const lines = 'hej4\nhej5\n';
+  it('should set log on source', () => {
+    const log = ['hej4', 'hej5'];
     const state = {
-      liveLines: ['hej1', 'hej2', 'hej3', '']
+      logs: { test: ['hej1', 'hej2', 'hej3'] }
     };
     const expectedState = {
-      liveLines: ['hej1', 'hej2', 'hej3', '', 'hej4', 'hej5', '']
+      logs: { test: ['hej4', 'hej5'] }
     };
+    const sourcePath = 'test';
     const action = {
-      type: 'liveLines',
-      data: lines
+      type: 'LOGVIEWER_SET_LOG',
+      data: { sourcePath, log }
+    };
+    expect(logViewerReducer(state, action)).toEqual(expectedState);
+  });
+  it('should append lines to source', () => {
+    const lines = ['hej4', 'hej5'];
+    const state = {
+      logs: { test: ['hej1', 'hej2', 'hej3'] }
+    };
+    const expectedState = {
+      logs: { test: ['hej1', 'hej2', 'hej3', 'hej4', 'hej5'] }
+    };
+    const sourcePath = 'test';
+    const action = {
+      type: 'LOGVIEWER_ADD_LINES',
+      data: { sourcePath, lines }
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });

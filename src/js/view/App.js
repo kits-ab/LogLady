@@ -16,17 +16,17 @@ class App extends Component {
   render() {
     return (
       <RootContainer>
-        {this.props.openFiles && this.props.openFiles[0] ? (
+        {this.props.openSources && this.props.openSources[0] ? (
           <LogPage>
             <TopPanel />
             <TabSettings />
-            <LogViewer />
+            <LogViewer source={this.props.openSources[0]} />
             <StatusBar />
-            <SnackBar />
           </LogPage>
         ) : (
           <DefaultPage />
         )}
+        <SnackBar />
       </RootContainer>
     );
   }
@@ -34,7 +34,7 @@ class App extends Component {
 
 const mapStateToProps = state => {
   return {
-    openFiles: state.menuReducer.openFiles
+    openSources: state.menuReducer.openSources
   };
 };
 

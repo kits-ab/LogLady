@@ -16,25 +16,28 @@ class LogViewer extends React.Component {
   }
 
   render() {
+    const lines = this.props.logs[this.props.source];
+
     const highlightRegExp = parseRegExp(this.props.highlightInput);
     const filterRegExp = parseRegExp(this.props.filterInput);
 
     return (
       <LogViewerContainer>
         <CloseFileButton
-          openFiles={this.props.openFiles}
+          show={this.props.source}
           onClick={() => {
             closeFile(
               this.props.dispatch,
-              this.props.openFiles ? this.props.openFiles : ''
+              this.props.source ? this.props.source : ''
             );
           }}
         />
         <LogViewerList
+          key={this.props.source}
           highlightColor={this.props.highlightColor}
           wrapLines={this.props.wrapLineOn}
           scrollToBottom={this.props.tailSwitch}
-          lines={this.props.liveLines}
+          lines={lines ? lines : []}
           highlightRegExp={highlightRegExp}
           filterRegExp={filterRegExp}
         />
@@ -43,16 +46,18 @@ class LogViewer extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = ({
+  topPanelReducer,
+  settingsReducer,
+  logViewerReducer
+}) => {
   return {
-    filterInput: state.topPanelReducer.filterInput,
-    highlightInput: state.topPanelReducer.highlightInput,
-    highlightColor: state.settingsReducer.highlightColor,
-    wrapLineOn: state.settingsReducer.wrapLineOn,
-    liveLines: state.logViewerReducer.liveLines,
-    nthLines: state.logViewerReducer.nthLines,
-    tailSwitch: state.topPanelReducer.tailSwitch,
-    openFiles: state.menuReducer.openFiles
+    filterInput: topPanelReducer.filterInput,
+    highlightInput: topPanelReducer.highlightInput,
+    highlightColor: settingsReducer.highlightColor,
+    wrapLineOn: settingsReducer.wrapLineOn,
+    logs: logViewerReducer.logs,
+    tailSwitch: topPanelReducer.tailSwitch
   };
 };
 

@@ -27,10 +27,10 @@ class StatusBar extends React.Component {
 
         <ul>
           <ReactTooltip />
-          <li data-tip={this.props.openFiles[0]}>
+          <li data-tip={this.props.openSources[0]}>
             File:{' '}
-            {this.props.openFiles && this.props.openFiles[0]
-              ? getFormattedFilePath(this.props.openFiles[0])
+            {this.props.openSources && this.props.openSources[0]
+              ? getFormattedFilePath(this.props.openSources[0])
               : null}
           </li>
           <li>Lines:{this.props.numberOfLines}</li>
@@ -43,7 +43,7 @@ class StatusBar extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    openFiles: state.menuReducer.openFiles,
+    openSources: state.menuReducer.openSources,
     numberOfLines: state.logInfoReducer.numberOfLines,
     fileSize: state.logInfoReducer.fileSize
   };

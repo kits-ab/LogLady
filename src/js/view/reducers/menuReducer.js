@@ -1,17 +1,15 @@
-export const menuReducer = (state = {}, action) => {
+const initialState = { openSources: [] };
+
+export const menuReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'menu_open':
-      return {
-        ...state,
-        openFiles:
-          action.data !== 'clearOpenFiles'
-            ? state.openFiles
-              ? [...state.openFiles, action.data[0]]
-              : [action.data[0]]
-            : []
-      };
+    case 'MENU_CLEAR':
+      return { ...state, openSources: [] };
+
+    case 'MENU_SET_SOURCE':
+      const { sourcePath } = action.data;
+      return { ...state, openSources: [sourcePath] };
     case 'menuReducerRestore':
-      return { ...action.data };
+      return { ...initialState, ...action.data };
     default:
       return state;
   }

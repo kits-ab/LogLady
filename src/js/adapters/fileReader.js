@@ -1,14 +1,9 @@
 const fs = require('fs');
 const lastLines = require('read-last-lines');
-const nthLine = require('nthline');
-const { EventEmitter } = require('events');
 const app = require('electron').app;
 const path = require('path');
 
 let watchers = [];
-
-const fileReaderEvents = new EventEmitter();
-fileReaderEvents.removeAllListeners('liveLines');
 
 const reduxStateFile = () => {
   return path.join(app.getPath('userData'), 'reduxState.json');
@@ -18,27 +13,11 @@ const recentFiles = () => {
   return path.join(app.getPath('userData'), 'recentFiles.json');
 };
 
-const readLastLines = (filePath, numberOfLines) => {
-  return lastLines.read(filePath, numberOfLines).catch(err => {
-    throw err;
-  });
-};
-
-//find and save the index of the last newline characters
-const getLastNewlineIndex = filePath => {
-  let lastNewlineIndex = 0;
-  let readStream = fs.createReadStream(filePath).setEncoding('utf8');
-
-  readStream.on('data', buffer => {
-    lastNewlineIndex += buffer.lastIndexOf('\n');
-  });
-  readStream.on('error', err => {
-    throw err;
-  });
-  return new Promise((resolve, reject) => {
-    readStream.on('end', () => {
-      console.log('lastNewlineIndex: ', lastNewlineIndex);
-      resolve(lastNewlineIndex);
+const readNLastLines = (filePath, numberOfLines) => {
+  return lastLines.read(filePath, numberOfLines).then(buffer => {
+    const lines = buffer.split(/\r?\n/);
+    return lines.filter(x => {
+      return x !== '';
     });
   });
 };
@@ -53,74 +32,86 @@ const formatLinesFromBuffer = _buffer => {
 
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
-const startWatcher = (filePath, lastNewlineIndex) => {
+const startWatcher = (filePath, fromIndex, onChange, onError) => {
+  let currentIndex = fromIndex;
+  let unusedChars = '';
   if (watchers[filePath] !== undefined) {
     watchers[filePath].close();
   }
-  let watcher = fs.watch(filePath, (event, filename) => {
-    let readStreamFromLastIndex = fs
-      .createReadStream(filePath, {
-        start: lastNewlineIndex
+  let watcher = fs.watch(filePath, (_event, _filename) => {
+    fs.createReadStream(filePath, {
+      start: currentIndex
+    })
+      .setEncoding('utf8')
+      .on('data', chunk => {
+        currentIndex += chunk.length;
+        const [lines, trailingChars] = formatChunk(chunk, unusedChars);
+        unusedChars = trailingChars;
+        if (lines.length > 0) {
+          onChange(lines);
+        }
       })
-      .setEncoding('utf8');
-    readStreamFromLastIndex.on('data', buffer => {
-      lastNewlineIndex += buffer.lastIndexOf('\n');
-      let lines = formatLinesFromBuffer(buffer);
-      fileReaderEvents.emit('liveLines', lines);
-    });
+      .on('error', error => {
+        onError(error);
+      });
   });
+
   watchers[filePath] = watcher;
+};
+
+const formatChunk = (chunk, prevChunkTrailingChars) => {
+  const lines = chunk.split(/\r?\n/);
+  lines[0] += prevChunkTrailingChars;
+  const trailingChars = lines[lines.length - 1];
+  lines.pop();
+
+  return [lines, trailingChars];
+};
+const stopAllWatchers = () => {
+  for (var key in watchers) {
+    watchers[key].close();
+  }
+  watchers = {};
 };
 
 const stopWatcher = filePath => {
   try {
-    if (filePath === 'initializing') {
-      fileReaderEvents.removeAllListeners('liveLines');
-    } else {
-      watchers[filePath].close();
-      delete watchers[filePath];
-      fileReaderEvents.removeAllListeners('liveLines');
-      return `successfully closed watcher on file ${filePath}`; //if we want to send a confirmation to the frontend.
-    }
+    watchers[filePath].close();
+    delete watchers[filePath];
+    return `successfully closed watcher on file ${filePath}`; //if we want to send a confirmation to the frontend.
   } catch (err) {
     return err;
   }
 };
 
-const readLinesLive = filePath => {
-  readLastLines(filePath, 10)
-    .then(lines => {
-      fileReaderEvents.emit(
-        'liveLines',
-        lines.slice(0, lines.lastIndexOf('\n'))
-      );
-      getLastNewlineIndex(filePath)
-        .then(lastNewlineIndex => {
-          startWatcher(filePath, lastNewlineIndex);
-        })
-        .catch(err => {
-          throw err;
-        });
-    })
-    .catch(err => {
-      console.log('error in readLinesLive: ', err);
-    });
+const followFile = async (filePath, fromIndex, onChange, onError) => {
+  startWatcher(filePath, fromIndex, onChange, onError);
 };
 
-const getNumberOfLines = filePath => {
+const getLinesInfo = (filePath, historyLength = 0) => {
   return new Promise((resolve, reject) => {
     let lineCount = 0;
-    let idx = -1;
+    let endIndex = 0;
+    let history = [];
+    let unusedChars = '';
+
     fs.createReadStream(filePath)
-      .on('data', buffer => {
-        lineCount--;
-        do {
-          idx = buffer.indexOf(10, idx + 1);
-          lineCount++;
-        } while (idx !== -1);
+      .setEncoding('utf8')
+      .on('data', chunk => {
+        const [lines, trailingChars] = formatChunk(chunk, unusedChars);
+        unusedChars = trailingChars;
+
+        if (historyLength > 0) {
+          history.push(...lines);
+          history = history.slice(Math.max(history.length - historyLength, 0));
+        }
+
+        lineCount += lines.length;
+        endIndex += chunk.length;
       })
       .on('end', () => {
-        resolve(lineCount);
+        endIndex = endIndex - unusedChars.length;
+        resolve([lineCount, endIndex, history]);
       })
       .on('error', err => {
         reject(err);
@@ -138,19 +129,6 @@ const readFile = filePath => {
       }
     });
   });
-};
-
-const readNthLines = async (filePath, lineNumber, numberOfLines) => {
-  let i;
-  let lines = {};
-  for (i = 0; i < numberOfLines; i++) {
-    lines[lineNumber + i] = await nthLine(lineNumber + i - 1, filePath);
-  }
-  if (lines !== null) {
-    return lines;
-  } else {
-    throw new Error('Lines are null.');
-  }
 };
 
 const getFileSizeInBytes = async filePath => {
@@ -192,13 +170,12 @@ const loadRecentFilesFromDisk = () => {
 
 module.exports = {
   readFile,
-  readLastLines,
-  getNumberOfLines,
-  readNthLines,
-  readLinesLive,
-  fileReaderEvents,
+  readNLastLines,
+  getLinesInfo,
+  followFile,
   getFileSizeInBytes,
   stopWatcher,
+  stopAllWatchers,
   saveStateToDisk,
   loadStateFromDisk,
   formatLinesFromBuffer,
