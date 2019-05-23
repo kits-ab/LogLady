@@ -22,11 +22,11 @@ class App extends Component {
             <TabSettings />
             <LogViewer source={this.props.openSources[0]} />
             <StatusBar />
-            <SnackBar />
           </LogPage>
         ) : (
           <DefaultPage />
         )}
+        <SnackBar />
       </RootContainer>
     );
   }

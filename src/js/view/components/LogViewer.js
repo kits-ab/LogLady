@@ -24,6 +24,7 @@ class LogViewer extends React.Component {
     return (
       <LogViewerContainer>
         <CloseFileButton
+          show={this.props.source}
           onClick={() => {
             closeFile(
               this.props.dispatch,
