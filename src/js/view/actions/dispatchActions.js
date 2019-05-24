@@ -106,7 +106,7 @@ export const addNewLines = (dispatch, sourcePath, lines) => {
   });
 };
 
-export const addSize = (dispatch, sourcePath, size) => {
+export const increaseSize = (dispatch, sourcePath, size) => {
   dispatch({
     type: 'LOGINFO_INCREASE_SIZE',
     data: {

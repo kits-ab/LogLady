@@ -44,8 +44,11 @@ const startWatcher = (filePath, startIndex, onChange, onError) => {
         currentIndex += chunk.length;
         const [lines, trailingChars] = parseLines(chunk, unusedChars);
         unusedChars = trailingChars;
-        if (lines.length > 0) {
-          onChange(lines, chunk.length);
+        const filtered = lines.filter(x => {
+          return x !== '';
+        });
+        if (filtered.length > 0) {
+          onChange(filtered, chunk.length);
         }
       })
       .on('error', error => {
