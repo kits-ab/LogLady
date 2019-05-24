@@ -25,10 +25,6 @@ const isLF = b => {
   return b === 10;
 };
 
-// const isCRLF = (a, b) => {
-//   return a === 10 && b === 13;
-// };
-
 const readTail = (filePath, startIndex, onLines, onError) => {
   return new Promise((resolve, reject) => {
     let unusedChars = '';
