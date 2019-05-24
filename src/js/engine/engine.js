@@ -106,12 +106,13 @@ const handleFollowSource = (sender, { sourceType, ...rest }) => {
 };
 
 const handleFollowFile = (sender, { filePath, fromIndex }) => {
-  const onChange = lines => {
+  const onChange = (lines, size) => {
     const action = {
       type: 'LINES_NEW',
       data: {
         sourcePath: filePath,
-        lines
+        lines,
+        size
       }
     };
 
@@ -143,6 +144,9 @@ ipcMain.on('frontendMessages', async (event, _argObj) => {
   switch (_argObj.function) {
     case 'DIALOG_OPEN_SHOW':
       handleShowOpenDialog(sender);
+      break;
+    case 'FILE_OPEN':
+      openFile(sender, _argObj.filePath);
       break;
     case 'SOURCE_FOLLOW':
       fileReader.stopAllWatchers();

@@ -3,7 +3,8 @@ import {
   setSource,
   clearAllLogs,
   showSnackBar,
-  addNewLines
+  addNewLines,
+  increaseSize
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
@@ -41,8 +42,9 @@ const handleFileOpened = (
   sendRequestToBackend(followSource);
 };
 
-const handleNewLines = (dispatch, { sourcePath, lines }) => {
+const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
   addNewLines(dispatch, sourcePath, lines);
+  increaseSize(dispatch, sourcePath, size);
 };
 
 const handleError = (dispatch, { message, error }) => {

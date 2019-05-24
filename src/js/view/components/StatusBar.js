@@ -33,7 +33,7 @@ class StatusBar extends React.Component {
           </li>
           <li>
             Size:
-            {getFormattedFileSize(this.props.fileSizes[this.props.source])}
+            {getFormattedFileSize(this.props.logSizes[this.props.source])}
           </li>
         </ul>
       </StatusBarSC.Statusbar>
@@ -43,7 +43,7 @@ class StatusBar extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    fileSizes: state.logInfoReducer.fileSizes
+    logSizes: state.logInfoReducer.logSizes
   };
 };
 

@@ -1,4 +1,10 @@
-const fs = require('fs');
+const {
+  createReadStream,
+  watch,
+  statSync,
+  readFile,
+  writeFile
+} = require('fs');
 const app = require('electron').app;
 const path = require('path');
 const createBackwardsStream = require('fs-backwards-stream');
@@ -13,12 +19,12 @@ const recentFiles = () => {
   return path.join(app.getPath('userData'), 'recentFiles.json');
 };
 
-const isNewLineByte = b => {
+const isLF = b => {
   return b === 10;
 };
 
-const isReturnByte = b => {
-  return b === 13;
+const isCRLF = (a, b) => {
+  return a === 10 && b === 13;
 };
 
 //start a watcher and read the new lines starting from the last newline index
@@ -29,17 +35,17 @@ const startWatcher = (filePath, startIndex, onChange, onError) => {
   if (watchers[filePath] !== undefined) {
     watchers[filePath].close();
   }
-  let watcher = fs.watch(filePath, (_event, _filename) => {
-    fs.createReadStream(filePath, {
+  let watcher = watch(filePath, (_event, _filename) => {
+    createReadStream(filePath, {
       start: currentIndex
     })
       .setEncoding('utf8')
       .on('data', chunk => {
         currentIndex += chunk.length;
-        const [lines, trailingChars] = formatChunk(chunk, unusedChars);
+        const [lines, trailingChars] = parseLines(chunk, unusedChars);
         unusedChars = trailingChars;
         if (lines.length > 0) {
-          onChange(lines);
+          onChange(lines, chunk.length);
         }
       })
       .on('error', error => {
@@ -50,15 +56,44 @@ const startWatcher = (filePath, startIndex, onChange, onError) => {
   watchers[filePath] = watcher;
 };
 
-const formatChunk = (chunk, prevChunkTrailingChars, reverse = false) => {
-  const lines = chunk.split(/\r?\n/);
-  const start = reverse ? lines.length - 1 : 0;
-  const end = reverse ? 0 : lines.length - 1;
-  lines[start] += prevChunkTrailingChars;
-  const trailingChars = lines[end];
-  reverse ? lines.shift() : lines.pop();
+/**parseLinesBackwards
+ * @param {string} chunk
+ * @param {string} trailingChars are any unused characters from the previous chunk
+ * @returns {[string[], string]}
+ */
+const parseLinesBackwards = (chunk, trailingChars) => {
+  if (trailingChars.length > 0) {
+    chunk = chunk + trailingChars[0];
+    trailingChars = trailingChars.slice(1);
+  }
 
-  return [lines, trailingChars];
+  const lines = chunk.split(/\r?\n/);
+  lines[lines.length - 1] += trailingChars;
+  const unusedChars = lines[0];
+  lines.shift();
+
+  return [lines, unusedChars];
+};
+
+/**
+ * parseLines parses a string into an array of lines, and also returns any unused characters
+ * @param {string} chunk
+ * @param {string} trailingChars are any unused characters from the previous chunk
+ * @returns {[string[], string]}
+ */
+const parseLines = (chunk, trailingChars) => {
+  // Move over the previous chunk character to check for CRLF
+  if (trailingChars.length > 0) {
+    chunk = trailingChars[trailingChars.length - 1] + chunk;
+    trailingChars = trailingChars.slice(0, trailingChars.length - 1);
+  }
+
+  const lines = chunk.split(/\r?\n/);
+  lines[0] = trailingChars + lines[0];
+  const unusedChars = lines[lines.length - 1];
+  lines.pop();
+
+  return [lines, unusedChars];
 };
 
 const stopAllWatchers = () => {
@@ -92,7 +127,7 @@ const readNLastLines = (filePath, numberOfLines, endIndex) => {
     backwardsStream
       .on('data', buffer => {
         const chunk = buffer.toString('utf-8');
-        const [lines, trailingChars] = formatChunk(chunk, unusedChars, true);
+        const [lines, trailingChars] = parseLinesBackwards(chunk, unusedChars);
         unusedChars = trailingChars;
         if (lines.length > 0) {
           if (result.length + lines.length >= numberOfLines) {
@@ -122,7 +157,7 @@ const getLastNewLineIndex = (filePath, endIndex) => {
     backwardsStream
       .on('data', chunk => {
         for (let i = chunk.length - 1; i > 0; i--) {
-          if (isNewLineByte(chunk[i])) {
+          if (isLF(chunk[i])) {
             result = endIndex - (chunk.length - i + index);
             backwardsStream.emit('end');
             return;
@@ -140,24 +175,24 @@ const getLastNewLineIndex = (filePath, endIndex) => {
   });
 };
 
+const countLinesInBuffer = buffer => {
+  let lineCount = 0;
+
+  for (let i = -1; i < buffer.length; i++) {
+    if (isLF(buffer[i])) lineCount++;
+  }
+
+  return lineCount;
+};
+
 //This will count the lines until the end index, if the file is big this will take a lot of time!
 const getLineCount = (filePath, endIndex) => {
   return new Promise((resolve, reject) => {
     let lineCount = 0;
 
-    fs.createReadStream(filePath, { end: endIndex })
+    createReadStream(filePath, { end: endIndex })
       .on('data', chunk => {
-        for (let i = 0; i < chunk.length; i++) {
-          if (isNewLineByte(chunk[i])) lineCount++;
-          else if (
-            i + 1 < chunk.length &&
-            isReturnByte(chunk[i]) &&
-            isNewLineByte(chunk[i + 1]) === 10
-          ) {
-            i++; //skip (i + 1) so it doesn't count twice
-            lineCount++;
-          }
-        }
+        lineCount += countLinesInBuffer(chunk);
       })
       .on('end', () => {
         resolve(lineCount);
@@ -168,9 +203,9 @@ const getLineCount = (filePath, endIndex) => {
   });
 };
 
-const readFile = filePath => {
+const readFileAsync = filePath => {
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf8', (err, data) => {
+    readFile(filePath, 'utf8', (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -181,11 +216,11 @@ const readFile = filePath => {
 };
 
 const getFileSizeInBytes = filePath => {
-  return fs.statSync(filePath).size;
+  return statSync(filePath).size;
 };
 
 const saveStateToDisk = _reduxStateValue => {
-  fs.writeFile(reduxStateFile(), _reduxStateValue, err => {
+  writeFile(reduxStateFile(), _reduxStateValue, err => {
     if (err) {
       throw err;
     }
@@ -195,11 +230,11 @@ const saveStateToDisk = _reduxStateValue => {
 };
 
 const loadStateFromDisk = () => {
-  return readFile(reduxStateFile());
+  return readFileAsync(reduxStateFile());
 };
 
 const saveRecentFilesToDisk = _recentFiles => {
-  fs.writeFile(recentFiles(), _recentFiles, err => {
+  writeFile(recentFiles(), _recentFiles, err => {
     if (err) {
       throw err;
     }
@@ -217,6 +252,10 @@ module.exports = {
   readNLastLines,
   getLineCount,
   followFile,
+  parseLinesBackwards,
+  countLinesInBuffer,
+  parseLines,
+  readFileAsync,
   getFileSizeInBytes,
   getLastNewLineIndex,
   stopWatcher,

@@ -54,10 +54,10 @@ export const setFileData = (dispatch, filePath, fileSize, history) => {
   });
 
   dispatch({
-    type: 'LOGINFO_SET_FILESIZE',
+    type: 'LOGINFO_SET_SIZE',
     data: {
-      filePath,
-      fileSize
+      sourcePath: filePath,
+      size: fileSize
     }
   });
 };
@@ -82,7 +82,7 @@ export const clearSources = dispatch => {
     data: ''
   });
   dispatch({
-    type: 'LOGINFO_SET_FILESIZE',
+    type: 'LOGINFO_SET_SIZE',
     data: ''
   });
 };
@@ -102,6 +102,16 @@ export const addNewLines = (dispatch, sourcePath, lines) => {
     data: {
       sourcePath,
       lines
+    }
+  });
+};
+
+export const addSize = (dispatch, sourcePath, size) => {
+  dispatch({
+    type: 'LOGINFO_INCREASE_SIZE',
+    data: {
+      sourcePath,
+      size
     }
   });
 };
