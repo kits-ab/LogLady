@@ -29,7 +29,12 @@ class StatusBar extends React.Component {
           <ReactTooltip />
           <li data-tip={this.props.source}>
             File:
-            {this.props.source ? getFormattedFilePath(this.props.source) : null}
+            {this.props.source
+              ? getFormattedFilePath(
+                  this.props.source,
+                  `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
+                )
+              : null}
           </li>
           <li>
             Size:
