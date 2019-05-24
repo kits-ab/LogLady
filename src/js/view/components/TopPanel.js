@@ -3,7 +3,8 @@ import {
   TopPanelItem,
   FollowSetting,
   TopPanelItemText,
-  TopPanelItemFiller
+  TopPanelItemFiller,
+  TopPanelLogoText
 } from 'js/view/styledComponents/TopPanelStyledComponents';
 import { OpenFileButton } from 'js/view/styledComponents/common/ButtonStyledComponents';
 import { TextFieldInput } from 'js/view/components/common/input';
@@ -16,12 +17,15 @@ import {
 } from 'js/view/actions/dispatchActions';
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
+
+const logoText = require('../../../resources/text.png');
+
 class TopPanel extends React.Component {
   render() {
     return (
       <TopPanelContainer>
         <TopPanelItem>
-          <TopPanelItemText>LogLady</TopPanelItemText>
+          <TopPanelLogoText src={logoText} />
         </TopPanelItem>
         <TopPanelItem>
           <OpenFileButton
@@ -35,14 +39,20 @@ class TopPanel extends React.Component {
         <TopPanelItem>
           <TextFieldInput
             placeholder="filter"
-            onChange={handleFilterInput}
+            debounce={222}
+            onTextChange={text => {
+              handleFilterInput(this.props.dispatch, text);
+            }}
             value={this.props.filterInput}
           />
         </TopPanelItem>
         <TopPanelItem>
           <TextFieldInput
             placeholder="highlight"
-            onChange={handleHighlightInput}
+            debounce={222}
+            onTextChange={text => {
+              handleHighlightInput(this.props.dispatch, text);
+            }}
             value={this.props.highlightInput}
           />
         </TopPanelItem>

@@ -1,125 +1,63 @@
 import React from 'react';
-import { findMatches } from './helpers/lineFilterHelper';
 import {
-  LogViewContainer,
-  CloseFileButton,
-  Log,
-  LogLine
+  LogViewerContainer,
+  CloseFileButton
 } from '../styledComponents/LogViewerStyledComponents';
+import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
-import TextHighlightRegex from './TextHighlightRegex';
-import WindowedList from 'react-list';
+import { parseRegExp } from 'js/view/components/helpers/regexHelper.js';
 
 class LogViewer extends React.Component {
   constructor(props) {
     super(props);
+
     this.windowedList = React.createRef();
-    this.state = {
-      escapeRegexPrefix: '学生'
-    };
   }
-
-  applyFilter = (lines, filter) => {
-    return !filter ? lines : findMatches(filter, lines);
-  };
-
-  hasMatch = (line, regex) => {
-    return regex.test(line);
-  };
-
-  scrollToBottom = (el, list) => {
-    el.scrollAround(list.length);
-  };
-
-  componentDidUpdate() {
-    if (this.props.tailSwitch)
-      this.scrollToBottom(this.windowedList.current, this.props.liveLines);
-  }
-
-  parseRegexInput = (input, escapeRegexPrefix) => {
-    if (!input) return '';
-
-    if (input.startsWith(escapeRegexPrefix))
-      return input
-        .slice(escapeRegexPrefix.length)
-        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    try {
-      new RegExp(input);
-      return input;
-    } catch (e) {
-      return '';
-    }
-  };
-
-  itemRenderer = (lines, regex) => {
-    return (i, key) => {
-      return (
-        <LogLine
-          key={key}
-          index={i}
-          wrap={this.props.wrapLineOn ? 'true' : undefined}
-        >
-          {regex && this.hasMatch(lines[i], regex) ? (
-            <TextHighlightRegex
-              text={lines[i]}
-              color={this.props.highlightColor}
-              regex={regex}
-            />
-          ) : (
-            lines[i]
-          )}
-        </LogLine>
-      );
-    };
-  };
 
   render() {
-    const lines =
-      this.props.liveLines &&
-      this.applyFilter(this.props.liveLines, this.props.filterInput);
+    const lines = this.props.logs[this.props.source];
 
-    const regexInput = this.parseRegexInput(
-      this.props.highlightInput,
-      this.state.escapeRegexPrefix
-    );
-
-    const regex = !regexInput ? undefined : new RegExp('(' + regexInput + ')');
+    const highlightRegExp = parseRegExp(this.props.highlightInput);
+    const filterRegExp = parseRegExp(this.props.filterInput);
 
     return (
-      <LogViewContainer>
+      <LogViewerContainer>
         <CloseFileButton
-          openFiles={this.props.openFiles}
+          show={this.props.source}
           onClick={() => {
             closeFile(
               this.props.dispatch,
-              this.props.openFiles ? this.props.openFiles : ''
+              this.props.source ? this.props.source : ''
             );
           }}
         />
-        <Log>
-          <WindowedList
-            itemRenderer={this.itemRenderer(lines, regex)}
-            length={lines.length}
-            type="uniform"
-            ref={this.windowedList}
-          />
-        </Log>
-      </LogViewContainer>
+        <LogViewerList
+          key={this.props.source}
+          highlightColor={this.props.highlightColor}
+          wrapLines={this.props.wrapLineOn}
+          scrollToBottom={this.props.tailSwitch}
+          lines={lines ? lines : []}
+          highlightRegExp={highlightRegExp}
+          filterRegExp={filterRegExp}
+        />
+      </LogViewerContainer>
     );
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = ({
+  topPanelReducer,
+  settingsReducer,
+  logViewerReducer
+}) => {
   return {
-    filterInput: state.topPanelReducer.filterInput,
-    highlightInput: state.topPanelReducer.highlightInput,
-    highlightColor: state.settingsReducer.highlightColor,
-    wrapLineOn: state.settingsReducer.wrapLineOn,
-    liveLines: state.logViewerReducer.liveLines,
-    nthLines: state.logViewerReducer.nthLines,
-    tailSwitch: state.topPanelReducer.tailSwitch,
-    openFiles: state.menuReducer.openFiles
+    filterInput: topPanelReducer.filterInput,
+    highlightInput: topPanelReducer.highlightInput,
+    highlightColor: settingsReducer.highlightColor,
+    wrapLineOn: settingsReducer.wrapLineOn,
+    logs: logViewerReducer.logs,
+    tailSwitch: topPanelReducer.tailSwitch
   };
 };
 

@@ -1,31 +1,47 @@
-const { Menu } = require('electron');
-const { dialog } = require('electron');
+const { Menu, ipcMain, shell } = require('electron');
+const engine = require('../engine/engine');
+const isDev = require('electron-is-dev');
 
-let ipc;
-
-const setIpc = _ipc => {
-  ipc = _ipc;
-};
-
-const handleMenuItemClicked = (type, data) => {
-  ipc.send('backendMessages', { type: `menu_${type}`, data: data });
-};
+let webContents;
+let recentFilesObject = [];
 
 const handleShowOpenDialog = () => {
-  dialog.showOpenDialog(
-    {
-      properties: ['openFile']
-    },
-    filePath => {
-      if (filePath === undefined) return;
-      handleMenuItemClicked('open', filePath);
-    }
+  ipcMain.emit(
+    'frontendMessages',
+    { sender: webContents },
+    { function: 'DIALOG_OPEN_SHOW' }
   );
 };
 
-const createMenu = ipc => {
-  // const menuItemClicked = handleMenuItemClicked(ipc);
-  setIpc(ipc);
+const handleOpenFile = filePath => {
+  ipcMain.emit(
+    'frontendMessages',
+    { sender: webContents },
+    { function: 'FILE_OPEN', data: { filePath } }
+  );
+};
+
+const handleRecentFiles = filePath => {
+  recentFilesObject = recentFilesObject.filter(file => {
+    return file !== filePath;
+  });
+  recentFilesObject.unshift(filePath);
+  if (recentFilesObject.length > 3) {
+    recentFilesObject.pop();
+  }
+  engine.saveRecentFilesToDisk(JSON.stringify(recentFilesObject));
+  createMenu();
+};
+
+const setRecentFiles = _recentFiles => {
+  recentFilesObject = JSON.parse(_recentFiles);
+};
+
+const getRecentFiles = () => {
+  return recentFilesObject;
+};
+
+const createTemplate = () => {
   const template = [
     {
       label: 'LogLady',
@@ -45,30 +61,40 @@ const createMenu = ipc => {
           click() {
             handleShowOpenDialog();
           }
+        },
+        {
+          label: 'Open recent...',
+          submenu: getRecentFiles().map(file => {
+            return {
+              label: file,
+              click() {
+                handleOpenFile(file);
+              }
+            };
+          })
         }
       ]
     },
     {
       label: 'View',
       submenu: [
-        {
-          label: 'Reload',
-          accelerator: 'CmdOrCtrl+R',
-          click(item, focusedWindow) {
-            if (focusedWindow) focusedWindow.reload();
-          }
-        },
-        {
-          label: 'Toggle Developer Tools',
-          accelerator:
-            process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-          click(item, focusedWindow) {
-            if (focusedWindow) focusedWindow.webContents.toggleDevTools();
-          }
-        },
-        {
-          type: 'separator'
-        },
+        isDev
+          ? {
+              role: 'reload'
+            }
+          : {
+              role: 'reload',
+              visible: false,
+              enabled: false
+            },
+        isDev
+          ? {
+              role: 'toggleDevTools'
+            }
+          : {
+              role: 'toggleDevTools',
+              visible: false
+            },
         {
           role: 'resetzoom'
         },
@@ -103,9 +129,7 @@ const createMenu = ipc => {
         {
           label: 'Learn More',
           click() {
-            require('electron').shell.openExternal(
-              'https://kits.se/om/akarkhatab'
-            );
+            shell.openExternal('https://kits.se/om/akarkhatab');
           }
         }
       ]
@@ -115,7 +139,18 @@ const createMenu = ipc => {
   return Menu.buildFromTemplate(template);
 };
 
+const setWebContents = _webContents => {
+  webContents = _webContents;
+};
+
+const createMenu = () => {
+  Menu.setApplicationMenu(createTemplate());
+};
+
 module.exports = {
-  createMenu: createMenu,
-  handleShowOpenDialog: handleShowOpenDialog
+  handleShowOpenDialog,
+  setWebContents,
+  setRecentFiles,
+  createMenu,
+  handleRecentFiles
 };

@@ -30,3 +30,8 @@ export const FollowSetting = styled.div`
   flex-direction: row;
   align-items: center;
 `;
+
+export const TopPanelLogoText = styled.img`
+  height: 40px;
+  padding: 0px 8px;
+`;

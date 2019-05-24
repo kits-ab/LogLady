@@ -2,7 +2,8 @@ import TabSettings from './components/TabSettings';
 import LogViewer from './components/LogViewer';
 import TopPanel from './components/TopPanel';
 import DefaultPage from './components/DefaultPage';
-import Statusbar from './components/StatusBar';
+import StatusBar from './components/StatusBar';
+import SnackBar from './components/SnackBar';
 import {
   RootContainer,
   LogPage
@@ -15,16 +16,17 @@ class App extends Component {
   render() {
     return (
       <RootContainer>
-        {this.props.openFiles && this.props.openFiles[0] ? (
+        {this.props.openSources && this.props.openSources[0] ? (
           <LogPage>
             <TopPanel />
             <TabSettings />
-            <LogViewer />
-            <Statusbar />
+            <LogViewer source={this.props.openSources[0]} />
+            <StatusBar source={this.props.openSources[0]} />
           </LogPage>
         ) : (
           <DefaultPage />
         )}
+        <SnackBar />
       </RootContainer>
     );
   }
@@ -32,7 +34,7 @@ class App extends Component {
 
 const mapStateToProps = state => {
   return {
-    openFiles: state.menuReducer.openFiles
+    openSources: state.menuReducer.openSources
   };
 };
 

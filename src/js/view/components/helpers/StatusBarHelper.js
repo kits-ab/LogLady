@@ -12,23 +12,18 @@ export const getFormattedFileSize = fileSize => {
   }
 };
 
-export const getFileName = openFile => {
-  const filePathToArray = openFile[0].split('/');
-  return filePathToArray.map((data, i, _filePathToArray) => {
-    let fileName;
-    if (_filePathToArray.length === i + 1) {
-      fileName = data;
-    }
-    return fileName;
-  });
-};
+export const getFormattedFilePath = (filePath, signToSplit) => {
+  const filePathToArray = filePath.split(signToSplit);
 
-export const getFormattedFilePath = filePath => {
-  const filePathToArray = filePath.split('/');
   if (filePathToArray.length > 4) {
     const shortFilePath = filePathToArray.slice(-3);
     return (
-      '...' + shortFilePath[0] + '/' + shortFilePath[1] + '/' + shortFilePath[2]
+      '...' +
+      shortFilePath[0] +
+      signToSplit +
+      shortFilePath[1] +
+      signToSplit +
+      shortFilePath[2]
     );
   }
   return filePath;

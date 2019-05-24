@@ -1,4 +1,10 @@
-export const topPanelReducer = (state = { tailSwitch: true }, action) => {
+const initialState = {
+  tailSwitch: true,
+  highlightInput: '',
+  filterInput: ''
+};
+
+export const topPanelReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'tailSwitch':
       return {
@@ -16,7 +22,7 @@ export const topPanelReducer = (state = { tailSwitch: true }, action) => {
         highlightInput: action.data
       };
     case 'topPanelReducerRestore':
-      return { ...action.data };
+      return { ...initialState, ...action.data };
     default:
       return state;
   }

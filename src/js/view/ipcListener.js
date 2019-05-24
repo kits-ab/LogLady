@@ -1,36 +1,82 @@
 import {
-  saveStateToDisk,
-  populateStore
-} from './configurations/configureStore';
-import { initializeOpenFile } from './configurations/configureStore';
+  setFileData,
+  setSource,
+  clearAllLogs,
+  showSnackBar,
+  addNewLines,
+  increaseSize
+} from 'js/view/actions/dispatchActions';
+import { sendRequestToBackend } from 'js/view/ipcPublisher';
+import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
 const { ipcRenderer } = window.require('electron');
 
-export const ipcListener = (dispatch, state) => {
-  ipcRenderer.on('backendMessages', (event, action) => {
+const handleSourcePicked = (dispatch, { sourcePath }) => {
+  setSource(dispatch, sourcePath);
+};
+
+const handleSourceOpened = (dispatch, { sourceType, ...rest }) => {
+  switch (sourceType) {
+    case 'FILE':
+      handleFileOpened(dispatch, rest);
+      break;
+    default:
+      console.log('ipcListener.js: Unknown source type');
+  }
+};
+
+const handleFileOpened = (
+  dispatch,
+  { filePath, fileSize, endIndex, history }
+) => {
+  clearAllLogs(dispatch);
+  setFileData(dispatch, filePath, fileSize, history);
+
+  const followSource = {
+    function: 'SOURCE_FOLLOW',
+    data: {
+      sourceType: 'FILE',
+      filePath,
+      fromIndex: endIndex
+    }
+  };
+  sendRequestToBackend(followSource);
+};
+
+const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
+  addNewLines(dispatch, sourcePath, lines);
+  increaseSize(dispatch, sourcePath, size);
+};
+
+const handleError = (dispatch, { message, error }) => {
+  const errorMessage = prettifyErrorMessage(message, error);
+  showSnackBar(dispatch, errorMessage, 'error', 20000);
+};
+
+export const ipcListener = (store, publisher) => {
+  const dispatch = store.dispatch;
+
+  ipcRenderer.on('backendMessages', (_event, action) => {
     switch (action.type) {
-      case 'menu_open':
-        dispatch({
-          type: action.type,
-          data: action.data
-        });
-        initializeOpenFile(action.data[0]);
+      case 'QUIT':
+        publisher.saveStateToDisk();
         break;
-      case 'saveState':
-        saveStateToDisk();
+      case 'STATE_SET':
+        publisher.populateStore(JSON.parse(action.data));
         break;
-      case 'loadState':
-        populateStore(JSON.parse(action.data));
+      case 'SOURCE_PICKED':
+        handleSourcePicked(dispatch, action.data);
         break;
-      case 'backendError':
-        //handle errors in the future
-        // alert('Error occured. ', action.data);
-        console.log('Error from the backend: ', action.data);
+      case 'SOURCE_OPENED':
+        handleSourceOpened(dispatch, action.data);
+        break;
+      case 'ERROR':
+        handleError(dispatch, action.data);
+        break;
+      case 'LINES_NEW':
+        handleNewLines(dispatch, action.data);
         break;
       default:
-        dispatch({
-          type: action.type,
-          data: action.data
-        });
+        console.log('Warning: Unrecognized message, ', action);
         break;
     }
   });

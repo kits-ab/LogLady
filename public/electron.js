@@ -6,7 +6,6 @@ const isDev = require('electron-is-dev');
 const updater = require('electron-simple-updater');
 const engine = require('../src/js/engine/engine');
 const menu = require('../src/js/electron/menu');
-const { Menu } = require('electron');
 const appConfig = require('electron-settings');
 
 updater.init();
@@ -57,7 +56,7 @@ const windowStateKeeper = windowName => {
   };
 };
 
-const createWindow = () => {
+const createWindow = async () => {
   const mainWindowStateKeeper = windowStateKeeper('main');
   const windowOptions = {
     x: mainWindowStateKeeper.x,
@@ -102,8 +101,7 @@ const createWindow = () => {
     `file://${path.join(__dirname, '../src/resources/loadingSpinner.html')}`
   );
   mainWindow.on('close', () => {
-    let argObj = {};
-    argObj.type = 'saveState';
+    const argObj = { type: 'QUIT' };
     mainWindow.webContents.send('backendMessages', argObj);
   });
   loadingWindow.show();
@@ -112,7 +110,15 @@ const createWindow = () => {
     mainWindow = null;
     quitApplication();
   });
-  Menu.setApplicationMenu(menu.createMenu(mainWindow.webContents));
+  menu.setWebContents(mainWindow.webContents);
+
+  try {
+    const recentFiles = await engine.loadRecentFilesFromDisk();
+    menu.setRecentFiles(recentFiles);
+  } catch (err) {
+    console.log("Couldn't load recent files, ", err);
+  }
+  menu.createMenu();
 };
 
 app.on('ready', createWindow);
@@ -130,5 +136,5 @@ const quitApplication = () => {
 };
 
 module.exports = {
-  quitApplication: quitApplication
+  quitApplication
 };
