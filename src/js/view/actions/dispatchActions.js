@@ -40,7 +40,7 @@ export const handleWrapLineOn = dispatch => {
 export const setSource = (dispatch, sourcePath) => {
   dispatch({
     type: 'MENU_SET_SOURCE',
-    data: { sourcePath: sourcePath }
+    data: { sourcePath }
   });
 };
 
