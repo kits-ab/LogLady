@@ -247,7 +247,7 @@ const saveRecentFilesToDisk = _recentFiles => {
 };
 
 const loadRecentFilesFromDisk = () => {
-  return readFile(recentFiles());
+  return readFileAsync(recentFiles());
 };
 
 module.exports = {

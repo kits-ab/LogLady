@@ -58,6 +58,10 @@ const openFile = async (sender, filePath) => {
   }
 };
 
+const handleOpenFile = (sender, { filePath }) => {
+  openFile(sender, filePath);
+};
+
 const saveRecentFilesToDisk = _recentFiles => {
   fileReader.saveRecentFilesToDisk(_recentFiles);
 };
@@ -146,7 +150,7 @@ ipcMain.on('frontendMessages', async (event, _argObj) => {
       handleShowOpenDialog(sender);
       break;
     case 'FILE_OPEN':
-      openFile(sender, _argObj.filePath);
+      handleOpenFile(sender, _argObj.data);
       break;
     case 'SOURCE_FOLLOW':
       fileReader.stopAllWatchers();
