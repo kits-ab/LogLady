@@ -1,21 +1,8 @@
 import {
-  readFileAsync,
   parseLines,
   parseLinesBackwards,
   countLinesInBuffer
 } from './fileReader';
-
-it('reads a file and prints content to console', done => {
-  readFileAsync('./src/resources/example.txt', 'utf8')
-    .then(data => {
-      expect(data).toBe('this is the content\n');
-      done();
-    })
-    .catch(err => {
-      console.log(err);
-      done();
-    });
-});
 
 describe('parseLines', () => {
   it('should account get all LF lines', () => {
