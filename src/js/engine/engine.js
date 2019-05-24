@@ -95,7 +95,7 @@ const loadStateFromDisk = sender => {
     .catch(error => {
       if (error.code === 'ENOENT') return;
 
-      sendError(sender, "Couldn't load previous state from disk")(error);
+      sendError(sender, "Couldn't load previous state from disk", error);
     });
 };
 
@@ -105,7 +105,7 @@ const handleFollowSource = (sender, { sourceType, ...rest }) => {
       handleFollowFile(sender, rest);
       break;
     default:
-      sendError(sender, 'Unknown source type')({ code: 'CUSTOM' });
+      sendError(sender, 'Unknown source type', { code: 'CUSTOM' });
   }
 };
 
@@ -173,8 +173,8 @@ const customError = reason => {
   return { code: 'CUSTOM', reason: reason };
 };
 
-const sendError = (sender, message) => {
-  return error => {
+const sendError = (sender, message, error) => {
+  const errorSender = error => {
     const action = {
       type: 'ERROR',
       data: {
@@ -185,6 +185,12 @@ const sendError = (sender, message) => {
 
     sender.send(ipcChannel, action);
   };
+
+  if (error === undefined) {
+    return errorSender;
+  }
+
+  errorSender(error);
 };
 
 module.exports = {
