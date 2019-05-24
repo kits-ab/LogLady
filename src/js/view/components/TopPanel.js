@@ -3,7 +3,8 @@ import {
   TopPanelItem,
   FollowSetting,
   TopPanelItemText,
-  TopPanelItemFiller
+  TopPanelItemFiller,
+  TopPanelLogoText
 } from 'js/view/styledComponents/TopPanelStyledComponents';
 import { OpenFileButton } from 'js/view/styledComponents/common/ButtonStyledComponents';
 import { TextFieldInput } from 'js/view/components/common/input';
@@ -16,12 +17,15 @@ import {
 } from 'js/view/actions/dispatchActions';
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
+
+const logoText = require('../../../resources/text.png');
+
 class TopPanel extends React.Component {
   render() {
     return (
       <TopPanelContainer>
         <TopPanelItem>
-          <TopPanelItemText>LogLady</TopPanelItemText>
+          <TopPanelLogoText src={logoText} />
         </TopPanelItem>
         <TopPanelItem>
           <OpenFileButton

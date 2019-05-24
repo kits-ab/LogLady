@@ -3,7 +3,9 @@ const {
   watch,
   statSync,
   readFile,
-  writeFile
+  writeFile,
+  watchFile,
+  unwatchFile
 } = require('fs');
 const app = require('electron').app;
 const path = require('path');
@@ -23,39 +25,54 @@ const isLF = b => {
   return b === 10;
 };
 
-const isCRLF = (a, b) => {
-  return a === 10 && b === 13;
+// const isCRLF = (a, b) => {
+//   return a === 10 && b === 13;
+// };
+
+const createTailStream = (filePath, startIndex, onChange, onError) => {
+  let unusedChars = '';
+  let currentIndex = startIndex;
+
+  createReadStream(filePath, {
+    start: currentIndex
+  })
+    .setEncoding('utf8')
+    .on('data', chunk => {
+      currentIndex += chunk.length;
+      const [lines, trailingChars] = parseLines(chunk, unusedChars);
+      unusedChars = trailingChars;
+      const filtered = lines.filter(x => {
+        return x !== '';
+      });
+      if (filtered.length > 0) {
+        onChange(filtered, chunk.length);
+      }
+    })
+    .on('error', error => {
+      onError(error);
+    });
 };
 
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
 const startWatcher = (filePath, startIndex, onChange, onError) => {
-  let currentIndex = startIndex;
-  let unusedChars = '';
   if (watchers[filePath] !== undefined) {
     watchers[filePath].close();
   }
-  let watcher = watch(filePath, (_event, _filename) => {
-    createReadStream(filePath, {
-      start: currentIndex
-    })
-      .setEncoding('utf8')
-      .on('data', chunk => {
-        currentIndex += chunk.length;
-        const [lines, trailingChars] = parseLines(chunk, unusedChars);
-        unusedChars = trailingChars;
-        const filtered = lines.filter(x => {
-          return x !== '';
-        });
-        if (filtered.length > 0) {
-          onChange(filtered, chunk.length);
-        }
-      })
-      .on('error', error => {
-        onError(error);
-      });
-  });
-
+  let watcher;
+  if (process.platform === 'win32') {
+    watcher = watchFile(
+      filePath,
+      { persistent: true, interval: 100 },
+      (_event, _filename) => {
+        createTailStream(filePath, startIndex, onChange, onError);
+      }
+    );
+  } else {
+    watcher = watch(filePath, (_event, _filename) => {
+      createTailStream(filePath, startIndex, onChange, onError);
+    });
+  }
   watchers[filePath] = watcher;
 };
 
@@ -101,7 +118,11 @@ const parseLines = (chunk, trailingChars) => {
 
 const stopAllWatchers = () => {
   for (var key in watchers) {
-    watchers[key].close();
+    if (process.platform === 'win32') {
+      unwatchFile(key);
+    } else {
+      watchers[key].close();
+    }
   }
   watchers = {};
 };
