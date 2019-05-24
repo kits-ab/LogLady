@@ -12,24 +12,24 @@ export const getFormattedFileSize = fileSize => {
   }
 };
 
-export const getFormattedFilePath = filePath => {
-  const sign = signToSplit();
-  const filePathToArray = filePath.split(sign);
+//const signToSplit = () => {
+//return `${navigator.platform.startsWith('Win') ? '\\' : '/'}`;
+//};
+
+export const getFormattedFilePath = (filePath, signToSplit) => {
+  //const sign = signToSplit();
+  const filePathToArray = filePath.split(signToSplit);
 
   if (filePathToArray.length > 4) {
     const shortFilePath = filePathToArray.slice(-3);
     return (
       '...' +
       shortFilePath[0] +
-      sign +
+      signToSplit +
       shortFilePath[1] +
-      sign +
+      signToSplit +
       shortFilePath[2]
     );
   }
   return filePath;
-};
-
-const signToSplit = () => {
-  return `${navigator.platform.startsWith('Win') ? '\\' : '/'}`;
 };

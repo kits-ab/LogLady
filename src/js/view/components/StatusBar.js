@@ -30,7 +30,10 @@ class StatusBar extends React.Component {
           <li data-tip={this.props.openFiles[0]}>
             File:{' '}
             {this.props.openFiles && this.props.openFiles[0]
-              ? getFormattedFilePath(this.props.openFiles[0])
+              ? getFormattedFilePath(
+                  this.props.openFiles[0],
+                  `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
+                )
               : null}
           </li>
           <li>Lines:{this.props.numberOfLines}</li>
