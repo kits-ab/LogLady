@@ -6,19 +6,10 @@ it('should return state at unknown type', () => {
   expect(menuReducer(state, action)).toEqual(state);
 });
 
-it('should add file to openFiles', () => {
-  const theFilePath = 'hey/ho/lets.go';
+it('should set openSources to specified file', () => {
+  const filePath = 'hey/ho/lets.go';
   const state = {};
-  const action = { type: 'menu_open', data: [theFilePath] };
-  const expectedState = { openFiles: [theFilePath] };
-  expect(menuReducer(state, action)).toEqual(expectedState);
-});
-
-it('should add more files to openFiles', () => {
-  const initialFilePath = 'one/two/three.four';
-  const theFilePath = 'hey/ho/lets.go';
-  const state = { openFiles: [initialFilePath] };
-  const action = { type: 'menu_open', data: [theFilePath] };
-  const expectedState = { openFiles: [initialFilePath, theFilePath] };
+  const action = { type: 'MENU_SET_SOURCE', data: { sourcePath: filePath } };
+  const expectedState = { openSources: [filePath] };
   expect(menuReducer(state, action)).toEqual(expectedState);
 });

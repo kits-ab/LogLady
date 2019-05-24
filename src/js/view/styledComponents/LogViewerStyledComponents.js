@@ -16,7 +16,7 @@ export const CloseFileButton = styled.button`
   margin-top: 10px;
   margin-left: calc(100% - 52px);
   display: ${props => {
-    return props.openFiles && props.openFiles[0] ? 'block' : 'none';
+    return props.show ? 'block' : 'none';
   }};
   box-sizing: border-box;
   width: 27px;

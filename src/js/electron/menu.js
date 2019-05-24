@@ -1,29 +1,15 @@
-const { Menu } = require('electron');
-const { dialog } = require('electron');
+const { Menu, ipcMain, shell } = require('electron');
 const engine = require('../engine/engine');
 const isDev = require('electron-is-dev');
 
 let webContents;
 let recentFilesObject = [];
 
-const handleMenuItemClicked = (type, data) => {
-  webContents.send('backendMessages', { type: `menu_${type}`, data: data });
-};
-
-const openFile = filePath => {
-  handleMenuItemClicked('open', [filePath]);
-  handleRecentFiles(filePath);
-};
-
 const handleShowOpenDialog = () => {
-  dialog.showOpenDialog(
-    {
-      properties: ['openFile']
-    },
-    filePath => {
-      if (filePath === undefined) return;
-      openFile(filePath[0]);
-    }
+  ipcMain.emit(
+    'frontendMessages',
+    { sender: webContents },
+    { function: 'DIALOG_OPEN_SHOW' }
   );
 };
 
@@ -74,7 +60,7 @@ const createTemplate = () => {
             return {
               label: file,
               click() {
-                openFile(file);
+                handleShowOpenDialog(file);
               }
             };
           })
@@ -135,9 +121,7 @@ const createTemplate = () => {
         {
           label: 'Learn More',
           click() {
-            require('electron').shell.openExternal(
-              'https://kits.se/om/akarkhatab'
-            );
+            shell.openExternal('https://kits.se/om/akarkhatab');
           }
         }
       ]
@@ -152,23 +136,13 @@ const setWebContents = _webContents => {
 };
 
 const createMenu = () => {
-  engine
-    .loadRecentFilesFromDisk()
-    .then(_recentFiles => {
-      setRecentFiles(_recentFiles);
-      Menu.setApplicationMenu(createTemplate());
-    })
-    .catch(err => {
-      let action = {};
-      action.type = 'backendError';
-      action.data = err;
-      webContents.send('backendMessages', action);
-      Menu.setApplicationMenu(createTemplate());
-    });
+  Menu.setApplicationMenu(createTemplate());
 };
 
 module.exports = {
   handleShowOpenDialog,
   setWebContents,
-  createMenu
+  setRecentFiles,
+  createMenu,
+  handleRecentFiles
 };

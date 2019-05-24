@@ -17,7 +17,7 @@ it('should saveStateToDisk', () => {
   expect(fakeRequester.mock.calls.length).toBe(1);
   expect(fakeRequester.mock.calls[0]).toEqual([
     {
-      function: 'saveState',
+      function: 'STATE_SAVE',
       reduxStateValue: '{"testStuff":"two"}'
     }
   ]);

@@ -1,19 +1,18 @@
-import { sendRequestToBackend } from '../../ipcPublisher';
-import { handleCloseFile } from '../../actions/dispatchActions';
-
-let argObj = {};
+import { sendRequestToBackend } from 'js/view/ipcPublisher';
+import { clearSources } from '../../actions/dispatchActions';
 
 export const showOpenDialog = () => {
-  argObj.function = 'showOpenDialog';
-  sendRequestToBackend(argObj);
+  sendRequestToBackend({ function: 'DIALOG_OPEN_SHOW' });
 };
 
 export const closeFile = (dispatch, _filePath) => {
   //send request to backend
-  argObj.function = 'stopWatcher';
-  argObj.filePath = _filePath;
+  const argObj = {
+    function: 'SOURCE_UNFOLLOW',
+    filePath: _filePath
+  };
   sendRequestToBackend(argObj);
 
   //handle related states on frontend
-  handleCloseFile(dispatch);
+  clearSources(dispatch);
 };
