@@ -12,12 +12,7 @@ export const getFormattedFileSize = fileSize => {
   }
 };
 
-//const signToSplit = () => {
-//return `${navigator.platform.startsWith('Win') ? '\\' : '/'}`;
-//};
-
 export const getFormattedFilePath = (filePath, signToSplit) => {
-  //const sign = signToSplit();
   const filePathToArray = filePath.split(signToSplit);
 
   if (filePathToArray.length > 4) {

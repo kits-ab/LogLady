@@ -13,6 +13,14 @@ const handleShowOpenDialog = () => {
   );
 };
 
+const handleOpenFile = filePath => {
+  ipcMain.emit(
+    'frontendMessages',
+    { sender: webContents },
+    { function: 'FILE_OPEN', data: { filePath } }
+  );
+};
+
 const handleRecentFiles = filePath => {
   recentFilesObject = recentFilesObject.filter(file => {
     return file !== filePath;
@@ -60,7 +68,7 @@ const createTemplate = () => {
             return {
               label: file,
               click() {
-                handleShowOpenDialog(file);
+                handleOpenFile(file);
               }
             };
           })

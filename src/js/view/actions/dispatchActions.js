@@ -37,18 +37,14 @@ export const handleWrapLineOn = dispatch => {
   });
 };
 
-export const setFileSource = (
-  dispatch,
-  filePath,
-  numberOfLines,
-  fileSize,
-  history
-) => {
+export const setSource = (dispatch, sourcePath) => {
   dispatch({
     type: 'MENU_SET_SOURCE',
-    data: { sourcePath: filePath }
+    data: { sourcePath }
   });
+};
 
+export const setFileData = (dispatch, filePath, fileSize, history) => {
   dispatch({
     type: 'LOGVIEWER_SET_LOG',
     data: {
@@ -58,13 +54,11 @@ export const setFileSource = (
   });
 
   dispatch({
-    type: 'LOGINFO_SET_NUMBER_OF_LINES',
-    data: numberOfLines
-  });
-
-  dispatch({
-    type: 'LOGINFO_SET_FILESIZE',
-    data: fileSize
+    type: 'LOGINFO_SET_SIZE',
+    data: {
+      sourcePath: filePath,
+      size: fileSize
+    }
   });
 };
 
@@ -88,7 +82,7 @@ export const clearSources = dispatch => {
     data: ''
   });
   dispatch({
-    type: 'LOGINFO_SET_FILESIZE',
+    type: 'LOGINFO_SET_SIZE',
     data: ''
   });
 };
@@ -108,6 +102,16 @@ export const addNewLines = (dispatch, sourcePath, lines) => {
     data: {
       sourcePath,
       lines
+    }
+  });
+};
+
+export const increaseSize = (dispatch, sourcePath, size) => {
+  dispatch({
+    type: 'LOGINFO_INCREASE_SIZE',
+    data: {
+      sourcePath,
+      size
     }
   });
 };
