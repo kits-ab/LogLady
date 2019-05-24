@@ -54,7 +54,12 @@ const loadStateFromDisk = sender => {
   fileReader
     .loadStateFromDisk()
     .then(_data => {
-      const previousSource = JSON.parse(_data).menuReducer.openSources[0];
+      let previousSource = '';
+      try {
+        previousSource = JSON.parse(_data).menuReducer.openSources[0];
+      } catch (_error) {
+        throw customError("couldn't parse JSON");
+      }
 
       if (previousSource) {
         openFile(sender, previousSource);
@@ -67,7 +72,11 @@ const loadStateFromDisk = sender => {
 
       sender.send(ipcChannel, action);
     })
-    .catch(sendError(sender, "Couldn't load previous state from disk"));
+    .catch(error => {
+      if (error.code === 'ENOENT') return;
+
+      sendError(sender, "Couldn't load previous state from disk")(error);
+    });
 };
 
 const handleFollowSource = (sender, { sourceType, ...rest }) => {
@@ -135,6 +144,10 @@ ipcMain.on('frontendMessages', async (event, _argObj) => {
     default:
   }
 });
+
+const customError = reason => {
+  return { code: 'CUSTOM', reason: reason };
+};
 
 const sendError = (sender, message) => {
   return error => {
