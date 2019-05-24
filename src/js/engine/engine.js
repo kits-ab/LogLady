@@ -110,7 +110,7 @@ const handleFollowSource = (sender, { sourceType, ...rest }) => {
 };
 
 const handleFollowFile = (sender, { filePath, fromIndex }) => {
-  const onChange = (lines, size) => {
+  const onLines = (lines, size) => {
     const action = {
       type: 'LINES_NEW',
       data: {
@@ -125,7 +125,7 @@ const handleFollowFile = (sender, { filePath, fromIndex }) => {
 
   const onError = sendError(sender, "Couldn't keep following source");
 
-  fileReader.followFile(filePath, fromIndex, onChange, onError);
+  fileReader.followFile(filePath, fromIndex, onLines, onError);
 };
 
 const handleShowOpenDialog = async sender => {

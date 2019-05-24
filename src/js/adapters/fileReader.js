@@ -29,33 +29,45 @@ const isLF = b => {
 //   return a === 10 && b === 13;
 // };
 
-const createTailStream = (filePath, startIndex, onChange, onError) => {
-  let unusedChars = '';
-  let currentIndex = startIndex;
+const readTail = (filePath, startIndex, onLines, onError) => {
+  return new Promise((resolve, reject) => {
+    let unusedChars = '';
+    let currentIndex = startIndex;
 
-  createReadStream(filePath, {
-    start: currentIndex
-  })
-    .setEncoding('utf8')
-    .on('data', chunk => {
-      currentIndex += chunk.length;
-      const [lines, trailingChars] = parseLines(chunk, unusedChars);
-      unusedChars = trailingChars;
-      const filtered = lines.filter(x => {
-        return x !== '';
-      });
-      if (filtered.length > 0) {
-        onChange(filtered, chunk.length);
-      }
+    createReadStream(filePath, {
+      start: currentIndex
     })
-    .on('error', error => {
-      onError(error);
-    });
+      .setEncoding('utf8')
+      .on('data', chunk => {
+        currentIndex += chunk.length;
+        const [lines, trailingChars] = parseLines(chunk, unusedChars);
+        unusedChars = trailingChars;
+        const filtered = lines.filter(x => {
+          return x !== '';
+        });
+        if (filtered.length > 0) {
+          onLines(filtered, chunk.length);
+        }
+      })
+      .on('end', () => {
+        resolve(currentIndex);
+      })
+      .on('error', error => {
+        onError(error);
+        resolve(error);
+      });
+  });
 };
 
 //start a watcher and read the new lines starting from the last newline index
 //whenever there is a change to the file.
-const startWatcher = (filePath, startIndex, onChange, onError) => {
+const followFile = (filePath, startIndex, onLines, onError) => {
+  let currentIndex = startIndex;
+
+  let onChange = async () => {
+    currentIndex = await readTail(filePath, currentIndex, onLines, onError);
+  };
+
   if (watchers[filePath] !== undefined) {
     watchers[filePath].close();
   }
@@ -64,14 +76,10 @@ const startWatcher = (filePath, startIndex, onChange, onError) => {
     watcher = watchFile(
       filePath,
       { persistent: true, interval: 100 },
-      (_event, _filename) => {
-        createTailStream(filePath, startIndex, onChange, onError);
-      }
+      onChange
     );
   } else {
-    watcher = watch(filePath, (_event, _filename) => {
-      createTailStream(filePath, startIndex, onChange, onError);
-    });
+    watcher = watch(filePath, onChange);
   }
   watchers[filePath] = watcher;
 };
@@ -82,6 +90,7 @@ const startWatcher = (filePath, startIndex, onChange, onError) => {
  * @returns {[string[], string]}
  */
 const parseLinesBackwards = (chunk, trailingChars) => {
+  // Move over the previous chunk character to check for CRLF
   if (trailingChars.length > 0) {
     chunk = chunk + trailingChars[0];
     trailingChars = trailingChars.slice(1);
@@ -135,10 +144,6 @@ const stopWatcher = filePath => {
   } catch (err) {
     return err;
   }
-};
-
-const followFile = (filePath, startIndex, onChange, onError) => {
-  startWatcher(filePath, startIndex, onChange, onError);
 };
 
 const readNLastLines = (filePath, numberOfLines, endIndex) => {
