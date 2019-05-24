@@ -1,12 +1,18 @@
 import {
-  setFileSource,
+  setFileData,
+  setSource,
   clearAllLogs,
   showSnackBar,
-  addNewLines
+  addNewLines,
+  increaseSize
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
 const { ipcRenderer } = window.require('electron');
+
+const handleSourcePicked = (dispatch, { sourcePath }) => {
+  setSource(dispatch, sourcePath);
+};
 
 const handleSourceOpened = (dispatch, { sourceType, ...rest }) => {
   switch (sourceType) {
@@ -20,10 +26,10 @@ const handleSourceOpened = (dispatch, { sourceType, ...rest }) => {
 
 const handleFileOpened = (
   dispatch,
-  { filePath, lineCount, endIndex, fileSize, history }
+  { filePath, fileSize, endIndex, history }
 ) => {
   clearAllLogs(dispatch);
-  setFileSource(dispatch, filePath, lineCount, fileSize, history);
+  setFileData(dispatch, filePath, fileSize, history);
 
   const followSource = {
     function: 'SOURCE_FOLLOW',
@@ -36,8 +42,9 @@ const handleFileOpened = (
   sendRequestToBackend(followSource);
 };
 
-const handleNewLines = (dispatch, { sourcePath, lines }) => {
+const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
   addNewLines(dispatch, sourcePath, lines);
+  increaseSize(dispatch, sourcePath, size);
 };
 
 const handleError = (dispatch, { message, error }) => {
@@ -55,6 +62,9 @@ export const ipcListener = (store, publisher) => {
         break;
       case 'STATE_SET':
         publisher.populateStore(JSON.parse(action.data));
+        break;
+      case 'SOURCE_PICKED':
+        handleSourcePicked(dispatch, action.data);
         break;
       case 'SOURCE_OPENED':
         handleSourceOpened(dispatch, action.data);

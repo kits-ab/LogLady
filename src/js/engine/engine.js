@@ -3,20 +3,34 @@ const { ipcMain } = require('electron');
 const { dialog } = require('electron');
 const ipcChannel = 'backendMessages';
 
-const getFileInfo = filePath => {
-  // [filepath, numberOfLines, fileSize, history]
-  return Promise.all([
-    fileReader.getLinesInfo(filePath, 10),
-    fileReader.getFileSizeInBytes(filePath)
-  ]);
+const getFileInfo = async filePath => {
+  const fileSize = await fileReader.getFileSizeInBytes(filePath);
+  const endIndex = fileReader.getLastNewLineIndex(filePath, fileSize);
+
+  // [endIndex, fileSize]
+  return Promise.all([fileSize, endIndex]);
+};
+
+const getFileHistory = (filePath, endIndex, numberOfLines) => {
+  return fileReader.readNLastLines(filePath, numberOfLines, endIndex);
+};
+
+const sendSourcePicked = (sender, sourcePath) => {
+  const action = {
+    type: 'SOURCE_PICKED',
+    data: {
+      sourcePath
+    }
+  };
+
+  sender.send(ipcChannel, action);
 };
 
 const sendFileOpened = async (
   sender,
   filePath,
-  lineCount,
-  endIndex,
   fileSize,
+  endIndex,
   history
 ) => {
   const action = {
@@ -24,9 +38,8 @@ const sendFileOpened = async (
     data: {
       sourceType: 'FILE',
       filePath,
-      lineCount,
-      endIndex,
       fileSize,
+      endIndex,
       history
     }
   };
@@ -35,11 +48,18 @@ const sendFileOpened = async (
 };
 
 const openFile = async (sender, filePath) => {
-  const [[lineCount, endIndex, history], fileSize] = await getFileInfo(
-    filePath
-  ).catch(sendError(sender, "Couldn't open file"));
+  try {
+    const [fileSize, endIndex] = await getFileInfo(filePath);
+    sendSourcePicked(sender, filePath);
+    const history = await getFileHistory(filePath, endIndex, 10);
+    sendFileOpened(sender, filePath, fileSize, endIndex, history);
+  } catch (error) {
+    sendError(sender, "Couldn't read file", error);
+  }
+};
 
-  sendFileOpened(sender, filePath, lineCount, endIndex, fileSize, history);
+const handleOpenFile = (sender, { filePath }) => {
+  openFile(sender, filePath);
 };
 
 const saveRecentFilesToDisk = _recentFiles => {
@@ -75,7 +95,7 @@ const loadStateFromDisk = sender => {
     .catch(error => {
       if (error.code === 'ENOENT') return;
 
-      sendError(sender, "Couldn't load previous state from disk")(error);
+      sendError(sender, "Couldn't load previous state from disk", error);
     });
 };
 
@@ -85,17 +105,18 @@ const handleFollowSource = (sender, { sourceType, ...rest }) => {
       handleFollowFile(sender, rest);
       break;
     default:
-      sendError(sender, 'Unknown source type')({ code: 'CUSTOM' });
+      sendError(sender, 'Unknown source type', { code: 'CUSTOM' });
   }
 };
 
 const handleFollowFile = (sender, { filePath, fromIndex }) => {
-  const onChange = lines => {
+  const onLines = (lines, size) => {
     const action = {
       type: 'LINES_NEW',
       data: {
         sourcePath: filePath,
-        lines
+        lines,
+        size
       }
     };
 
@@ -104,7 +125,7 @@ const handleFollowFile = (sender, { filePath, fromIndex }) => {
 
   const onError = sendError(sender, "Couldn't keep following source");
 
-  fileReader.followFile(filePath, fromIndex, onChange, onError);
+  fileReader.followFile(filePath, fromIndex, onLines, onError);
 };
 
 const handleShowOpenDialog = async sender => {
@@ -128,6 +149,9 @@ ipcMain.on('frontendMessages', async (event, _argObj) => {
     case 'DIALOG_OPEN_SHOW':
       handleShowOpenDialog(sender);
       break;
+    case 'FILE_OPEN':
+      handleOpenFile(sender, _argObj.data);
+      break;
     case 'SOURCE_FOLLOW':
       fileReader.stopAllWatchers();
       handleFollowSource(sender, _argObj.data);
@@ -149,8 +173,8 @@ const customError = reason => {
   return { code: 'CUSTOM', reason: reason };
 };
 
-const sendError = (sender, message) => {
-  return error => {
+const sendError = (sender, message, error) => {
+  const errorSender = error => {
     const action = {
       type: 'ERROR',
       data: {
@@ -161,6 +185,12 @@ const sendError = (sender, message) => {
 
     sender.send(ipcChannel, action);
   };
+
+  if (error === undefined) {
+    return errorSender;
+  }
+
+  errorSender(error);
 };
 
 module.exports = {
