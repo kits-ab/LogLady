@@ -9,20 +9,17 @@ export const logInfoReducer = (state = initialState, action) => {
       };
     case 'LOGINFO_INCREASE_SIZE': {
       const { size, sourcePath } = action.data;
-      const logSizes = { ...state.logSizes };
-      logSizes[sourcePath] += size;
+      const currentSize = state.logSizes[sourcePath];
       return {
         ...state,
-        logSizes
+        logSizes: { ...state.logSizes, [sourcePath]: currentSize + size }
       };
     }
     case 'LOGINFO_SET_SIZE': {
       const { size, sourcePath } = action.data;
-      const logSizes = { ...state.logSizes };
-      logSizes[sourcePath] = size;
       return {
         ...state,
-        logSizes
+        logSizes: { ...state.logSizes, [sourcePath]: size }
       };
     }
     default:

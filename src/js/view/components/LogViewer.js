@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LogViewerContainer,
   CloseFileButton
@@ -8,43 +8,40 @@ import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
 import { parseRegExp } from 'js/view/components/helpers/regexHelper.js';
 
-class LogViewer extends React.Component {
-  constructor(props) {
-    super(props);
+const LogViewer = props => {
+  const lines = props.logs[props.source];
 
-    this.windowedList = React.createRef();
-  }
+  const [highlightRegExp, setHighlightRegExp] = useState(undefined);
+  const [filterRegExp, setFilterRegExp] = useState(undefined);
 
-  render() {
-    const lines = this.props.logs[this.props.source];
+  useEffect(() => {
+    setHighlightRegExp(parseRegExp(props.highlightInput));
+  }, [props.highlightInput]);
 
-    const highlightRegExp = parseRegExp(this.props.highlightInput);
-    const filterRegExp = parseRegExp(this.props.filterInput);
+  useEffect(() => {
+    setFilterRegExp(parseRegExp(props.filterInput));
+  }, [props.filterInput]);
 
-    return (
-      <LogViewerContainer>
-        <CloseFileButton
-          show={this.props.source}
-          onClick={() => {
-            closeFile(
-              this.props.dispatch,
-              this.props.source ? this.props.source : ''
-            );
-          }}
-        />
-        <LogViewerList
-          key={this.props.source}
-          highlightColor={this.props.highlightColor}
-          wrapLines={this.props.wrapLineOn}
-          scrollToBottom={this.props.tailSwitch}
-          lines={lines ? lines : []}
-          highlightRegExp={highlightRegExp}
-          filterRegExp={filterRegExp}
-        />
-      </LogViewerContainer>
-    );
-  }
-}
+  return (
+    <LogViewerContainer>
+      <CloseFileButton
+        show={props.source}
+        onClick={() => {
+          closeFile(props.dispatch, props.source ? props.source : '');
+        }}
+      />
+      <LogViewerList
+        key={props.source}
+        highlightColor={props.highlightColor}
+        wrapLines={props.wrapLineOn}
+        scrollToBottom={props.tailSwitch}
+        lines={lines ? lines : []}
+        highlightRegExp={highlightRegExp}
+        filterRegExp={filterRegExp}
+      />
+    </LogViewerContainer>
+  );
+};
 
 const mapStateToProps = ({
   topPanelReducer,

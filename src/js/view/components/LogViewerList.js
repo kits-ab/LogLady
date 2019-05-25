@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   LogViewerListContainer,
   LogLine,
@@ -12,192 +12,150 @@ import {
 import _ from 'lodash';
 import TextHighlightRegex from './TextHighlightRegex';
 import WindowedList from 'react-list';
-import { filterByRegExp } from 'js/view/components/helpers/regexHelper.js';
-import {
-  CachedTransformedList,
-  CachedReducedValue
-} from 'js/view/components/helpers/cacheHelper.js';
 
-class LogViewerList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.logRef = React.createRef();
-    this.windowedListRef = React.createRef();
-    this.rulerRef = React.createRef();
+const createHeightReducer = (charSize, elWidth) => {
+  return (map, next) => {
+    const key = next.length;
+    if (map[key]) return map; // No need to recalculate
 
-    this.state = {
-      cachedCharSize: [0, 0],
-      cachedLines: new CachedTransformedList(this.filterLinesFunc()),
-      cachedHeightsByLength: new CachedReducedValue(
-        this.heightByLengthReduceFunc([0, 0], 1),
-        {}
-      ),
-      cachedLongestLine: new CachedReducedValue(maxLengthReducer, 0),
-      cachedClientWidth: 0
-    };
-  }
+    const height = calculateWrappedHeight(next, charSize, elWidth);
+    return { ...map, [key]: height };
+  };
+};
 
-  heightByLengthReduceFunc = (charSize, elementWidth) => {
-    return (map, next) => {
-      const key = next.length;
-      if (map[key]) return map; // No need to recalculate
+const createRegexReducer = regex => {
+  return (lines, line) => {
+    if (!regex || (regex && regex.test(line))) lines.push(line);
+    return lines;
+  };
+};
 
-      const height = calculateWrappedHeight(next, charSize, elementWidth);
-      const mapCopy = { ...map };
-      mapCopy[key] = height;
-      return mapCopy;
-    };
+const scrollToBottom = (el, list) => {
+  el.scrollAround(list.length - 1);
+};
+
+const useListCache = v => {
+  const [length, setLength] = useState(0);
+  const [value, setValue] = useState(v);
+
+  const cacheUpdate = (reducer, list) => {
+    if (list.length <= length) return;
+    const items = list.slice(length);
+    setValue(items.reduce(reducer, value));
+    setLength(list.length);
   };
 
-  filterLinesFunc = regex => {
-    return lines => {
-      return filterByRegExp(lines, regex);
-    };
+  const cacheReset = v => {
+    setValue(v);
+    setLength(0);
   };
 
-  componentDidMount() {
-    this.setState({
-      cachedCharSize: calculateSize('W', this.rulerRef.current)
-    });
+  return [value, cacheUpdate, cacheReset];
+};
 
-    this.resizeObserver = new ResizeObserver(this.onResize);
-    this.resizeObserver.observe(this.logRef.current);
-  }
+const LogViewerList = props => {
+  const logRef = useRef();
+  const listRef = useRef();
+  const rulerRef = useRef();
 
-  componentWillUpdate(nextProps, nextState) {
-    const lines = nextProps.lines;
-    const charSize = nextState.cachedCharSize;
-    const clientWidth = this.logRef.current.clientWidth;
-    const filterArgs = [nextProps.filterRegExp];
-    const sizeArgs = [charSize, clientWidth];
+  const [charSize, setCharSize] = useState([0, 0]);
+  const [clientWidth, setClientWidth] = useState(1);
+  const [lines, linesUpdate, linesReset] = useListCache([]);
+  const [heights, heightsUpdate, heightsReset] = useListCache({});
+  const [maxLength, maxLengthUpdate, maxLengthReset] = useListCache(0);
 
-    if (
-      (this.props.filterRegExp || {}).source !==
-      (nextProps.filterRegExp || {}).source
-    ) {
-      this.refreshCaches(lines, filterArgs, sizeArgs);
-    } else {
-      this.updateCaches(lines);
-    }
-  }
-
-  componentDidUpdate() {
-    if (this.props.scrollToBottom) {
-      this.scrollToBottom(
-        this.windowedListRef.current,
-        this.state.cachedLines.get().length - 1
-      );
-    }
-  }
-
-  componentWillUnmount() {
-    this.resizeObserver.disconnect();
-  }
-
-  scrollToBottom = (el, index) => {
-    el.scrollAround(index);
+  const updateCaches = () => {
+    linesUpdate(createRegexReducer(props.filterRegExp), props.lines);
+    heightsUpdate(createHeightReducer(charSize, clientWidth), lines);
+    maxLengthUpdate(maxLengthReducer, lines);
   };
 
-  updateCaches = lines => {
-    this.state.cachedLines.diffAppend(lines);
-    this.state.cachedHeightsByLength.diffReduce(this.state.cachedLines.get());
-    this.state.cachedLongestLine.diffReduce(this.state.cachedLines.get());
+  const refreshSizes = () => {
+    if (!logRef.current || !rulerRef.current) return;
+
+    setClientWidth(logRef.current.clientWidth);
+    setCharSize(calculateSize('W', rulerRef.current));
   };
 
-  //The onResize function is debounced as the resize event occurs all the time while resizing the window
-  onResize = _.debounce(() => {
-    if (!this.rulerRef.current) return;
+  const resetCaches = (ignore = {}) => {
+    console.log("I'M RESETTING");
+    if (!ignore.lines) linesReset([]);
+    if (!ignore.heights) heightsReset({});
+    if (!ignore.maxLength) maxLengthReset(0);
+  };
 
-    //The line heights needs to be recalculated on a resize
-    const charSize = calculateSize('W', this.rulerRef.current);
-    const clientWidth = this.logRef.current.clientWidth;
-    const cachedLines = this.state.cachedLines;
-    const cachedHeightsByLength = this.state.cachedHeightsByLength;
-
-    cachedHeightsByLength.reset(
-      this.heightByLengthReduceFunc(charSize, clientWidth)
-    );
-    cachedHeightsByLength.diffReduce(cachedLines.get());
-
-    this.setState({
-      cachedCharSize: charSize,
-      cachedClientWidth: clientWidth
-    }); //This also re-renders, so if this is removed make sure to re-render
+  const onResize = _.debounce(() => {
+    refreshSizes();
+    resetCaches({ heights: true, maxLength: true });
   }, 222);
 
-  refreshCaches = (lines, filterArgs, sizeArgs) => {
-    const cachedLines = this.state.cachedLines;
-    const cachedHeightsByLength = this.state.cachedHeightsByLength;
-    const cachedLongestLine = this.state.cachedLongestLine;
+  useEffect(() => {
+    if (props.scrollToBottom && listRef.current)
+      scrollToBottom(listRef.current, lines);
+  });
 
-    cachedLines.reset(this.filterLinesFunc(...filterArgs));
-    cachedHeightsByLength.reset(this.heightByLengthReduceFunc(...sizeArgs), {});
-    cachedLongestLine.reset();
-    cachedLines.diffAppend(lines);
-    cachedHeightsByLength.diffReduce(cachedLines.get());
-    cachedLongestLine.diffReduce(cachedLines.get());
-  };
+  useEffect(() => {
+    refreshSizes();
+  }, []);
 
-  wrapItemSizeGetter = (lines, sizes) => {
-    return index => {
-      return index < 0 ? 0 : sizes[lines[index].length];
+  useEffect(() => {
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      window.removeEventListener('resize', onResize);
     };
+  }, []);
+
+  useEffect(() => {
+    resetCaches();
+  }, [props.filterRegExp]);
+
+  useEffect(() => {
+    updateCaches();
+  });
+
+  const width = props.wrapLines ? clientWidth : maxLength * charSize[1];
+
+  const heightGetter = index => {
+    return index >= 0 && props.wrapLines
+      ? heights[lines[index].length]
+      : charSize[0];
   };
 
-  noWrapItemSizeGetter = size => {
-    return index => {
-      return size;
-    };
-  };
-
-  render() {
-    const highlightRegExp = this.props.highlightRegExp;
-    const wrapLines = this.props.wrapLines;
-    const highlightColor = this.props.highlightColor;
-    const lines = this.state.cachedLines.get();
-    const sizes = this.state.cachedHeightsByLength.get();
-    const lineWidth = this.props.wrapLines
-      ? this.state.cachedClientWidth
-      : this.state.cachedLongestLine.get() * this.state.cachedCharSize[1];
-
-    const itemSizeGetter = this.props.wrapLines
-      ? this.wrapItemSizeGetter(lines, sizes)
-      : this.noWrapItemSizeGetter(this.state.cachedCharSize[0]);
-
-    return (
-      <LogViewerListContainer ref={this.logRef}>
-        <LogLineRuler ref={this.rulerRef} />
-        <WindowedList
-          ref={this.windowedListRef}
-          itemRenderer={(i, key) => {
-            return (
-              <LogLine
-                key={key}
-                index={i}
-                minSize={0}
-                fixedWidth={lineWidth}
-                fixedHeight={itemSizeGetter(i)}
-                wrap={wrapLines ? 'true' : undefined}
-              >
-                {highlightRegExp && highlightRegExp.test(lines[i]) ? (
-                  <TextHighlightRegex
-                    text={lines[i]}
-                    color={highlightColor}
-                    regex={highlightRegExp}
-                  />
-                ) : (
-                  lines[i]
-                )}
-              </LogLine>
-            );
-          }}
-          itemSizeGetter={itemSizeGetter}
-          length={lines.length}
-          type="variable"
-        />
-      </LogViewerListContainer>
-    );
-  }
-}
+  return (
+    <LogViewerListContainer ref={logRef}>
+      <LogLineRuler ref={rulerRef} />
+      <WindowedList
+        ref={listRef}
+        itemRenderer={(i, key) => {
+          const line = lines[i];
+          return (
+            <LogLine
+              key={key}
+              index={i}
+              minSize={0}
+              fixedWidth={width}
+              fixedHeight={heightGetter(i)}
+              wrap={props.wrapLines ? 'true' : undefined}
+            >
+              {props.highlightRegExp && props.highlightRegExp.test(line) ? (
+                <TextHighlightRegex
+                  text={line}
+                  color={props.highlightColor}
+                  regex={props.highlightRegExp}
+                />
+              ) : (
+                line
+              )}
+            </LogLine>
+          );
+        }}
+        itemSizeGetter={heightGetter}
+        length={lines.length}
+        type="variable"
+      />
+    </LogViewerListContainer>
+  );
+};
 
 export default LogViewerList;

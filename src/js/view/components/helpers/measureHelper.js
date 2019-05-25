@@ -6,7 +6,8 @@
  */
 export const calculateSize = (text, ruler) => {
   ruler.innerHTML = text;
-  return [ruler.offsetHeight, ruler.offsetWidth];
+  const rect = ruler.getBoundingClientRect();
+  return [rect.height, rect.width];
 };
 
 /**
