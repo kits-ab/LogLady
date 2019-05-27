@@ -67,6 +67,10 @@ const LogViewerList = props => {
     if (!reset.maxLength !== false) maxLengthReset(0);
   };
 
+  const getLineWidth = () => {
+    return props.wrapLines || !charSize ? clientWidth : maxLength * charSize[1];
+  };
+
   const reset = ignore => {
     resetSizes();
     resetCaches(ignore);
@@ -101,8 +105,6 @@ const LogViewerList = props => {
       scrollToBottom(listRef.current, lines);
   });
 
-  const width = props.wrapLines ? clientWidth : maxLength * charSize[1];
-
   const heightGetter = index => {
     return index >= 0 && props.wrapLines
       ? heights[lines[index].length]
@@ -121,7 +123,7 @@ const LogViewerList = props => {
               key={key}
               index={i}
               minSize={0}
-              fixedWidth={width}
+              fixedWidth={getLineWidth()}
               fixedHeight={heightGetter(i)}
               wrap={props.wrapLines ? 'true' : undefined}
             >
