@@ -1,22 +1,25 @@
-const initialState = { show: false, message: '', level: 'info', fadeAfter: 0 };
+const initialState = {
+  index: 0,
+  show: false,
+  message: '',
+  level: 'info'
+};
 
 export const snackBarReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'SNACKBAR_SHOW_NEW':
-      const { message, level, fadeAfter } = action.data;
+      const { message, level } = action.data;
+      state.index++;
       return {
         ...state,
         show: true,
         message: message,
-        level: level ? level : initialState.level,
-        fadeAfter: fadeAfter ? fadeAfter : initialState.fadeAfter
+        level: level ? level : initialState.level
       };
     case 'SNACKBAR_HIDE':
-      const { instant } = action.data;
       return {
         ...state,
-        show: false,
-        fadeAfter: instant ? 0 : state.fadeAfter
+        show: false
       };
     default:
       return state;
