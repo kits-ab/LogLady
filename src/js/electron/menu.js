@@ -1,5 +1,4 @@
 const { Menu, ipcMain, shell } = require('electron');
-const engine = require('../engine/engine');
 const isDev = require('electron-is-dev');
 
 let webContents;
