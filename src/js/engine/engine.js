@@ -225,12 +225,13 @@ const start = async () => {
   try {
     const loadedRecentFiles = await loadRecentFilesFromDisk();
     recentFiles = loadedRecentFiles;
-    createMenu(recentFiles);
   } catch (error) {
     console.log(error);
   }
 
-  let state = { recentFiles };
+  createMenu(recentFiles);
+
+  const state = { recentFiles };
   ipcMain.on('frontendMessages', createEventHandler(state));
 };
 
