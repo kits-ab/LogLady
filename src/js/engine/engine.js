@@ -1,30 +1,19 @@
 const fileReader = require('../adapters/fileReader');
-const { ipcMain } = require('electron');
-const { dialog } = require('electron');
+const { ipcMain, dialog } = require('electron');
 const { createMenu } = require('../electron/menu');
 const ipcChannel = 'backendMessages';
+const { addRecentFile } = require('./../helpers/recentFilesHelper');
 
 const updateRecentFiles = (recentFiles, file) => {
-  addMostRecentFile(recentFiles, file);
+  recentFiles = addRecentFile(recentFiles, file);
   createMenu(recentFiles);
   saveRecentFilesToDisk(recentFiles);
-};
-
-const addMostRecentFile = (recentFiles, file) => {
-  recentFiles = recentFiles.filter(f => {
-    return f !== file;
-  });
-  recentFiles.unshift(file);
-  if (recentFiles.length > 3) {
-    recentFiles.pop();
-  }
 };
 
 const getFileInfo = async filePath => {
   const fileSize = await fileReader.getFileSizeInBytes(filePath);
   const endIndex = fileReader.getLastNewLineIndex(filePath, fileSize);
 
-  // [endIndex, fileSize]
   return Promise.all([fileSize, endIndex]);
 };
 
