@@ -1,7 +1,25 @@
 const fileReader = require('../adapters/fileReader');
 const { ipcMain } = require('electron');
 const { dialog } = require('electron');
+const { createMenu } = require('../electron/menu');
 const ipcChannel = 'backendMessages';
+
+let recentFiles = [];
+
+const updateRecentFiles = file => {
+  addMostRecentFile(file);
+  createMenu(recentFiles);
+};
+
+const addMostRecentFile = file => {
+  recentFiles = recentFiles.filter(f => {
+    return f !== file;
+  });
+  recentFiles.unshift(file);
+  if (recentFiles.length > 3) {
+    recentFiles.pop();
+  }
+};
 
 const getFileInfo = async filePath => {
   const fileSize = await fileReader.getFileSizeInBytes(filePath);
@@ -55,19 +73,24 @@ const openFile = async (sender, filePath) => {
     sendFileOpened(sender, filePath, fileSize, endIndex, history);
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
+    return false;
   }
+
+  updateRecentFiles(filePath);
+  return true;
 };
 
 const handleOpenFile = (sender, { filePath }) => {
   openFile(sender, filePath);
 };
 
-const saveRecentFilesToDisk = _recentFiles => {
-  fileReader.saveRecentFilesToDisk(_recentFiles);
+const saveRecentFilesToDisk = () => {
+  fileReader.saveRecentFilesToDisk(JSON.stringify(recentFiles));
 };
 
-const loadRecentFilesFromDisk = () => {
-  return fileReader.loadRecentFilesFromDisk();
+const loadRecentFilesFromDisk = async () => {
+  const loadedRecentFiles = await fileReader.loadRecentFilesFromDisk();
+  recentFiles = JSON.parse(loadedRecentFiles);
 };
 
 const loadStateFromDisk = sender => {
@@ -138,7 +161,6 @@ const handleShowOpenDialog = async sender => {
 
       const filePath = filePaths[0];
       await openFile(sender, filePath);
-      menu.handleRecentFiles(filePath);
     }
   );
 };
@@ -193,9 +215,12 @@ const sendError = (sender, message, error) => {
   errorSender(error);
 };
 
-module.exports = {
-  saveRecentFilesToDisk,
-  loadRecentFilesFromDisk
+const getRecentFiles = () => {
+  return recentFiles;
 };
 
-const menu = require('../electron/menu');
+module.exports = {
+  saveRecentFilesToDisk,
+  loadRecentFilesFromDisk,
+  getRecentFiles
+};

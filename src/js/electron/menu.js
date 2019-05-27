@@ -3,7 +3,6 @@ const engine = require('../engine/engine');
 const isDev = require('electron-is-dev');
 
 let webContents;
-let recentFilesObject = [];
 
 const handleShowOpenDialog = () => {
   ipcMain.emit(
@@ -21,27 +20,7 @@ const handleOpenFile = filePath => {
   );
 };
 
-const handleRecentFiles = filePath => {
-  recentFilesObject = recentFilesObject.filter(file => {
-    return file !== filePath;
-  });
-  recentFilesObject.unshift(filePath);
-  if (recentFilesObject.length > 3) {
-    recentFilesObject.pop();
-  }
-  engine.saveRecentFilesToDisk(JSON.stringify(recentFilesObject));
-  createMenu();
-};
-
-const setRecentFiles = _recentFiles => {
-  recentFilesObject = JSON.parse(_recentFiles);
-};
-
-const getRecentFiles = () => {
-  return recentFilesObject;
-};
-
-const createTemplate = () => {
+const createTemplate = recentFiles => {
   const template = [
     {
       label: 'LogLady',
@@ -64,7 +43,7 @@ const createTemplate = () => {
         },
         {
           label: 'Open recent...',
-          submenu: getRecentFiles().map(file => {
+          submenu: recentFiles.map(file => {
             return {
               label: file,
               click() {
@@ -143,14 +122,12 @@ const setWebContents = _webContents => {
   webContents = _webContents;
 };
 
-const createMenu = () => {
-  Menu.setApplicationMenu(createTemplate());
+const createMenu = recentFiles => {
+  Menu.setApplicationMenu(createTemplate(recentFiles));
 };
 
 module.exports = {
   handleShowOpenDialog,
   setWebContents,
-  setRecentFiles,
-  createMenu,
-  handleRecentFiles
+  createMenu
 };

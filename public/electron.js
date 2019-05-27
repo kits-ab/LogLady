@@ -112,13 +112,8 @@ const createWindow = async () => {
   });
   menu.setWebContents(mainWindow.webContents);
 
-  try {
-    const recentFiles = await engine.loadRecentFilesFromDisk();
-    menu.setRecentFiles(recentFiles);
-  } catch (err) {
-    console.log("Couldn't load recent files, ", err);
-  }
-  menu.createMenu();
+  await engine.loadRecentFilesFromDisk();
+  menu.createMenu(engine.getRecentFiles());
 };
 
 app.on('ready', createWindow);
