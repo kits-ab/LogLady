@@ -6,51 +6,37 @@ import {
 } from '../styledComponents/LogViewerListStyledComponents';
 import {
   calculateSize,
-  calculateWrappedHeight,
   maxLengthReducer
 } from 'js/view/components/helpers/measureHelper';
+import {
+  createRegexReducer,
+  createHeightReducer,
+  scrollToBottom
+} from 'js/view/components/helpers/logHelper';
 import _ from 'lodash';
 import TextHighlightRegex from './TextHighlightRegex';
 import WindowedList from 'react-list';
 
-const createHeightReducer = (charSize, elWidth) => {
-  return (map, next) => {
-    const key = next.length;
-    if (map[key]) return map; // No need to recalculate
-
-    const height = calculateWrappedHeight(next, charSize, elWidth);
-    return { ...map, [key]: height };
-  };
-};
-
-const createRegexReducer = regex => {
-  return (lines, line) => {
-    if (!regex || (regex && regex.test(line))) lines.push(line);
-    return lines;
-  };
-};
-
-const scrollToBottom = (el, list) => {
-  el.scrollAround(list.length - 1);
-};
-
-const useListCache = v => {
+/** Custom hook for a reduced value cache that only
+ * reduces further values if the list supplied to
+ * reduce is longer than the previous length */
+const useCache = v => {
   const [length, setLength] = useState(0);
   const [value, setValue] = useState(v);
 
-  const cacheUpdate = (reducer, list) => {
+  const reduce = (reducer, list) => {
     if (list.length <= length) return;
     const items = list.slice(length);
     setValue(items.reduce(reducer, value));
     setLength(list.length);
   };
 
-  const cacheReset = v => {
+  const reset = v => {
     setValue(v);
     setLength(0);
   };
 
-  return [value, cacheUpdate, cacheReset];
+  return [value, reduce, reset];
 };
 
 const LogViewerList = props => {
@@ -60,45 +46,43 @@ const LogViewerList = props => {
 
   const [charSize, setCharSize] = useState([0, 0]);
   const [clientWidth, setClientWidth] = useState(1);
-  const [lines, linesUpdate, linesReset] = useListCache([]);
-  const [heights, heightsUpdate, heightsReset] = useListCache({});
-  const [maxLength, maxLengthUpdate, maxLengthReset] = useListCache(0);
+  const [lines, linesReduce, linesReset] = useCache([]);
+  const [heights, heightsReduce, heightsReset] = useCache({});
+  const [maxLength, maxLengthReduce, maxLengthReset] = useCache(0);
 
   const updateCaches = () => {
-    linesUpdate(createRegexReducer(props.filterRegExp), props.lines);
-    heightsUpdate(createHeightReducer(charSize, clientWidth), lines);
-    maxLengthUpdate(maxLengthReducer, lines);
+    linesReduce(createRegexReducer(props.filterRegExp), props.lines);
+    heightsReduce(createHeightReducer(charSize, clientWidth), lines);
+    maxLengthReduce(maxLengthReducer, lines);
   };
 
-  const refreshSizes = () => {
+  const resetSizes = () => {
     if (!logRef.current || !rulerRef.current) return;
 
     setClientWidth(logRef.current.clientWidth);
     setCharSize(calculateSize('W', rulerRef.current));
   };
 
-  const resetCaches = (ignore = {}) => {
-    console.log("I'M RESETTING");
-    if (!ignore.lines) linesReset([]);
-    if (!ignore.heights) heightsReset({});
-    if (!ignore.maxLength) maxLengthReset(0);
+  const resetCaches = (reset = {}) => {
+    if (!reset.lines !== false) linesReset([]);
+    if (!reset.heights !== false) heightsReset({});
+    if (!reset.maxLength !== false) maxLengthReset(0);
   };
 
-  const onResize = _.debounce(() => {
-    refreshSizes();
-    resetCaches({ heights: true, maxLength: true });
-  }, 222);
+  const reset = ignore => {
+    resetSizes();
+    resetCaches(ignore);
+  };
 
   useEffect(() => {
-    if (props.scrollToBottom && listRef.current)
-      scrollToBottom(listRef.current, lines);
-  });
-
-  useEffect(() => {
-    refreshSizes();
+    resetSizes();
   }, []);
 
   useEffect(() => {
+    const onResize = _.debounce(() => {
+      reset({ lines: false });
+    }, 222);
+
     window.addEventListener('resize', onResize);
 
     return () => {
@@ -107,11 +91,16 @@ const LogViewerList = props => {
   }, []);
 
   useEffect(() => {
-    resetCaches();
+    reset();
   }, [props.filterRegExp]);
 
   useEffect(() => {
     updateCaches();
+  });
+
+  useEffect(() => {
+    if (props.scrollToBottom && listRef.current)
+      scrollToBottom(listRef.current, lines);
   });
 
   const width = props.wrapLines ? clientWidth : maxLength * charSize[1];
