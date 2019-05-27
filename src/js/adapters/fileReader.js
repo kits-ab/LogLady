@@ -65,7 +65,9 @@ const followFile = (filePath, startIndex, onLines, onError) => {
   };
 
   if (watchers[filePath] !== undefined) {
-    watchers[filePath].close();
+    process.platform === 'win32'
+      ? unwatchFile(filePath)
+      : watchers[filePath].close();
   }
   let watcher;
   if (process.platform === 'win32') {
