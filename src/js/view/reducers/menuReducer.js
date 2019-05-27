@@ -1,4 +1,8 @@
-const initialState = { openSources: [], currentSource: undefined };
+const initialState = {
+  nextIndex: 0,
+  openSources: [],
+  currentSource: undefined
+};
 
 export const menuReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -7,7 +11,7 @@ export const menuReducer = (state = initialState, action) => {
 
     case 'MENU_SET_SOURCE':
       const { sourcePath } = action.data;
-      const source = { path: sourcePath, index: Math.random() };
+      const source = { path: sourcePath, index: state.nextIndex++ };
       return {
         ...state,
         openSources: [source],
