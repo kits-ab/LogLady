@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   LogViewerContainer,
   CloseFileButton
@@ -10,17 +10,6 @@ import { parseRegExp } from 'js/view/components/helpers/regexHelper.js';
 
 const LogViewer = props => {
   const lines = props.logs[props.source.path];
-
-  const [highlightRegExp, setHighlightRegExp] = useState(undefined);
-  const [filterRegExp, setFilterRegExp] = useState(undefined);
-
-  useEffect(() => {
-    setHighlightRegExp(parseRegExp(props.highlightInput));
-  }, [props.highlightInput]);
-
-  useEffect(() => {
-    setFilterRegExp(parseRegExp(props.filterInput));
-  }, [props.filterInput]);
 
   return (
     <LogViewerContainer>
@@ -36,8 +25,8 @@ const LogViewer = props => {
         wrapLines={props.wrapLineOn}
         scrollToBottom={props.tailSwitch}
         lines={lines ? lines : []}
-        highlightRegExp={highlightRegExp}
-        filterRegExp={filterRegExp}
+        highlightRegExp={parseRegExp(props.highlightInput)}
+        filterRegExp={parseRegExp(props.filterInput)}
       />
     </LogViewerContainer>
   );
