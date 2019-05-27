@@ -13,7 +13,6 @@ export const menuReducer = (state = initialState, action) => {
       const { sourcePath } = action.data;
       const index = state.nextIndex++;
       const source = { path: sourcePath, index };
-      console.log(source);
       return {
         ...state,
         openSources: { [index]: source },
