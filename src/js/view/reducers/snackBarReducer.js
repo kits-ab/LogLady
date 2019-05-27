@@ -14,7 +14,7 @@ export const snackBarReducer = (state = initialState, action) => {
         show: true,
         message: message,
         level: level ? level : initialState.level,
-        index: state.index + 1
+        index: ~~state.index + 1
       };
     case 'SNACKBAR_HIDE':
       return {
