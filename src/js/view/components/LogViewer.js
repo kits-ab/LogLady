@@ -31,7 +31,7 @@ const LogViewer = props => {
         }}
       />
       <LogViewerList
-        key={props.source}
+        key={lines && props.source}
         highlightColor={props.highlightColor}
         wrapLines={props.wrapLineOn}
         scrollToBottom={props.tailSwitch}

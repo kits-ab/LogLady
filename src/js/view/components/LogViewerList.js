@@ -52,15 +52,15 @@ const LogViewerList = props => {
 
   const updateCaches = () => {
     linesReduce(createRegexReducer(props.filterRegExp), props.lines);
-    heightsReduce(createHeightReducer(charSize, clientWidth), lines);
     maxLengthReduce(maxLengthReducer, lines);
+    heightsReduce(createHeightReducer(charSize, clientWidth), lines);
   };
 
   const resetSizes = () => {
     if (!logRef.current || !rulerRef.current) return;
 
     setClientWidth(logRef.current.clientWidth);
-    setCharSize(calculateSize('W', rulerRef.current));
+    setCharSize(calculateSize(rulerRef.current));
   };
 
   const resetCaches = (reset = {}) => {
@@ -91,11 +91,11 @@ const LogViewerList = props => {
   }, []);
 
   useEffect(() => {
-    reset();
+    resetCaches();
   }, [props.filterRegExp]);
 
   useEffect(() => {
-    updateCaches();
+    if (charSize[0] > 0) updateCaches();
   });
 
   useEffect(() => {
@@ -113,7 +113,7 @@ const LogViewerList = props => {
 
   return (
     <LogViewerListContainer ref={logRef}>
-      <LogLineRuler ref={rulerRef} />
+      <LogLineRuler ref={rulerRef}>W</LogLineRuler>
       <WindowedList
         ref={listRef}
         itemRenderer={(i, key) => {

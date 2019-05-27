@@ -4,8 +4,8 @@
  * @param {HTMLElement} ruler
  * @returns {Number[]} [height, width]
  */
-export const calculateSize = (text, ruler) => {
-  ruler.innerHTML = text;
+export const calculateSize = (ruler, innerHTML) => {
+  if (innerHTML !== undefined) ruler.innerHTML = innerHTML;
   const rect = ruler.getBoundingClientRect();
   return [rect.height, rect.width];
 };
@@ -23,8 +23,8 @@ export const calculateWrappedHeight = (
   [charHeight, charWidth],
   elementWidth
 ) => {
-  if (charWidth < 0 || charHeight < 0)
-    throw new Error('character size has negative values');
+  if (charWidth <= 0 || charHeight <= 0)
+    throw new Error('character size has zero or negative values');
 
   if (charWidth > elementWidth)
     throw new Error('character width is wider than element width: ', {
