@@ -9,7 +9,7 @@ import { closeFile } from './helpers/handleFileHelper';
 import { parseRegExp } from 'js/view/components/helpers/regexHelper.js';
 
 const LogViewer = props => {
-  const lines = props.logs[props.source];
+  const lines = props.logs[props.source.path];
 
   const [highlightRegExp, setHighlightRegExp] = useState(undefined);
   const [filterRegExp, setFilterRegExp] = useState(undefined);
@@ -27,11 +27,11 @@ const LogViewer = props => {
       <CloseFileButton
         show={props.source}
         onClick={() => {
-          closeFile(props.dispatch, props.source ? props.source : '');
+          closeFile(props.dispatch, props.source ? props.source.path : '');
         }}
       />
       <LogViewerList
-        key={lines && props.source}
+        key={props.source.index}
         highlightColor={props.highlightColor}
         wrapLines={props.wrapLineOn}
         scrollToBottom={props.tailSwitch}

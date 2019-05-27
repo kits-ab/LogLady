@@ -44,8 +44,8 @@ const LogViewerList = props => {
   const listRef = useRef();
   const rulerRef = useRef();
 
-  const [charSize, setCharSize] = useState([0, 0]);
-  const [clientWidth, setClientWidth] = useState(1);
+  const [charSize, setCharSize] = useState(undefined);
+  const [clientWidth, setClientWidth] = useState(undefined);
   const [lines, linesReduce, linesReset] = useCache([]);
   const [heights, heightsReduce, heightsReset] = useCache({});
   const [maxLength, maxLengthReduce, maxLengthReset] = useCache(0);
@@ -57,8 +57,6 @@ const LogViewerList = props => {
   };
 
   const resetSizes = () => {
-    if (!logRef.current || !rulerRef.current) return;
-
     setClientWidth(logRef.current.clientWidth);
     setCharSize(calculateSize(rulerRef.current));
   };
@@ -95,11 +93,11 @@ const LogViewerList = props => {
   }, [props.filterRegExp]);
 
   useEffect(() => {
-    if (charSize[0] > 0) updateCaches();
+    if (charSize && clientWidth) updateCaches();
   });
 
   useEffect(() => {
-    if (props.scrollToBottom && listRef.current)
+    if (props.scrollToBottom && listRef.current && lines.length > 0)
       scrollToBottom(listRef.current, lines);
   });
 
