@@ -4,14 +4,13 @@ const { dialog } = require('electron');
 const { createMenu } = require('../electron/menu');
 const ipcChannel = 'backendMessages';
 
-let recentFiles = [];
-
-const updateRecentFiles = file => {
-  addMostRecentFile(file);
+const updateRecentFiles = (recentFiles, file) => {
+  addMostRecentFile(recentFiles, file);
   createMenu(recentFiles);
+  saveRecentFilesToDisk(recentFiles);
 };
 
-const addMostRecentFile = file => {
+const addMostRecentFile = (recentFiles, file) => {
   recentFiles = recentFiles.filter(f => {
     return f !== file;
   });
@@ -76,24 +75,26 @@ const openFile = async (sender, filePath) => {
     return false;
   }
 
-  updateRecentFiles(filePath);
   return true;
 };
 
-const handleOpenFile = (sender, { filePath }) => {
-  openFile(sender, filePath);
+const handleOpenFile = async (sender, recentFiles, { filePath }) => {
+  if (await openFile(sender, filePath)) {
+    updateRecentFiles(recentFiles, filePath);
+  }
 };
 
-const saveRecentFilesToDisk = () => {
+const saveRecentFilesToDisk = recentFiles => {
   fileReader.saveRecentFilesToDisk(JSON.stringify(recentFiles));
 };
 
-const loadRecentFilesFromDisk = async () => {
-  const loadedRecentFiles = await fileReader.loadRecentFilesFromDisk();
-  recentFiles = JSON.parse(loadedRecentFiles);
+const loadRecentFilesFromDisk = () => {
+  return fileReader.loadRecentFilesFromDisk().then(files => {
+    return JSON.parse(files);
+  });
 };
 
-const loadStateFromDisk = sender => {
+const loadStateFromDisk = async sender => {
   fileReader
     .loadStateFromDisk()
     .then(_data => {
@@ -151,7 +152,7 @@ const handleFollowFile = (sender, { filePath, fromIndex }) => {
   fileReader.followFile(filePath, fromIndex, onLines, onError);
 };
 
-const handleShowOpenDialog = async sender => {
+const handleShowOpenDialog = async (sender, recentFiles) => {
   dialog.showOpenDialog(
     {
       properties: ['openFile']
@@ -160,36 +161,12 @@ const handleShowOpenDialog = async sender => {
       if (filePaths === undefined) return;
 
       const filePath = filePaths[0];
-      await openFile(sender, filePath);
+      if (await openFile(sender, filePath)) {
+        updateRecentFiles(recentFiles, filePath);
+      }
     }
   );
 };
-
-ipcMain.on('frontendMessages', async (event, _argObj) => {
-  const sender = event.sender;
-  switch (_argObj.function) {
-    case 'DIALOG_OPEN_SHOW':
-      handleShowOpenDialog(sender);
-      break;
-    case 'FILE_OPEN':
-      handleOpenFile(sender, _argObj.data);
-      break;
-    case 'SOURCE_FOLLOW':
-      fileReader.stopAllWatchers();
-      handleFollowSource(sender, _argObj.data);
-      break;
-    case 'SOURCE_UNFOLLOW':
-      fileReader.stopWatcher(_argObj);
-      break;
-    case 'STATE_SAVE':
-      fileReader.saveStateToDisk(_argObj.reduxStateValue);
-      break;
-    case 'STATE_LOAD':
-      loadStateFromDisk(sender);
-      break;
-    default:
-  }
-});
 
 const customError = reason => {
   return { code: 'CUSTOM', reason: reason };
@@ -215,12 +192,48 @@ const sendError = (sender, message, error) => {
   errorSender(error);
 };
 
-const getRecentFiles = () => {
-  return recentFiles;
+const createEventHandler = ({ recentFiles }) => {
+  return async (event, _argObj) => {
+    const sender = event.sender;
+    switch (_argObj.function) {
+      case 'DIALOG_OPEN_SHOW':
+        handleShowOpenDialog(sender, recentFiles);
+        break;
+      case 'FILE_OPEN':
+        handleOpenFile(sender, recentFiles, _argObj.data);
+        break;
+      case 'SOURCE_FOLLOW':
+        fileReader.stopAllWatchers();
+        handleFollowSource(sender, _argObj.data);
+        break;
+      case 'SOURCE_UNFOLLOW':
+        fileReader.stopWatcher(_argObj);
+        break;
+      case 'STATE_SAVE':
+        fileReader.saveStateToDisk(_argObj.reduxStateValue);
+        break;
+      case 'STATE_LOAD':
+        loadStateFromDisk(sender);
+        break;
+      default:
+    }
+  };
+};
+
+const start = async () => {
+  let recentFiles = [];
+  try {
+    const loadedRecentFiles = await loadRecentFilesFromDisk();
+    recentFiles = loadedRecentFiles;
+    createMenu(recentFiles);
+  } catch (error) {
+    console.log(error);
+  }
+
+  let state = { recentFiles };
+  ipcMain.on('frontendMessages', createEventHandler(state));
 };
 
 module.exports = {
-  saveRecentFilesToDisk,
-  loadRecentFilesFromDisk,
-  getRecentFiles
+  start
 };
