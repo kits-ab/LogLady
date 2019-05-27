@@ -3,8 +3,8 @@ import { menuReducer } from './menuReducer';
 describe('menu reducer', () => {
   const initialState = {
     nextIndex: 0,
-    openSources: [],
-    currentSource: undefined
+    openSources: {},
+    currentSourceHandle: undefined
   };
   it('should return state at unknown type', () => {
     const state = { some: 'state' };
@@ -16,27 +16,51 @@ describe('menu reducer', () => {
     const filePath = 'hey/ho/lets.go';
     const state = { ...initialState };
     const action = { type: 'MENU_SET_SOURCE', data: { sourcePath: filePath } };
-    const source = { path: filePath, index: 0 };
     const expectedState = {
       nextIndex: 1,
-      openSources: [source],
-      currentSource: source
+      openSources: { 0: { path: filePath, index: 0 } },
+      currentSourceHandle: 0
     };
     expect(menuReducer(state, action)).toEqual(expectedState);
   });
 
-  it('should update index at the same action', () => {
+  it('should update index on the exact same action', () => {
     const filePath = 'hey/ho/lets.go';
     const state = { ...initialState };
     const action = { type: 'MENU_SET_SOURCE', data: { sourcePath: filePath } };
-    const source = { path: filePath, index: 1 };
     const expectedState = {
       nextIndex: 2,
-      openSources: [source],
-      currentSource: source
+      openSources: { 1: { path: filePath, index: 1 } },
+      currentSourceHandle: 1
     };
     expect(menuReducer(menuReducer(state, action), action)).toEqual(
       expectedState
     );
+  });
+
+  it('should not reset index on clear', () => {
+    const state = { ...initialState, nextIndex: 12 };
+    const action = { type: 'MENU_CLEAR' };
+    const expectedState = {
+      nextIndex: 12,
+      openSources: {},
+      currentSourceHandle: undefined
+    };
+    expect(menuReducer(state, action)).toEqual(expectedState);
+  });
+
+  it('should reset everything but index on clear', () => {
+    const state = {
+      nextIndex: 3,
+      openSources: { 0: { path: 'dsfdsf', index: 2 } },
+      currentSourceHandle: 2
+    };
+    const action = { type: 'MENU_CLEAR' };
+    const expectedState = {
+      nextIndex: 3,
+      openSources: {},
+      currentSourceHandle: undefined
+    };
+    expect(menuReducer(state, action)).toEqual(expectedState);
   });
 });

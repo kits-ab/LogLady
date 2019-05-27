@@ -97,7 +97,7 @@ const LogViewerList = props => {
   });
 
   useEffect(() => {
-    if (props.scrollToBottom && listRef.current && lines.length > 0)
+    if (props.scrollToBottom && lines.length > 0)
       scrollToBottom(listRef.current, lines);
   });
 

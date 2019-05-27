@@ -5,11 +5,11 @@ export const showOpenDialog = () => {
   sendRequestToBackend({ function: 'DIALOG_OPEN_SHOW' });
 };
 
-export const closeFile = (dispatch, _filePath) => {
+export const closeFile = (dispatch, filePath) => {
   //send request to backend
   const argObj = {
     function: 'SOURCE_UNFOLLOW',
-    filePath: _filePath
+    filePath
   };
   sendRequestToBackend(argObj);
 

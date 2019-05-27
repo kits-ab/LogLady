@@ -27,7 +27,7 @@ const LogViewer = props => {
       <CloseFileButton
         show={props.source}
         onClick={() => {
-          closeFile(props.dispatch, props.source ? props.source.path : '');
+          closeFile(props.dispatch, props.source.path);
         }}
       />
       <LogViewerList

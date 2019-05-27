@@ -16,12 +16,12 @@ class App extends Component {
   render() {
     return (
       <RootContainer>
-        {this.props.source ? (
+        {this.props.currentSource ? (
           <LogPage>
             <TopPanel />
             <TabSettings />
-            <LogViewer source={this.props.source} />
-            <StatusBar source={this.props.source} />
+            <LogViewer source={this.props.currentSource} />
+            <StatusBar source={this.props.currentSource} />
           </LogPage>
         ) : (
           <DefaultPage />
@@ -34,7 +34,8 @@ class App extends Component {
 
 const mapStateToProps = state => {
   return {
-    source: state.menuReducer.currentSource
+    currentSource:
+      state.menuReducer.openSources[state.menuReducer.currentSourceHandle]
   };
 };
 

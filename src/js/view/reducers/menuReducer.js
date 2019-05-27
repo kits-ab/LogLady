@@ -1,21 +1,23 @@
 const initialState = {
   nextIndex: 0,
-  openSources: [],
-  currentSource: undefined
+  openSources: {},
+  currentSourceHandle: undefined
 };
 
 export const menuReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'MENU_CLEAR':
-      return { openSources: [], currentSource: undefined };
+      return { ...state, openSources: {}, currentSourceHandle: undefined };
 
     case 'MENU_SET_SOURCE':
       const { sourcePath } = action.data;
-      const source = { path: sourcePath, index: state.nextIndex++ };
+      const index = state.nextIndex++;
+      const source = { path: sourcePath, index };
+      console.log(source);
       return {
         ...state,
-        openSources: [source],
-        currentSource: source // Using random for now, to create a unique index
+        openSources: { [index]: source },
+        currentSourceHandle: index
       };
 
     case 'menuReducerRestore':
