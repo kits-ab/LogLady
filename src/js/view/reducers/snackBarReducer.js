@@ -9,12 +9,12 @@ export const snackBarReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'SNACKBAR_SHOW_NEW':
       const { message, level } = action.data;
-      state.index++;
       return {
         ...state,
         show: true,
         message: message,
-        level: level ? level : initialState.level
+        level: level ? level : initialState.level,
+        index: state.index + 1
       };
     case 'SNACKBAR_HIDE':
       return {
