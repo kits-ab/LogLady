@@ -5,7 +5,7 @@ import {
   LogLineRuler
 } from '../styledComponents/LogViewerListStyledComponents';
 import {
-  calculateSize,
+  getRectSize,
   maxLengthReducer
 } from 'js/view/components/helpers/measureHelper';
 import {
@@ -44,8 +44,9 @@ const LogViewerList = props => {
   const listRef = useRef();
   const rulerRef = useRef();
 
-  const [charSize, setCharSize] = useState(undefined);
-  const [clientWidth, setClientWidth] = useState(undefined);
+  const clientWidth = logRef.current && logRef.current.clientWidth;
+  const charSize = rulerRef.current && getRectSize(rulerRef.current);
+
   const [lines, linesReduce, linesReset] = useCache([]);
   const [heights, heightsReduce, heightsReset] = useCache({});
   const [maxLength, maxLengthReduce, maxLengthReset] = useCache(0);
@@ -54,11 +55,6 @@ const LogViewerList = props => {
     linesReduce(createRegexReducer(props.filterRegExp), props.lines);
     maxLengthReduce(maxLengthReducer, lines);
     heightsReduce(createHeightReducer(charSize, clientWidth), lines);
-  };
-
-  const resetSizes = () => {
-    setClientWidth(logRef.current.clientWidth);
-    setCharSize(calculateSize(rulerRef.current));
   };
 
   const resetCaches = (reset = {}) => {
@@ -71,18 +67,9 @@ const LogViewerList = props => {
     return props.wrapLines || !charSize ? clientWidth : maxLength * charSize[1];
   };
 
-  const reset = ignore => {
-    resetSizes();
-    resetCaches(ignore);
-  };
-
-  useEffect(() => {
-    resetSizes();
-  }, []);
-
   useEffect(() => {
     const onResize = _.debounce(() => {
-      reset({ lines: false });
+      resetCaches({ lines: false });
     }, 222);
 
     window.addEventListener('resize', onResize);

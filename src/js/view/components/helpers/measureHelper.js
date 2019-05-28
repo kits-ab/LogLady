@@ -4,8 +4,7 @@
  * @param {HTMLElement} ruler
  * @returns {Number[]} [height, width]
  */
-export const calculateSize = (ruler, innerHTML) => {
-  if (innerHTML !== undefined) ruler.innerHTML = innerHTML;
+export const getRectSize = ruler => {
   const rect = ruler.getBoundingClientRect();
   return [rect.height, rect.width];
 };
