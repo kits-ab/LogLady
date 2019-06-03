@@ -5,9 +5,10 @@ const ipcChannel = 'backendMessages';
 const { addRecentFile } = require('./../helpers/recentFilesHelper');
 
 const updateRecentFiles = (recentFiles, file) => {
-  recentFiles = addRecentFile(recentFiles, file);
-  createMenu(recentFiles);
-  saveRecentFilesToDisk(recentFiles);
+  const updatedRecentFiles = addRecentFile(recentFiles, file);
+  createMenu(updatedRecentFiles);
+  saveRecentFilesToDisk(updatedRecentFiles);
+  return updatedRecentFiles;
 };
 
 const getFileInfo = async filePath => {
@@ -67,9 +68,9 @@ const openFile = async (sender, filePath) => {
   return true;
 };
 
-const handleOpenFile = async (sender, recentFiles, { filePath }) => {
+const handleOpenFile = async (state, sender, { filePath }) => {
   if (await openFile(sender, filePath)) {
-    updateRecentFiles(recentFiles, filePath);
+    state.recentFiles = updateRecentFiles(state.recentFiles, filePath);
   }
 };
 
@@ -83,7 +84,7 @@ const loadRecentFilesFromDisk = () => {
   });
 };
 
-const loadStateFromDisk = async sender => {
+const loadStateFromDisk = async (state, sender) => {
   fileReader
     .loadStateFromDisk()
     .then(_data => {
@@ -95,7 +96,7 @@ const loadStateFromDisk = async sender => {
       }
 
       if (previousSource) {
-        openFile(sender, previousSource);
+        handleOpenFile(state, sender, { filePath: previousSource });
       }
 
       const action = {
@@ -141,7 +142,7 @@ const handleFollowFile = (sender, { filePath, fromIndex }) => {
   fileReader.followFile(filePath, fromIndex, onLines, onError);
 };
 
-const handleShowOpenDialog = async (sender, recentFiles) => {
+const handleShowOpenDialog = async (state, sender) => {
   dialog.showOpenDialog(
     {
       properties: ['openFile']
@@ -151,7 +152,7 @@ const handleShowOpenDialog = async (sender, recentFiles) => {
 
       const filePath = filePaths[0];
       if (await openFile(sender, filePath)) {
-        updateRecentFiles(recentFiles, filePath);
+        state.recentFiles = updateRecentFiles(state.recentFiles, filePath);
       }
     }
   );
@@ -181,15 +182,15 @@ const sendError = (sender, message, error) => {
   errorSender(error);
 };
 
-const createEventHandler = ({ recentFiles }) => {
+const createEventHandler = state => {
   return async (event, _argObj) => {
     const sender = event.sender;
     switch (_argObj.function) {
       case 'DIALOG_OPEN_SHOW':
-        handleShowOpenDialog(sender, recentFiles);
+        handleShowOpenDialog(state, sender);
         break;
       case 'FILE_OPEN':
-        handleOpenFile(sender, recentFiles, _argObj.data);
+        handleOpenFile(state, sender, _argObj.data);
         break;
       case 'SOURCE_FOLLOW':
         fileReader.stopAllWatchers();
@@ -202,7 +203,7 @@ const createEventHandler = ({ recentFiles }) => {
         fileReader.saveStateToDisk(_argObj.reduxStateValue);
         break;
       case 'STATE_LOAD':
-        loadStateFromDisk(sender);
+        loadStateFromDisk(state, sender);
         break;
       default:
     }
