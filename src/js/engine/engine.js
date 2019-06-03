@@ -5,10 +5,8 @@ const ipcChannel = 'backendMessages';
 const { addRecentFile } = require('./../helpers/recentFilesHelper');
 
 const updateRecentFiles = (recentFiles, file) => {
-  const updatedRecentFiles = addRecentFile(recentFiles, file);
-  createMenu(updatedRecentFiles);
-  saveRecentFilesToDisk(updatedRecentFiles);
-  return updatedRecentFiles;
+  createMenu(recentFiles);
+  saveRecentFilesToDisk(recentFiles);
 };
 
 const getFileInfo = async filePath => {
@@ -70,7 +68,8 @@ const openFile = async (sender, filePath) => {
 
 const handleOpenFile = async (state, sender, { filePath }) => {
   if (await openFile(sender, filePath)) {
-    state.recentFiles = updateRecentFiles(state.recentFiles, filePath);
+    state.recentFiles = addRecentFile(state.recentFiles, filePath);
+    updateRecentFiles(state.recentFiles, filePath);
   }
 };
 
@@ -152,7 +151,8 @@ const handleShowOpenDialog = async (state, sender) => {
 
       const filePath = filePaths[0];
       if (await openFile(sender, filePath)) {
-        state.recentFiles = updateRecentFiles(state.recentFiles, filePath);
+        state.recentFiles = addRecentFile(state.recentFiles, filePath);
+        updateRecentFiles(state.recentFiles, filePath);
       }
     }
   );
