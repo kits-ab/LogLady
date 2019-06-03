@@ -4,7 +4,7 @@ const { createMenu } = require('../electron/menu');
 const ipcChannel = 'backendMessages';
 const { addRecentFile } = require('./../helpers/recentFilesHelper');
 
-const updateRecentFiles = (recentFiles, file) => {
+const updateRecentFiles = recentFiles => {
   createMenu(recentFiles);
   saveRecentFilesToDisk(recentFiles);
 };
@@ -69,7 +69,7 @@ const openFile = async (sender, filePath) => {
 const handleOpenFile = async (state, sender, { filePath }) => {
   if (await openFile(sender, filePath)) {
     state.recentFiles = addRecentFile(state.recentFiles, filePath);
-    updateRecentFiles(state.recentFiles, filePath);
+    updateRecentFiles(state.recentFiles);
   }
 };
 
@@ -152,7 +152,7 @@ const handleShowOpenDialog = async (state, sender) => {
       const filePath = filePaths[0];
       if (await openFile(sender, filePath)) {
         state.recentFiles = addRecentFile(state.recentFiles, filePath);
-        updateRecentFiles(state.recentFiles, filePath);
+        updateRecentFiles(state.recentFiles);
       }
     }
   );
