@@ -74,13 +74,18 @@ const loadStateFromDisk = sender => {
   fileReader
     .loadStateFromDisk()
     .then(_data => {
+      let menuState;
+
       try {
-        const menuState = JSON.parse(_data).menuReducer;
+        menuState = JSON.parse(_data).menuReducer;
+      } catch (_error) {
+        throw customError("couldn't parse JSON");
+      }
+
+      if (menuState && menuState.currentSourceHandle) {
         const currentSource =
           menuState.openSources[menuState.currentSourceHandle];
         openFile(sender, currentSource.path);
-      } catch (_error) {
-        throw customError("couldn't parse JSON");
       }
 
       const action = {
