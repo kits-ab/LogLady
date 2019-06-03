@@ -6,7 +6,7 @@ const initialState = {
 };
 
 const nextIndex = index => {
-  return ~~index + 1;
+  return index + 1;
 };
 
 export const snackBarReducer = (state = initialState, action) => {
