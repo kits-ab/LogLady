@@ -3,11 +3,13 @@ import { SnackBarContainer } from 'js/view/styledComponents/common/SnackBarStyle
 
 const SnackBar = props => {
   const [show, setShow] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
     let timeout;
 
     setShow(props.show);
+    setFadeOut(props.show);
     if (props.fadeAfter > 0 && props.show) {
       timeout = setTimeout(() => {
         setShow(false);
@@ -21,7 +23,7 @@ const SnackBar = props => {
 
   return (
     <SnackBarContainer
-      fadeOut={props.fadeAfter > 0}
+      fadeOut={fadeOut}
       color={props.color}
       className={show ? 'show' : 'hide'}
     >
