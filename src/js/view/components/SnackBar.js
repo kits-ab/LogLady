@@ -11,19 +11,19 @@ import CommonSnackBar from 'js/view/components/common/snackbar/SnackBar';
 const SnackBar = props => {
   return (
     <CommonSnackBar
-      key={props.message + props.level}
-      show={props.show}
-      fadeAfter={props.fadeAfter}
+      key={props.snackbar.index}
+      show={props.snackbar.show}
+      fadeAfter={20000}
     >
       <Layout row>
         <Container grow pr-2>
-          {props.message}
+          {props.snackbar.message}
         </Container>
         <Container>
           <TextButton
             color="#bb86fc"
             onClick={() => {
-              hideSnackBar(props.dispatch, true);
+              hideSnackBar(props.dispatch);
             }}
           >
             DISMISS
@@ -36,10 +36,7 @@ const SnackBar = props => {
 
 const mapStateToProps = state => {
   return {
-    message: state.snackBarReducer.message,
-    show: state.snackBarReducer.show,
-    fadeAfter: state.snackBarReducer.fadeAfter,
-    level: state.snackBarReducer.level
+    snackbar: state.snackBarReducer
   };
 };
 

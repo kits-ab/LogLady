@@ -49,7 +49,7 @@ const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
 
 const handleError = (dispatch, { message, error }) => {
   const errorMessage = prettifyErrorMessage(message, error);
-  showSnackBar(dispatch, errorMessage, 'error', 20000);
+  showSnackBar(dispatch, errorMessage, 'error');
 };
 
 export const ipcListener = (store, publisher) => {
