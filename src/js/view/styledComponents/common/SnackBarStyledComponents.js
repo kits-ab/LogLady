@@ -3,6 +3,7 @@ import styled from 'styled-components';
 export const SnackBarContainer = styled.div`
   position: absolute;
   min-width: 50%;
+  width: 90vw;
   visibility: hidden;
   background-color: ${props => {
     return props.color ? props.color : '#333';

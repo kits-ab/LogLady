@@ -33,6 +33,7 @@ const findLevel = (props, prefix) => {
 
 export const Container = styled.div`
   display: flex;
+  word-break: break-all;
 
   ${props => {
     let padding = [
