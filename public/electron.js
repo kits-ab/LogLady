@@ -9,6 +9,7 @@ const menu = require('../src/js/electron/menu');
 const appConfig = require('electron-settings');
 
 updater.init();
+engine.start();
 
 console.log(updater.version);
 
@@ -111,14 +112,6 @@ const createWindow = async () => {
     quitApplication();
   });
   menu.setWebContents(mainWindow.webContents);
-
-  try {
-    const recentFiles = await engine.loadRecentFilesFromDisk();
-    menu.setRecentFiles(recentFiles);
-  } catch (err) {
-    console.log("Couldn't load recent files, ", err);
-  }
-  menu.createMenu();
 };
 
 app.on('ready', createWindow);
