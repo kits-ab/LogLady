@@ -3,7 +3,8 @@ import styled from 'styled-components';
 export const SnackBarContainer = styled.div`
   position: absolute;
   min-width: 50%;
-  width: 90vw;
+  right: 10px;
+  max-width: 600px;
   visibility: hidden;
   background-color: ${props => {
     return props.color ? props.color : '#333';
@@ -22,14 +23,14 @@ export const SnackBarContainer = styled.div`
   }
 
   &.hide {
-    ${props => {
+    animation: ${props => {
       return props.fadeOut
         ? `
     -webkit-animation: fadeout 1.5s;
     animation: fadeout 1.5s;
     `
         : '';
-    }}
+    }};
   }
 
   @-webkit-keyframes fadein {

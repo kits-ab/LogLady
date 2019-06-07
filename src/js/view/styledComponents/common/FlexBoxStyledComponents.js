@@ -7,11 +7,11 @@ export const Layout = styled.div`
   }};
   flex: 1;
 
-  align-items ${props => {
-    if (props.alignStart) return 'flex-start';
-    if (props.alignEnd) return 'flex-end';
-    if (props.alignCenter) return 'center';
-    if (props.alignStretch) return 'stretch';
+  align-items: ${props => {
+    if (props['align-start']) return 'flex-start';
+    if (props['align-end']) return 'flex-end';
+    if (props['align-center']) return 'center';
+    if (props['align-stretch']) return 'stretch';
 
     return 'baseline';
   }};
@@ -57,7 +57,7 @@ export const Container = styled.div`
     return `padding: ${padding[0]}px ${padding[1]}px ${padding[2]}px ${
       padding[3]
     }px`;
-  }}
+  }};
   flex-direction: ${props => {
     return props.column ? 'column' : 'row';
   }};
