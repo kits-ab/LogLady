@@ -16,7 +16,7 @@ const SnackBar = props => {
       fadeAfter={20000}
     >
       <Layout row>
-        <Container grow pr-2 style={{ flexShrink: 1 }}>
+        <Container grow pr-2 shrink>
           {props.snackbar.message}
         </Container>
         <Container>

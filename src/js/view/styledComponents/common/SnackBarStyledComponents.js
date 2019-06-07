@@ -23,7 +23,7 @@ export const SnackBarContainer = styled.div`
   }
 
   &.hide {
-    animation: ${props => {
+    ${props => {
       return props.fadeOut
         ? `
     -webkit-animation: fadeout 1.5s;
