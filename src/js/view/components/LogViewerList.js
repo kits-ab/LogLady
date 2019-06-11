@@ -58,9 +58,9 @@ const LogViewerList = props => {
   };
 
   const resetCaches = (reset = {}) => {
-    if (!reset.lines !== false) linesReset([]);
-    if (!reset.heights !== false) heightsReset({});
-    if (!reset.maxLength !== false) maxLengthReset(0);
+    if (reset.lines !== false) linesReset([]);
+    if (reset.heights !== false) heightsReset({});
+    if (reset.maxLength !== false) maxLengthReset(0);
   };
 
   const getLineWidth = () => {
