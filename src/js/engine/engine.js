@@ -1,13 +1,18 @@
 const fileReader = require('../adapters/fileReader');
-const { ipcMain } = require('electron');
-const { dialog } = require('electron');
+const { ipcMain, dialog } = require('electron');
+const { createMenu } = require('../electron/menu');
 const ipcChannel = 'backendMessages';
+const { addRecentFile } = require('./../helpers/recentFilesHelper');
+
+const updateRecentFiles = recentFiles => {
+  createMenu(recentFiles);
+  saveRecentFilesToDisk(recentFiles);
+};
 
 const getFileInfo = async filePath => {
   const fileSize = await fileReader.getFileSizeInBytes(filePath);
   const endIndex = fileReader.getLastNewLineIndex(filePath, fileSize);
 
-  // [endIndex, fileSize]
   return Promise.all([fileSize, endIndex]);
 };
 
@@ -55,22 +60,30 @@ const openFile = async (sender, filePath) => {
     sendFileOpened(sender, filePath, fileSize, endIndex, history);
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
+    return false;
+  }
+
+  return true;
+};
+
+const handleOpenFile = async (state, sender, { filePath }) => {
+  if (await openFile(sender, filePath)) {
+    state.recentFiles = addRecentFile(state.recentFiles, filePath);
+    updateRecentFiles(state.recentFiles);
   }
 };
 
-const handleOpenFile = (sender, { filePath }) => {
-  openFile(sender, filePath);
-};
-
-const saveRecentFilesToDisk = _recentFiles => {
-  fileReader.saveRecentFilesToDisk(_recentFiles);
+const saveRecentFilesToDisk = recentFiles => {
+  fileReader.saveRecentFilesToDisk(JSON.stringify(recentFiles));
 };
 
 const loadRecentFilesFromDisk = () => {
-  return fileReader.loadRecentFilesFromDisk();
+  return fileReader.loadRecentFilesFromDisk().then(files => {
+    return JSON.parse(files);
+  });
 };
 
-const loadStateFromDisk = sender => {
+const loadStateFromDisk = async (state, sender) => {
   fileReader
     .loadStateFromDisk()
     .then(_data => {
@@ -82,10 +95,11 @@ const loadStateFromDisk = sender => {
         throw customError("couldn't parse JSON");
       }
 
-      if (menuState && menuState.currentSourceHandle) {
+      if (menuState && menuState.currentSourceHandle !== undefined) {
         const currentSource =
           menuState.openSources[menuState.currentSourceHandle];
-        openFile(sender, currentSource.path);
+
+        handleOpenFile(state, sender, { filePath: currentSource.path });
       }
 
       const action = {
@@ -131,7 +145,7 @@ const handleFollowFile = (sender, { filePath, fromIndex }) => {
   fileReader.followFile(filePath, fromIndex, onLines, onError);
 };
 
-const handleShowOpenDialog = async sender => {
+const handleShowOpenDialog = async (state, sender) => {
   dialog.showOpenDialog(
     {
       properties: ['openFile']
@@ -140,37 +154,13 @@ const handleShowOpenDialog = async sender => {
       if (filePaths === undefined) return;
 
       const filePath = filePaths[0];
-      await openFile(sender, filePath);
-      menu.handleRecentFiles(filePath);
+      if (await openFile(sender, filePath)) {
+        state.recentFiles = addRecentFile(state.recentFiles, filePath);
+        updateRecentFiles(state.recentFiles);
+      }
     }
   );
 };
-
-ipcMain.on('frontendMessages', async (event, _argObj) => {
-  const sender = event.sender;
-  switch (_argObj.function) {
-    case 'DIALOG_OPEN_SHOW':
-      handleShowOpenDialog(sender);
-      break;
-    case 'FILE_OPEN':
-      handleOpenFile(sender, _argObj.data);
-      break;
-    case 'SOURCE_FOLLOW':
-      fileReader.stopAllWatchers();
-      handleFollowSource(sender, _argObj.data);
-      break;
-    case 'SOURCE_UNFOLLOW':
-      fileReader.stopWatcher(_argObj);
-      break;
-    case 'STATE_SAVE':
-      fileReader.saveStateToDisk(_argObj.reduxStateValue);
-      break;
-    case 'STATE_LOAD':
-      loadStateFromDisk(sender);
-      break;
-    default:
-  }
-});
 
 const customError = reason => {
   return { code: 'CUSTOM', reason: reason };
@@ -196,9 +186,49 @@ const sendError = (sender, message, error) => {
   errorSender(error);
 };
 
-module.exports = {
-  saveRecentFilesToDisk,
-  loadRecentFilesFromDisk
+const createEventHandler = state => {
+  return async (event, _argObj) => {
+    const sender = event.sender;
+    switch (_argObj.function) {
+      case 'DIALOG_OPEN_SHOW':
+        handleShowOpenDialog(state, sender);
+        break;
+      case 'FILE_OPEN':
+        handleOpenFile(state, sender, _argObj.data);
+        break;
+      case 'SOURCE_FOLLOW':
+        fileReader.stopAllWatchers();
+        handleFollowSource(sender, _argObj.data);
+        break;
+      case 'SOURCE_UNFOLLOW':
+        fileReader.stopWatcher(_argObj);
+        break;
+      case 'STATE_SAVE':
+        fileReader.saveStateToDisk(_argObj.reduxStateValue);
+        break;
+      case 'STATE_LOAD':
+        loadStateFromDisk(state, sender);
+        break;
+      default:
+    }
+  };
 };
 
-const menu = require('../electron/menu');
+const start = async () => {
+  let recentFiles = [];
+  try {
+    const loadedRecentFiles = await loadRecentFilesFromDisk();
+    recentFiles = loadedRecentFiles;
+  } catch (error) {
+    console.log(error);
+  }
+
+  createMenu(recentFiles);
+
+  const state = { recentFiles };
+  ipcMain.on('frontendMessages', createEventHandler(state));
+};
+
+module.exports = {
+  start
+};

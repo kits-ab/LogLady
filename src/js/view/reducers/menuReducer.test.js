@@ -1,4 +1,4 @@
-import { menuReducer } from './menuReducer';
+import { menuReducer, isValidState } from './menuReducer';
 
 describe('menu reducer', () => {
   const initialState = {
@@ -62,5 +62,25 @@ describe('menu reducer', () => {
       currentSourceHandle: undefined
     };
     expect(menuReducer(state, action)).toEqual(expectedState);
+  });
+});
+
+describe('isValidState', () => {
+  it('should consider the initial state valid', () => {
+    const initialState = { openSources: [] };
+
+    expect(isValidState(initialState)).toEqual(true);
+  });
+
+  it('should consider the a good state valid', () => {
+    const initialState = { openSources: ['file1', 'file2'] };
+
+    expect(isValidState(initialState)).toEqual(true);
+  });
+
+  it('should consider non-strings invalid', () => {
+    const initialState = { openSources: [1] };
+
+    expect(isValidState(initialState)).toEqual(false);
   });
 });

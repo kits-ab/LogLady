@@ -167,6 +167,10 @@ const readNLastLines = (filePath, numberOfLines, endIndex) => {
         }
       })
       .on('end', () => {
+        if (result.length < numberOfLines && unusedChars) {
+          result.unshift(unusedChars);
+        }
+
         resolve(result);
       })
       .on('error', err => {
