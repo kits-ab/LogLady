@@ -47,17 +47,17 @@ class LogViewer extends React.Component {
 }
 
 const mapStateToProps = ({
-  topPanelReducer,
-  settingsReducer,
-  logViewerReducer
+  topPanelState: { filterInput, highlightInput, tailSwitch },
+  settingsState: { highlightColor, wrapLineOn },
+  logViewerState: { logs }
 }) => {
   return {
-    filterInput: topPanelReducer.filterInput,
-    highlightInput: topPanelReducer.highlightInput,
-    highlightColor: settingsReducer.highlightColor,
-    wrapLineOn: settingsReducer.wrapLineOn,
-    logs: logViewerReducer.logs,
-    tailSwitch: topPanelReducer.tailSwitch
+    filterInput,
+    highlightInput,
+    tailSwitch,
+    highlightColor,
+    wrapLineOn,
+    logs
   };
 };
 

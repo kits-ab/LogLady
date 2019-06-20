@@ -89,7 +89,7 @@ const loadStateFromDisk = async (state, sender) => {
     .then(_data => {
       let previousSource = '';
       try {
-        previousSource = JSON.parse(_data).menuReducer.openSources[0];
+        previousSource = JSON.parse(_data).menuState.openSources[0];
       } catch (_error) {
         throw customError("couldn't parse JSON");
       }

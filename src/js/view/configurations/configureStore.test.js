@@ -7,18 +7,28 @@ it('should saveStateToDisk', () => {
   };
 
   fakeStore.getState.mockReturnValue({
-    logInfoReducer: 'hejhoj',
-    logViewerReducer: 'one',
-    testStuff: 'two'
+    logInfoState: 'hejhoj',
+    logViewerState: 'one',
+    menuState: 'menu',
+    topPanelState: 'top',
+    settingsState: 'settings'
   });
 
   const publisher = configureStore(fakeStore, fakeRequester);
   publisher.saveStateToDisk();
   expect(fakeRequester.mock.calls.length).toBe(1);
-  expect(fakeRequester.mock.calls[0]).toEqual([
+
+  const saveCall = fakeRequester.mock.calls[0];
+  expect(typeof saveCall[0].reduxStateValue).toEqual('string');
+  saveCall[0].reduxStateValue = JSON.parse(saveCall[0].reduxStateValue);
+  expect(saveCall).toEqual([
     {
       function: 'STATE_SAVE',
-      reduxStateValue: '{"testStuff":"two"}'
+      reduxStateValue: {
+        topPanelState: 'top',
+        menuState: 'menu',
+        settingsState: 'settings'
+      }
     }
   ]);
 });

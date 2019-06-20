@@ -34,9 +34,9 @@ const SnackBar = props => {
   );
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = ({ snackBarState }) => {
   return {
-    snackbar: state.snackBarReducer
+    snackbar: snackBarState
   };
 };
 
