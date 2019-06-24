@@ -165,7 +165,10 @@ class LogViewerList extends React.Component {
       : this.noWrapItemSizeGetter(this.state.cachedCharSize[0]);
 
     return (
-      <LogViewerListContainer ref={this.logRef}>
+      <LogViewerListContainer
+        ref={this.logRef}
+        wrap={wrapLines ? 'true' : undefined}
+      >
         <LogLineRuler ref={this.rulerRef} />
         <WindowedList
           ref={this.windowedListRef}
