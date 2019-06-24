@@ -73,12 +73,15 @@ class TopPanel extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = ({
+  menuState: { openFiles },
+  topPanelState: { tailSwitch, filterInput, highlightInput }
+}) => {
   return {
-    openFiles: state.menuReducer.openFiles,
-    tailSwitch: state.topPanelReducer.tailSwitch,
-    filterInput: state.topPanelReducer.filterInput,
-    highlightInput: state.topPanelReducer.highlightInput
+    openFiles,
+    tailSwitch,
+    filterInput,
+    highlightInput
   };
 };
 

@@ -32,9 +32,9 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = ({ menuState: { openSources } }) => {
   return {
-    openSources: state.menuReducer.openSources
+    openSources
   };
 };
 

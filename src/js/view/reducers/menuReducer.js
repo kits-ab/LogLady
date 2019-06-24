@@ -23,7 +23,7 @@ export const menuReducer = (state = initialState, action) => {
     case 'MENU_SET_SOURCE':
       const { sourcePath } = action.data;
       return { ...state, openSources: [sourcePath] };
-    case 'menuReducerRestore':
+    case 'MENU_STATE_RESTORE':
       return isValidState(action.data)
         ? { openSources: action.data.openSources }
         : initialState;
