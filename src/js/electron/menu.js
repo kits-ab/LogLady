@@ -54,6 +54,16 @@ const createTemplate = recentFiles => {
       ]
     },
     {
+      label: 'Edit',
+      submenu: [
+        {
+          label: 'Copy',
+          accelerator: 'CmdOrCtrl+C',
+          selector: 'copy:'
+        }
+      ]
+    },
+    {
       label: 'View',
       submenu: [
         isDev
