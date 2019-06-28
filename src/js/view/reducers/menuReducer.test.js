@@ -75,7 +75,8 @@ describe('menu reducer', () => {
           0: { path: 'file1', index: 0 },
           1: { path: 'file2', index: 1 }
         },
-        nextIndex: 2
+        nextIndex: 2,
+        currentSourceHandle: 0
       };
 
       expect(isValidState(state)).toEqual(true);
