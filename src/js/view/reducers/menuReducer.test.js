@@ -63,24 +63,28 @@ describe('menu reducer', () => {
     };
     expect(menuReducer(state, action)).toEqual(expectedState);
   });
-});
 
-describe('isValidState', () => {
-  it('should consider the initial state valid', () => {
-    const initialState = { openSources: [] };
+  describe('isValidState', () => {
+    it('should consider the initial state valid', () => {
+      expect(isValidState(initialState)).toEqual(true);
+    });
 
-    expect(isValidState(initialState)).toEqual(true);
-  });
+    it('should consider the a good state valid', () => {
+      const state = {
+        openSources: {
+          0: { path: 'file1', index: 0 },
+          1: { path: 'file2', index: 1 }
+        },
+        nextIndex: 2
+      };
 
-  it('should consider the a good state valid', () => {
-    const initialState = { openSources: ['file1', 'file2'] };
+      expect(isValidState(state)).toEqual(true);
+    });
 
-    expect(isValidState(initialState)).toEqual(true);
-  });
+    it('should consider incomplete state invalid', () => {
+      const state = {};
 
-  it('should consider non-strings invalid', () => {
-    const initialState = { openSources: [1] };
-
-    expect(isValidState(initialState)).toEqual(false);
+      expect(isValidState(state)).toEqual(false);
+    });
   });
 });

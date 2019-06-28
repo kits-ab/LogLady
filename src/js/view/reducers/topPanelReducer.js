@@ -21,7 +21,7 @@ export const topPanelReducer = (state = initialState, action) => {
         ...state,
         highlightInput: action.data
       };
-    case 'topPanelReducerRestore':
+    case 'TOP_PANEL_STATE_RESTORE':
       return { ...initialState, ...action.data };
     default:
       return state;

@@ -46,9 +46,9 @@ class StatusBar extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = ({ logInfoState: { logSizes } }) => {
   return {
-    logSizes: state.logInfoReducer.logSizes
+    logSizes
   };
 };
 
