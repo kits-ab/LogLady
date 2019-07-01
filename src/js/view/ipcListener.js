@@ -8,6 +8,7 @@ import {
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
+import { openFile } from './components/helpers/handleFileHelper';
 const { ipcRenderer } = window.require('electron');
 
 const handleSourcePicked = (dispatch, { sourcePath }) => {
@@ -22,6 +23,24 @@ const handleSourceOpened = (dispatch, { sourceType, ...rest }) => {
     default:
       console.log('ipcListener.js: Unknown source type');
   }
+};
+
+const handleStateSet = (publisher, state) => {
+  let openedSource;
+
+  // Save previously opened source for reopening of the file
+  if (state.menuState) {
+    const openedSourceHandle = state.menuState.currentSourceHandle;
+    openedSource = (state.menuState.openSources || {})[openedSourceHandle];
+
+    // Set previously opened file to undefined so it isn't opened if the opening process fails
+    state.menuState.currentSourceHandle = undefined;
+  }
+
+  publisher.populateStore(state);
+
+  // Open file after the store is populated
+  if (openedSource) openFile(openedSource.path);
 };
 
 const handleFileOpened = (
@@ -61,7 +80,7 @@ export const ipcListener = (store, publisher) => {
         publisher.saveStateToDisk();
         break;
       case 'STATE_SET':
-        publisher.populateStore(JSON.parse(action.data));
+        handleStateSet(publisher, action.data);
         break;
       case 'SOURCE_PICKED':
         handleSourcePicked(dispatch, action.data);

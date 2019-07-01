@@ -8,19 +8,22 @@ export const logViewerReducer = (state = initialState, action) => {
         logs: {}
       };
     case 'LOGVIEWER_SET_LOG': {
+      console.log('SETTING');
       const { sourcePath, log } = action.data;
-      const logs = { ...state.logs };
-      logs[sourcePath] = [...log];
-
-      return { ...state, logs: logs };
+      return { ...state, logs: { ...state.logs, [sourcePath]: [...log] } };
     }
     case 'LOGVIEWER_ADD_LINES':
+      console.log('ADDING');
       const { sourcePath, lines } = action.data;
-      const newLogs = { ...state.logs };
       const log = state.logs[sourcePath];
-      newLogs[sourcePath] = log ? [...log, ...lines] : [...lines];
 
-      return { ...state, logs: newLogs };
+      return {
+        ...state,
+        logs: {
+          ...state.logs,
+          [sourcePath]: log ? [...log, ...lines] : [...lines]
+        }
+      };
 
     default:
       return state;

@@ -4,6 +4,7 @@ import TopPanel from './components/TopPanel';
 import DefaultPage from './components/DefaultPage';
 import StatusBar from './components/StatusBar';
 import SnackBar from './components/SnackBar';
+import { getCurrentSource } from './reducers/menuReducer';
 import {
   RootContainer,
   LogPage
@@ -16,12 +17,12 @@ class App extends Component {
   render() {
     return (
       <RootContainer>
-        {this.props.openSources && this.props.openSources[0] ? (
+        {this.props.currentSource ? (
           <LogPage>
             <TopPanel />
             <TabSettings />
-            <LogViewer source={this.props.openSources[0]} />
-            <StatusBar source={this.props.openSources[0]} />
+            <LogViewer source={this.props.currentSource} />
+            <StatusBar source={this.props.currentSource} />
           </LogPage>
         ) : (
           <DefaultPage />
@@ -32,9 +33,9 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = ({ menuState: { openSources } }) => {
+const mapStateToProps = ({ menuState }) => {
   return {
-    openSources
+    currentSource: getCurrentSource(menuState)
   };
 };
 

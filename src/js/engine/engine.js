@@ -87,20 +87,9 @@ const loadStateFromDisk = async (state, sender) => {
   fileReader
     .loadStateFromDisk()
     .then(_data => {
-      let previousSource = '';
-      try {
-        previousSource = JSON.parse(_data).menuState.openSources[0];
-      } catch (_error) {
-        throw customError("couldn't parse JSON");
-      }
-
-      if (previousSource) {
-        handleOpenFile(state, sender, { filePath: previousSource });
-      }
-
       const action = {
         type: 'STATE_SET',
-        data: _data
+        data: JSON.parse(_data)
       };
 
       sender.send(ipcChannel, action);
