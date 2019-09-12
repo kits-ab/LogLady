@@ -68,7 +68,8 @@ const createWindow = async () => {
     minHeight: 145,
     darkTheme: true,
     webPreferences: {
-      devTools: isDev ? true : false
+      devTools: isDev ? true : false,
+      preload: path.join(__dirname, '..', 'src', 'js', 'view', 'preload.js')
     },
     icon: path.join(__dirname, './icons/png/256x256.png'),
     show: false

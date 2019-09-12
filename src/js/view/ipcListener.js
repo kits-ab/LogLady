@@ -9,7 +9,6 @@ import {
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
 import { openFile } from './components/helpers/handleFileHelper';
-const { ipcRenderer } = window.require('electron');
 
 const handleSourcePicked = (dispatch, { sourcePath }) => {
   setSource(dispatch, sourcePath);
@@ -74,7 +73,7 @@ const handleError = (dispatch, { message, error }) => {
 export const ipcListener = (store, publisher) => {
   const dispatch = store.dispatch;
 
-  ipcRenderer.on('backendMessages', (_event, action) => {
+  window.ipcRenderer.on('backendMessages', (_event, action) => {
     switch (action.type) {
       case 'QUIT':
         publisher.saveStateToDisk();
@@ -102,5 +101,5 @@ export const ipcListener = (store, publisher) => {
 };
 
 export const removeAllListeners = () => {
-  ipcRenderer.removeAllListeners('backendMessages');
+  window.ipcRenderer.removeAllListeners('backendMessages');
 };
