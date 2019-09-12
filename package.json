@@ -55,7 +55,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron --inspect .\"",
-    "electron-pack": "build -lmw -c.extraMetadata.main=build/electron.js",
+    "electron-pack": "electron-builder -lmw",
     "preelectron-pack": "npm run build"
   },
   "repository": {
