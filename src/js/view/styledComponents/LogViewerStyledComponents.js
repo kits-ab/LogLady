@@ -6,7 +6,7 @@ export const LogViewerContainer = styled.div`
   border: 1px solid white;
   color: #ccc;
   background: #444;
-  max-height: 100%;
+  height: calc(100% - 32px);
   overflow-anchor: none;
   min-width: 0;
 `;
