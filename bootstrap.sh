@@ -100,7 +100,7 @@ function npm_test() {
     fi
 }
 
-fun npm_run() {
+function npm_run() {
     info "Checkes everything works in the project"
     if npm run dev; then
         success "Npm tests succeeded"
@@ -109,8 +109,6 @@ fun npm_run() {
         exit 1
     fi
 }
-
-
 
 ################################
 # Help functions
