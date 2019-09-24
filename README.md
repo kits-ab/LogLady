@@ -2,6 +2,11 @@
 
 ## How to develop
 
+You can set up your development environment on macOS simply by using this one-liner
+    ``` curl --silent https://raw.githubusercontent.com/kits-ab/LogLady/feature/automate-dev-env/bootstrap.sh | bash ```
+
+Alternatively:
+
 Start with running `npm install`.
 
 Run `npm test` to run tests.
