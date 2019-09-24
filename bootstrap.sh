@@ -17,7 +17,7 @@ main() {
     npm_run
 }
 
-KITS_REPO=~/kits
+LOGLADY_LOCAL_REPO=$PWD/kits-ab/loglady
 
 function ask_for_sudo() {
     info "Prompting for sudo password"
@@ -48,28 +48,28 @@ function install_homebrew() {
 }
 
 function clone_loglady_repo() {
-    info "Cloning dotfiles repository into ${KITS_REPO}"
-    if test -e $KITS_REPO; then
-        substep "${KITS_REPO} already exists"
-        pull_latest $KITS_REPO
-        success "Pull successful in ${KITS_REPO} repository"
+    info "Cloning repository into ${LOGLADY_LOCAL_REPO}"
+    if test -e $LOGLADY_LOCAL_REPO; then
+        substep "${LOGLADY_LOCAL_REPO} already exists"
+        pull_latest $LOGLADY_LOCAL_REPO
+        success "Pull successful in ${LOGLADY_LOCAL_REPO} repository"
     else
         url=https://github.com/kits-ab/loglady.git
-        if git clone "$url" $KITS_REPO && \
-           git -C $KITS_REPO remote set-url origin git@github.com:kits-ab/loglady.git; then
-            success "Dotfiles repository cloned into ${KITS_REPO}"
+        if git clone "$url" $LOGLADY_LOCAL_REPO && \
+           git -C $LOGLADY_LOCAL_REPO remote set-url origin git@github.com:kits-ab/loglady.git; then
+            success "Loglady Repository cloned into ${LOGLADY_LOCAL_REPO}"
         else
-            error "Dotfiles repository cloning failed"
+            error "Loglady Repository cloning failed"
             exit 1
         fi
     fi
 }
 
 function install_homebrew_formulae() {
-    BREW_FILE_PATH="${KITS_REPO}/macOS.Brewfile"
+    BREW_FILE_PATH="${LOGLADY_LOCAL_REPO}/macOS.Brewfile"
     info "Installing packages within ${BREW_FILE_PATH}"
     if brew bundle check --file="$BREW_FILE_PATH" &> /dev/null; then
-        success "Brewfile's dependencies are already satisfied "
+        success "Brewfile's dependencies are already satisfied."
     else
         if brew bundle --file="$BREW_FILE_PATH"; then
             success "Brewfile installation succeeded"
@@ -81,8 +81,8 @@ function install_homebrew_formulae() {
 }
 
 function install_npm_packages() {
-    info "Installing all npm packages in ${KITS_REPO}"
-    if npm install ${KITS_REPO}/loglady &> /dev/null; then
+    info "Installing all npm packages in ${LOGLADY_LOCAL_REPO}"
+    if cd ${LOGLADY_LOCAL_REPO} && npm install &> /dev/null; then
         success "Npm installation succeeded"
     else
         error "Npm installation failed"
@@ -101,11 +101,11 @@ function npm_test() {
 }
 
 function npm_run() {
-    info "Checkes everything works in the project"
+    info "Run Loglady project"
     if npm run dev; then
-        success "Npm tests succeeded"
+        success "Npm run succeeded"
     else
-        error "Npm tests failed"
+        error "Npm run failed"
         exit 1
     fi
 }
