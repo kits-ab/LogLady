@@ -56,6 +56,7 @@ function clone_loglady_repo() {
     else
         url=https://github.com/kits-ab/loglady.git
         if git clone "$url" $LOGLADY_LOCAL_REPO && \
+           cd $LOGLADY_LOCAL_REPO && git checkout feature/automate-dev-env#314 && \
            git -C $LOGLADY_LOCAL_REPO remote set-url origin git@github.com:kits-ab/loglady.git; then
             success "Loglady Repository cloned into ${LOGLADY_LOCAL_REPO}"
         else
@@ -92,7 +93,7 @@ function install_npm_packages() {
 
 function npm_test() {
     info "Checkes everything works in the project"
-    if npm test; then
+    if CI=true npm test; then
         success "Npm tests succeeded"
     else
         error "Npm tests failed"
