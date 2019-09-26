@@ -68,7 +68,7 @@ function install_homebrew_formulae() {
 
 function install_npm_packages() {
     info "Installing all npm packages in ${LOGLADY_LOCAL_REPO}"
-    if cd ${LOGLADY_LOCAL_REPO} && npm install &> /dev/null; then
+    if cd "${LOGLADY_LOCAL_REPO}" && npm install &> /dev/null; then
         success "Npm installation succeeded"
     else
         error "Npm installation failed"
