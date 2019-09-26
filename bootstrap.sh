@@ -49,15 +49,15 @@ function install_homebrew() {
 
 function clone_loglady_repo() {
     info "Cloning repository into ${LOGLADY_LOCAL_REPO}"
-    if test -e $LOGLADY_LOCAL_REPO; then
+    if test -e "$LOGLADY_LOCAL_REPO"; then
         substep "${LOGLADY_LOCAL_REPO} already exists"
-        pull_latest $LOGLADY_LOCAL_REPO
+        pull_latest "$LOGLADY_LOCAL_REPO"
         success "Pull successful in ${LOGLADY_LOCAL_REPO} repository"
     else
         url=https://github.com/kits-ab/loglady.git
-        if git clone "$url" $LOGLADY_LOCAL_REPO && \
-           cd $LOGLADY_LOCAL_REPO && git checkout feature/automate-dev-env#314 && \
-           git -C $LOGLADY_LOCAL_REPO remote set-url origin git@github.com:kits-ab/loglady.git; then
+        if git clone "$url" "$LOGLADY_LOCAL_REPO" && \
+           cd "$LOGLADY_LOCAL_REPO" && git checkout feature/automate-dev-env#314 && \
+           git -C "$LOGLADY_LOCAL_REPO" remote set-url origin git@github.com:kits-ab/loglady.git; then
             success "Loglady Repository cloned into ${LOGLADY_LOCAL_REPO}"
         else
             error "Loglady Repository cloning failed"
