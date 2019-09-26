@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 main() {
-    # First things first, asking for sudo credentials
-    ask_for_sudo
     # Installing Homebrew, the basis of anything and everything
     install_homebrew
     # Cloning loglady repository for install_homebrew_formulae to have access to Brewfile
@@ -18,19 +16,6 @@ main() {
 }
 
 LOGLADY_LOCAL_REPO=$PWD/kits-ab/loglady
-
-function ask_for_sudo() {
-    info "Prompting for sudo password"
-    if sudo --validate; then
-        # Keep-alive
-        while true; do sudo --non-interactive true; \
-            sleep 10; kill -0 "$$" || exit; done 2>/dev/null &
-        success "Sudo password updated"
-    else
-        error "Sudo password update failed"
-        exit 1
-    fi
-}
 
 function install_homebrew() {
     info "Installing Homebrew"
