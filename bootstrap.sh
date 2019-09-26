@@ -55,7 +55,7 @@ function clone_loglady_repo() {
         success "Pull successful in ${LOGLADY_LOCAL_REPO} repository"
     else
         url=https://github.com/kits-ab/loglady.git
-        if git clone "$url" "$LOGLADY_LOCAL_REPO" && \
+        if git clone "$url" "$LOGLADY_LOCAL_REPO" &> /dev/null && \
            cd "$LOGLADY_LOCAL_REPO" && git checkout feature/automate-dev-env#314 && \
            git -C "$LOGLADY_LOCAL_REPO" remote set-url origin git@github.com:kits-ab/loglady.git; then
             success "Loglady Repository cloned into ${LOGLADY_LOCAL_REPO}"
