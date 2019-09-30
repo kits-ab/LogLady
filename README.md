@@ -2,6 +2,15 @@
 
 ## How to develop
 
+You can set up your development environment on macOS simply by using this one-liner:
+
+``` curl --silent https://raw.githubusercontent.com/kits-ab/LogLady/develop/bootstrap.sh | bash ```
+
+## Bullsh*t, what does it really do to my mac
+The script starts with install [Homebrew](https://brew.sh/)  and brew formulas which are [git](https://git-scm.com/) and [yarn](https://yarnpkg.com/lang/en/). Then, the script pulls the latest Loglady repo and install the project's dependencies that described in `packages.json`. Finally, the tests check everything works well and the development server and the application start.
+
+Alternatively:
+
 Start with running `npm install`.
 
 Run `npm test` to run tests.
