@@ -9,6 +9,7 @@ const menu = require('../src/js/electron/menu');
 const appConfig = require('electron-settings');
 
 updater.init();
+engine.start();
 
 console.log(updater.version);
 
@@ -67,7 +68,8 @@ const createWindow = async () => {
     minHeight: 145,
     darkTheme: true,
     webPreferences: {
-      devTools: isDev ? true : false
+      devTools: isDev ? true : false,
+      preload: path.join(__dirname, '..', 'src', 'js', 'view', 'preload.js')
     },
     icon: path.join(__dirname, './icons/png/256x256.png'),
     show: false
@@ -111,14 +113,6 @@ const createWindow = async () => {
     quitApplication();
   });
   menu.setWebContents(mainWindow.webContents);
-
-  try {
-    const recentFiles = await engine.loadRecentFilesFromDisk();
-    menu.setRecentFiles(recentFiles);
-  } catch (err) {
-    console.log("Couldn't load recent files, ", err);
-  }
-  menu.createMenu();
 };
 
 app.on('ready', createWindow);

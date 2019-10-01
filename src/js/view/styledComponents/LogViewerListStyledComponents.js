@@ -3,7 +3,11 @@ import Color from 'color';
 
 export const LogViewerListContainer = styled.div`
   min-width: 100%;
-  overflow: auto;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: ${props => {
+    return props.wrap ? 'hidden' : 'auto';
+  }};
 `;
 
 export const LogLine = styled.div`

@@ -8,7 +8,7 @@ import {
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
-const { ipcRenderer } = window.require('electron');
+import { openFile } from './components/helpers/handleFileHelper';
 
 const handleSourcePicked = (dispatch, { sourcePath }) => {
   setSource(dispatch, sourcePath);
@@ -22,6 +22,24 @@ const handleSourceOpened = (dispatch, { sourceType, ...rest }) => {
     default:
       console.log('ipcListener.js: Unknown source type');
   }
+};
+
+const handleStateSet = (publisher, state) => {
+  let openedSource;
+
+  // Save previously opened source for reopening of the file
+  if (state.menuState) {
+    const openedSourceHandle = state.menuState.currentSourceHandle;
+    openedSource = (state.menuState.openSources || {})[openedSourceHandle];
+
+    // Set previously opened file to undefined so it isn't opened if the opening process fails
+    state.menuState.currentSourceHandle = undefined;
+  }
+
+  publisher.populateStore(state);
+
+  // Open file after the store is populated
+  if (openedSource) openFile(openedSource.path);
 };
 
 const handleFileOpened = (
@@ -49,19 +67,19 @@ const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
 
 const handleError = (dispatch, { message, error }) => {
   const errorMessage = prettifyErrorMessage(message, error);
-  showSnackBar(dispatch, errorMessage, 'error', 20000);
+  showSnackBar(dispatch, errorMessage, 'error');
 };
 
 export const ipcListener = (store, publisher) => {
   const dispatch = store.dispatch;
 
-  ipcRenderer.on('backendMessages', (_event, action) => {
+  window.ipcRenderer.on('backendMessages', (_event, action) => {
     switch (action.type) {
       case 'QUIT':
         publisher.saveStateToDisk();
         break;
       case 'STATE_SET':
-        publisher.populateStore(JSON.parse(action.data));
+        handleStateSet(publisher, action.data);
         break;
       case 'SOURCE_PICKED':
         handleSourcePicked(dispatch, action.data);
@@ -83,5 +101,5 @@ export const ipcListener = (store, publisher) => {
 };
 
 export const removeAllListeners = () => {
-  ipcRenderer.removeAllListeners('backendMessages');
+  window.ipcRenderer.removeAllListeners('backendMessages');
 };

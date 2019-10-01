@@ -87,12 +87,9 @@ export const clearSources = dispatch => {
   });
 };
 
-export const hideSnackBar = (dispatch, instant) => {
+export const hideSnackBar = dispatch => {
   dispatch({
-    type: 'SNACKBAR_HIDE',
-    data: {
-      instant
-    }
+    type: 'SNACKBAR_HIDE'
   });
 };
 
@@ -116,13 +113,12 @@ export const increaseSize = (dispatch, sourcePath, size) => {
   });
 };
 
-export const showSnackBar = (dispatch, message, level, fadeAfter) => {
+export const showSnackBar = (dispatch, message, level) => {
   dispatch({
     type: 'SNACKBAR_SHOW_NEW',
     data: {
       message,
-      level,
-      fadeAfter
+      level
     }
   });
 };

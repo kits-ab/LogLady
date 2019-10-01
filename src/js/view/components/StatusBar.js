@@ -27,18 +27,18 @@ class StatusBar extends React.Component {
 
         <ul>
           <ReactTooltip />
-          <li data-tip={this.props.source}>
+          <li data-tip={this.props.source.path}>
             File:
             {this.props.source
               ? getFormattedFilePath(
-                  this.props.source,
+                  this.props.source.path,
                   `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
                 )
               : null}
           </li>
           <li>
             Size:
-            {getFormattedFileSize(this.props.logSizes[this.props.source])}
+            {getFormattedFileSize(this.props.logSizes[this.props.source.path])}
           </li>
         </ul>
       </StatusBarSC.Statusbar>
@@ -46,9 +46,9 @@ class StatusBar extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = ({ logInfoState: { logSizes } }) => {
   return {
-    logSizes: state.logInfoReducer.logSizes
+    logSizes
   };
 };
 

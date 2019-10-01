@@ -8,56 +8,42 @@ import { connect } from 'react-redux';
 import { closeFile } from './helpers/handleFileHelper';
 import { parseRegExp } from 'js/view/components/helpers/regexHelper.js';
 
-class LogViewer extends React.Component {
-  constructor(props) {
-    super(props);
+const LogViewer = props => {
+  const lines = props.logs[props.source.path];
 
-    this.windowedList = React.createRef();
-  }
-
-  render() {
-    const lines = this.props.logs[this.props.source];
-
-    const highlightRegExp = parseRegExp(this.props.highlightInput);
-    const filterRegExp = parseRegExp(this.props.filterInput);
-
-    return (
-      <LogViewerContainer>
-        <CloseFileButton
-          show={this.props.source}
-          onClick={() => {
-            closeFile(
-              this.props.dispatch,
-              this.props.source ? this.props.source : ''
-            );
-          }}
-        />
-        <LogViewerList
-          key={this.props.source}
-          highlightColor={this.props.highlightColor}
-          wrapLines={this.props.wrapLineOn}
-          scrollToBottom={this.props.tailSwitch}
-          lines={lines ? lines : []}
-          highlightRegExp={highlightRegExp}
-          filterRegExp={filterRegExp}
-        />
-      </LogViewerContainer>
-    );
-  }
-}
+  return (
+    <LogViewerContainer>
+      <CloseFileButton
+        show={props.source}
+        onClick={() => {
+          closeFile(props.dispatch, props.source.path);
+        }}
+      />
+      <LogViewerList
+        key={props.source.index}
+        highlightColor={props.highlightColor}
+        wrapLines={props.wrapLineOn}
+        scrollToBottom={props.tailSwitch}
+        lines={lines ? lines : []}
+        highlightRegExp={parseRegExp(props.highlightInput)}
+        filterRegExp={parseRegExp(props.filterInput)}
+      />
+    </LogViewerContainer>
+  );
+};
 
 const mapStateToProps = ({
-  topPanelReducer,
-  settingsReducer,
-  logViewerReducer
+  topPanelState: { filterInput, highlightInput, tailSwitch },
+  settingsState: { highlightColor, wrapLineOn },
+  logViewerState: { logs }
 }) => {
   return {
-    filterInput: topPanelReducer.filterInput,
-    highlightInput: topPanelReducer.highlightInput,
-    highlightColor: settingsReducer.highlightColor,
-    wrapLineOn: settingsReducer.wrapLineOn,
-    logs: logViewerReducer.logs,
-    tailSwitch: topPanelReducer.tailSwitch
+    filterInput,
+    highlightInput,
+    tailSwitch,
+    highlightColor,
+    wrapLineOn,
+    logs
   };
 };
 

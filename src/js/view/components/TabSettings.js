@@ -52,11 +52,13 @@ class TabSettings extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = ({
+  settingsState: { showSettings, highlightColor, wrapLineOn }
+}) => {
   return {
-    showSettings: state.settingsReducer.showSettings,
-    highlightColor: state.settingsReducer.highlightColor,
-    wrapLineOn: state.settingsReducer.wrapLineOn
+    showSettings,
+    highlightColor,
+    wrapLineOn
   };
 };
 

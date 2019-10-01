@@ -1,15 +1,8 @@
-const {
-  createReadStream,
-  watch,
-  statSync,
-  readFile,
-  writeFile,
-  watchFile,
-  unwatchFile
-} = require('fs');
+const { createReadStream, statSync, readFile, writeFile } = require('fs');
 const app = require('electron').app;
 const path = require('path');
 const createBackwardsStream = require('fs-backwards-stream');
+const chokidar = require('chokidar');
 
 let watchers = [];
 
@@ -60,25 +53,20 @@ const readTail = (filePath, startIndex, onLines, onError) => {
 const followFile = (filePath, startIndex, onLines, onError) => {
   let currentIndex = startIndex;
 
-  let onChange = async () => {
-    currentIndex = await readTail(filePath, currentIndex, onLines, onError);
-  };
-
   if (watchers[filePath] !== undefined) {
-    process.platform === 'win32'
-      ? unwatchFile(filePath)
-      : watchers[filePath].close();
+    watchers[filePath].close();
   }
-  let watcher;
-  if (process.platform === 'win32') {
-    watcher = watchFile(
-      filePath,
-      { persistent: true, interval: 100 },
-      onChange
-    );
-  } else {
-    watcher = watch(filePath, onChange);
-  }
+
+  /* UsePolling gives better results while the file is appended continously, but might give a hit to performance */
+  let watcher = chokidar.watch(filePath, {
+    persistent: true,
+    usePolling: true
+  });
+
+  watcher.on('change', async () => {
+    currentIndex = await readTail(filePath, currentIndex, onLines, onError);
+  });
+
   watchers[filePath] = watcher;
 };
 
@@ -125,11 +113,7 @@ const parseLines = (chunk, trailingChars) => {
 
 const stopAllWatchers = () => {
   for (var key in watchers) {
-    if (process.platform === 'win32') {
-      unwatchFile(key);
-    } else {
-      watchers[key].close();
-    }
+    watchers[key].close();
   }
   watchers = {};
 };
@@ -167,6 +151,10 @@ const readNLastLines = (filePath, numberOfLines, endIndex) => {
         }
       })
       .on('end', () => {
+        if (result.length < numberOfLines && unusedChars) {
+          result.unshift(unusedChars);
+        }
+
         resolve(result);
       })
       .on('error', err => {

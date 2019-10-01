@@ -1,7 +1,7 @@
 language: node_js
-node_js:
-  - 8.11.4
+node_js: "10"
 os: osx
+osx_image: xcode10.2
 script:
   - npm run lint
   - npm test
@@ -13,7 +13,7 @@ branches:
 deploy:
   provider: releases
   api_key:
-    secure: UA1RveBAQ4eF7SisUwS2sVMvdBVVvAUbP74I2odC34mU2sqRO9+qmOMYo+HL733vIbZWV9fPV27Yyz4mkXOU0pEoAHLxMzL2YHrlzrtnqwbrrl8Gpq0DLuaQMHphDlDPAdBlnLiZy8UyCEGq/F/8p706tCGrLnNMNfWssc0/hwvZ4CpwBpNZ8+72rObNqZ7u3qkZs0thWC8JzPkG7vpQBtZ74JdBfoAGKdJyLGoo0uDCwttO/sG5NlVcdrzVRshJkfl4QEMcdVanN991U0SGFZpPEFAXnfd0Sl4yjAUyQ0bmubv4cKp6MRv2PBvDyy8HgzQpqE3Ul2Cy3X4kxj7vt29PZ8wdu+3466Yi4kq9174nO8J/y28U85XCX9kRGGGehEH0focyzgnOJBhU6Zwxbt5/UiZa/0hn6LT5XVTKuZEVIoM6rEt2cccjmBTyJGN2szSV8aumuqaMu206IHZTAE7rFyCNAuAjK2EenFLl10giV+4M92FbCyumyvB68ts/X/bnnM5JFbnmGJEfdaNr1jpUtB1vSlLx5jiFvmqUX5YNb/K6pNEimChgY/3vaPjacu6nGpQhdyrVe2swgqYi8TT/+tPzgjvYk4nn0TfDznNGVW+75XD4XtDqPbp3Ytbe4UazJo3dn+C2q4N4t1Rc3HlaF8NqXl3f8WW2s7r4Y5E=
+    secure: dODQpXQx14wbK+5U2Jx6cyjhTNYuDETA8Y1Es7HVhjABy5YZnLTyN+3/TJA5FeHDxtHl41cS5mv0TSZu4MN6SFR9p4FLG+D35O2SI3BTcBEDwG9t8zdNaY8NzMjvIgdXDISIoS0yQhxTBThpl2+0a5Y7bRUlHJ27huo4tKfoHP9rGdHOpKWA8Oqss1ntQ1MHW573vIG4q7hbJm4jlKlDAH8h/YnKEcwEgremKnVZb3HCyElu6bB9nFnzaaPyLnNbUCl/uJxaqoBWAMcshwv+f2SXtbRaHGXSl1Alt9AeLehc/ibC15ZsqiSu2djZMrBGKh2GWWKLbbOl/5PBi0EpGrPLQl+SBRYR3+qKXtSMs6Z/50SYtrEf4W+uuZ0g60eoTQb0vOFlxf7sTvMg3//BB/lixgHXoTqfrNcP5RiEXTfLnzkHbDW0wQebXlMBKr+QdpadgM2mxeosN9fGoGxE2K49uKhZIcPSEWVbjRmmnvDIbJxBZZa559oDOZhu29xn6UDT1/mR0oV6lgN5Job4DDCreifUzFXz8dEOUtnWjgWWz1IIcoFuUEZey807b0PJS4pJHMeDuaZDHxS8Nawj8stLoADS9L1SOT1xH+S4Noqn5Bp7di4/Kj7TmEtkTpYJMd5Qm0+DVUBY/8Ww/IdMcbDkzwChVTx4msS2ljmMJoI=
   file:
     - 'dist/loglady 1.0.0.AppImage'
     - 'dist/loglady-1.0.0.dmg'
