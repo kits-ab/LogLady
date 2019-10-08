@@ -147,10 +147,6 @@ const handleShowOpenDialog = async (state, sender) => {
   );
 };
 
-const customError = reason => {
-  return { code: 'CUSTOM', reason: reason };
-};
-
 const sendError = (sender, message, error) => {
   const errorSender = error => {
     const action = {
