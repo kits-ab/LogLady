@@ -137,12 +137,12 @@ const handleShowOpenDialog = async (state, sender) => {
     },
     async filePaths => {
       if (filePaths === undefined) return;
-
-      const filePath = filePaths[0];
-      if (await openFile(sender, filePath)) {
-        state.recentFiles = addRecentFile(state.recentFiles, filePath);
-        updateRecentFiles(state.recentFiles);
-      }
+      filePaths.forEach(async filePath => {
+        if (await openFile(sender, filePath)) {
+          state.recentFiles = addRecentFile(state.recentFiles, filePath);
+          updateRecentFiles(state.recentFiles);
+        }
+      });
     }
   );
 };
