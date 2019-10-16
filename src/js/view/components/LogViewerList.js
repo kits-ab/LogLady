@@ -148,6 +148,7 @@ const LogViewerList = props => {
         <span>A</span>
       </LogLineRuler>
       <VariableSizeList
+        style={{ willChange: 'unset' }}
         ref={variableSizeListRef}
         outerRef={variableSizeListOuterRef}
         width={listDimensions.width}
