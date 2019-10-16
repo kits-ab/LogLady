@@ -1,6 +1,4 @@
-const electron = require('electron');
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const isDev = require('electron-is-dev');
 const updater = require('electron-simple-updater');
@@ -13,7 +11,7 @@ engine.start();
 
 console.log(updater.version);
 
-let mainWindow;
+let mainWindow, hiddenBackgroundWindow;
 
 const windowStateKeeper = windowName => {
   let window, windowState;
@@ -69,7 +67,7 @@ const createWindow = async () => {
     darkTheme: true,
     webPreferences: {
       devTools: isDev ? true : false,
-      preload: path.join(__dirname, '..', 'src', 'js', 'view', 'preload.js')
+      preload: path.join(__dirname, '..', '/src/js/view/preload.js')
     },
     icon: path.join(__dirname, './icons/png/256x256.png'),
     show: false
@@ -83,6 +81,8 @@ const createWindow = async () => {
   };
 
   let loadingWindow = new BrowserWindow(loadWindowOptions);
+
+  hiddenBackgroundWindow = new BrowserWindow(loadWindowOptions);
 
   mainWindow = new BrowserWindow(windowOptions);
   mainWindowStateKeeper.track(mainWindow);
@@ -99,9 +99,13 @@ const createWindow = async () => {
         : `file://${path.join(__dirname, '../build/index.html')}`
     );
   });
-  loadingWindow.loadURL(
-    `file://${path.join(__dirname, '../src/resources/loadingSpinner.html')}`
+  loadingWindow.loadFile(
+    path.join(__dirname, '../src/resources/loadingSpinner.html')
   );
+  hiddenBackgroundWindow.loadFile(
+    path.join(__dirname, '..', '/src/resources/hiddenWindow.html')
+  );
+
   mainWindow.on('close', () => {
     const argObj = { type: 'QUIT' };
     mainWindow.webContents.send('backendMessages', argObj);
@@ -114,6 +118,15 @@ const createWindow = async () => {
   });
   menu.setWebContents(mainWindow.webContents);
 };
+
+// Forward hiddenWindowMessages to the window that didn't send it
+ipcMain.on('hiddenWindowMessages', (event, args) => {
+  if (event.sender === hiddenBackgroundWindow.webContents) {
+    mainWindow.webContents.send('hiddenWindowMessages', args);
+  } else if (event.sender === mainWindow.webContents) {
+    hiddenBackgroundWindow.webContents.send('hiddenWindowMessages', args);
+  }
+});
 
 app.on('ready', createWindow);
 
