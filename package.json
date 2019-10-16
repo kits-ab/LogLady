@@ -16,6 +16,7 @@
     "fs-backwards-stream": "^1.0.0",
     "lodash": "^4.17.15",
     "md5": "^2.2.1",
+    "memoize-one": "^5.1.1",
     "node-notifier": "^5.4.3",
     "nthline": "^1.0.1",
     "react": "^16.9.0",

@@ -1,14 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import { VariableSizeList } from 'react-window';
+import memoize from 'memoize-one';
 import {
   LogViewerListContainer,
-  LogLine,
   LogLineRuler
 } from '../styledComponents/LogViewerListStyledComponents';
-import TextHighlightRegex from './TextHighlightRegex';
+import SingleLogLineTranslator from './SingleLogLine';
 
 import _ from 'lodash';
+
+const createItemData = memoize(
+  (lines, highlightColor, elementWidth, shouldWrap) => {
+    return {
+      lines,
+      highlightColor,
+      elementWidth,
+      shouldWrap
+    };
+  }
+);
 
 const LogViewerList = props => {
   const variableSizeListRef = useRef(); // Reference to the React List component. Used for calling the lists functions to reset the cache of sizes
@@ -29,6 +40,15 @@ const LogViewerList = props => {
     width: 10,
     height: 19
   });
+
+  // Itemdata is used to pass all of the needed props and values from this component to the component that renders a single line
+  const itemData = createItemData(
+    props.lines,
+    props.highlightColor,
+    logLineElementWidth,
+    props.wrapLines
+  );
+
   useEffect(() => {
     // Handler to update the dimensions when needed
     const handleResize = () => {
@@ -119,29 +139,6 @@ const LogViewerList = props => {
     }
   };
 
-  /**
-   * Component for rendering a single line based on the index React-window sends as argument.
-   * I wanted to use Memoization to improve performance on this, but every element got rerendered and mounted whenever a line was added, even though the args didn't change.
-   */
-  const SingleLogLineRenderer = ({ index, style }) => {
-    let line = props.lines[index];
-    return (
-      <LogLine
-        style={{
-          ...style,
-          width: logLineElementWidth + 'px'
-        }}
-        wrap={props.wrapLines ? 'true' : undefined}
-      >
-        {/^\[HLL\].*\[\/HLL\]$/.test(line) ? (
-          <TextHighlightRegex text={line} color={props.highlightColor} />
-        ) : (
-          <span>{line}</span>
-        )}
-      </LogLine>
-    );
-  };
-
   return (
     <LogViewerListContainer ref={logViewerListContainerRef}>
       <LogLineRuler ref={oneCharacterSizeRef}>
@@ -155,8 +152,9 @@ const LogViewerList = props => {
         height={listDimensions.height}
         itemCount={props.lines.length}
         itemSize={getItemSizeAtPosition}
+        itemData={itemData}
       >
-        {SingleLogLineRenderer}
+        {SingleLogLineTranslator}
       </VariableSizeList>
     </LogViewerListContainer>
   );
