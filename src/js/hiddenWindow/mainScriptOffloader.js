@@ -1,11 +1,14 @@
 /* eslint-disable no-unused-vars */
 /**
- * This file is used to offload work from the main process. It was created for #258 for filtering logs in another thread.
- * Usage: Main window sends an array of lines to filter and highlight using IPC and this helper then starts working through these lines, sending them back using IPC when finished or as it's going.
+ * This file is used to offload work from the main process.
+ * It was created for #258 for filtering logs in another thread, check PR #331 for more info.
+ * Usage:
+ * - Main window sends an array of lines to filter and highlight using IPC
+ * - This helper then starts working through these lines, sending them back using IPC when finished or as it's going.
  */
 
 /**
- * Class filtering and highlighting lines of text
+ * Class for filtering and highlighting lines of text
  * @class
  */
 class LogsFiltererAndHighlighter {
@@ -24,11 +27,12 @@ class LogsFiltererAndHighlighter {
   }
 
   /**
-   * Loops through all lines, filtering and highlighting them using the regexes supplied. If filter is not set, or filter matches it will try to highlight.
-   * If highlight matches will wrap the entire line with [HLL] and [/HLL] for showing that the line should be highlighted, and wrap words with [HLG{a number}] and [/HLG{same number}] for showing that the specific word should be highlighted.
-   * HLL for highlight line and HLG for hightlight group
+   * Loops through all lines, filtering and highlighting them using the regexes supplied.
+   * Will try to highlight if filter matches or filter is not set
+   * Highlighting works by wrapping the entire line with [HLL] and [/HLL],
+   * and wrapping words with [HLG(number)] and [/HLG(number)]
    * @public
-   * @param {boolean} [sendLinesOneByOne=false] - Whether to send the lines one by one as they are filtered and highlighted, or as bulk when everything is done. Defaults to false
+   * @param {boolean} [sendLinesOneByOne=false]
    */
   start(sendLinesOneByOne = false) {
     let filteredAndHighlightedLines = [];
@@ -45,9 +49,8 @@ class LogsFiltererAndHighlighter {
           line =
             '[HLL]' +
             line.replace(this.highlightRegex, match => {
-              highlightCount++;
               return (
-                `[HLG${highlightCount}]` + match + `[/HLG${highlightCount}]`
+                `[HLG${++highlightCount}]` + match + `[/HLG${highlightCount}]`
               );
             }) +
             '[/HLL]';
@@ -92,7 +95,8 @@ class LogsFiltererAndHighlighter {
 }
 
 /**
- * Register a listener for messages from the main window addressed to here. Remember that the message has been stringified/serialized!
+ * Register a listener for messages from the main window addressed to here.
+ * Remember that the message has been stringified/serialized!
  * The message argument should contain these parameters:
  * @param {object} args - A object that was sent with the message.
  * @param {string} args.type - The type of request

@@ -13,7 +13,10 @@ const LogViewer = props => {
   const [filteredAndHighlightedLines, setLines] = useState([]);
 
   const sendMessageToHiddenWindow = args => {
-    // Send a message to the hidden window that it should filter the logs. IPC messages go through the main process and are stringified - but JSON can't serialize RegExes, so I use toString before that
+    /* Send a message to the hidden window that it should filter the logs.
+    IPC messages go through the main process and are stringified,
+    but JSON can't serialize RegExes, so toString is used before that.
+    For more information see mainScriptOffloader.js */
     let filterRegex = parseRegExp(props.filterInput),
       highlightRegex = parseRegExp(props.highlightInput);
     window.ipcRenderer.send('hiddenWindowMessages', {
@@ -62,7 +65,8 @@ const LogViewer = props => {
 
   useEffect(() => {
     if (props.logs[props.source.path]) {
-      // Only send lines one by one if there already are lines set. Slice used so only newer lines is sent or the entire array if no lines
+      /* Only send lines one by one if there already are lines set.
+      Slice used so only newer lines is sent or the entire array if no lines */
       sendMessageToHiddenWindow({
         sendLinesOneByOne:
           filteredAndHighlightedLines.length > 0 ? true : false,

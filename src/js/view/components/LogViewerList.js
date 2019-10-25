@@ -25,7 +25,7 @@ const LogViewerList = props => {
   const variableSizeListRef = useRef(); // Reference to the React List component. Used for calling the lists functions to reset the cache of sizes
   const variableSizeListOuterRef = useRef(); // Reference to the actual DOM element. Used for manually scrolling to the bottom
 
-  const [logLineElementWidth, setLogLineElementWidth] = useState(1); // Used to set and change the width the LogLine elements should be
+  const [logLineElementWidth, setLogLineElementWidth] = useState(1); // Used to save and set the width the LogLine elements should be
   const [maxLineLength, setCurrentMaxLineLength] = useState(1); // Used to save and update how many characters the longest line has
   const [lastLineCount, setLastLineCount] = useState(0); // Used to keep track of how many lines there were last render, for optimizing mainly calculation of new lines
 
@@ -41,7 +41,7 @@ const LogViewerList = props => {
     height: 19
   });
 
-  // Itemdata is used to pass all of the needed props and values from this component to the component that renders a single line
+  // Itemdata used to send needed props and state from this component to the pure component that renders a single line
   const itemData = createItemData(
     props.lines,
     props.highlightColor,
@@ -116,7 +116,8 @@ const LogViewerList = props => {
   }, [props.lines]);
 
   /**
-   * Returns the row height needed for an item at position index, based on if it should wrap lines and how many characters fit in the window
+   * Returns the row height needed for an item at position index,
+   * based on if it should wrap lines and how many characters fit in the window
    * @function
    * @param {Number} index - the index of the item
    * @returns The rowheight to use, in pixels.
