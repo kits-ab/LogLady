@@ -46,7 +46,7 @@ const handleFileOpened = (
   dispatch,
   { filePath, fileSize, endIndex, history }
 ) => {
-  clearAllLogs(dispatch);
+  // clearAllLogs(dispatch);
   setFileData(dispatch, filePath, fileSize, history);
 
   const followSource = {

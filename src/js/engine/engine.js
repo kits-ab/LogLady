@@ -134,7 +134,6 @@ const handleShowOpenDialog = async (state, sender) => {
   dialog.showOpenDialog(
     {
       properties: ['openFile', 'multiSelections']
-
     },
     async filePaths => {
       if (filePaths === undefined) return;
