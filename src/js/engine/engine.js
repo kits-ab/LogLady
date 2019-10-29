@@ -133,7 +133,8 @@ const handleFollowFile = (sender, { filePath, fromIndex }) => {
 const handleShowOpenDialog = async (state, sender) => {
   dialog.showOpenDialog(
     {
-      properties: ['openFile']
+      properties: ['openFile', 'multiSelections']
+
     },
     async filePaths => {
       if (filePaths === undefined) return;
