@@ -62,6 +62,15 @@ export const setFileData = (dispatch, filePath, fileSize, history) => {
   });
 };
 
+export const clearLog = (dispatch, filePath) => {
+  dispatch({
+    type: 'LOGVIEWER_REMOVE_LOG',
+    data: {
+      sourcePath: filePath
+    }
+  });
+};
+
 export const clearAllLogs = dispatch => {
   dispatch({
     type: 'LOGVIEWER_CLEAR'
