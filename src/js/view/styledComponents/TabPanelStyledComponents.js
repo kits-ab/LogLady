@@ -24,3 +24,10 @@ export const TabPanel = styled.div`
   background: #ccc;
   padding-top: 1px;
 `;
+
+export const Button = styled.div`
+  background: darkgrey;
+  border-radius: 50%;
+  display: inline-block;
+  padding: 5px;
+`;

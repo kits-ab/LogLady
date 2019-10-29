@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { Tab, TabPanel } from '../styledComponents/TabPanelStyledComponents';
+import {
+  Tab,
+  TabPanel,
+  Button
+} from '../styledComponents/TabPanelStyledComponents';
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
-
+import { clearLog } from '../actions/dispatchActions';
 function TabPanelContainer(props) {
   const [state, setState] = useState(0);
 
@@ -11,6 +15,10 @@ function TabPanelContainer(props) {
     setState(index);
   }
   console.log(props.state);
+
+  function exitLog(sourcePath) {
+    clearLog(props.dispatch, sourcePath);
+  }
 
   return (
     <TabPanel>
@@ -28,6 +36,13 @@ function TabPanelContainer(props) {
               log,
               `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
             )}
+            <Button
+              onClick={() => {
+                exitLog(log);
+              }}
+            >
+              X
+            </Button>
           </Tab>
         );
       })}
