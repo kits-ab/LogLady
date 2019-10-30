@@ -15,7 +15,6 @@ function TabPanelContainer(props) {
     updateSourceHandle(props.dispatch, index);
     setState(index);
   }
-  console.log(props.state);
 
   function exitLog(sourcePath) {
     clearLog(props.dispatch, sourcePath);
@@ -24,7 +23,6 @@ function TabPanelContainer(props) {
   return (
     <TabPanel>
       {Object.keys(props.menuState.openSources).map(source => {
-        console.log(source);
         return (
           <Tab
             key={props.menuState.openSources[source].index}
