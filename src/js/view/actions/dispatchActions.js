@@ -44,6 +44,13 @@ export const setSource = (dispatch, sourcePath) => {
   });
 };
 
+export const updateSourceHandle = (dispatch, newSourceHandle) => {
+  dispatch({
+    type: 'UPDATE_CURRENT_SOURCE_HANDLE',
+    data: { newSourceHandle }
+  });
+};
+
 export const setFileData = (dispatch, filePath, fileSize, history) => {
   dispatch({
     type: 'LOGVIEWER_SET_LOG',

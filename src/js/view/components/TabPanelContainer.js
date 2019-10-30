@@ -7,11 +7,12 @@ import {
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
-import { clearLog } from '../actions/dispatchActions';
+import { clearLog, updateSourceHandle } from '../actions/dispatchActions';
 function TabPanelContainer(props) {
   const [state, setState] = useState(0);
 
   function tabOnClick(index) {
+    updateSourceHandle(props.dispatch, index);
     setState(index);
   }
   console.log(props.state);
@@ -22,23 +23,26 @@ function TabPanelContainer(props) {
 
   return (
     <TabPanel>
-      {Object.keys(props.logViewerState.logs).map((log, index) => {
+      {Object.keys(props.menuState.openSources).map(source => {
+        console.log(source);
         return (
           <Tab
-            key={index}
-            selected={index === state ? true : false}
-            index={index}
+            key={props.menuState.openSources[source].index}
+            selected={
+              props.menuState.openSources[source].index === state ? true : false
+            }
+            index={props.menuState.openSources[source].index}
             onClick={() => {
-              tabOnClick(index);
+              tabOnClick(props.menuState.openSources[source].index);
             }}
           >
             {getFormattedFilePath(
-              log,
+              props.menuState.openSources[source].path,
               `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
             )}
             <Button
               onClick={() => {
-                exitLog(log);
+                exitLog(props.menuState.openSources[source].path);
               }}
             >
               X
@@ -54,7 +58,7 @@ function TabPanelContainer(props) {
 const mapStateToProps = function(state) {
   return {
     state: state,
-    logViewerState: state.logViewerState
+    menuState: state.menuState
   };
 };
 

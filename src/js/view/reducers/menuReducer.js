@@ -86,6 +86,12 @@ export const menuReducer = (state = initialState, action) => {
 
     case 'MENU_STATE_RESTORE':
       return isValidState(action.data) ? { ...action.data } : initialState;
+    case 'UPDATE_CURRENT_SOURCE_HANDLE':
+      const { newSourceHandle } = action.data;
+      return {
+        ...state,
+        currentSourceHandle: newSourceHandle
+      };
     default:
       return state;
   }
