@@ -178,7 +178,7 @@ const createEventHandler = state => {
         handleOpenFile(state, sender, _argObj.data);
         break;
       case 'SOURCE_FOLLOW':
-        fileReader.stopAllWatchers();
+        // fileReader.stopAllWatchers();
         handleFollowSource(sender, _argObj.data);
         break;
       case 'SOURCE_UNFOLLOW':

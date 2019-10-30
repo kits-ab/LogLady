@@ -69,9 +69,17 @@ export const menuReducer = (state = initialState, action) => {
       const { sourcePath } = action.data;
       const index = state.nextIndex;
       const source = { path: sourcePath, index };
+      const sourcesToKeep = {};
+
+      for(let [index, sourceObject] of Object.entries(state.openSources)) {
+        if(sourceObject.path !== sourcePath) {
+          sourcesToKeep[index] = sourceObject;
+        }
+      }
+
       return {
         ...state,
-        openSources: { [index]: source },
+        openSources: { ...sourcesToKeep, [index]: source },
         currentSourceHandle: index,
         nextIndex: nextIndex(index)
       };
