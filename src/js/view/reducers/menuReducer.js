@@ -71,8 +71,8 @@ export const menuReducer = (state = initialState, action) => {
       const source = { path: sourcePath, index };
       const sourcesToKeep = {};
 
-      for(let [index, sourceObject] of Object.entries(state.openSources)) {
-        if(sourceObject.path !== sourcePath) {
+      for (let [index, sourceObject] of Object.entries(state.openSources)) {
+        if (sourceObject.path !== sourcePath) {
           sourcesToKeep[index] = sourceObject;
         }
       }
