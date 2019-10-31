@@ -103,6 +103,29 @@ export const clearSources = dispatch => {
   });
 };
 
+export const clearSource = (dispatch, filePath) => {
+  dispatch({
+    type: 'LOGVIEWER_REMOVE_LOG',
+    data: {
+      sourcePath: filePath
+    }
+  });
+
+  dispatch({
+    type: 'MENU_CLEAR_ITEM',
+    data: {
+      sourcePath: filePath
+    }
+  });
+
+  dispatch({
+    type: 'LOGINFO_REMOVE_LOG',
+    data: {
+      sourcePath: filePath
+    }
+  });
+};
+
 export const hideSnackBar = dispatch => {
   dispatch({
     type: 'SNACKBAR_HIDE'

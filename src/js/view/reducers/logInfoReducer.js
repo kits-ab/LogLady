@@ -28,6 +28,22 @@ export const logInfoReducer = (state = initialState, action) => {
         logSizes: { ...state.logSizes, [sourcePath]: size }
       };
     }
+    case 'LOGINFO_REMOVE_LOG': {
+      const { sourcePath } = action.data;
+      const logsToKeep = {};
+
+      // Find which logs to keep
+      for (let [source, log] of Object.entries(state.logSizes)) {
+        if (source !== sourcePath) {
+          logsToKeep[source] = log;
+        }
+      }
+
+      return {
+        ...state,
+        logSizes: { ...logsToKeep }
+      };
+    }
     default:
       return state;
   }
