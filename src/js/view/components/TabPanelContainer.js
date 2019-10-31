@@ -12,24 +12,19 @@ import { closeFile } from './helpers/handleFileHelper';
 
 function TabPanelContainer(props) {
   const [state, setState] = useState({});
-  console.log(props.state);
+
   function tabOnClick(index) {
     updateSourceHandle(props.dispatch, index);
-    setState({
-      active: index
-    });
   }
 
   function onMouseEnter(index) {
     setState({
-      ...state,
       hover: index
     });
   }
 
   function onMouseLeave() {
     setState({
-      ...state,
       hover: ''
     });
   }
@@ -79,7 +74,8 @@ function TabPanelContainer(props) {
                   : false
               }
               selected={
-                props.menuState.openSources[source].index === state.active
+                props.menuState.openSources[source].index ===
+                props.menuState.currentSourceHandle
                   ? true
                   : false
               }
