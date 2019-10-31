@@ -65,6 +65,46 @@ export const menuReducer = (state = initialState, action) => {
     case 'MENU_CLEAR':
       return { ...state, openSources: {}, currentSourceHandle: undefined };
 
+    case 'MENU_CLEAR_ITEM': {
+      const { sourcePath } = action.data;
+      const sourcesToKeep = {};
+      let newSourceHandle = undefined;
+
+      for (let [index, sourceObject] of Object.entries(state.openSources)) {
+        let indexAsInt = parseInt(index);
+        if (sourceObject.path !== sourcePath) {
+          sourcesToKeep[indexAsInt] = sourceObject;
+        } else {
+          // Check if we are closing the currently active tab
+          // If so, set new active tab
+          if (indexAsInt === state.currentSourceHandle) {
+            let sourceIndexes = Object.keys(state.openSources);
+
+            if (sourceIndexes[sourceIndexes.length - 1] === index) {
+              // If closing tab is the last tab, set focus to next to last tab
+              newSourceHandle = parseInt(
+                sourceIndexes[sourceIndexes.length - 2]
+              );
+            } else {
+              // Otherwise, focus next tab in order
+              newSourceHandle = parseInt(
+                sourceIndexes[sourceIndexes.indexOf(index) + 1]
+              );
+            }
+          } else {
+            newSourceHandle = state.currentSourceHandle;
+          }
+        }
+      }
+
+      return {
+        ...state,
+        openSources: {
+          ...sourcesToKeep
+        },
+        currentSourceHandle: newSourceHandle
+      };
+    }
     case 'MENU_SET_SOURCE':
       const { sourcePath } = action.data;
       const index = state.nextIndex;
