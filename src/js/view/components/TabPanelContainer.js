@@ -46,7 +46,8 @@ function TabPanelContainer(props) {
           <Tab
             key={props.menuState.openSources[source].index}
             selected={
-              props.menuState.openSources[source].index === state.active
+              props.menuState.openSources[source].index ===
+              props.menuState.currentSourceHandle
                 ? true
                 : false
             }
