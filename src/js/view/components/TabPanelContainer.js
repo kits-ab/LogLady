@@ -7,7 +7,9 @@ import {
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
-import { clearLog, updateSourceHandle } from '../actions/dispatchActions';
+import { updateSourceHandle } from '../actions/dispatchActions';
+import { closeFile } from './helpers/handleFileHelper';
+
 function TabPanelContainer(props) {
   const [state, setState] = useState(0);
 
@@ -17,7 +19,7 @@ function TabPanelContainer(props) {
   }
 
   function exitLog(sourcePath) {
-    clearLog(props.dispatch, sourcePath);
+    closeFile(props.dispatch, sourcePath);
   }
 
   return (
