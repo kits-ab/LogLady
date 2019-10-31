@@ -1,14 +1,13 @@
 import styled from 'styled-components';
 
 export const Tab = styled.div`
-
   cursor: default;
   background-color: ${props => {
     let backgroundColor = '#ccc';
-    if(props.hover && !props.selected) {
-      backgroundColor =  '#B8B8B8'
+    if (props.hover && !props.selected) {
+      backgroundColor = '#B8B8B8';
     } else if (props.selected) {
-      backgroundColor = 'darkgrey'
+      backgroundColor = 'darkgrey';
     }
     return backgroundColor;
   }};
@@ -34,7 +33,6 @@ export const TabPanel = styled.div`
   padding-top: 1px;
   overflow: auto;
   white-space: nowrap;
-  
 `;
 
 export const Button = styled.div`
