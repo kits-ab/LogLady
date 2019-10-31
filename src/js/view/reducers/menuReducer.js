@@ -60,6 +60,26 @@ export const isValidState = state => {
   );
 };
 
+const findNextSourceHandle = (index, state) => {
+  let indexAsInt = parseInt(index);
+  // Check if we are closing the currently active tab
+  if (indexAsInt === state.currentSourceHandle) {
+    // If so, set new active tab
+    let sourceIndexes = Object.keys(state.openSources);
+
+    if (sourceIndexes[sourceIndexes.length - 1] === index) {
+      // If closing tab is the last tab, set focus to next to last tab
+      return parseInt(sourceIndexes[sourceIndexes.length - 2]);
+    } else {
+      // Otherwise, focus next tab in order
+      return parseInt(sourceIndexes[sourceIndexes.indexOf(index) + 1]);
+    }
+  } else {
+    // We did not close currently active tab, do not switch current source
+    return state.currentSourceHandle;
+  }
+};
+
 export const menuReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'MENU_CLEAR':
@@ -71,29 +91,11 @@ export const menuReducer = (state = initialState, action) => {
       let newSourceHandle = undefined;
 
       for (let [index, sourceObject] of Object.entries(state.openSources)) {
-        let indexAsInt = parseInt(index);
         if (sourceObject.path !== sourcePath) {
-          sourcesToKeep[indexAsInt] = sourceObject;
+          sourcesToKeep[index] = sourceObject;
         } else {
-          // Check if we are closing the currently active tab
-          // If so, set new active tab
-          if (indexAsInt === state.currentSourceHandle) {
-            let sourceIndexes = Object.keys(state.openSources);
-
-            if (sourceIndexes[sourceIndexes.length - 1] === index) {
-              // If closing tab is the last tab, set focus to next to last tab
-              newSourceHandle = parseInt(
-                sourceIndexes[sourceIndexes.length - 2]
-              );
-            } else {
-              // Otherwise, focus next tab in order
-              newSourceHandle = parseInt(
-                sourceIndexes[sourceIndexes.indexOf(index) + 1]
-              );
-            }
-          } else {
-            newSourceHandle = state.currentSourceHandle;
-          }
+          // Update sourcehandle in case we are closing currently active tab
+          newSourceHandle = findNextSourceHandle(index, state);
         }
       }
 
