@@ -182,7 +182,7 @@ const createEventHandler = state => {
         handleFollowSource(sender, _argObj.data);
         break;
       case 'SOURCE_UNFOLLOW':
-        fileReader.stopWatcher(_argObj);
+        fileReader.stopWatcher(_argObj.filePath);
         break;
       case 'STATE_SAVE':
         fileReader.saveStateToDisk(_argObj.reduxStateValue);
