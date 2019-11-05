@@ -112,6 +112,7 @@ const createWindow = async () => {
     mainWindow = null;
     quitApplication();
   });
+  mainWindow.webContents.openDevTools();
   menu.setWebContents(mainWindow.webContents);
 };
 

@@ -1,7 +1,6 @@
 import {
   setFileData,
   setSource,
-  clearAllLogs,
   showSnackBar,
   addNewLines,
   increaseSize
@@ -25,12 +24,13 @@ const handleSourceOpened = (dispatch, { sourceType, ...rest }) => {
 };
 
 const handleStateSet = (publisher, state) => {
-  let openedSource;
+  let sourcesToOpen = [];
 
-  // Save previously opened source for reopening of the file
+  // Get all sources to open
   if (state.menuState) {
-    const openedSourceHandle = state.menuState.currentSourceHandle;
-    openedSource = (state.menuState.openSources || {})[openedSourceHandle];
+    Object.values(state.menuState.openSources).forEach(openSource => {
+      sourcesToOpen.push(openSource);
+    });
 
     // Set previously opened file to undefined so it isn't opened if the opening process fails
     state.menuState.currentSourceHandle = undefined;
@@ -38,15 +38,19 @@ const handleStateSet = (publisher, state) => {
 
   publisher.populateStore(state);
 
-  // Open file after the store is populated
-  if (openedSource) openFile(openedSource.path);
+  // Open all files after the store is populated
+  if (sourcesToOpen) {
+    sourcesToOpen.forEach(sourceToOpen => {
+      openFile(sourceToOpen.path);
+    });
+  }
 };
 
 const handleFileOpened = (
   dispatch,
   { filePath, fileSize, endIndex, history }
 ) => {
-  clearAllLogs(dispatch);
+  // clearAllLogs(dispatch);
   setFileData(dispatch, filePath, fileSize, history);
 
   const followSource = {

@@ -133,22 +133,18 @@ const handleFollowFile = (sender, { filePath, fromIndex }) => {
 const handleShowOpenDialog = async (state, sender) => {
   dialog.showOpenDialog(
     {
-      properties: ['openFile']
+      properties: ['openFile', 'multiSelections']
     },
     async filePaths => {
       if (filePaths === undefined) return;
-
-      const filePath = filePaths[0];
-      if (await openFile(sender, filePath)) {
-        state.recentFiles = addRecentFile(state.recentFiles, filePath);
-        updateRecentFiles(state.recentFiles);
-      }
+      filePaths.forEach(async filePath => {
+        if (await openFile(sender, filePath)) {
+          state.recentFiles = addRecentFile(state.recentFiles, filePath);
+          updateRecentFiles(state.recentFiles);
+        }
+      });
     }
   );
-};
-
-const customError = reason => {
-  return { code: 'CUSTOM', reason: reason };
 };
 
 const sendError = (sender, message, error) => {
@@ -182,11 +178,11 @@ const createEventHandler = state => {
         handleOpenFile(state, sender, _argObj.data);
         break;
       case 'SOURCE_FOLLOW':
-        fileReader.stopAllWatchers();
+        // fileReader.stopAllWatchers();
         handleFollowSource(sender, _argObj.data);
         break;
       case 'SOURCE_UNFOLLOW':
-        fileReader.stopWatcher(_argObj);
+        fileReader.stopWatcher(_argObj.filePath);
         break;
       case 'STATE_SAVE':
         fileReader.saveStateToDisk(_argObj.reduxStateValue);

@@ -60,24 +60,82 @@ export const isValidState = state => {
   );
 };
 
+const findNextSourceHandle = (index, state) => {
+  let indexAsInt = parseInt(index);
+  // Check if we are closing the currently active tab
+  if (indexAsInt === state.currentSourceHandle) {
+    // If so, set new active tab
+    let sourceIndexes = Object.keys(state.openSources);
+
+    if (sourceIndexes[sourceIndexes.length - 1] === index) {
+      // If closing tab is the last tab, set focus to next to last tab
+      return parseInt(sourceIndexes[sourceIndexes.length - 2]);
+    } else {
+      // Otherwise, focus next tab in order
+      return parseInt(sourceIndexes[sourceIndexes.indexOf(index) + 1]);
+    }
+  } else {
+    // We did not close currently active tab, do not switch current source
+    return state.currentSourceHandle;
+  }
+};
+
 export const menuReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'MENU_CLEAR':
       return { ...state, openSources: {}, currentSourceHandle: undefined };
 
+    case 'MENU_CLEAR_ITEM': {
+      const { sourcePath } = action.data;
+      const sourcesToKeep = {};
+      let newSourceHandle = undefined;
+
+      Object.keys(state.openSources).forEach(sourceIndex => {
+        let sourceObject = state.openSources[sourceIndex];
+        if (sourceObject.path !== sourcePath) {
+          sourcesToKeep[sourceIndex] = sourceObject;
+        } else {
+          // Update sourcehandle in case we are closing currently active tab
+          newSourceHandle = findNextSourceHandle(sourceIndex, state);
+        }
+      });
+
+      return {
+        ...state,
+        openSources: {
+          ...sourcesToKeep
+        },
+        currentSourceHandle: newSourceHandle
+      };
+    }
     case 'MENU_SET_SOURCE':
       const { sourcePath } = action.data;
       const index = state.nextIndex;
       const source = { path: sourcePath, index };
+      const sourcesToKeep = {};
+
+      Object.keys(state.openSources).forEach(sourceIndex => {
+        let sourceObject = state.openSources[sourceIndex];
+        if (sourceObject.path !== sourcePath) {
+          sourcesToKeep[sourceIndex] = sourceObject;
+        }
+      });
+
       return {
         ...state,
-        openSources: { [index]: source },
+        openSources: { ...sourcesToKeep, [index]: source },
         currentSourceHandle: index,
         nextIndex: nextIndex(index)
       };
 
     case 'MENU_STATE_RESTORE':
       return isValidState(action.data) ? { ...action.data } : initialState;
+    case 'UPDATE_CURRENT_SOURCE_HANDLE':
+      const { newSourceHandle } = action.data;
+      return {
+        ...state,
+        currentSourceHandle: newSourceHandle
+      };
     default:
       return state;
   }

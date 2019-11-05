@@ -1,4 +1,5 @@
 import TabSettings from './components/TabSettings';
+import TabPanelContainer from './components/TabPanelContainer';
 import LogViewer from './components/LogViewer';
 import TopPanel from './components/TopPanel';
 import DefaultPage from './components/DefaultPage';
@@ -21,6 +22,7 @@ class App extends Component {
           <LogPage>
             <TopPanel />
             <TabSettings />
+            <TabPanelContainer />
             <LogViewer source={this.props.currentSource} />
             <StatusBar source={this.props.currentSource} />
           </LogPage>

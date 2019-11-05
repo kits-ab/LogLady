@@ -44,6 +44,13 @@ export const setSource = (dispatch, sourcePath) => {
   });
 };
 
+export const updateSourceHandle = (dispatch, newSourceHandle) => {
+  dispatch({
+    type: 'UPDATE_CURRENT_SOURCE_HANDLE',
+    data: { newSourceHandle }
+  });
+};
+
 export const setFileData = (dispatch, filePath, fileSize, history) => {
   dispatch({
     type: 'LOGVIEWER_SET_LOG',
@@ -58,6 +65,15 @@ export const setFileData = (dispatch, filePath, fileSize, history) => {
     data: {
       sourcePath: filePath,
       size: fileSize
+    }
+  });
+};
+
+export const clearLog = (dispatch, filePath) => {
+  dispatch({
+    type: 'LOGVIEWER_REMOVE_LOG',
+    data: {
+      sourcePath: filePath
     }
   });
 };
@@ -84,6 +100,29 @@ export const clearSources = dispatch => {
   dispatch({
     type: 'LOGINFO_SET_SIZE',
     data: ''
+  });
+};
+
+export const clearSource = (dispatch, filePath) => {
+  dispatch({
+    type: 'LOGVIEWER_REMOVE_LOG',
+    data: {
+      sourcePath: filePath
+    }
+  });
+
+  dispatch({
+    type: 'MENU_CLEAR_ITEM',
+    data: {
+      sourcePath: filePath
+    }
+  });
+
+  dispatch({
+    type: 'LOGINFO_REMOVE_LOG',
+    data: {
+      sourcePath: filePath
+    }
   });
 };
 
