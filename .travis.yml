@@ -13,11 +13,11 @@ branches:
 deploy:
   provider: releases
   api_key:
-    secure: euLb8PYutOT+b3wssd4K4sxrYTJv24it0cnVDPFyx0OB3pGZg7JlEr5MTR7IfSVY4fTUkfVzbTZrNuJdohsr0qPI5gyv+RUHhaRtmbrdF0+5tKFEPsGV6mljEjGvCxUw3YgdZz5Yv+gw31VaDkZ5pBkwBCsiC/jaby0F0rOq0vYUi8hrG+E3EMa4KAIruQoKurYE3eN4Wq6I8lWPegOZx5aXSEI8UYkJ6CGFKEvzD6gOhwjRsi+Z2FVdFZ8IPligmanx3MEOFi1GwHyT12kMri3L4JrposktWkKKy3Vtkn2jvlR5JOXeou9UYjYHrQBOM+ho81+/G1jHiH9D3eVgWBqMEupj/y+AQd5T9UnzE6EVlxVH8m0x27eCLO1QUFEHahxReZ2p0GmimueXic+Vhr8NIbaQMFvqlq3p8bOTkTGHm7DeOXtirey3mLP9kzow3mc1k6AE3FS7xTjn/OEu/ADR0jDcFTYuC9KzEhQPtUG8h9nHH2MK3slXbvqg0zXOPEOMPya3s0EtElOFeSBAm7EBqxS1qKImK5UbL4uVG1orcY71hF68ROy3Wcp/2qWd63QhC3yue0F6zArqVd219xUGcknq+8xtHTT4gQBBd22Y39m5f4ZijMor6Oua0CooUAsoiwyyUpQb/gUVjTpcn/7OAUbBwQpmHxD4x2/JcdA=
+    secure: hHEJcTGLLjtbk1foVHkn/u7JBl1N9x/TwkMq5fX8JVWCRdcXL06NZnwbt8vb/Ah7CLgvXvGrn77aU0qWlbtj8d+MBo7oTW/dgGzT7PyXKhq4uj+E6KYFcmjCJv3tSHxy4H3U304IRuXYQGhzKZceuvVUSKUReKUz64ICDwJvPnU57tYo1jLKv8T5ZQTgQZvd8roAhxhLKND/gatayr+4Jdyzr/LAwx3jeweWNFFOaBkgiwSov6cuf4GVQ9zk5SwqnKdNiTQp5h1mRbYLqem6qIyEgU7X3g8rVff4LumqqyL9jpqjAf0ppujgFL8dZ6ktAkIWo7/8DpA7Jfkf0MNg6e0FVos6r7/EWdgu3/OPRCTn6bSHznv15jpxclSzIV5uXjrcGXUgljm8oAUfyUQTYSn9xKMv+cgvO0OtmjfYE7hgNwt3odtcUp0jeKi4NJvuzDVaC+56QCFbx+bgkTUfS1ypmV6u3f5eNyDtd5mIPaE11pBXQP2CoKXvxFqLNodjxSe5vTB9cqeaHMmYgSYvhfD6jfvV77LFIyB+RjQfnbq9JZXMiZlhjFn6cNkUfK58oHxCpGTeMQ4qBekCbN7syWMJqNSUTjHbc+sZncexwPnMAg8gCmLCeY26bitXDAauiizm13Gof337AG52w88tzAOkqFpa1gOR+T8wyOnbqEs=
   file:
-    - 'dist/loglady 1.0.0.AppImage'
-    - 'dist/loglady-1.0.0.dmg'
-    - 'dist/loglady Setup 1.0.0.exe'
+    - 'dist/loglady-1.0.1.AppImage'
+    - 'dist/loglady-1.0.1.dmg'
+    - 'dist/loglady Setup 1.0.1.exe'
   skip_cleanup: true
   on:
     branch: master
