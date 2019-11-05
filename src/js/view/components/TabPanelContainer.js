@@ -12,9 +12,13 @@ import { closeFile } from './helpers/handleFileHelper';
 
 function TabPanelContainer(props) {
   const [state, setState] = useState({});
+  const {
+    menuState: { openSources, currentSourceHandle },
+    dispatch
+  } = props;
 
   function tabOnClick(index) {
-    updateSourceHandle(props.dispatch, index);
+    updateSourceHandle(dispatch, index);
   }
 
   function onMouseEnter(index) {
@@ -30,54 +34,40 @@ function TabPanelContainer(props) {
   }
 
   function exitLog(sourcePath, event) {
-    closeFile(props.dispatch, sourcePath);
+    closeFile(dispatch, sourcePath);
     event.stopPropagation();
   }
 
   return (
     <TabPanel>
-      {Object.keys(props.menuState.openSources).map(source => {
+      {Object.keys(openSources).map(source => {
         return (
           <Tab
-            key={props.menuState.openSources[source].index}
+            key={openSources[source].index}
             selected={
-              props.menuState.openSources[source].index ===
-              props.menuState.currentSourceHandle
-                ? true
-                : false
+              openSources[source].index === currentSourceHandle ? true : false
             }
-            hover={
-              props.menuState.openSources[source].index === state.hover
-                ? true
-                : false
-            }
-            index={props.menuState.openSources[source].index}
+            hover={openSources[source].index === state.hover ? true : false}
+            index={openSources[source].index}
             onClick={() => {
-              tabOnClick(props.menuState.openSources[source].index);
+              tabOnClick(openSources[source].index);
             }}
             onMouseEnter={() => {
-              onMouseEnter(props.menuState.openSources[source].index);
+              onMouseEnter(openSources[source].index);
             }}
             onMouseLeave={onMouseLeave}
           >
             {getFormattedFilePath(
-              props.menuState.openSources[source].path,
+              openSources[source].path,
               `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
             )}
             <Button
               onClick={event => {
-                exitLog(props.menuState.openSources[source].path, event);
+                exitLog(openSources[source].path, event);
               }}
-              hover={
-                props.menuState.openSources[source].index === state.hover
-                  ? true
-                  : false
-              }
+              hover={openSources[source].index === state.hover ? true : false}
               selected={
-                props.menuState.openSources[source].index ===
-                props.menuState.currentSourceHandle
-                  ? true
-                  : false
+                openSources[source].index === currentSourceHandle ? true : false
               }
             >
               X
