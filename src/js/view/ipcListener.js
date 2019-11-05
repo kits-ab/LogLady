@@ -1,7 +1,6 @@
 import {
   setFileData,
   setSource,
-  clearAllLogs,
   showSnackBar,
   addNewLines,
   increaseSize

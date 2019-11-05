@@ -90,14 +90,15 @@ export const menuReducer = (state = initialState, action) => {
       const sourcesToKeep = {};
       let newSourceHandle = undefined;
 
-      for (let [index, sourceObject] of Object.entries(state.openSources)) {
+      Object.keys(state.openSources).forEach(sourceIndex => {
+        let sourceObject = state.openSources[sourceIndex];
         if (sourceObject.path !== sourcePath) {
-          sourcesToKeep[index] = sourceObject;
+          sourcesToKeep[sourceIndex] = sourceObject;
         } else {
           // Update sourcehandle in case we are closing currently active tab
-          newSourceHandle = findNextSourceHandle(index, state);
+          newSourceHandle = findNextSourceHandle(sourceIndex, state);
         }
-      }
+      });
 
       return {
         ...state,
@@ -113,11 +114,12 @@ export const menuReducer = (state = initialState, action) => {
       const source = { path: sourcePath, index };
       const sourcesToKeep = {};
 
-      for (let [index, sourceObject] of Object.entries(state.openSources)) {
+      Object.keys(state.openSources).forEach(sourceIndex => {
+        let sourceObject = state.openSources[sourceIndex];
         if (sourceObject.path !== sourcePath) {
-          sourcesToKeep[index] = sourceObject;
+          sourcesToKeep[sourceIndex] = sourceObject;
         }
-      }
+      });
 
       return {
         ...state,

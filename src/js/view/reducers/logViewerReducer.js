@@ -6,12 +6,12 @@ export const logViewerReducer = (state = initialState, action) => {
       const { sourcePath } = action.data;
       const logsToKeep = {};
 
-      // Find which logs to keep
-      for (let [source, log] of Object.entries(state.logs)) {
+      Object.keys(state.logs).forEach(source => {
+        let log = state.logs[source];
         if (source !== sourcePath) {
           logsToKeep[source] = log;
         }
-      }
+      });
 
       return { ...state, logs: { ...logsToKeep } };
     }
