@@ -2,6 +2,19 @@ const initialState = { logs: {} };
 
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
+    case 'LOGVIEWER_REMOVE_LOG': {
+      const { sourcePath } = action.data;
+      const logsToKeep = {};
+
+      Object.keys(state.logs).forEach(source => {
+        let log = state.logs[source];
+        if (source !== sourcePath) {
+          logsToKeep[source] = log;
+        }
+      });
+
+      return { ...state, logs: { ...logsToKeep } };
+    }
     case 'LOGVIEWER_CLEAR':
       return {
         ...state,
