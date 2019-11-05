@@ -1,137 +1,162 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
 import React, { useState, useRef, useEffect } from 'react';
+import { VariableSizeList } from 'react-window';
+import memoize from 'memoize-one';
 import {
   LogViewerListContainer,
-  LogLine,
   LogLineRuler
 } from '../styledComponents/LogViewerListStyledComponents';
-import {
-  getRectSize,
-  maxLengthReducer
-} from 'js/view/components/helpers/measureHelper';
-import {
-  createRegexReducer,
-  createHeightReducer,
-  scrollToBottom
-} from 'js/view/components/helpers/logHelper';
+import SingleLogLineTranslator from './SingleLogLine';
+
 import _ from 'lodash';
-import TextHighlightRegex from './TextHighlightRegex';
-import WindowedList from 'react-list';
 
-/** Custom hook for a reduced value cache that only
- * reduces further values if the list supplied to
- * reduce is longer than the previous length */
-const useCache = v => {
-  const [length, setLength] = useState(0);
-  const [value, setValue] = useState(v);
-
-  const reduce = (reducer, list) => {
-    if (list.length <= length) return;
-    const items = list.slice(length);
-    setValue(items.reduce(reducer, value));
-    setLength(list.length);
-  };
-
-  const reset = v => {
-    setValue(v);
-    setLength(0);
-  };
-
-  return [value, reduce, reset];
-};
+const createItemData = memoize(
+  (lines, highlightColor, elementWidth, shouldWrap) => {
+    return {
+      lines,
+      highlightColor,
+      elementWidth,
+      shouldWrap
+    };
+  }
+);
 
 const LogViewerList = props => {
-  const logRef = useRef();
-  const listRef = useRef();
-  const rulerRef = useRef();
+  const variableSizeListRef = useRef(); // Reference to the React List component. Used for calling the lists functions to reset the cache of sizes
+  const variableSizeListOuterRef = useRef(); // Reference to the actual DOM element. Used for manually scrolling to the bottom
 
-  const clientWidth = logRef.current && logRef.current.clientWidth;
-  const charSize = rulerRef.current && getRectSize(rulerRef.current);
+  const [logLineElementWidth, setLogLineElementWidth] = useState(1); // Used to save and set the width the LogLine elements should be
+  const [maxLineLength, setCurrentMaxLineLength] = useState(1); // Used to save and update how many characters the longest line has
+  const [lastLineCount, setLastLineCount] = useState(0); // Used to keep track of how many lines there were last render, for optimizing mainly calculation of new lines
 
-  const [lines, linesReduce, linesReset] = useCache([]);
-  const [heights, heightsReduce, heightsReset] = useCache({});
-  const [maxLength, maxLengthReduce, maxLengthReset] = useCache(0);
+  const logViewerListContainerRef = useRef();
+  const [listDimensions, setListDimensions] = useState({
+    width: 575,
+    height: 145
+  });
 
-  const updateCaches = () => {
-    linesReduce(createRegexReducer(props.filterRegExp), props.lines);
-    maxLengthReduce(maxLengthReducer, lines);
-    heightsReduce(createHeightReducer(charSize, clientWidth), lines);
-  };
+  const oneCharacterSizeRef = useRef();
+  const [characterDimensions, setCharacterDimensions] = useState({
+    width: 10,
+    height: 19
+  });
 
-  const resetCaches = (reset = {}) => {
-    if (reset.lines !== false) linesReset([]);
-    if (reset.heights !== false) heightsReset({});
-    if (reset.maxLength !== false) maxLengthReset(0);
-  };
-
-  const getLineWidth = () => {
-    return props.wrapLines || !charSize ? clientWidth : maxLength * charSize[1];
-  };
+  // Itemdata used to send needed props and state from this component to the pure component that renders a single line
+  const itemData = createItemData(
+    props.lines,
+    props.highlightColor,
+    logLineElementWidth,
+    props.wrapLines
+  );
 
   useEffect(() => {
-    const onResize = _.debounce(() => {
-      resetCaches({ lines: false });
-    }, 222);
+    // Handler to update the dimensions when needed
+    const handleResize = () => {
+      setListDimensions({
+        width: logViewerListContainerRef.current.offsetWidth,
+        height: logViewerListContainerRef.current.offsetHeight
+      });
 
-    window.addEventListener('resize', onResize);
+      setCharacterDimensions({
+        width: oneCharacterSizeRef.current.offsetWidth,
+        height: oneCharacterSizeRef.current.offsetHeight
+      });
+    };
+    handleResize();
 
+    // Calls are throttled to once every 200 ms
+    const debouncedResizeHandler = _.debounce(handleResize, 200);
+
+    window.addEventListener('resize', debouncedResizeHandler);
+
+    // Return cleanup function
     return () => {
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener('resize', debouncedResizeHandler);
     };
   }, []);
 
   useEffect(() => {
-    resetCaches();
-  }, [props.filterRegExp]);
+    // Update the width to use for the list to fit the longest line if wraplines isn't set
+    setLogLineElementWidth(
+      props.wrapLines
+        ? listDimensions.width
+        : maxLineLength * characterDimensions.width
+    );
+    // Clear the list's cache of all item sizes
+    variableSizeListRef.current &&
+      variableSizeListRef.current.resetAfterIndex(0);
+  }, [
+    props.wrapLines,
+    maxLineLength,
+    listDimensions.width,
+    characterDimensions.width
+  ]);
 
   useEffect(() => {
-    if (charSize && clientWidth) updateCaches();
-  });
+    let currentMaxLength = maxLineLength;
+    let index = lastLineCount;
+    for (; index < props.lines.length; index++) {
+      // Remove all of the stuff hiddenWindow has added to it, as they shouldn't count towards the length of the string
+      let lineWithoutExtrasLength = props.lines[index].replace(
+        /\[\/?HL[LG\d]+\]/g,
+        ''
+      ).length;
+      if (lineWithoutExtrasLength > currentMaxLength) {
+        currentMaxLength = lineWithoutExtrasLength;
+      }
+    }
 
-  useEffect(() => {
-    if (props.scrollToBottom && lines.length > 0)
-      scrollToBottom(listRef.current, lines);
-  });
+    setCurrentMaxLineLength(currentMaxLength);
+    setLastLineCount(index);
 
-  const heightGetter = index => {
-    return index >= 0 && props.wrapLines
-      ? heights[lines[index].length]
-      : charSize[0];
+    if (props.scrollToBottom) {
+      variableSizeListOuterRef.current.scrollTop =
+        variableSizeListOuterRef.current.scrollHeight;
+    }
+  }, [props.lines]);
+
+  /**
+   * Returns the row height needed for an item at position index,
+   * based on if it should wrap lines and how many characters fit in the window
+   * @function
+   * @param {Number} index - the index of the item
+   * @returns The rowheight to use, in pixels.
+   */
+  const getItemSizeAtPosition = index => {
+    if (props.wrapLines) {
+      // Replace all of the stuff hiddenWindow has added to it, as they shouldn't count towards the length of the string
+      let lineWithoutExtrasLength = props.lines[index].replace(
+        /\[\/?HL[LG\d]*\]/g,
+        ''
+      ).length;
+      return (
+        Math.round(
+          (lineWithoutExtrasLength * characterDimensions.width) /
+            logLineElementWidth
+        ) * characterDimensions.height
+      );
+    } else {
+      return characterDimensions.height;
+    }
   };
 
   return (
-    <LogViewerListContainer ref={logRef}>
-      <LogLineRuler ref={rulerRef}>W</LogLineRuler>
-      <WindowedList
-        ref={listRef}
-        itemRenderer={(i, key) => {
-          const line = lines[i];
-          return (
-            <LogLine
-              key={key}
-              index={i}
-              minSize={0}
-              fixedWidth={getLineWidth()}
-              fixedHeight={heightGetter(i)}
-              wrap={props.wrapLines ? 'true' : undefined}
-            >
-              {props.highlightRegExp && props.highlightRegExp.test(line) ? (
-                <TextHighlightRegex
-                  text={line}
-                  color={props.highlightColor}
-                  regex={props.highlightRegExp}
-                />
-              ) : (
-                line
-              )}
-            </LogLine>
-          );
-        }}
-        itemSizeGetter={heightGetter}
-        length={lines.length}
-        type="variable"
-      />
+    <LogViewerListContainer ref={logViewerListContainerRef}>
+      <LogLineRuler ref={oneCharacterSizeRef}>
+        <span>A</span>
+      </LogLineRuler>
+      <VariableSizeList
+        style={{ willChange: 'unset' }}
+        ref={variableSizeListRef}
+        outerRef={variableSizeListOuterRef}
+        width={listDimensions.width}
+        height={listDimensions.height}
+        itemCount={props.lines.length}
+        itemSize={getItemSizeAtPosition}
+        itemData={itemData}
+      >
+        {SingleLogLineTranslator}
+      </VariableSizeList>
     </LogViewerListContainer>
   );
 };
