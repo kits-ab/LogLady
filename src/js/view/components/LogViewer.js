@@ -29,16 +29,15 @@ const LogViewer = props => {
   };
 
   const eventListenerIPCMessage = (event, args) => {
-    if (args.path === props.source.path) {
-      if (args.type === 'serveFilteredLogsOneDone') {
-        // Update state using updater form, as the state in this function is stale
-        setLines(lines => {
-          return lines.concat(args.line);
-        });
-      } else if (args.type === 'serveFilteredLogsAllDone') {
-        // Overwrite anything in the state
-        setLines(args.lines);
-      }
+    // Assume there is only one LogViewer sending messages. props is stale here, so it can't reliably be used to see if the lines are for this source
+    if (args.type === 'serveFilteredLogsOneDone') {
+      // Update state using updater form, as the state in this function is stale
+      setLines(lines => {
+        return lines.concat(args.line);
+      });
+    } else if (args.type === 'serveFilteredLogsAllDone') {
+      // Overwrite anything in the state
+      setLines(args.lines);
     }
   };
 
@@ -56,6 +55,8 @@ const LogViewer = props => {
   }, []);
 
   useEffect(() => {
+    /* Effect for when a new filter or highlight is applied,
+    send the lines to be filtered and highlighted again */
     if (props.logs[props.source.path]) {
       sendMessageToHiddenWindow({
         logs: props.logs[props.source.path]
@@ -64,6 +65,7 @@ const LogViewer = props => {
   }, [props.filterInput, props.highlightInput]);
 
   useEffect(() => {
+    // Effect for when new lines are added
     if (props.logs[props.source.path]) {
       /* Only send lines one by one if there already are lines set.
       Slice used so only newer lines is sent or the entire array if no lines */
@@ -76,6 +78,14 @@ const LogViewer = props => {
       });
     }
   }, [props.logs]);
+
+  useEffect(() => {
+    /* Effect for when another source is selected,
+    to send the correct lines to be filtered and highlighted and update the ref to be the correct source */
+    sendMessageToHiddenWindow({
+      logs: props.logs[props.source.path]
+    });
+  }, [props.source.path]);
 
   return (
     <LogViewerContainer>
