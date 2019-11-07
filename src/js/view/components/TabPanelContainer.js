@@ -7,18 +7,25 @@ import {
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
-import { updateSourceHandle } from '../actions/dispatchActions';
+import { updateSourceHandle, updateLastSeenLogSizes } from '../actions/dispatchActions';
 import { closeFile } from './helpers/handleFileHelper';
 
 function TabPanelContainer(props) {
   const [state, setState] = useState({});
   const {
     menuState: { openSources, currentSourceHandle },
+    logInfoState: { logSizes },
     dispatch
   } = props;
 
   function tabOnClick(index) {
+
+    const currentPath = openSources[currentSourceHandle].path;
+
+
+    updateLastSeenLogSizes(dispatch, currentPath, logSizes[currentPath]);
     updateSourceHandle(dispatch, index);
+    
   }
 
   function onMouseEnter(index) {
@@ -83,7 +90,8 @@ function TabPanelContainer(props) {
 const mapStateToProps = function(state) {
   return {
     state: state,
-    menuState: state.menuState
+    menuState: state.menuState,
+    logInfoState: state.logInfoState
   };
 };
 

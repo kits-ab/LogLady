@@ -51,6 +51,10 @@ export const updateSourceHandle = (dispatch, newSourceHandle) => {
   });
 };
 
+export const updateLastSeenLogSizes = (dispatch, path, fileSize) => {
+  console.log(path, fileSize);
+}
+
 export const setFileData = (dispatch, filePath, fileSize, history) => {
   dispatch({
     type: 'LOGVIEWER_SET_LOG',
