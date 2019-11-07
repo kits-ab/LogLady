@@ -32,12 +32,12 @@ export const logInfoReducer = (state = initialState, action) => {
       const { sourcePath } = action.data;
       const logsToKeep = {};
 
-      // Find which logs to keep
-      for (let [source, log] of Object.entries(state.logSizes)) {
+      Object.keys(state.logSizes).forEach(source => {
+        let log = state.logSizes[source];
         if (source !== sourcePath) {
           logsToKeep[source] = log;
         }
-      }
+      });
 
       return {
         ...state,

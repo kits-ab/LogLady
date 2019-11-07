@@ -18,14 +18,18 @@ export const groupByMatches = (string, regex) => {
     const match = result[0];
 
     //if textBeforeMatch is '' it means there was no characters between this match and the previous match, so append it to the previous match
-    if (!textBeforeMatch && array.length > 0) {
+    if (!result.groups && !textBeforeMatch && array.length > 0) {
       array[array.length - 1].text += match;
     } else if (match) {
       //normal text are strings and higlighted items are wrapped in an object so that we can see what text got highlighted later
       if (textBeforeMatch)
         array.push({ matched: false, text: textBeforeMatch });
 
-      array.push({ matched: true, text: match });
+      // Push only named group text if matched and available, otherwise entire match
+      array.push({
+        matched: true,
+        text: (result.groups && result.groups.text) || match
+      });
     } else {
       break; //can't do much if it matches ''
     }
