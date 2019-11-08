@@ -51,9 +51,25 @@ export const updateSourceHandle = (dispatch, newSourceHandle) => {
   });
 };
 
+export const setLastSeenLogSizeToSize = (dispatch, path, fileSize) => {
+  dispatch({
+    type: 'LOGINFO_SET_LAST_SEEN_SIZE_TO_SIZE',
+    data: {
+      sourcePath: path,
+      size: fileSize
+    }
+  });
+};
+
 export const updateLastSeenLogSizes = (dispatch, path, fileSize) => {
-  console.log(path, fileSize);
-}
+  dispatch({
+    type: 'UPDATE_LAST_SEEN_LOG_SIZE',
+    data: {
+      sourcePath: path,
+      size: fileSize
+    }
+  });
+};
 
 export const setFileData = (dispatch, filePath, fileSize, history) => {
   dispatch({

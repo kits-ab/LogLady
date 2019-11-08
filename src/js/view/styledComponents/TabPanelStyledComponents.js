@@ -9,6 +9,9 @@ export const Tab = styled.div`
     } else if (props.selected) {
       backgroundColor = 'darkgrey';
     }
+    // } else if (!props.selected && props.activity) {
+    //   backgroundColor = 'lightgreen';
+    // }
     return backgroundColor;
   }};
 
@@ -44,4 +47,23 @@ export const Button = styled.div`
   display: inline-block;
   padding: 5px;
   margin-left: 5px;
+`;
+
+export const Indicator = styled.div`
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  background-color: lightgreen;
+  border-radius: 50%;
+  position: relative;
+  top: -8px;
+  left: 5px;
+  border: darkgrey solid 1px;
+  opacity: ${props => {
+    let opacity = 0;
+    if (!props.selected && props.activity) {
+      opacity = 1;
+    }
+    return opacity;
+  }};
 `;

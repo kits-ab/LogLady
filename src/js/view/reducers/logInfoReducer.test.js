@@ -1,7 +1,7 @@
 import { logInfoReducer } from './logInfoReducer';
 
 describe('log info reducer', () => {
-  const initialState = { numberOfLines: 0, logSizes: {} };
+  const initialState = { numberOfLines: 0, logSizes: {}, lastSeenLogSizes: {} };
 
   it('should return the initial state', () => {
     expect(logInfoReducer(undefined, {})).toEqual(initialState);

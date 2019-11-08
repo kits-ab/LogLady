@@ -6,12 +6,25 @@ const engine = require('../src/js/engine/engine');
 const menu = require('../src/js/electron/menu');
 const appConfig = require('electron-settings');
 
+const {
+  default: installExtension,
+  REDUX_DEVTOOLS
+} = require('electron-devtools-installer');
+
 updater.init();
 engine.start();
 
 console.log(updater.version);
 
+
 let mainWindow, hiddenBackgroundWindow;
+
+
+app.on('ready', () => {
+  installExtension(REDUX_DEVTOOLS)
+    .then(name => console.log(`Added Extension: ${name}`))
+    .catch(err => console.log('An error occurred: ', err));
+});
 
 const windowStateKeeper = windowName => {
   let window, windowState;

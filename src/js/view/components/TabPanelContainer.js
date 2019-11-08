@@ -2,30 +2,31 @@ import React, { useState } from 'react';
 import {
   Tab,
   TabPanel,
-  Button
+  Button,
+  Indicator
 } from '../styledComponents/TabPanelStyledComponents';
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
-import { updateSourceHandle, updateLastSeenLogSizes } from '../actions/dispatchActions';
+import {
+  updateSourceHandle,
+  updateLastSeenLogSizes
+} from '../actions/dispatchActions';
 import { closeFile } from './helpers/handleFileHelper';
 
 function TabPanelContainer(props) {
   const [state, setState] = useState({});
   const {
     menuState: { openSources, currentSourceHandle },
-    logInfoState: { logSizes },
+    logInfoState: { logSizes, lastSeenLogSizes },
     dispatch
   } = props;
 
   function tabOnClick(index) {
-
     const currentPath = openSources[currentSourceHandle].path;
-
 
     updateLastSeenLogSizes(dispatch, currentPath, logSizes[currentPath]);
     updateSourceHandle(dispatch, index);
-    
   }
 
   function onMouseEnter(index) {
@@ -48,6 +49,10 @@ function TabPanelContainer(props) {
   return (
     <TabPanel>
       {Object.keys(openSources).map(source => {
+        const path = openSources[source].path;
+        const logSize = logSizes[path];
+        const lastSeenLogSize = lastSeenLogSizes[path];
+
         return (
           <Tab
             key={openSources[source].index}
@@ -79,6 +84,12 @@ function TabPanelContainer(props) {
             >
               X
             </Button>
+            <Indicator
+              selected={
+                openSources[source].index === currentSourceHandle ? true : false
+              }
+              activity={logSize !== lastSeenLogSize ? true : false}
+            />
           </Tab>
         );
       })}
