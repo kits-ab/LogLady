@@ -3,11 +3,11 @@ name: I see you
 on: [project_card]
 
 jobs:
-  notify_me:
+  notify_slack:
     runs-on: ubuntu-latest
     steps:
-      - name: Hey ho, let's go
+      - name: Notify Slack
         uses: gustavjorlov/slacker@e74d5f0
         with:
-			    message: ${{github.actor}}${{github.event.action}}card,${{github.event.project_card.note}}
-				  slack-url: ${{secrets.SLACK_URL}}
+          message: ${{github.actor}} ${{github.event.action}} card, ${{github.event.project_card.note}}
+          slack-url: ${{secrets.SLACK_URL}}
