@@ -39,16 +39,7 @@ export const logInfoReducer = (state = initialState, action) => {
         }
       };
     }
-    case 'UPDATE_LAST_SEEN_LOG_SIZE': {
-      const { size, sourcePath } = action.data;
-      return {
-        ...state,
-        lastSeenLogSizes: {
-          ...state.lastSeenLogSizes,
-          [sourcePath]: size
-        }
-      };
-    }
+
     case 'LOGINFO_REMOVE_LOG': {
       const { sourcePath } = action.data;
       const logsToKeep = {};

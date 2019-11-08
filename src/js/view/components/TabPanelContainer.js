@@ -10,7 +10,7 @@ import { showOpenDialog } from './helpers/handleFileHelper';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
 import {
   updateSourceHandle,
-  updateLastSeenLogSizes
+  setLastSeenLogSizeToSize
 } from '../actions/dispatchActions';
 import { closeFile } from './helpers/handleFileHelper';
 
@@ -25,7 +25,7 @@ function TabPanelContainer(props) {
   function tabOnClick(index) {
     const currentPath = openSources[currentSourceHandle].path;
 
-    updateLastSeenLogSizes(dispatch, currentPath, logSizes[currentPath]);
+    setLastSeenLogSizeToSize(dispatch, currentPath, logSizes[currentPath]);
     updateSourceHandle(dispatch, index);
   }
 

@@ -9,9 +9,6 @@ export const Tab = styled.div`
     } else if (props.selected) {
       backgroundColor = 'darkgrey';
     }
-    // } else if (!props.selected && props.activity) {
-    //   backgroundColor = 'lightgreen';
-    // }
     return backgroundColor;
   }};
 
