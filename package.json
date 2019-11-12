@@ -9,6 +9,7 @@
     "@material-ui/core": "^4.4.2",
     "chokidar": "^3.0.2",
     "concurrently": "^4.1.2",
+    "electron-devtools-installer": "^2.2.4",
     "electron-is-dev": "^1.1.0",
     "electron-settings": "^3.2.0",
     "electron-simple-updater": "^1.5.0",

@@ -7,7 +7,12 @@ import App from './App';
 import { configureStore } from './configurations/configureStore';
 const React = require('react');
 
-const store = createStore(reducers);
+// Create store with undefined initial state and use the redux devtools if available
+const store = createStore(
+  reducers,
+  undefined,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
 
 const publisher = configureStore(store);
 ipcListener(store, publisher);

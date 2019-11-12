@@ -5,6 +5,11 @@ const updater = require('electron-simple-updater');
 const engine = require('../src/js/engine/engine');
 const menu = require('../src/js/electron/menu');
 const appConfig = require('electron-settings');
+const {
+  default: installChromeExtension,
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS
+} = require('electron-devtools-installer');
 
 updater.init();
 engine.start();
@@ -56,6 +61,23 @@ const windowStateKeeper = windowName => {
 };
 
 const createWindow = async () => {
+  // Install chrome extensions for React and Redux for the Electron windows
+  // These are placed in the apps userData folder, remove the files there to remove the extensions
+  installChromeExtension(REACT_DEVELOPER_TOOLS)
+    .then(name => {
+      console.log(`electron-devtools-installer: Installed extension: ${name}`);
+    })
+    .catch(err => {
+      console.log(`electron-devtools-installer: An error occured: ${err}`);
+    });
+  installChromeExtension(REDUX_DEVTOOLS)
+    .then(name => {
+      console.log(`electron-devtools-installer: Installed extension: ${name}`);
+    })
+    .catch(err => {
+      console.log(`electron-devtools-installer: An error occured: ${err}`);
+    });
+
   const mainWindowStateKeeper = windowStateKeeper('main');
   const windowOptions = {
     x: mainWindowStateKeeper.x,
