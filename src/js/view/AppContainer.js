@@ -7,9 +7,7 @@ import App from './App';
 import { configureStore } from './configurations/configureStore';
 const React = require('react');
 
-const store = createStore(
-  reducers
-);
+const store = createStore(reducers);
 
 const publisher = configureStore(store);
 ipcListener(store, publisher);

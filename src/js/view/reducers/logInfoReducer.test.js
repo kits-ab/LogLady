@@ -37,14 +37,16 @@ describe('log info reducer', () => {
     const state = {
       ...initialState
     };
-    const expectedState = { ...initialState, lastSeenLogSizes: { [sourcePath]: size } };
+    const expectedState = {
+      ...initialState,
+      lastSeenLogSizes: { [sourcePath]: size }
+    };
     const action = {
       type: 'LOGINFO_SET_LAST_SEEN_SIZE_TO_SIZE',
       data: { sourcePath, size }
     };
     expect(logInfoReducer(state, action)).toEqual(expectedState);
   });
-
 
   it('should not accept negative values', () => {
     const sourcePath = 'folder/file';
