@@ -59,6 +59,8 @@ const LogViewer = props => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
     if (props.logs[props.source.path]) {
+      // Reset the previous lines count, as all lines should be wiped.
+      previousLinesLength.current = 0;
       sendMessageToHiddenWindow({
         logs: props.logs[props.source.path]
       });
