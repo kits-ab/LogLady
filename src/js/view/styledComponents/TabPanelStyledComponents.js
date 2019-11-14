@@ -50,12 +50,12 @@ export const Indicator = styled.div`
   width: 10px;
   height: 10px;
   display: inline-block;
-  background-color: lightgreen;
+  background-color: orange;
   border-radius: 50%;
   position: relative;
   top: -8px;
   left: 5px;
-  border: darkgrey solid 1px;
+  border: grey solid 1px;
   opacity: ${props => {
     let opacity = 0;
     if (!props.selected && props.activity) {
