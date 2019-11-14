@@ -3,7 +3,8 @@ import {
   setSource,
   showSnackBar,
   addNewLines,
-  increaseSize
+  increaseSize,
+  setLastSeenLogSizeToSize
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
@@ -52,6 +53,7 @@ const handleFileOpened = (
 ) => {
   // clearAllLogs(dispatch);
   setFileData(dispatch, filePath, fileSize, history);
+  setLastSeenLogSizeToSize(dispatch, filePath, fileSize);
 
   const followSource = {
     function: 'SOURCE_FOLLOW',
