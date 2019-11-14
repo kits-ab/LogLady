@@ -27,7 +27,7 @@
           ],
           "background": {
             "activeOnStart": false,
-            "beginsPattern": "^Compiled successfully!$",
+            "beginsPattern": "^(Compiled successfully!)|(Starting the development server\\.\\.\\.)$",
             "endsPattern": "."
           }
         }
