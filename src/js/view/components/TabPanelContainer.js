@@ -2,22 +2,30 @@ import React, { useState } from 'react';
 import {
   Tab,
   TabPanel,
-  Button
+  Button,
+  Indicator
 } from '../styledComponents/TabPanelStyledComponents';
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
-import { updateSourceHandle } from '../actions/dispatchActions';
+import {
+  updateSourceHandle,
+  setLastSeenLogSizeToSize
+} from '../actions/dispatchActions';
 import { closeFile } from './helpers/handleFileHelper';
 
 function TabPanelContainer(props) {
   const [state, setState] = useState({});
   const {
     menuState: { openSources, currentSourceHandle },
+    logInfoState: { logSizes, lastSeenLogSizes },
     dispatch
   } = props;
 
   function tabOnClick(index) {
+    const currentPath = openSources[currentSourceHandle].path;
+
+    setLastSeenLogSizeToSize(dispatch, currentPath, logSizes[currentPath]);
     updateSourceHandle(dispatch, index);
   }
 
@@ -41,6 +49,10 @@ function TabPanelContainer(props) {
   return (
     <TabPanel>
       {Object.keys(openSources).map(source => {
+        const path = openSources[source].path;
+        const logSize = logSizes[path];
+        const lastSeenLogSize = lastSeenLogSizes[path];
+
         return (
           <Tab
             key={openSources[source].index}
@@ -72,6 +84,12 @@ function TabPanelContainer(props) {
             >
               X
             </Button>
+            <Indicator
+              selected={
+                openSources[source].index === currentSourceHandle ? true : false
+              }
+              activity={logSize !== lastSeenLogSize ? true : false}
+            />
           </Tab>
         );
       })}
@@ -83,7 +101,8 @@ function TabPanelContainer(props) {
 const mapStateToProps = function(state) {
   return {
     state: state,
-    menuState: state.menuState
+    menuState: state.menuState,
+    logInfoState: state.logInfoState
   };
 };
 
