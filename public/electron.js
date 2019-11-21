@@ -11,6 +11,7 @@ engine.start();
 
 console.log(updater.version);
 
+
 let mainWindow, hiddenBackgroundWindow;
 
 const windowStateKeeper = windowName => {

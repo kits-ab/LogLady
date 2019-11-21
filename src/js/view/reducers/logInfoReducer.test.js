@@ -1,7 +1,7 @@
 import { logInfoReducer } from './logInfoReducer';
 
 describe('log info reducer', () => {
-  const initialState = { numberOfLines: 0, logSizes: {} };
+  const initialState = { numberOfLines: 0, logSizes: {}, lastSeenLogSizes: {} };
 
   it('should return the initial state', () => {
     expect(logInfoReducer(undefined, {})).toEqual(initialState);
@@ -26,6 +26,23 @@ describe('log info reducer', () => {
     const expectedState = { ...initialState, logSizes: { [sourcePath]: 1033 } };
     const action = {
       type: 'LOGINFO_INCREASE_SIZE',
+      data: { sourcePath, size }
+    };
+    expect(logInfoReducer(state, action)).toEqual(expectedState);
+  });
+
+  it('should set lastSeenLogSize to logSize', () => {
+    const sourcePath = 'folder/file';
+    const size = 33;
+    const state = {
+      ...initialState
+    };
+    const expectedState = {
+      ...initialState,
+      lastSeenLogSizes: { [sourcePath]: size }
+    };
+    const action = {
+      type: 'LOGINFO_SET_LAST_SEEN_SIZE_TO_SIZE',
       data: { sourcePath, size }
     };
     expect(logInfoReducer(state, action)).toEqual(expectedState);

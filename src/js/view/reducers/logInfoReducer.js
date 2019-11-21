@@ -1,4 +1,4 @@
-const initialState = { numberOfLines: 0, logSizes: {} };
+const initialState = { numberOfLines: 0, logSizes: {}, lastSeenLogSizes: {} };
 
 export const logInfoReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -28,6 +28,18 @@ export const logInfoReducer = (state = initialState, action) => {
         logSizes: { ...state.logSizes, [sourcePath]: size }
       };
     }
+
+    case 'LOGINFO_SET_LAST_SEEN_SIZE_TO_SIZE': {
+      const { size, sourcePath } = action.data;
+      return {
+        ...state,
+        lastSeenLogSizes: {
+          ...state.lastSeenLogSizes,
+          [sourcePath]: size
+        }
+      };
+    }
+
     case 'LOGINFO_REMOVE_LOG': {
       const { sourcePath } = action.data;
       const logsToKeep = {};
