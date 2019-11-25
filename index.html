@@ -167,6 +167,72 @@
         }
       }
     </style>
+    <script>
+      const determineUserOS = () => {
+        if (navigator.platform.startsWith("Mac")) {
+          return "Mac";
+        }
+        if (navigator.platform.startsWith("Linux")) {
+          return "Linux";
+        }
+        if (navigator.platform.startsWith("Win")) {
+          return "Windows";
+        }
+      };
+      window.onload = () => {
+        let downloadButton = document.querySelector("button.download-btn"),
+          downloadLink = "https://github.com/kits-ab/LogLady/releases/latest"; // Default state, link to the latest release on GitHub
+
+        downloadButton.onclick = () => {
+          location.href = downloadLink;
+        };
+
+        // Fetch information on the latest release using GitHub API and then update button text and link for the users OS
+        fetch("https://api.github.com/repos/kits-ab/LogLady/releases/latest")
+          .then(response => {
+            if (response.status !== 200) {
+              console.error(`GitHub API response not OK: ${response.status}`);
+              return;
+            }
+            response.json().then(data => {
+              // Determine what file extension is the correct one for user
+              let wantedFileExtensionRegex;
+              switch (determineUserOS()) {
+                case "Mac":
+                  downloadButton.innerText = "Download for Mac";
+                  wantedFileExtensionRegex = /\.dmg$/g;
+                  break;
+                case "Linux":
+                  downloadButton.innerText = "Download for Linux";
+                  wantedFileExtensionRegex = /\.AppImage$/g;
+                  break;
+                case "Windows":
+                  downloadButton.innerText = "Download for Windows";
+                  wantedFileExtensionRegex = /\.exe$/g;
+                  break;
+                default:
+                  wantedFileExtensionRegex = /^$/g; // Do-nothing regex
+                  break;
+              }
+
+              // Loop through the assets in the release. Assume there is at least one AppImage, one dmg and one exe
+              for (let index in data.assets) {
+                let asset = data.assets[index];
+                if (wantedFileExtensionRegex.test(asset.name)) {
+                  // Update so the button links directly to the download of a file for the correct OS, if supported
+                  downloadLink = asset.browser_download_url;
+                }
+              }
+            });
+          })
+          .catch(err => {
+            console.error(
+              "An error occured while fetching information about latest release from GitHub API:",
+              err
+            );
+          });
+      };
+    </script>
   </head>
 
   <body>
@@ -176,32 +242,14 @@
         <p>
           Making logs bearable!
         </p>
-        <button class="download-btn" id="download-btn">
-          <script>
-            const macLink =
-              "https://github.com/kits-ab/LogLady/releases/download/v1.0.0/loglady-1.0.0.dmg";
-            const linuxLink =
-              "https://github.com/kits-ab/LogLady/releases/download/v1.0.0/loglady.1.0.0.AppImage";
-            const windowsLink =
-              "https://github.com/kits-ab/LogLady/releases/download/v1.0.0/loglady.Setup.1.0.0.exe";
-            const downloadButton = document.getElementById("download-btn");
-            if (navigator.platform.startsWith("Mac")) {
-              downloadButton.innerHTML = "Download for Mac";
-              downloadButton.onclick = () => (location.href = macLink);
-            } else if (navigator.platform.startsWith("Linux")) {
-              downloadButton.innerHTML = "Download for Linux";
-              downloadButton.onclick = () => (location.href = linuxLink);
-            } else {
-              downloadButton.innerHTML = "Download for Windows";
-              downloadButton.onclick = () => (location.href = windowsLink);
-            }
-          </script>
+        <button class="download-btn">
+          Download on GitHub
         </button>
 
         <p>
           <a
             class="other-platform"
-            href="https://github.com/kits-ab/LogLady/releases"
+            href="https://github.com/kits-ab/LogLady/releases/latest"
             >Other platforms
           </a>
         </p>
