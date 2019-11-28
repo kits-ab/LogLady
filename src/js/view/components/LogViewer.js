@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   LogViewerContainer,
   CloseFileButton
@@ -10,7 +10,8 @@ import { closeFile } from './helpers/handleFileHelper';
 import { parseRegExp } from './helpers/regexHelper';
 
 const LogViewer = props => {
-  const [filteredAndHighlightedLines, setLines] = useState([]);
+  const [filteredAndHighlightedLines, setLines] = useState([]); // Used to save and update the current filtered and highlighted lines
+  let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
 
   const sendMessageToHiddenWindow = args => {
     /* Send a message to the hidden window that it should filter the logs.
@@ -58,6 +59,8 @@ const LogViewer = props => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
     if (props.logs[props.source.path]) {
+      // Reset the previous lines count, as all lines should be wiped.
+      previousLinesLength.current = 0;
       sendMessageToHiddenWindow({
         logs: props.logs[props.source.path]
       });
@@ -69,13 +72,14 @@ const LogViewer = props => {
     if (props.logs[props.source.path]) {
       /* Only send lines one by one if there already are lines set.
       Slice used so only newer lines is sent or the entire array if no lines */
+      let newLines = props.logs[props.source.path].slice(
+        previousLinesLength.current
+      );
       sendMessageToHiddenWindow({
-        sendLinesOneByOne:
-          filteredAndHighlightedLines.length > 0 ? true : false,
-        logs: props.logs[props.source.path].slice(
-          filteredAndHighlightedLines.length
-        )
+        sendLinesOneByOne: previousLinesLength.current > 0 ? true : false,
+        logs: newLines
       });
+      previousLinesLength.current = props.logs.length;
     }
   }, [props.logs]);
 
