@@ -17,13 +17,35 @@ Run `npm test` to run tests.
 
 Run `npm run lint` to check for code errors
 
+## Running the application as developer:
+
+__Using Visual Studio Code (Recommended):__<br/>
+Simply run the debug configuration using F5. Then, use the [Debug toolbar](https://code.visualstudio.com/docs/editor/debugging#_debug-actions) to stop or restart the application.<br/>
+A background task for React/webpack server will start if it isn't running. This task can be left running while you are developing!
+
+__Without Visual Studio Code:__<br/>
 Run  `npm run dev` to run application in developer mode with live update
+
+## Developer tools/Debugging:
+
+__For main process:__<br/>
+If using VSCode and the debug configuration:<br/>
+Output from the main electron process is in Debug Console. In VS Code breakpoints can be added to the scripts the main process executes.<br/>
+Output from the background task (the webpack server) is in a Terminal tab.
+
+Else:<br/>
+Output from the main electron process is wherever you ran `npm run dev`. Debugging and breakpoints is available using the [Chrome Node Inspector](https://nodejs.org/en/docs/guides/debugging-getting-started/#chrome-devtools-55-microsoft-edge)
+
+__For renderer process:__<br/>
+Redux Devtools and React Developer Tools are installed and can be found in the Chrome DevTools.<br/>
+In the tab _Sources_ breakpoints can be added to scripts the specific window executes.
+
 
 (Node version used: `8.4.0`, others (newer versions) may work as well.)
 
 Make sure your editor of choice has plugins for ESLint and Prettier installed _(for VSCode these are recommended: [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode))_, because then it will give a lot of hints for what the linter complains about.
 
-### How to name branches and git flow
+## How to name branches and git flow
 
 Tasks can be found in [Projects](https://github.com/kits-ab/LogLady/projects/1).
 
