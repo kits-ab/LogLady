@@ -15,9 +15,9 @@ deploy:
   api_key:
     secure: hHEJcTGLLjtbk1foVHkn/u7JBl1N9x/TwkMq5fX8JVWCRdcXL06NZnwbt8vb/Ah7CLgvXvGrn77aU0qWlbtj8d+MBo7oTW/dgGzT7PyXKhq4uj+E6KYFcmjCJv3tSHxy4H3U304IRuXYQGhzKZceuvVUSKUReKUz64ICDwJvPnU57tYo1jLKv8T5ZQTgQZvd8roAhxhLKND/gatayr+4Jdyzr/LAwx3jeweWNFFOaBkgiwSov6cuf4GVQ9zk5SwqnKdNiTQp5h1mRbYLqem6qIyEgU7X3g8rVff4LumqqyL9jpqjAf0ppujgFL8dZ6ktAkIWo7/8DpA7Jfkf0MNg6e0FVos6r7/EWdgu3/OPRCTn6bSHznv15jpxclSzIV5uXjrcGXUgljm8oAUfyUQTYSn9xKMv+cgvO0OtmjfYE7hgNwt3odtcUp0jeKi4NJvuzDVaC+56QCFbx+bgkTUfS1ypmV6u3f5eNyDtd5mIPaE11pBXQP2CoKXvxFqLNodjxSe5vTB9cqeaHMmYgSYvhfD6jfvV77LFIyB+RjQfnbq9JZXMiZlhjFn6cNkUfK58oHxCpGTeMQ4qBekCbN7syWMJqNSUTjHbc+sZncexwPnMAg8gCmLCeY26bitXDAauiizm13Gof337AG52w88tzAOkqFpa1gOR+T8wyOnbqEs=
   file:
-    - 'dist/loglady-1.1.2.AppImage'
-    - 'dist/loglady-1.1.2.dmg'
-    - 'dist/loglady Setup 1.1.2.exe'
+    - 'dist/loglady-1.1.3.AppImage'
+    - 'dist/loglady-1.1.3.dmg'
+    - 'dist/loglady Setup 1.1.3.exe'
   skip_cleanup: true
   on:
     branch: master
