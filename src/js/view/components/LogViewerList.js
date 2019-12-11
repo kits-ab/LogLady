@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
-import { VariableSizeList } from 'react-window';
 import memoize from 'memoize-one';
 import {
   LogViewerListContainer,
@@ -9,6 +8,7 @@ import {
 import SingleLogLineTranslator from './SingleLogLine';
 
 import _ from 'lodash';
+import { List } from 'office-ui-fabric-react';
 
 const createItemData = memoize(
   (lines, highlightColor, elementWidth, shouldWrap) => {
@@ -83,8 +83,8 @@ const LogViewerList = props => {
         : maxLineLength * characterDimensions.width
     );
     // Clear the list's cache of all item sizes
-    variableSizeListRef.current &&
-      variableSizeListRef.current.resetAfterIndex(0);
+    //variableSizeListRef.current &&
+    //  variableSizeListRef.current.resetAfterIndex(0);
   }, [
     props.wrapLines,
     maxLineLength,
@@ -110,8 +110,10 @@ const LogViewerList = props => {
     setLastLineCount(index);
 
     if (props.scrollToBottom) {
-      variableSizeListOuterRef.current.scrollTop =
-        variableSizeListOuterRef.current.scrollHeight;
+      logViewerListContainerRef.current.scrollTop =
+        logViewerListContainerRef.current.scrollHeight;
+      //variableSizeListOuterRef.current.scrollTop =
+      //  variableSizeListOuterRef.current.scrollHeight;
     }
   }, [props.lines]);
 
@@ -140,12 +142,22 @@ const LogViewerList = props => {
     }
   };
 
+  const _onRenderCell = (item, index) => {
+    return (
+      <SingleLogLineTranslator
+        data={itemData}
+        index={index}
+        style={{ willChange: 'unset' }}
+      ></SingleLogLineTranslator>
+    );
+  };
+
   return (
     <LogViewerListContainer ref={logViewerListContainerRef}>
       <LogLineRuler ref={oneCharacterSizeRef}>
         <span>A</span>
       </LogLineRuler>
-      <VariableSizeList
+      {/* <VariableSizeList
         style={{ willChange: 'unset' }}
         ref={variableSizeListRef}
         outerRef={variableSizeListOuterRef}
@@ -156,7 +168,8 @@ const LogViewerList = props => {
         itemData={itemData}
       >
         {SingleLogLineTranslator}
-      </VariableSizeList>
+      </VariableSizeList> */}
+      <List items={props.lines} onRenderCell={_onRenderCell} />
     </LogViewerListContainer>
   );
 };
