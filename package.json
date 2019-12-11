@@ -80,6 +80,7 @@
   ],
   "build": {
     "appId": "se.kits.loglady",
+    "afterSign": "./public/notarization/notarize.js",
     "files": [
       "src/**/*",
       "build/**/*",
