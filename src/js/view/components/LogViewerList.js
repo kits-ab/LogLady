@@ -22,9 +22,6 @@ const createItemData = memoize(
 );
 
 const LogViewerList = props => {
-  const variableSizeListRef = useRef(); // Reference to the React List component. Used for calling the lists functions to reset the cache of sizes
-  const variableSizeListOuterRef = useRef(); // Reference to the actual DOM element. Used for manually scrolling to the bottom
-
   const [logLineElementWidth, setLogLineElementWidth] = useState(1); // Used to save and set the width the LogLine elements should be
   const [maxLineLength, setCurrentMaxLineLength] = useState(1); // Used to save and update how many characters the longest line has
   const [lastLineCount, setLastLineCount] = useState(0); // Used to keep track of how many lines there were last render, for optimizing mainly calculation of new lines
@@ -82,9 +79,6 @@ const LogViewerList = props => {
         ? listDimensions.width
         : maxLineLength * characterDimensions.width
     );
-    // Clear the list's cache of all item sizes
-    //variableSizeListRef.current &&
-    //  variableSizeListRef.current.resetAfterIndex(0);
   }, [
     props.wrapLines,
     maxLineLength,
@@ -112,35 +106,8 @@ const LogViewerList = props => {
     if (props.scrollToBottom) {
       logViewerListContainerRef.current.scrollTop =
         logViewerListContainerRef.current.scrollHeight;
-      //variableSizeListOuterRef.current.scrollTop =
-      //  variableSizeListOuterRef.current.scrollHeight;
     }
   }, [props.lines]);
-
-  /**
-   * Returns the row height needed for an item at position index,
-   * based on if it should wrap lines and how many characters fit in the window
-   * @function
-   * @param {Number} index - the index of the item
-   * @returns The rowheight to use, in pixels.
-   */
-  const getItemSizeAtPosition = index => {
-    if (props.wrapLines) {
-      // Replace all of the stuff hiddenWindow has added to it, as they shouldn't count towards the length of the string
-      let lineWithoutExtrasLength = props.lines[index].replace(
-        /\[\/?HL[LG\d]*\]/g,
-        ''
-      ).length;
-      return (
-        Math.round(
-          (lineWithoutExtrasLength * characterDimensions.width) /
-            logLineElementWidth
-        ) * characterDimensions.height
-      );
-    } else {
-      return characterDimensions.height;
-    }
-  };
 
   const _onRenderCell = (item, index) => {
     return (
@@ -157,18 +124,6 @@ const LogViewerList = props => {
       <LogLineRuler ref={oneCharacterSizeRef}>
         <span>A</span>
       </LogLineRuler>
-      {/* <VariableSizeList
-        style={{ willChange: 'unset' }}
-        ref={variableSizeListRef}
-        outerRef={variableSizeListOuterRef}
-        width={listDimensions.width}
-        height={listDimensions.height}
-        itemCount={props.lines.length}
-        itemSize={getItemSizeAtPosition}
-        itemData={itemData}
-      >
-        {SingleLogLineTranslator}
-      </VariableSizeList> */}
       <List items={props.lines} onRenderCell={_onRenderCell} />
     </LogViewerListContainer>
   );
