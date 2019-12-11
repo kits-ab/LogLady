@@ -15,6 +15,7 @@ const MemoedSingleLogLine = React.memo(props => {
         width: props.elementWidth + 'px'
       }}
       wrap={props.shouldWrap ? 'true' : undefined}
+      index={props.index}
     >
       {/^\[HLL\].*\[\/HLL\]$/.test(props.line) ? (
         <TextHighlightRegex text={props.line} color={props.highlightColor} />
@@ -39,6 +40,7 @@ const SingleLogLineTranslator = React.memo(({ data, index, style }) => {
       highlightColor={data.highlightColor}
       elementWidth={data.elementWidth}
       shouldWrap={data.shouldWrap}
+      index={index}
     ></MemoedSingleLogLine>
   );
 });
