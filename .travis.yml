@@ -1,7 +1,7 @@
 language: node_js
 node_js: "10"
 os: osx
-osx_image: xcode10.2
+osx_image: xcode11.2
 script:
   - npm run lint
   - npm test

@@ -40,6 +40,7 @@
     "electron": "^6.0.8",
     "electron-builder": "^21.2.0",
     "electron-devtools-installer": "^2.2.4",
+    "electron-notarize": "^0.2.1",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "eslint": "^6.1.0",
@@ -78,7 +79,8 @@
     "not op_mini all"
   ],
   "build": {
-    "appId": "com.example.electron-cra",
+    "appId": "se.kits.loglady",
+    "afterSign": "./public/notarization/notarize.js",
     "files": [
       "src/**/*",
       "build/**/*",
@@ -86,8 +88,14 @@
     ],
     "mac": {
       "category": "Utility",
-      "target": "dmg",
-      "icon": "./public/icons/mac/icon.icns"
+      "icon": "./public/icons/mac/icon.icns",
+      "hardenedRuntime": true,
+      "entitlements": "./public/notarization/entitlements.mac.plist",
+      "entitlementsInherit": "./public/notarization/entitlements.mac.plist",
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "win": {
       "target": "nsis",
