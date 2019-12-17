@@ -131,20 +131,20 @@ const handleFollowFile = (sender, { filePath, fromIndex }) => {
 };
 
 const handleShowOpenDialog = async (state, sender) => {
-  dialog.showOpenDialog(
-    {
+  dialog
+    .showOpenDialog({
       properties: ['openFile', 'multiSelections']
-    },
-    async filePaths => {
-      if (filePaths === undefined) return;
-      filePaths.forEach(async filePath => {
+    })
+    .then(infoObject => {
+      if (infoObject.filePaths === undefined || infoObject.canceled) return;
+
+      infoObject.filePaths.forEach(async filePath => {
         if (await openFile(sender, filePath)) {
           state.recentFiles = addRecentFile(state.recentFiles, filePath);
           updateRecentFiles(state.recentFiles);
         }
       });
-    }
-  );
+    });
 };
 
 const sendError = (sender, message, error) => {
