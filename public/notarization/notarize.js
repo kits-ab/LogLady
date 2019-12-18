@@ -17,21 +17,24 @@ const err = (...args) => {
  * Function to start or stop the writing while waiting on notarization
  */
 const controlWaitingOutput = shouldRun => {
-  waitingOutputRunning = shouldRun;
-
   // Start writing waiting output, or if finished make a new line
-  if (shouldRun) runWaitingOutput();
-  else process.stdout.write('\n');
+  if (shouldRun && !waitingOutputRunning) {
+    waitingOutputRunning = shouldRun;
+    runWaitingOutput();
+  } else {
+    process.stdout.write('\n');
+  }
 };
 
 /**
  * Function to write a dot in a single line until told not to
  */
 async function runWaitingOutput() {
-  // stdout.write instead of console.log so the dots appear on the same line
-  process.stdout.write('.');
-
-  if (waitingOutputRunning) setTimeout(runWaitingOutput, 10000);
+  if (waitingOutputRunning) {
+    // stdout.write instead of console.log so the dots appear on the same line
+    process.stdout.write('.');
+    setTimeout(runWaitingOutput, 10000);
+  }
 }
 
 /**
@@ -45,21 +48,20 @@ exports.default = async function notarizing(context) {
 
   const appName = context.packager.appInfo.productFilename;
 
-  if (fs.existsSync(`${appOutDir}/${appName}.app`)) {
-    log(`Attempting to notarize app - ${appOutDir}/${appName}.app.`);
-  } else {
-    err(`File not found - ${appOutDir}/${appName}.app.`);
+  if (process.env.TRAVIS_PULL_REQUEST) {
+    log('This is a Pull Request build. Skipping notarization.');
     return;
   }
 
   if (!process.env.APPLE_ID || !process.env.APPLE_APPPASS) {
-    if (process.env.CI && process.env.TRAVIS) {
-      log(
-        'Environment variables for notarization not set. This is expected if this is a PR build to develop. Skipping notarization.'
-      );
-    } else {
-      err('Environment variables for notarization not set.');
-    }
+    err('Environment variables for notarization not set. Aborting.');
+    return;
+  }
+
+  if (fs.existsSync(`${appOutDir}/${appName}.app`)) {
+    log(`Attempting to notarize app - ${appOutDir}/${appName}.app.`);
+  } else {
+    err(`File not found - ${appOutDir}/${appName}.app. Aborting.`);
     return;
   }
 
@@ -67,6 +69,7 @@ exports.default = async function notarizing(context) {
 
   // Start running output, to show something is still happening
   controlWaitingOutput(true);
+
   return await notarize({
     appBundleId: `AMTS839RRZ.se.kits.loglady`,
     appPath: `${appOutDir}/${appName}.app`,
