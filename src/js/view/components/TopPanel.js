@@ -38,7 +38,7 @@ class TopPanel extends React.Component {
         </TopPanelItem>
         <TopPanelItem>
           <TextFieldInput
-            placeholder="filter"
+            placeholder="Filter"
             debounce={222}
             onTextChange={text => {
               handleFilterInput(this.props.dispatch, text);
@@ -48,7 +48,7 @@ class TopPanel extends React.Component {
         </TopPanelItem>
         <TopPanelItem>
           <TextFieldInput
-            placeholder="highlight"
+            placeholder="Highlight"
             debounce={222}
             onTextChange={text => {
               handleHighlightInput(this.props.dispatch, text);
