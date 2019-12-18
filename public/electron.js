@@ -1,16 +1,12 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const isDev = require('electron-is-dev');
-const updater = require('electron-simple-updater');
+const { autoUpdater } = require('electron-updater');
 const engine = require('../src/js/engine/engine');
 const menu = require('../src/js/electron/menu');
 const appConfig = require('electron-settings');
 
-updater.init();
 engine.start();
-
-console.log(updater.version);
-
 
 let mainWindow, hiddenBackgroundWindow;
 
@@ -56,10 +52,11 @@ const windowStateKeeper = windowName => {
   };
 };
 
-const createWindow = async () => {
-  // Install chrome extensions for React and Redux for the Electron windows
-  // These are placed in the apps userData folder, remove the files there to remove the extensions
+const handleOnAppReady = () => {
   if (isDev) {
+    // Install chrome extensions for React and Redux for the Electron windows, if developer
+    // These are placed in the apps userData folder, remove the files there to remove the extensions
+
     // Require here as they are only needed in this scope, and to make sure they user is running as dev
     const {
       default: installChromeExtension,
@@ -82,8 +79,15 @@ const createWindow = async () => {
     installChromeExtension(REDUX_DEVTOOLS)
       .then(logPrefixedSuccessInstall)
       .catch(logPrefixedErrorOccured);
+  } else {
+    // Check for update from electron-updater, and notify if available
+    autoUpdater.checkForUpdatesAndNotify();
   }
 
+  createWindow();
+};
+
+const createWindow = async () => {
   const mainWindowStateKeeper = windowStateKeeper('main');
   const windowOptions = {
     x: mainWindowStateKeeper.x,
@@ -157,7 +161,7 @@ ipcMain.on('hiddenWindowMessages', (event, args) => {
   }
 });
 
-app.on('ready', createWindow);
+app.on('ready', handleOnAppReady);
 
 app.on('activate', () => {
   if (mainWindow === null) {
