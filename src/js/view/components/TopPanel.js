@@ -6,7 +6,6 @@ import {
   TopPanelItemFiller,
   TopPanelLogoText
 } from 'js/view/styledComponents/TopPanelStyledComponents';
-import { OpenFileButton } from 'js/view/styledComponents/common/ButtonStyledComponents';
 import { TextFieldInput } from 'js/view/components/common/input';
 import { SwitchButton } from 'js/view/components/common/buttons';
 import React from 'react';
@@ -17,6 +16,7 @@ import {
 } from 'js/view/actions/dispatchActions';
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
+import { PrimaryButton } from 'office-ui-fabric-react';
 
 const logoText = require('../../../resources/text.png');
 
@@ -28,13 +28,12 @@ class TopPanel extends React.Component {
           <TopPanelLogoText src={logoText} />
         </TopPanelItem>
         <TopPanelItem>
-          <OpenFileButton
+          <PrimaryButton
+            text="Open file"
             onClick={() => {
               showOpenDialog();
             }}
-          >
-            Open file
-          </OpenFileButton>
+          />
         </TopPanelItem>
         <TopPanelItem>
           <TextFieldInput
