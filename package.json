@@ -59,8 +59,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "dev": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron --inspect .\"",
-    "electron-pack": "electron-builder -lmw",
-    "preelectron-pack": "npm run build"
+    "preelectron-pack": "npm run build",
+    "electron-pack": "electron-builder -lmw --publish never",
+    "electron-deploy": "electron-builder -lmw --publish always"
   },
   "repository": {
     "type": "git",
@@ -89,22 +90,31 @@
     "mac": {
       "category": "Utility",
       "icon": "./public/icons/mac/icon.icns",
-      "hardenedRuntime": true,
-      "entitlements": "./public/notarization/entitlements.mac.plist",
-      "entitlementsInherit": "./public/notarization/entitlements.mac.plist",
       "target": [
         "dmg",
         "zip"
-      ]
+      ],
+      "publish": [
+        "github"
+      ],
+      "hardenedRuntime": true,
+      "entitlements": "./public/notarization/entitlements.mac.plist",
+      "entitlementsInherit": "./public/notarization/entitlements.mac.plist"
     },
     "win": {
       "target": "nsis",
-      "icon": "./public/icons/win/icon.ico"
+      "icon": "./public/icons/win/icon.ico",
+      "publish": [
+        "github"
+      ]
     },
     "linux": {
       "category": "Development",
       "target": "AppImage",
-      "icon": "./public/icons/png"
+      "icon": "./public/icons/png",
+      "publish": [
+        "github"
+      ]
     },
     "directories": {
       "buildResources": "assets"
