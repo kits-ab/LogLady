@@ -1,6 +1,6 @@
 {
   "name": "loglady",
-  "version": "v1.1.4",
+  "version": "v1.1.5",
   "description": "Log file viewer",
   "author": "lalala",
   "homepage": "./",
@@ -61,6 +61,7 @@
     "dev": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron --inspect .\"",
     "preelectron-pack": "npm run build",
     "electron-pack": "electron-builder -lmw --publish never",
+    "preelectron-deploy": "npm run build",
     "electron-deploy": "electron-builder -lmw --publish always"
   },
   "repository": {
@@ -93,10 +94,7 @@
     "mac": {
       "category": "Utility",
       "icon": "./public/icons/mac/icon.icns",
-      "target": [
-        "dmg",
-        "zip"
-      ],
+      "target": "dmg",
       "hardenedRuntime": true,
       "entitlements": "./public/notarization/entitlements.mac.plist",
       "entitlementsInherit": "./public/notarization/entitlements.mac.plist"
