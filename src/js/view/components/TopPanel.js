@@ -62,6 +62,9 @@ class TopPanel extends React.Component {
               onChange={() => {
                 handleTailSwitch(this.props.dispatch);
               }}
+              label="Follow"
+              onText="On"
+              offText="Off"
             />
           </Stack.Item>
         </Stack>
