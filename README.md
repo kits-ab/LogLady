@@ -63,7 +63,16 @@ Commit messages should start with task ID
 
 Example: `#5 update README. Explained naming.`
 
-Push when done. Make pull request where you add task ID to beginning of comment.
+Push when done. Make pull request to develop (Merge the created branch into develop) where you add task ID to beginning of comment.
+
+## Creating a new release
+
+Travis is currently used for building and deploying to GitHub Releases. When the project is ready for a new release you need to:
+
+* Update the version field in `package.json`, using [semantic versioning](https://semver.org/)
+* Make a pull request to master with all the changes from develop (Merge develop into master)
+* Wait for the Travis build to finish
+* Update the release title and description found on [GitHub Releases](https://github.com/kits-ab/LogLady/releases/latest)
 
 ## Creating a new release
 
