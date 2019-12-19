@@ -1,4 +1,3 @@
-import { TopPanelLogoText } from 'js/view/styledComponents/TopPanelStyledComponents';
 import { TextFieldInput } from 'js/view/components/common/input';
 import { SwitchButton } from 'js/view/components/common/buttons';
 import React from 'react';
@@ -24,7 +23,7 @@ class TopPanel extends React.Component {
       <Stack horizontal horizontalAlign="space-between">
         <Stack horizontal tokens={stackTokens}>
           <Stack.Item align="center">
-            <TopPanelLogoText src={logoText} />
+            <Image src={logoText} height={40} />
           </Stack.Item>
           <Stack.Item align="center">
             <PrimaryButton
