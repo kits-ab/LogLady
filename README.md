@@ -63,7 +63,7 @@ Commit messages should start with task ID
 
 Example: `#5 update README. Explained naming.`
 
-Push when done. Make pull request where you add task ID to beginning of comment.
+Push when done. Make pull request to develop (Merge the created branch into develop) where you add task ID to beginning of comment.
 
 ## Creating a new release
 
