@@ -2,12 +2,27 @@ language: node_js
 node_js: '10'
 os: osx
 osx_image: xcode11.2
-script:
-  - npm run lint
-  - npm test
-  - npm run electron-pack
-  - if [ "$TRAVIS_BRANCH" = "master"] && [ "$TRAVIS_PULL_REQUEST" = false ]; then npm run electron-deploy; fi
-branches:
-  only:
-    - master
-    - develop
+jobs:
+  include:
+    # Note that jobs do not share storage in any way
+    - stage: lint
+      name: 'Run ESLint'
+      script: npm run lint
+    - stage: test
+      name: 'Run Unit Tests'
+      script: npm test
+    - stage: package
+      name: 'Package Electron app'
+      script: npm run electron-pack
+    - stage: deploy
+      name: 'Package Electron app and deploy to GitHub Releases'
+      script: npm run electron-deploy
+stages:
+  - lint
+  - test
+  - name: package
+    # Try packaging app, without deploying, on builds triggered by PRs and on develop
+    if: branch = develop OR type = pull_request
+  - name: deploy
+    # Only package app and deploy when build is triggered on master
+    if: branch = master
