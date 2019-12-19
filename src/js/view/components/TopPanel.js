@@ -55,7 +55,7 @@ class TopPanel extends React.Component {
           </Stack.Item>
         </Stack>
         <Stack horizontal tokens={stackTokens}>
-          <Stack.Item align="center">
+          <Stack.Item disableShrink align="center">
             <SwitchButton
               checked={this.props.tailSwitch}
               onChange={() => {
