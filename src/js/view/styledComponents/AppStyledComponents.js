@@ -10,7 +10,6 @@ export const RootContainer = styled.div`
 `;
 
 export const LogPage = styled.div`
-  background: black;
   display: flex;
   width: 100%;
   flex: 1;
