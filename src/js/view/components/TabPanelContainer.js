@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
 import {
-  Tab,
-  TabPanel,
-  Button,
-  Indicator
-} from '../styledComponents/TabPanelStyledComponents';
+  Pivot,
+  PivotItem,
+  PivotLinkSize
+} from 'office-ui-fabric-react/lib/Pivot';
+//import { Label } from 'office-ui-fabric-react/lib/Label';
+import React from 'react';
+import { TabPanel } from '../styledComponents/TabPanelStyledComponents';
 import { connect } from 'react-redux';
-import { showOpenDialog } from './helpers/handleFileHelper';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
 import {
   updateSourceHandle,
@@ -15,7 +15,6 @@ import {
 import { closeFile } from './helpers/handleFileHelper';
 
 function TabPanelContainer(props) {
-  const [state, setState] = useState({});
   const {
     menuState: { openSources, currentSourceHandle },
     logInfoState: { logSizes, lastSeenLogSizes },
@@ -29,7 +28,12 @@ function TabPanelContainer(props) {
     updateSourceHandle(dispatch, index);
   }
 
-  function onMouseEnter(index) {
+  const onLinkClick = function(PivotItem) {
+    const index = PivotItem.props.index;
+    tabOnClick(index);
+  };
+
+  /* function onMouseEnter(index) {
     setState({
       hover: index
     });
@@ -40,15 +44,16 @@ function TabPanelContainer(props) {
       hover: ''
     });
   }
-
+  */
   function exitLog(sourcePath, event) {
-    closeFile(dispatch, sourcePath);
     event.stopPropagation();
+    console.log('Exit log');
+    closeFile(dispatch, sourcePath);
   }
 
   return (
     <TabPanel>
-      {Object.keys(openSources).map(source => {
+      {/*     {Object.keys(openSources).map(source => {
         const path = openSources[source].path;
         const logSize = logSizes[path];
         const lastSeenLogSize = lastSeenLogSizes[path];
@@ -84,6 +89,7 @@ function TabPanelContainer(props) {
             >
               X
             </Button>
+
             <Indicator
               selected={
                 openSources[source].index === currentSourceHandle ? true : false
@@ -93,9 +99,67 @@ function TabPanelContainer(props) {
           </Tab>
         );
       })}
-      <Tab onClick={showOpenDialog}> + </Tab>
+      <Tab onClick={showOpenDialog}> + </Tab> */}
+      <div>
+        <Pivot
+          linkSize={PivotLinkSize.large}
+          onLinkClick={onLinkClick}
+          selectedKey={currentSourceHandle}
+        >
+          {Object.keys(openSources).map(source => {
+            // const path = openSources[source].path;
+            const index = openSources[source].index;
+            /* const logSize = logSizes[path];
+            const lastSeenLogSize = lastSeenLogSizes[path]; */
+
+            return (
+              <PivotItem
+                headerText={getFormattedFilePath(
+                  openSources[source].path,
+                  `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
+                )}
+                onRenderItemLink={customRenderer(openSources, source, exitLog)}
+                index={index}
+                key={source}
+                itemKey={index}
+              ></PivotItem>
+            );
+          })}
+        </Pivot>
+      </div>
     </TabPanel>
   );
+}
+
+function customRenderer(openSources, source, exitLog) {
+  return function _customRenderer(link, defaultRenderer) {
+    return (
+      <span>
+        {defaultRenderer(link)}
+        <div style={{ display: 'inline' }}>
+          {/* <ActionButton
+            iconProps={{ iconName: 'Cancel' }}
+            allowDisabledFocus
+            disabled={false}
+            checked={false}
+            onClick={event => {
+              exitLog(openSources[source].path, event);
+            }}
+          /> */}
+
+          <div
+            onClick={event => {
+              console.log('clickevent');
+              exitLog(openSources[source].path, event);
+            }}
+            style={{ display: 'inline-block', marginLeft: '10px' }}
+          >
+            X
+          </div>
+        </div>
+      </span>
+    );
+  };
 }
 
 const mapStateToProps = function(state) {
