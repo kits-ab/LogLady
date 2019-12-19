@@ -6,6 +6,7 @@ export const TabPanel = styled.div`
   background: #ccc;
   padding-top: 1px;
   overflow: auto;
+  overflow-y: hidden;
   white-space: nowrap;
 `;
 
