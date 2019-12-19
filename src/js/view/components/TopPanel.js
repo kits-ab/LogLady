@@ -14,13 +14,13 @@ const logoText = require('../../../resources/text.png');
 
 const stackTokens = {
   childrenGap: 16,
-  padding: '8px 0'
+  padding: '8px 8px'
 };
 
 class TopPanel extends React.Component {
   render() {
     return (
-      <Stack horizontal horizontalAlign="space-between">
+      <Stack wrap horizontal horizontalAlign="space-between">
         <Stack horizontal tokens={stackTokens}>
           <Stack.Item align="center">
             <Image src={logoText} height={40} />
