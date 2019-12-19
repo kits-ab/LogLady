@@ -7,6 +7,7 @@ export const RootContainer = styled.div`
   width: 100%;
   overflow: hidden;
   min-width: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
 `;
 
 export const LogPage = styled.div`
