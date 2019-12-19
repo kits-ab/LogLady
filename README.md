@@ -67,19 +67,20 @@ Push when done. Make pull request where you add task ID to beginning of comment.
 
 ## Creating a new release
 
-Currently, the project is using Travis to run electron-builder, which handles the building, packing and distribution. The files are stored using GitHub Releases.<br/>
+Currently, the project is using Travis to run electron-builder, which handles the building, packing and distribution. Apps installed on computers will autoupdate when a new release is available. The files are stored using GitHub Releases.
+
 When the project is ready for a new release you need to:
 
-1. Update the version field in `package.json` and merge it into develop, using [semantic versioning](https://semver.org/)
-2. Create a draft release with a tag that is the version from step 1.
-3. Update the release title and description to be informative!
-4. Make a pull request to master with all the changes from develop (Merge develop into master)
-5. Wait for the Travis build to finish, which should add a lot of files to the release
-6. Update the release from draft to final
+1. Update the version field in `package.json`, using [semantic versioning](https://semver.org/), and merge it into develop
+2. Make a pull request to master with all the changes from develop (Pull request to merge develop into master)
+3. Wait for the Travis checks to finish and make sure everything is fine, then merge the PR
+4. Wait for the Travis build to finish, which should add a draft release and upload a lot of files. They are all essential!
+5. Update the release title and description to be informative!
+6. Save the changes and update the release from draft to final
 
-The new update should be automatically downloaded for users.
+The new update should be automatically downloaded for users and the website will always link to the latest files.
 
-## When in doubt: Look through the repo to see how it was done earlier, or git blame and ask the people listed there!
+## When in doubt: Look through the repo to see how something was done earlier, or git blame and ask the people listed there!
 
 ## Useful links
 
