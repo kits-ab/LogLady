@@ -94,7 +94,10 @@
     "mac": {
       "category": "Utility",
       "icon": "./public/icons/mac/icon.icns",
-      "target": "dmg",
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "hardenedRuntime": true,
       "entitlements": "./public/notarization/entitlements.mac.plist",
       "entitlementsInherit": "./public/notarization/entitlements.mac.plist"
