@@ -87,6 +87,9 @@
       "build/**/*",
       "node_modules/**/*"
     ],
+    "publish": [
+      "github"
+    ],
     "mac": {
       "category": "Utility",
       "icon": "./public/icons/mac/icon.icns",
@@ -94,27 +97,18 @@
         "dmg",
         "zip"
       ],
-      "publish": [
-        "github"
-      ],
       "hardenedRuntime": true,
       "entitlements": "./public/notarization/entitlements.mac.plist",
       "entitlementsInherit": "./public/notarization/entitlements.mac.plist"
     },
     "win": {
       "target": "nsis",
-      "icon": "./public/icons/win/icon.ico",
-      "publish": [
-        "github"
-      ]
+      "icon": "./public/icons/win/icon.ico"
     },
     "linux": {
       "category": "Development",
       "target": "AppImage",
-      "icon": "./public/icons/png",
-      "publish": [
-        "github"
-      ]
+      "icon": "./public/icons/png"
     },
     "directories": {
       "buildResources": "assets"
