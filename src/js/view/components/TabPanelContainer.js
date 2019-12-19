@@ -8,7 +8,7 @@ import { TabPanel } from '../styledComponents/TabPanelStyledComponent';
 import { connect } from 'react-redux';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
 import { Indicator } from '../styledComponents/TabPanelStyledComponent';
-
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import {
   updateSourceHandle,
   setLastSeenLogSizeToSize
@@ -100,7 +100,7 @@ function customRenderer(
             }}
             style={{ display: 'inline-block', marginLeft: '10px' }}
           >
-            X
+            <Icon iconName="Cancel" />
           </div>
           <Indicator
             selected={

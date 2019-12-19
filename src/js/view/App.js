@@ -1,3 +1,4 @@
+import { initializeIcons } from '@uifabric/icons';
 import TabSettings from './components/TabSettings';
 import TabPanelContainer from './components/TabPanelContainer';
 import LogViewer from './components/LogViewer';
@@ -13,6 +14,8 @@ import {
 import { connect } from 'react-redux';
 const React = require('react');
 const { Component } = require('react');
+
+initializeIcons();
 
 class App extends Component {
   render() {
