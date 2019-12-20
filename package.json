@@ -1,6 +1,6 @@
 {
   "name": "loglady",
-  "version": "v1.1.4",
+  "version": "v1.1.5",
   "description": "Log file viewer",
   "author": "lalala",
   "homepage": "./",
@@ -11,7 +11,7 @@
     "concurrently": "^4.1.2",
     "electron-is-dev": "^1.1.0",
     "electron-settings": "^3.2.0",
-    "electron-simple-updater": "^1.5.0",
+    "electron-updater": "^4.2.0",
     "eslint-config-react-app": "^5.0.1",
     "fs-backwards-stream": "^1.0.0",
     "lodash": "^4.17.15",
@@ -59,8 +59,10 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "dev": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron --inspect .\"",
-    "electron-pack": "electron-builder -lmw",
-    "preelectron-pack": "npm run build"
+    "preelectron-pack": "npm run build",
+    "electron-pack": "electron-builder -lmw --publish never",
+    "preelectron-deploy": "npm run build",
+    "electron-deploy": "electron-builder -lmw --publish always"
   },
   "repository": {
     "type": "git",
@@ -86,16 +88,19 @@
       "build/**/*",
       "node_modules/**/*"
     ],
+    "publish": [
+      "github"
+    ],
     "mac": {
       "category": "Utility",
       "icon": "./public/icons/mac/icon.icns",
-      "hardenedRuntime": true,
-      "entitlements": "./public/notarization/entitlements.mac.plist",
-      "entitlementsInherit": "./public/notarization/entitlements.mac.plist",
       "target": [
         "dmg",
         "zip"
-      ]
+      ],
+      "hardenedRuntime": true,
+      "entitlements": "./public/notarization/entitlements.mac.plist",
+      "entitlementsInherit": "./public/notarization/entitlements.mac.plist"
     },
     "win": {
       "target": "nsis",
@@ -109,5 +114,10 @@
     "directories": {
       "buildResources": "assets"
     }
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+        "/node_modules/(?!office-ui-fabric-react/.*)"
+      ]
   }
 }
