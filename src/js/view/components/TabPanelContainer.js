@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
 import {
-  Tab,
-  TabPanel,
-  Button,
-  Indicator
-} from '../styledComponents/TabPanelStyledComponents';
+  Pivot,
+  PivotItem,
+  PivotLinkSize
+} from 'office-ui-fabric-react/lib/Pivot';
+import React from 'react';
+import { TabPanel } from '../styledComponents/TabPanelStyledComponent';
 import { connect } from 'react-redux';
-import { showOpenDialog } from './helpers/handleFileHelper';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
+import { Indicator } from '../styledComponents/TabPanelStyledComponent';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import {
   updateSourceHandle,
   setLastSeenLogSizeToSize
@@ -15,7 +16,6 @@ import {
 import { closeFile } from './helpers/handleFileHelper';
 
 function TabPanelContainer(props) {
-  const [state, setState] = useState({});
   const {
     menuState: { openSources, currentSourceHandle },
     logInfoState: { logSizes, lastSeenLogSizes },
@@ -29,73 +29,89 @@ function TabPanelContainer(props) {
     updateSourceHandle(dispatch, index);
   }
 
-  function onMouseEnter(index) {
-    setState({
-      hover: index
-    });
-  }
-
-  function onMouseLeave() {
-    setState({
-      hover: ''
-    });
-  }
+  const onLinkClick = function(PivotItem) {
+    const index = PivotItem.props.index;
+    tabOnClick(index);
+  };
 
   function exitLog(sourcePath, event) {
-    closeFile(dispatch, sourcePath);
     event.stopPropagation();
+    console.log('Exit log');
+    closeFile(dispatch, sourcePath);
   }
 
   return (
     <TabPanel>
-      {Object.keys(openSources).map(source => {
-        const path = openSources[source].path;
-        const logSize = logSizes[path];
-        const lastSeenLogSize = lastSeenLogSizes[path];
+      <div>
+        <Pivot
+          linkSize={PivotLinkSize.large}
+          onLinkClick={onLinkClick}
+          selectedKey={currentSourceHandle}
+        >
+          {Object.keys(openSources).map(source => {
+            const path = openSources[source].path;
+            const index = openSources[source].index;
+            const logSize = logSizes[path];
+            const lastSeenLogSize = lastSeenLogSizes[path];
 
-        return (
-          <Tab
-            key={openSources[source].index}
+            return (
+              <PivotItem
+                headerText={getFormattedFilePath(
+                  openSources[source].path,
+                  `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
+                )}
+                onRenderItemLink={customRenderer(
+                  openSources,
+                  source,
+                  exitLog,
+                  currentSourceHandle,
+                  logSize,
+                  lastSeenLogSize
+                )}
+                index={index}
+                key={source}
+                itemKey={index}
+              ></PivotItem>
+            );
+          })}
+        </Pivot>
+      </div>
+    </TabPanel>
+  );
+}
+
+function customRenderer(
+  openSources,
+  source,
+  exitLog,
+  currentSourceHandle,
+  logSize,
+  lastSeenLogSize
+) {
+  return function _customRenderer(link, defaultRenderer) {
+    return (
+      <span>
+        {defaultRenderer(link)}
+        <div style={{ display: 'inline' }}>
+          <div
+            onClick={event => {
+              console.log('clickevent');
+              exitLog(openSources[source].path, event);
+            }}
+            style={{ display: 'inline-block', marginLeft: '10px' }}
+          >
+            <Icon iconName="Cancel" />
+          </div>
+          <Indicator
             selected={
               openSources[source].index === currentSourceHandle ? true : false
             }
-            hover={openSources[source].index === state.hover ? true : false}
-            index={openSources[source].index}
-            onClick={() => {
-              tabOnClick(openSources[source].index);
-            }}
-            onMouseEnter={() => {
-              onMouseEnter(openSources[source].index);
-            }}
-            onMouseLeave={onMouseLeave}
-          >
-            {getFormattedFilePath(
-              openSources[source].path,
-              `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
-            )}
-            <Button
-              onClick={event => {
-                exitLog(openSources[source].path, event);
-              }}
-              hover={openSources[source].index === state.hover ? true : false}
-              selected={
-                openSources[source].index === currentSourceHandle ? true : false
-              }
-            >
-              X
-            </Button>
-            <Indicator
-              selected={
-                openSources[source].index === currentSourceHandle ? true : false
-              }
-              activity={logSize !== lastSeenLogSize ? true : false}
-            />
-          </Tab>
-        );
-      })}
-      <Tab onClick={showOpenDialog}> + </Tab>
-    </TabPanel>
-  );
+            activity={logSize !== lastSeenLogSize ? true : false}
+          />
+        </div>
+      </span>
+    );
+  };
 }
 
 const mapStateToProps = function(state) {

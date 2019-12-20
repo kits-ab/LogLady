@@ -1,7 +1,8 @@
 import React from 'react';
-import { TextFieldInputContainer } from 'js/view/styledComponents/common/InputStyledComponents';
+import { TextField } from 'office-ui-fabric-react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+
 class TextFieldInput extends React.Component {
   constructor(props) {
     super(props);
@@ -31,7 +32,9 @@ class TextFieldInput extends React.Component {
 
   render() {
     return (
-      <TextFieldInputContainer
+      <TextField
+        underlined
+        label={this.props.placeholder}
         placeholder={this.props.placeholder}
         value={this.state.input}
         onChange={event => {

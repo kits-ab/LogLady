@@ -114,5 +114,10 @@
     "directories": {
       "buildResources": "assets"
     }
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+        "/node_modules/(?!office-ui-fabric-react/.*)"
+      ]
   }
 }
