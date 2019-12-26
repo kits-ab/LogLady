@@ -55,6 +55,11 @@ exports.default = async function notarizing(context) {
     return;
   }
 
+  if (process.env.TRAVIS_BRANCH != 'master') {
+    log("This isn't a build on master branch. Skipping notarization.");
+    return;
+  }
+
   if (!process.env.APPLE_ID || !process.env.APPLE_APPPASS) {
     err('Environment variables for notarization not set. Aborting.');
     return;
