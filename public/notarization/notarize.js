@@ -1,3 +1,5 @@
+/* eslint-disable eqeqeq */
+
 const fs = require('fs');
 const { notarize } = require('electron-notarize');
 
@@ -48,8 +50,13 @@ exports.default = async function notarizing(context) {
 
   const appName = context.packager.appInfo.productFilename;
 
-  if (process.env.TRAVIS_PULL_REQUEST) {
+  if (process.env.TRAVIS_PULL_REQUEST != 'false') {
     log('This is a Pull Request build. Skipping notarization.');
+    return;
+  }
+
+  if (process.env.TRAVIS_BRANCH != 'master') {
+    log("This isn't a build on master branch. Skipping notarization.");
     return;
   }
 
