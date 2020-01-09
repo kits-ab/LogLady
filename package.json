@@ -17,6 +17,7 @@
     "lodash": "^4.17.15",
     "md5": "^2.2.1",
     "memoize-one": "^5.1.1",
+    "mousetrap": "^1.6.3",
     "node-notifier": "^5.4.3",
     "nthline": "^1.0.1",
     "office-ui-fabric-react": "^7.68.0",
