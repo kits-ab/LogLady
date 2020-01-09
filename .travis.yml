@@ -25,5 +25,5 @@ stages:
     if: branch = develop OR type = pull_request
   - name: deploy
     # Only package app and deploy when build is triggered on master
-    if: branch = master
+    if: branch = master AND type != pull_request
 if: branch IN (master, develop) OR type = pull_request
