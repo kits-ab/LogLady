@@ -117,7 +117,7 @@ const createTemplate = recentFiles => {
         {
           label: 'Learn More',
           click() {
-            shell.openExternal('https://kits.se/om/akarkhatab');
+            shell.openExternal('https://loglady.dev/');
           }
         }
       ]
