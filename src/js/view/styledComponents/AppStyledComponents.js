@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 export const RootContainer = styled.div`
+  box-sizing: border-box;
   display: flex;
   height: 100vh;
   max-height: 100vh;
