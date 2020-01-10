@@ -17,6 +17,7 @@
     "lodash": "^4.17.15",
     "md5": "^2.2.1",
     "memoize-one": "^5.1.1",
+    "mousetrap": "^1.6.3",
     "node-notifier": "^5.4.3",
     "nthline": "^1.0.1",
     "office-ui-fabric-react": "^7.68.0",
@@ -37,6 +38,7 @@
   "devDependencies": {
     "babel-register": "^6.26.0",
     "chai": "^4.2.0",
+    "cross-env": "^6.0.3",
     "electron": "^7.1.2",
     "electron-builder": "^21.2.0",
     "electron-devtools-installer": "^2.2.4",
@@ -58,7 +60,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron --inspect .\"",
+    "dev": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron --inspect .\"",
     "preelectron-pack": "npm run build",
     "electron-pack": "electron-builder -lmw --publish never",
     "preelectron-deploy": "npm run build",
@@ -71,7 +73,7 @@
   "license": "ISC",
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint && CI=true npm run test -- --coverage"
+      "pre-commit": "npm run lint && cross-env CI=true npm run test -- --coverage"
     }
   },
   "browserslist": [
@@ -117,7 +119,7 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-        "/node_modules/(?!office-ui-fabric-react/.*)"
-      ]
+      "/node_modules/(?!office-ui-fabric-react/.*)"
+    ]
   }
 }

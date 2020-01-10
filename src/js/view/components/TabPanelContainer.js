@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Pivot,
   PivotItem,
   PivotLinkSize
 } from 'office-ui-fabric-react/lib/Pivot';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TabPanel } from '../styledComponents/TabPanelStyledComponent';
 import { connect } from 'react-redux';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
@@ -14,6 +15,14 @@ import {
   setLastSeenLogSizeToSize
 } from '../actions/dispatchActions';
 import { closeFile } from './helpers/handleFileHelper';
+import Mousetrap from 'mousetrap';
+
+/**
+ * Helper function to get actual modulo operation, as %-operator doesn't quite fit the bill
+ */
+function modulo(n, m) {
+  return ((n % m) + m) % m;
+}
 
 function TabPanelContainer(props) {
   const {
@@ -39,6 +48,52 @@ function TabPanelContainer(props) {
     console.log('Exit log');
     closeFile(dispatch, sourcePath);
   }
+
+  useEffect(() => {
+    /**
+     * Calculates the index of the tab to the left and right of current tab, overflows to other end if needed
+     * @param direction {Number} - The direction to look for tabs, 1 for forward/right and -1 for backward/left
+     * @returns {Number} The index of the tab in the specified direction
+     */
+    const calculateIndexNeighbouringTabOfCurrent = direction => {
+      const openSourcesKeys = Object.keys(props.menuState.openSources);
+      let calculatedIndexToReturn = props.menuState.currentSourceHandle;
+
+      // Loops through the keys of openSources looking for the current tab
+      /* eslint-disable no-unused-vars */
+      for (let sourceIndex in openSourcesKeys) {
+        sourceIndex = parseInt(sourceIndex);
+        let value = openSourcesKeys[sourceIndex];
+
+        /* eslint-disable eqeqeq */
+        if (value == props.menuState.currentSourceHandle) {
+          // When current tab is found, calculate the index of the neighbouring tab in specified direction, using modulo to allow wrapping to other end
+          calculatedIndexToReturn = parseInt(
+            openSourcesKeys[
+              modulo(sourceIndex + direction, openSourcesKeys.length)
+            ]
+          );
+          break;
+        }
+      }
+      return calculatedIndexToReturn;
+    };
+
+    Mousetrap.bind('ctrl+tab', () => {
+      // Move forwards (the the right) in tab order
+      tabOnClick(calculateIndexNeighbouringTabOfCurrent(1));
+    });
+
+    Mousetrap.bind('ctrl+shift+tab', () => {
+      // Move backwards (to the left) in tab order
+      tabOnClick(calculateIndexNeighbouringTabOfCurrent(-1));
+    });
+
+    return function cleanup() {
+      Mousetrap.unbind('ctrl+tab');
+      Mousetrap.unbind('ctrl+shift+tab');
+    };
+  }, [props.menuState]);
 
   return (
     <TabPanel>
