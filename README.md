@@ -20,31 +20,32 @@ The script starts with install [Homebrew](https://brew.sh/) and brew formulas wh
 - Run `npm test` to run tests
 - Run `npm run lint` to check for code errors
 
-### Running the application as developer:
+### Running the application as developer
 
-**Using Visual Studio Code (Recommended):**<br/>
-Simply run the debug configuration using F5. Then, use the [Debug toolbar](https://code.visualstudio.com/docs/editor/debugging#_debug-actions) to stop or restart the application.<br/>
+#### Using Visual Studio Code (Recommended)
+Simply run the debug configuration using F5. Then, use the [Debug toolbar](https://code.visualstudio.com/docs/editor/debugging#_debug-actions) to stop or restart the application.  
 A background task for React/webpack server will start if it isn't running. This task can be left running while you are developing!
 
-**Without Visual Studio Code:**<br/>
+#### Without Visual Studio Code:
 Run `npm run dev` to run application in developer mode with live update
 
-### Developer tools/Debugging:
+### Developer tools/Debugging
 
-**For main process:**<br/>
-If using VSCode and the debug configuration:<br/>
-Output from the main electron process is in Debug Console. In VS Code breakpoints can be added to the scripts the main process executes.<br/>
+#### For main process
+If using VSCode and the debug configuration:  
+Output from the main electron process is in Debug Console. In VS Code breakpoints can be added to the scripts the main process executes.  
 Output from the background task (the webpack server) is in a Terminal tab.
 
-Else:<br/>
+Else:  
 Output from the main electron process is wherever you ran `npm run dev`. Debugging and breakpoints is available using the [Chrome Node Inspector](https://nodejs.org/en/docs/guides/debugging-getting-started/#chrome-devtools-55-microsoft-edge)
 
-**For renderer process:**<br/>
+#### For renderer process
 Redux Devtools and React Developer Tools are installed and can be found in the Chrome DevTools.<br/>
 In the tab _Sources_ breakpoints can be added to scripts the specific window executes.
 
 (Node version used: `8.4.0`, others (newer versions) may work as well.)
 
+#### Linting
 Make sure your editor of choice has plugins for ESLint and Prettier installed _(for VSCode these are recommended: [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode))_, because then it will give a lot of hints for what the linter complains about.
 
 ### How to name branches and git flow
