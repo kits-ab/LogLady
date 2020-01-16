@@ -19,7 +19,7 @@ Run `npm test` to run tests.
 
 Run `npm run lint` to check for code errors
 
-## Running the application as developer:
+### Running the application as developer:
 
 **Using Visual Studio Code (Recommended):**<br/>
 Simply run the debug configuration using F5. Then, use the [Debug toolbar](https://code.visualstudio.com/docs/editor/debugging#_debug-actions) to stop or restart the application.<br/>
@@ -28,7 +28,7 @@ A background task for React/webpack server will start if it isn't running. This 
 **Without Visual Studio Code:**<br/>
 Run `npm run dev` to run application in developer mode with live update
 
-## Developer tools/Debugging:
+### Developer tools/Debugging:
 
 **For main process:**<br/>
 If using VSCode and the debug configuration:<br/>
@@ -46,7 +46,7 @@ In the tab _Sources_ breakpoints can be added to scripts the specific window exe
 
 Make sure your editor of choice has plugins for ESLint and Prettier installed _(for VSCode these are recommended: [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode))_, because then it will give a lot of hints for what the linter complains about.
 
-## How to name branches and git flow
+### How to name branches and git flow
 
 Tasks can be found in [Projects](https://github.com/kits-ab/LogLady/projects/1).
 
@@ -66,7 +66,7 @@ Example: `#5 update README. Explained naming.`
 
 Push when done. Make pull request to develop (Merge the created branch into develop) where you add task ID to beginning of comment.
 
-## Creating a new release
+### Creating a new release
 
 Currently, the project is using Travis to run electron-builder, which handles the building, packing and distribution. Apps installed on computers will autoupdate when a new release is available. The files are stored using GitHub Releases.
 
@@ -81,9 +81,9 @@ When the project is ready for a new release you need to:
 
 The new update should be automatically downloaded for users and the website will always link to the latest files.
 
-## When in doubt: Look through the repo to see how something was done earlier, or git blame and ask the people listed there!
+### When in doubt: Look through the repo to see how something was done earlier, or git blame and ask the people listed there!
 
-## Useful links
+### Useful links
 
 _Learn Javascript and Node_
 
@@ -119,15 +119,15 @@ _...more_
 
 ## Project Overview
 
-#### Context
+### Context
 
 ![Context Overview](docs/Context.png 'Context')
 
-#### Containers
+### Containers
 
 ![Containers](docs/Containers.png 'Containers')
 
-#### Continous Integration
+### Continous Integration
 
 ![Continous Integration](docs/CI.png 'Continous Integration')
 
@@ -139,31 +139,31 @@ _...more_
 - Display - UI display device
 - Export - Exports data to other formats
 
-#### Source
+### Source
 
 | Source           | Adapter       | Engine                    | Display/Export                        |
 | ---------------- | ------------- | ------------------------- | ------------------------------------- |
 | Generator change | Adapter reads | Engine notifies listeners | Listeners can read change if relevant |
 
-#### Random Input
+### Random Input
 
 | Seekable Source    | Adapter       | Engine                    | Display/Export                        |
 | ------------------ | ------------- | ------------------------- | ------------------------------------- |
 | Device reads block | Adapter reads | Engine notifies listeners | Listeners can read change if relevant |
 
-#### Scan Input
+### Scan Input
 
 | Seekable Source           | Adapter       | Engine                    | Display/Export                        |
 | ------------------------- | ------------- | ------------------------- | ------------------------------------- |
 | Complete scan with filter | Adapter reads | Engine notifies listeners | Listeners can read change if relevant |
 
-#### Random Seek
+### Random Seek
 
 | Display/Export                           | Engine                  | Adapter                           |
 | ---------------------------------------- | ----------------------- | --------------------------------- |
 | Display/Export requests data at position | Engine notifies Adapter | Adapter starts random input cycle |
 
-#### Full Scan
+### Full Scan
 
 | Display/Export                         | Engine                  | Adapter                         |
 | -------------------------------------- | ----------------------- | ------------------------------- |
