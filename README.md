@@ -2,6 +2,12 @@
 
 ## How to develop
 
+### Tools to install
+
+- Node: version `8.4.0`, newer versions may work as well
+- npm: version `6.4.1` confirmed to work, older may work, newer should work 
+- VS Code (recommended): Can be used for easy debugging, but other than that any editor works
+
 ### Setting up your environment
 
 #### Using Homebrew
@@ -42,8 +48,6 @@ Output from the main electron process is wherever you ran `npm run dev`. Debuggi
 #### For renderer process
 Redux Devtools and React Developer Tools are installed and can be found in the Chrome DevTools.<br/>
 In the tab _Sources_ breakpoints can be added to scripts the specific window executes.
-
-(Node version used: `8.4.0`, others (newer versions) may work as well.)
 
 #### Linting
 Make sure your editor of choice has plugins for ESLint and Prettier installed _(for VSCode these are recommended: [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode))_, because then it will give a lot of hints for what the linter complains about.
