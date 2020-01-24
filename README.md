@@ -4,8 +4,8 @@
 
 ### Tools to install
 
-- Node: version `8.4.0`, newer versions may work as well
-- npm: version `6.4.1` confirmed to work, older may work, newer should work 
+- Node: Use latest version, but version `8.4.0` is confirmed to work
+- npm: Use latest version, but version `6.4.1` is confirmed to work
 - VS Code (recommended): Can be used for easy debugging, but other than that any editor works
 
 ### Setting up your environment
