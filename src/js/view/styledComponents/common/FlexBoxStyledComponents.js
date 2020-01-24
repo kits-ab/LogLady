@@ -54,9 +54,7 @@ export const Container = styled.div`
         return calculatePadding(x);
       });
 
-    return `padding: ${padding[0]}px ${padding[1]}px ${padding[2]}px ${
-      padding[3]
-    }px`;
+    return `padding: ${padding[0]}px ${padding[1]}px ${padding[2]}px ${padding[3]}px`;
   }};
   flex-direction: ${props => {
     return props.column ? 'column' : 'row';
