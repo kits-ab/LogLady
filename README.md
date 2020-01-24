@@ -1,5 +1,10 @@
 # LogLady
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/kits-ab/loglady)
+![GitHub All Releases](https://img.shields.io/github/downloads/kits-ab/loglady/total)
+![Travis build status](https://travis-ci.com/kits-ab/LogLady.svg?branch=develop "build status")
+
+
 ## How to develop
 
 ### Tools to install
