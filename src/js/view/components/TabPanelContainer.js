@@ -5,7 +5,6 @@ import {
   PivotLinkSize
 } from 'office-ui-fabric-react/lib/Pivot';
 import React, { useEffect } from 'react';
-import { TabPanel } from '../styledComponents/TabPanelStyledComponent';
 import { connect } from 'react-redux';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
 import { Indicator } from '../styledComponents/TabPanelStyledComponent';
