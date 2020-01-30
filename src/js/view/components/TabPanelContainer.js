@@ -16,6 +16,7 @@ import {
 } from '../actions/dispatchActions';
 import { closeFile } from './helpers/handleFileHelper';
 import Mousetrap from 'mousetrap';
+import { Stack } from 'office-ui-fabric-react';
 
 /**
  * Helper function to get actual modulo operation, as %-operator doesn't quite fit the bill
@@ -30,6 +31,14 @@ function TabPanelContainer(props) {
     logInfoState: { logSizes, lastSeenLogSizes },
     dispatch
   } = props;
+
+  // Set overflow on stack so that scrollbars appear when overflowing
+  const stackStyles = {
+    root: {
+      overflowX: 'auto',
+      overflowY: 'hidden'
+    }
+  };
 
   function tabOnClick(index) {
     const currentPath = openSources[currentSourceHandle].path;
@@ -96,42 +105,40 @@ function TabPanelContainer(props) {
   }, [props.menuState]);
 
   return (
-    <TabPanel>
-      <div>
-        <Pivot
-          linkSize={PivotLinkSize.large}
-          onLinkClick={onLinkClick}
-          selectedKey={currentSourceHandle}
-        >
-          {Object.keys(openSources).map(source => {
-            const path = openSources[source].path;
-            const index = openSources[source].index;
-            const logSize = logSizes[path];
-            const lastSeenLogSize = lastSeenLogSizes[path];
+    <Stack horizontal styles={stackStyles}>
+      <Pivot
+        linkSize={PivotLinkSize.large}
+        onLinkClick={onLinkClick}
+        selectedKey={currentSourceHandle}
+      >
+        {Object.keys(openSources).map(source => {
+          const path = openSources[source].path;
+          const index = openSources[source].index;
+          const logSize = logSizes[path];
+          const lastSeenLogSize = lastSeenLogSizes[path];
 
-            return (
-              <PivotItem
-                headerText={getFormattedFilePath(
-                  openSources[source].path,
-                  `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
-                )}
-                onRenderItemLink={customRenderer(
-                  openSources,
-                  source,
-                  exitLog,
-                  currentSourceHandle,
-                  logSize,
-                  lastSeenLogSize
-                )}
-                index={index}
-                key={source}
-                itemKey={index}
-              ></PivotItem>
-            );
-          })}
-        </Pivot>
-      </div>
-    </TabPanel>
+          return (
+            <PivotItem
+              headerText={getFormattedFilePath(
+                openSources[source].path,
+                `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
+              )}
+              onRenderItemLink={customRenderer(
+                openSources,
+                source,
+                exitLog,
+                currentSourceHandle,
+                logSize,
+                lastSeenLogSize
+              )}
+              index={index}
+              key={source}
+              itemKey={index}
+            ></PivotItem>
+          );
+        })}
+      </Pivot>
+    </Stack>
   );
 }
 
