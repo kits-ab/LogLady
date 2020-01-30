@@ -53,7 +53,6 @@ function TabPanelContainer(props) {
 
   function exitLog(sourcePath, event) {
     event.stopPropagation();
-    console.log('Exit log');
     closeFile(dispatch, sourcePath);
   }
 
@@ -156,7 +155,6 @@ function customRenderer(
         <div style={{ display: 'inline' }}>
           <div
             onClick={event => {
-              console.log('clickevent');
               exitLog(openSources[source].path, event);
             }}
             style={{ display: 'inline-block', marginLeft: '10px' }}
