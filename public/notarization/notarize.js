@@ -20,8 +20,8 @@ const err = (...args) => {
  */
 const controlWaitingOutput = shouldRun => {
   // Start writing waiting output, or if finished make a new line
-  if (shouldRun && !waitingOutputRunning) {
-    waitingOutputRunning = shouldRun;
+  waitingOutputRunning = shouldRun;
+  if (waitingOutputRunning) {
     runWaitingOutput();
   } else {
     process.stdout.write('\n');
