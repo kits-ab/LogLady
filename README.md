@@ -33,6 +33,11 @@ The script starts with install [Homebrew](https://brew.sh/) and brew formulas wh
 
 ### Running the application as developer
 
+#### Help, the app won't start!
+Some developers have reported problems with the startup-scripts working correctly, but electron refuses to display a window. I.e., running `npm run dev` or starting via F5 in VS Code does not produce an error, but displays `Compiled successfully!` as expected, yet no window is displayed by electron.
+
+This seems to somehow be related to saved appData, and clearing folder `C:\Users\<user>\AppData\Roaming\loglady` is confirmed to have helped.
+
 #### Using Visual Studio Code (Recommended)
 Simply run the debug configuration using F5. Then, use the [Debug toolbar](https://code.visualstudio.com/docs/editor/debugging#_debug-actions) to stop or restart the application.  
 A background task for React/webpack server will start if it isn't running. This task can be left running while you are developing!
