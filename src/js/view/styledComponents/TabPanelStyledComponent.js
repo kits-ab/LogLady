@@ -1,15 +1,5 @@
 import styled from 'styled-components';
 
-export const TabPanel = styled.div`
-  display: flex;
-  flex-direction: row;
-  background: #ccc;
-  padding-top: 1px;
-  overflow: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-`;
-
 export const Indicator = styled.div`
   width: 10px;
   height: 10px;
