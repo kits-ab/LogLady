@@ -1,12 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  LogViewerContainer,
-  CloseFileButton
-} from '../styledComponents/LogViewerStyledComponents';
+import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponents';
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
-import { closeFile } from './helpers/handleFileHelper';
 import { parseRegExp } from './helpers/regexHelper';
 
 const LogViewer = props => {
@@ -93,12 +89,6 @@ const LogViewer = props => {
 
   return (
     <LogViewerContainer>
-      <CloseFileButton
-        show={props.source}
-        onClick={() => {
-          closeFile(props.dispatch, props.source.path);
-        }}
-      />
       <LogViewerList
         key={props.source.index}
         highlightColor={props.highlightColor}
