@@ -37,5 +37,5 @@ export const HighlightMatch = styled.span`
   background: yellow;
   opacity: 0.5;
   color: black;
-  fontweight: bold;
+  font-weight: bold;
 `;
