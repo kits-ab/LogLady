@@ -15,7 +15,7 @@ import {
 } from '../actions/dispatchActions';
 import { closeFile, showOpenDialog } from './helpers/handleFileHelper';
 import Mousetrap from 'mousetrap';
-import { Stack } from 'office-ui-fabric-react';
+import { Stack, IconButton } from 'office-ui-fabric-react';
 
 /**
  * Helper function to get actual modulo operation, as %-operator doesn't quite fit the bill
@@ -40,14 +40,10 @@ function TabPanelContainer(props) {
   };
 
   function tabOnClick(index) {
-    if (index === 'open-new-file-tab') {
-      showOpenDialog();
-    } else {
-      const currentPath = openSources[currentSourceHandle].path;
+    const currentPath = openSources[currentSourceHandle].path;
 
-      setLastSeenLogSizeToSize(dispatch, currentPath, logSizes[currentPath]);
-      updateSourceHandle(dispatch, index);
-    }
+    setLastSeenLogSizeToSize(dispatch, currentPath, logSizes[currentPath]);
+    updateSourceHandle(dispatch, index);
   }
 
   const onLinkClick = function(PivotItem) {
@@ -107,7 +103,7 @@ function TabPanelContainer(props) {
   }, [props.menuState]);
 
   return (
-    <Stack horizontal styles={stackStyles}>
+    <Stack horizontal verticalAlign="center" styles={stackStyles}>
       <Pivot
         linkSize={PivotLinkSize.large}
         onLinkClick={onLinkClick}
@@ -139,14 +135,13 @@ function TabPanelContainer(props) {
             ></PivotItem>
           );
         })}
-
-        <PivotItem
-          index="open-new-file-tab"
-          itemIcon="Add"
-          itemKey="open-new-file-tab"
-          linkSize={PivotLinkSize.large}
-        />
       </Pivot>
+      <IconButton
+        iconProps={{ iconName: 'Add' }}
+        onClick={() => {
+          showOpenDialog();
+        }}
+      />
     </Stack>
   );
 }
