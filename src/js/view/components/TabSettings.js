@@ -6,8 +6,7 @@ import {
   handleHighlightColor,
   handleWrapLineOn
 } from '../actions/dispatchActions';
-import { SettingTitle } from '../styledComponents/TabSettingsStyledComponents';
-import { Stack, IconButton } from 'office-ui-fabric-react';
+import { Stack, IconButton, Label } from 'office-ui-fabric-react';
 
 const { Component } = require('react');
 const React = require('react');
@@ -23,7 +22,7 @@ class TabSettings extends Component {
       <Stack horizontal horizontalAlign="space-between">
         <Stack horizontal tokens={stackTokens}>
           <Stack.Item>
-            <SettingTitle>Color for highlights</SettingTitle>
+            <Label>Color for highlights</Label>
             <GithubPicker
               color={this.props.highlightColor}
               triangle={'hide'}
@@ -33,7 +32,7 @@ class TabSettings extends Component {
             />
           </Stack.Item>
           <Stack.Item>
-            <SettingTitle>Wrap Lines</SettingTitle>
+            <Label>Wrap Lines</Label>
             <SwitchButton
               checked={this.props.wrapLineOn}
               onChange={() => {
