@@ -13,9 +13,9 @@ import {
   updateSourceHandle,
   setLastSeenLogSizeToSize
 } from '../actions/dispatchActions';
-import { closeFile } from './helpers/handleFileHelper';
+import { closeFile, showOpenDialog } from './helpers/handleFileHelper';
 import Mousetrap from 'mousetrap';
-import { Stack } from 'office-ui-fabric-react';
+import { Stack, IconButton } from 'office-ui-fabric-react';
 
 /**
  * Helper function to get actual modulo operation, as %-operator doesn't quite fit the bill
@@ -103,7 +103,7 @@ function TabPanelContainer(props) {
   }, [props.menuState]);
 
   return (
-    <Stack horizontal styles={stackStyles}>
+    <Stack horizontal verticalAlign="center" styles={stackStyles}>
       <Pivot
         linkSize={PivotLinkSize.large}
         onLinkClick={onLinkClick}
@@ -136,6 +136,12 @@ function TabPanelContainer(props) {
           );
         })}
       </Pivot>
+      <IconButton
+        iconProps={{ iconName: 'Add' }}
+        onClick={() => {
+          showOpenDialog();
+        }}
+      />
     </Stack>
   );
 }
