@@ -61,7 +61,7 @@ const LogViewer = props => {
         logs: props.logs[props.source.path]
       });
     }
-  }, [props.filterInput, props.highlightInput]);
+  }, [props.filterInput, props.highlightInput, props.highlightColor]);
 
   useEffect(() => {
     // Effect for when new lines are added
