@@ -13,7 +13,7 @@ import {
   updateSourceHandle,
   setLastSeenLogSizeToSize
 } from '../actions/dispatchActions';
-import { closeFile } from './helpers/handleFileHelper';
+import { closeFile, showOpenDialog } from './helpers/handleFileHelper';
 import Mousetrap from 'mousetrap';
 import { Stack } from 'office-ui-fabric-react';
 
@@ -40,10 +40,14 @@ function TabPanelContainer(props) {
   };
 
   function tabOnClick(index) {
-    const currentPath = openSources[currentSourceHandle].path;
+    if (index === 'open-new-file-tab') {
+      showOpenDialog();
+    } else {
+      const currentPath = openSources[currentSourceHandle].path;
 
-    setLastSeenLogSizeToSize(dispatch, currentPath, logSizes[currentPath]);
-    updateSourceHandle(dispatch, index);
+      setLastSeenLogSizeToSize(dispatch, currentPath, logSizes[currentPath]);
+      updateSourceHandle(dispatch, index);
+    }
   }
 
   const onLinkClick = function(PivotItem) {
@@ -135,6 +139,13 @@ function TabPanelContainer(props) {
             ></PivotItem>
           );
         })}
+
+        <PivotItem
+          index="open-new-file-tab"
+          itemIcon="Add"
+          itemKey="open-new-file-tab"
+          linkSize={PivotLinkSize.large}
+        />
       </Pivot>
     </Stack>
   );
