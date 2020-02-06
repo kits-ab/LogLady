@@ -19,6 +19,23 @@ const stackTokens = {
 
 class TopPanel extends React.Component {
   render() {
+    const sourcePath = this.props.openSources[this.props.currentSourceHandle]
+      .path;
+
+    const filterText = this.props.settings[sourcePath]
+      ? this.props.settings[sourcePath].filterInput
+      : '';
+    const highlightText = this.props.settings[sourcePath]
+      ? this.props.settings[sourcePath].highlightInput
+      : '';
+    const tailSwitch = this.props.settings[sourcePath]
+      ? this.props.settings[sourcePath].tailSwitch
+      : true;
+
+    console.log(filterText);
+    console.log(highlightText);
+    console.log(tailSwitch);
+
     return (
       <Stack wrap horizontal horizontalAlign="space-between">
         <Stack wrap horizontal tokens={stackTokens}>
@@ -38,9 +55,9 @@ class TopPanel extends React.Component {
               placeholder="Filter"
               debounce={222}
               onTextChange={text => {
-                handleFilterInput(this.props.dispatch, text);
+                handleFilterInput(this.props.dispatch, { sourcePath, text });
               }}
-              value={this.props.filterInput}
+              value={filterText}
             />
           </Stack.Item>
           <Stack.Item align="center">
@@ -48,18 +65,18 @@ class TopPanel extends React.Component {
               placeholder="Highlight"
               debounce={222}
               onTextChange={text => {
-                handleHighlightInput(this.props.dispatch, text);
+                handleHighlightInput(this.props.dispatch, { sourcePath, text });
               }}
-              value={this.props.highlightInput}
+              value={highlightText}
             />
           </Stack.Item>
         </Stack>
         <Stack horizontal tokens={stackTokens}>
           <Stack.Item disableShrink align="center">
             <SwitchButton
-              checked={this.props.tailSwitch}
+              checked={tailSwitch}
               onChange={() => {
-                handleTailSwitch(this.props.dispatch);
+                handleTailSwitch(this.props.dispatch, { sourcePath });
               }}
               label="Follow"
               onText="On"
@@ -73,14 +90,13 @@ class TopPanel extends React.Component {
 }
 
 const mapStateToProps = ({
-  menuState: { openFiles },
-  topPanelState: { tailSwitch, filterInput, highlightInput }
+  menuState: { openSources, currentSourceHandle },
+  topPanelState: { settings }
 }) => {
   return {
-    openFiles,
-    tailSwitch,
-    filterInput,
-    highlightInput
+    currentSourceHandle,
+    openSources,
+    settings
   };
 };
 
