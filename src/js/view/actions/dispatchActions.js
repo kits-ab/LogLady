@@ -1,6 +1,7 @@
-export const handleShowSettings = dispatch => {
+export const handleShowSettings = (dispatch, data) => {
   dispatch({
-    type: 'showSettings'
+    type: 'showSettings',
+    data: data
   });
 };
 
@@ -32,9 +33,10 @@ export const handleHighlightColor = (dispatch, data) => {
   });
 };
 
-export const handleWrapLineOn = dispatch => {
+export const handleWrapLineOn = (dispatch, data) => {
   dispatch({
-    type: 'wrapLineOn'
+    type: 'wrapLineOn',
+    data: data
   });
 };
 
