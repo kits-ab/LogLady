@@ -6,6 +6,13 @@ import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
 
 const LogViewer = props => {
+  const filterInput = props.settings[props.source.path]
+    ? props.settings[props.source.path].filterInput
+    : '';
+  const highlightInput = props.settings[props.source.path]
+    ? props.settings[props.source.path].highlightInput
+    : '';
+
   const [filteredAndHighlightedLines, setLines] = useState([]); // Used to save and update the current filtered and highlighted lines
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
 
@@ -14,8 +21,8 @@ const LogViewer = props => {
     IPC messages go through the main process and are stringified,
     but JSON can't serialize RegExes, so toString is used before that.
     For more information see mainScriptOffloader.js */
-    let filterRegex = parseRegExp(props.filterInput),
-      highlightRegex = parseRegExp(props.highlightInput);
+    let filterRegex = parseRegExp(filterInput),
+      highlightRegex = parseRegExp(highlightInput);
     window.ipcRenderer.send('hiddenWindowMessages', {
       type: 'requestHelpFilterAndHighlightLines',
       filterRegexString: filterRegex ? filterRegex.toString() : '',
@@ -61,7 +68,7 @@ const LogViewer = props => {
         logs: props.logs[props.source.path]
       });
     }
-  }, [props.filterInput, props.highlightInput, props.highlightColor]);
+  }, [filterInput, highlightInput, props.highlightColor]);
 
   useEffect(() => {
     // Effect for when new lines are added
@@ -101,14 +108,12 @@ const LogViewer = props => {
 };
 
 const mapStateToProps = ({
-  topPanelState: { filterInput, highlightInput, tailSwitch },
+  topPanelState: { settings },
   settingsState: { highlightColor, wrapLineOn },
   logViewerState: { logs }
 }) => {
   return {
-    filterInput,
-    highlightInput,
-    tailSwitch,
+    settings,
     highlightColor,
     wrapLineOn,
     logs
