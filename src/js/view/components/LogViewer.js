@@ -6,6 +6,22 @@ import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
 
 const LogViewer = props => {
+  const filterInput = props.settings[props.source.path]
+    ? props.settings[props.source.path].filterInput
+    : '';
+  const highlightInput = props.settings[props.source.path]
+    ? props.settings[props.source.path].highlightInput
+    : '';
+  const highlightColor = props.tabSettings[props.source.path]
+    ? props.tabSettings[props.source.path].highlightColor
+    : 'red';
+  const wrapLineOn = props.tabSettings[props.source.path]
+    ? props.tabSettings[props.source.path].wrapLineOn
+    : 'false';
+  const tailSwitch = props.settings[props.source.path]
+    ? props.settings[props.source.path].tailSwitch
+    : 'true';
+
   const [filteredAndHighlightedLines, setLines] = useState([]); // Used to save and update the current filtered and highlighted lines
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
 
@@ -14,8 +30,8 @@ const LogViewer = props => {
     IPC messages go through the main process and are stringified,
     but JSON can't serialize RegExes, so toString is used before that.
     For more information see mainScriptOffloader.js */
-    let filterRegex = parseRegExp(props.filterInput),
-      highlightRegex = parseRegExp(props.highlightInput);
+    let filterRegex = parseRegExp(filterInput),
+      highlightRegex = parseRegExp(highlightInput);
     window.ipcRenderer.send('hiddenWindowMessages', {
       type: 'requestHelpFilterAndHighlightLines',
       filterRegexString: filterRegex ? filterRegex.toString() : '',
@@ -61,7 +77,7 @@ const LogViewer = props => {
         logs: props.logs[props.source.path]
       });
     }
-  }, [props.filterInput, props.highlightInput, props.highlightColor]);
+  }, [filterInput, highlightInput, highlightColor]);
 
   useEffect(() => {
     // Effect for when new lines are added
@@ -91,9 +107,9 @@ const LogViewer = props => {
     <LogViewerContainer>
       <LogViewerList
         key={props.source.index}
-        highlightColor={props.highlightColor}
-        wrapLines={props.wrapLineOn}
-        scrollToBottom={props.tailSwitch}
+        highlightColor={highlightColor}
+        wrapLines={wrapLineOn}
+        scrollToBottom={tailSwitch}
         lines={filteredAndHighlightedLines}
       />
     </LogViewerContainer>
@@ -101,16 +117,13 @@ const LogViewer = props => {
 };
 
 const mapStateToProps = ({
-  topPanelState: { filterInput, highlightInput, tailSwitch },
-  settingsState: { highlightColor, wrapLineOn },
+  topPanelState: { settings },
+  settingsState: { tabSettings },
   logViewerState: { logs }
 }) => {
   return {
-    filterInput,
-    highlightInput,
-    tailSwitch,
-    highlightColor,
-    wrapLineOn,
+    settings,
+    tabSettings,
     logs
   };
 };

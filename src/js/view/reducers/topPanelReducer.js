@@ -1,26 +1,63 @@
-const initialState = {
+const initialTabState = {
   tailSwitch: true,
   highlightInput: '',
   filterInput: ''
 };
 
+const initialState = {
+  settings: {}
+};
+
 export const topPanelReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'tailSwitch':
+    case 'tailSwitch': {
+      const { sourcePath } = action.data;
+
       return {
-        ...state,
-        tailSwitch: !state.tailSwitch
+        settings: {
+          ...state.settings,
+          [sourcePath]: {
+            ...state.settings[sourcePath],
+            tailSwitch: !state.settings[sourcePath].tailSwitch
+          }
+        }
       };
-    case 'filterInput':
+    }
+    case 'filterInput': {
+      const { sourcePath } = action.data;
+
       return {
-        ...state,
-        filterInput: action.data
+        settings: {
+          ...state.settings,
+          [sourcePath]: {
+            ...state.settings[sourcePath],
+            filterInput: action.data.text
+          }
+        }
       };
-    case 'highlightInput':
+    }
+    case 'highlightInput': {
+      const { sourcePath } = action.data;
+
       return {
-        ...state,
-        highlightInput: action.data
+        settings: {
+          ...state.settings,
+          [sourcePath]: {
+            ...state.settings[sourcePath],
+            highlightInput: action.data.text
+          }
+        }
       };
+    }
+    case 'CREATE_SETTINGS_OBJECT': {
+      const { sourcePath } = action.data;
+      return {
+        settings: {
+          ...state.settings,
+          [sourcePath]: initialTabState
+        }
+      };
+    }
     case 'TOP_PANEL_STATE_RESTORE':
       return { ...initialState, ...action.data };
     default:

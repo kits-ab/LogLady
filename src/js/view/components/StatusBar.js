@@ -20,7 +20,9 @@ class StatusBar extends React.Component {
         <StatusBarSC.SettingIcon
           src={settings}
           onClick={() => {
-            handleShowSettings(this.props.dispatch);
+            handleShowSettings(this.props.dispatch, {
+              sourcePath: this.props.source.path
+            });
           }}
           alt="settings"
         />

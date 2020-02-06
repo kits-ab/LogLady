@@ -18,25 +18,41 @@ const stackTokens = {
 
 class TabSettings extends Component {
   render() {
-    return this.props.showSettings ? (
+    const sourcePath = this.props.openSources[this.props.currentSourceHandle]
+      .path;
+
+    const showSettings = this.props.tabSettings[sourcePath]
+      ? this.props.tabSettings[sourcePath].showSettings
+      : false;
+    const highlightColor = this.props.tabSettings[sourcePath]
+      ? this.props.tabSettings[sourcePath].highlightColor
+      : 'red';
+    const wrapLineOn = this.props.tabSettings[sourcePath]
+      ? this.props.tabSettings[sourcePath].wrapLineOn
+      : false;
+
+    return showSettings ? (
       <Stack horizontal horizontalAlign="space-between">
         <Stack horizontal tokens={stackTokens}>
           <Stack.Item>
             <Label>Color for highlights</Label>
             <GithubPicker
-              color={this.props.highlightColor}
+              color={highlightColor}
               triangle={'hide'}
               onChangeComplete={e => {
-                handleHighlightColor(this.props.dispatch, e.hex);
+                handleHighlightColor(this.props.dispatch, {
+                  color: e.hex,
+                  sourcePath
+                });
               }}
             />
           </Stack.Item>
           <Stack.Item>
             <Label>Wrap Lines</Label>
             <SwitchButton
-              checked={this.props.wrapLineOn}
+              checked={wrapLineOn}
               onChange={() => {
-                handleWrapLineOn(this.props.dispatch);
+                handleWrapLineOn(this.props.dispatch, { sourcePath });
               }}
               onText="On"
               offText="Off"
@@ -47,7 +63,7 @@ class TabSettings extends Component {
           <IconButton
             iconProps={{ iconName: 'Cancel' }}
             onClick={() => {
-              handleShowSettings(this.props.dispatch);
+              handleShowSettings(this.props.dispatch, { sourcePath });
             }}
           ></IconButton>
         </Stack>
@@ -57,12 +73,13 @@ class TabSettings extends Component {
 }
 
 const mapStateToProps = ({
-  settingsState: { showSettings, highlightColor, wrapLineOn }
+  settingsState: { tabSettings },
+  menuState: { openSources, currentSourceHandle }
 }) => {
   return {
-    showSettings,
-    highlightColor,
-    wrapLineOn
+    tabSettings,
+    openSources,
+    currentSourceHandle
   };
 };
 

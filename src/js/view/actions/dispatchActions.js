@@ -1,12 +1,14 @@
-export const handleShowSettings = dispatch => {
+export const handleShowSettings = (dispatch, data) => {
   dispatch({
-    type: 'showSettings'
+    type: 'showSettings',
+    data: data
   });
 };
 
-export const handleTailSwitch = dispatch => {
+export const handleTailSwitch = (dispatch, data) => {
   dispatch({
-    type: 'tailSwitch'
+    type: 'tailSwitch',
+    data: data
   });
 };
 
@@ -31,9 +33,10 @@ export const handleHighlightColor = (dispatch, data) => {
   });
 };
 
-export const handleWrapLineOn = dispatch => {
+export const handleWrapLineOn = (dispatch, data) => {
   dispatch({
-    type: 'wrapLineOn'
+    type: 'wrapLineOn',
+    data: data
   });
 };
 
@@ -85,6 +88,13 @@ export const setFileData = (dispatch, filePath, fileSize, history) => {
     data: {
       sourcePath: filePath,
       size: fileSize
+    }
+  });
+
+  dispatch({
+    type: 'CREATE_SETTINGS_OBJECT',
+    data: {
+      sourcePath: filePath
     }
   });
 };
