@@ -5,7 +5,6 @@ import {
   PivotLinkSize
 } from 'office-ui-fabric-react/lib/Pivot';
 import React, { useEffect } from 'react';
-import { TabPanel } from '../styledComponents/TabPanelStyledComponent';
 import { connect } from 'react-redux';
 import { getFormattedFilePath } from './helpers/StatusBarHelper';
 import { Indicator } from '../styledComponents/TabPanelStyledComponent';
@@ -14,8 +13,9 @@ import {
   updateSourceHandle,
   setLastSeenLogSizeToSize
 } from '../actions/dispatchActions';
-import { closeFile } from './helpers/handleFileHelper';
+import { closeFile, showOpenDialog } from './helpers/handleFileHelper';
 import Mousetrap from 'mousetrap';
+import { Stack, IconButton } from 'office-ui-fabric-react';
 
 /**
  * Helper function to get actual modulo operation, as %-operator doesn't quite fit the bill
@@ -31,6 +31,14 @@ function TabPanelContainer(props) {
     dispatch
   } = props;
 
+  // Set overflow on stack so that scrollbars appear when overflowing
+  const stackStyles = {
+    root: {
+      overflowX: 'auto',
+      overflowY: 'hidden'
+    }
+  };
+
   function tabOnClick(index) {
     const currentPath = openSources[currentSourceHandle].path;
 
@@ -45,7 +53,6 @@ function TabPanelContainer(props) {
 
   function exitLog(sourcePath, event) {
     event.stopPropagation();
-    console.log('Exit log');
     closeFile(dispatch, sourcePath);
   }
 
@@ -96,42 +103,46 @@ function TabPanelContainer(props) {
   }, [props.menuState]);
 
   return (
-    <TabPanel>
-      <div>
-        <Pivot
-          linkSize={PivotLinkSize.large}
-          onLinkClick={onLinkClick}
-          selectedKey={currentSourceHandle}
-        >
-          {Object.keys(openSources).map(source => {
-            const path = openSources[source].path;
-            const index = openSources[source].index;
-            const logSize = logSizes[path];
-            const lastSeenLogSize = lastSeenLogSizes[path];
+    <Stack horizontal verticalAlign="center" styles={stackStyles}>
+      <Pivot
+        linkSize={PivotLinkSize.large}
+        onLinkClick={onLinkClick}
+        selectedKey={currentSourceHandle}
+      >
+        {Object.keys(openSources).map(source => {
+          const path = openSources[source].path;
+          const index = openSources[source].index;
+          const logSize = logSizes[path];
+          const lastSeenLogSize = lastSeenLogSizes[path];
 
-            return (
-              <PivotItem
-                headerText={getFormattedFilePath(
-                  openSources[source].path,
-                  `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
-                )}
-                onRenderItemLink={customRenderer(
-                  openSources,
-                  source,
-                  exitLog,
-                  currentSourceHandle,
-                  logSize,
-                  lastSeenLogSize
-                )}
-                index={index}
-                key={source}
-                itemKey={index}
-              ></PivotItem>
-            );
-          })}
-        </Pivot>
-      </div>
-    </TabPanel>
+          return (
+            <PivotItem
+              headerText={getFormattedFilePath(
+                openSources[source].path,
+                `${navigator.platform.startsWith('Win') ? '\\' : '/'}`
+              )}
+              onRenderItemLink={customRenderer(
+                openSources,
+                source,
+                exitLog,
+                currentSourceHandle,
+                logSize,
+                lastSeenLogSize
+              )}
+              index={index}
+              key={source}
+              itemKey={index}
+            ></PivotItem>
+          );
+        })}
+      </Pivot>
+      <IconButton
+        iconProps={{ iconName: 'Add' }}
+        onClick={() => {
+          showOpenDialog();
+        }}
+      />
+    </Stack>
   );
 }
 
@@ -150,7 +161,6 @@ function customRenderer(
         <div style={{ display: 'inline' }}>
           <div
             onClick={event => {
-              console.log('clickevent');
               exitLog(openSources[source].path, event);
             }}
             style={{ display: 'inline-block', marginLeft: '10px' }}

@@ -1,15 +1,5 @@
 import styled from 'styled-components';
 
-export const TabPanel = styled.div`
-  display: flex;
-  flex-direction: row;
-  background: #ccc;
-  padding-top: 1px;
-  overflow: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-`;
-
 export const Indicator = styled.div`
   width: 10px;
   height: 10px;
@@ -17,8 +7,8 @@ export const Indicator = styled.div`
   background-color: orange;
   border-radius: 50%;
   position: relative;
-  top: -8px;
-  left: 10px;
+  top: -3px;
+  left: 2px;
   border: grey solid 1px;
   opacity: ${props => {
     let opacity = 0;
