@@ -12,6 +12,15 @@ const LogViewer = props => {
   const highlightInput = props.settings[props.source.path]
     ? props.settings[props.source.path].highlightInput
     : '';
+  const highlightColor = props.tabSettings[props.source.path]
+    ? props.tabSettings[props.source.path].highlightColor
+    : 'red';
+  const wrapLineOn = props.tabSettings[props.source.path]
+    ? props.tabSettings[props.source.path].wrapLineOn
+    : 'false';
+  const tailSwitch = props.settings[props.source.path]
+    ? props.settings[props.source.path].tailSwitch
+    : 'true';
 
   const [filteredAndHighlightedLines, setLines] = useState([]); // Used to save and update the current filtered and highlighted lines
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
@@ -68,7 +77,7 @@ const LogViewer = props => {
         logs: props.logs[props.source.path]
       });
     }
-  }, [filterInput, highlightInput, props.highlightColor]);
+  }, [filterInput, highlightInput, highlightColor]);
 
   useEffect(() => {
     // Effect for when new lines are added
@@ -98,9 +107,9 @@ const LogViewer = props => {
     <LogViewerContainer>
       <LogViewerList
         key={props.source.index}
-        highlightColor={props.highlightColor}
-        wrapLines={props.wrapLineOn}
-        scrollToBottom={props.tailSwitch}
+        highlightColor={highlightColor}
+        wrapLines={wrapLineOn}
+        scrollToBottom={tailSwitch}
         lines={filteredAndHighlightedLines}
       />
     </LogViewerContainer>
@@ -109,13 +118,12 @@ const LogViewer = props => {
 
 const mapStateToProps = ({
   topPanelState: { settings },
-  settingsState: { highlightColor, wrapLineOn },
+  settingsState: { tabSettings },
   logViewerState: { logs }
 }) => {
   return {
     settings,
-    highlightColor,
-    wrapLineOn,
+    tabSettings,
     logs
   };
 };
