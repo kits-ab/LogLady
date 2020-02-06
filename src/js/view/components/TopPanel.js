@@ -22,6 +22,8 @@ class TopPanel extends React.Component {
     const sourcePath = this.props.openSources[this.props.currentSourceHandle]
       .path;
 
+    // Get sane defaults if settings object is not initialized
+    // and prevents crashes due to undefined objects
     const filterText = this.props.settings[sourcePath]
       ? this.props.settings[sourcePath].filterInput
       : '';
@@ -31,10 +33,6 @@ class TopPanel extends React.Component {
     const tailSwitch = this.props.settings[sourcePath]
       ? this.props.settings[sourcePath].tailSwitch
       : true;
-
-    console.log(filterText);
-    console.log(highlightText);
-    console.log(tailSwitch);
 
     return (
       <Stack wrap horizontal horizontalAlign="space-between">

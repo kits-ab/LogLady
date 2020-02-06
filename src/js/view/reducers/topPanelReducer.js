@@ -11,10 +11,6 @@ const initialState = {
 export const topPanelReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'tailSwitch': {
-      /*return {
-        ...state,
-        tailSwitch: !state.tailSwitch
-      };*/
       const { sourcePath } = action.data;
 
       return {
@@ -28,10 +24,6 @@ export const topPanelReducer = (state = initialState, action) => {
       };
     }
     case 'filterInput': {
-      /*return {
-        ...state,
-        filterInput: action.data
-      };*/
       const { sourcePath } = action.data;
 
       return {
@@ -45,10 +37,6 @@ export const topPanelReducer = (state = initialState, action) => {
       };
     }
     case 'highlightInput': {
-      /*return {
-        ...state,
-        highlightInput: action.data
-      };*/
       const { sourcePath } = action.data;
 
       return {
@@ -62,7 +50,6 @@ export const topPanelReducer = (state = initialState, action) => {
       };
     }
     case 'CREATE_SETTINGS_OBJECT': {
-      console.log('creating object');
       const { sourcePath } = action.data;
       return {
         settings: {
