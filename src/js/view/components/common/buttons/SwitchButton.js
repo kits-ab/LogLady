@@ -11,7 +11,7 @@ class SwitchButton extends React.Component {
   render() {
     return (
       <Toggle
-        defaultChecked={this.props.checked}
+        checked={this.props.checked}
         label={this.props.label}
         inlineLabel
         ref="checkbox"
