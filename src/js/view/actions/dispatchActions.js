@@ -88,6 +88,13 @@ export const setFileData = (dispatch, filePath, fileSize, history) => {
       size: fileSize
     }
   });
+
+  dispatch({
+    type: 'CREATE_SETTINGS_OBJECT',
+    data: {
+      sourcePath: filePath
+    }
+  });
 };
 
 export const clearLog = (dispatch, filePath) => {
