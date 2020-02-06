@@ -2,9 +2,7 @@ import { settingsReducer } from './settingsReducer';
 
 describe('settingsReducer', () => {
   const initialState = {
-    showSettings: false,
-    highlightColor: 'red',
-    wrapLineOn: false
+    tabSettings: {}
   };
 
   it('should return the initial state', () => {
@@ -12,18 +10,36 @@ describe('settingsReducer', () => {
   });
 
   it('should toggle showSettings ', () => {
+    const createObject = {
+      type: 'CREATE_SETTINGS_OBJECT',
+      data: { sourcePath: 'file' }
+    };
+
+    const objectCreatedState = settingsReducer(initialState, createObject);
+
     const state = {
-      ...initialState,
-      showSettings: false
+      ...objectCreatedState,
+      tabSettings: {
+        file: {
+          ...objectCreatedState.tabSettings.file,
+          showSettings: false
+        }
+      }
     };
 
     const expectedState = {
       ...state,
-      showSettings: true
+      tabSettings: {
+        file: {
+          ...objectCreatedState.tabSettings.file,
+          showSettings: true
+        }
+      }
     };
 
     const action = {
-      type: 'showSettings'
+      type: 'showSettings',
+      data: { sourcePath: 'file' }
     };
 
     expect(settingsReducer(state, action)).toEqual(expectedState);
@@ -31,28 +47,53 @@ describe('settingsReducer', () => {
   });
 
   it('should set highlightColor ', () => {
+    const createObject = {
+      type: 'CREATE_SETTINGS_OBJECT',
+      data: { sourcePath: 'file' }
+    };
+
+    const objectCreatedState = settingsReducer(initialState, createObject);
+
     const expectedState = {
-      ...initialState,
-      highlightColor: 'yellow'
+      ...objectCreatedState,
+      tabSettings: {
+        file: {
+          ...objectCreatedState.tabSettings.file,
+          highlightColor: 'yellow'
+        }
+      }
     };
     const action = {
       type: 'highlightColor',
-      data: 'yellow'
+      data: { sourcePath: 'file', color: 'yellow' }
     };
 
-    expect(settingsReducer(initialState, action)).toEqual(expectedState);
+    expect(settingsReducer(objectCreatedState, action)).toEqual(expectedState);
   });
   it('should toggle wrapLineOn ', () => {
+    const createObject = {
+      type: 'CREATE_SETTINGS_OBJECT',
+      data: { sourcePath: 'file' }
+    };
+
+    const objectCreatedState = settingsReducer(initialState, createObject);
+
     const expectedState = {
-      ...initialState,
-      wrapLineOn: true
+      ...objectCreatedState,
+      tabSettings: {
+        file: {
+          ...objectCreatedState.tabSettings.file,
+          wrapLineOn: true
+        }
+      }
     };
 
     const action = {
-      type: 'wrapLineOn'
+      type: 'wrapLineOn',
+      data: { sourcePath: 'file' }
     };
 
-    expect(settingsReducer(initialState, action)).toEqual(expectedState);
-    expect(settingsReducer(expectedState, action)).toEqual(initialState);
+    expect(settingsReducer(objectCreatedState, action)).toEqual(expectedState);
+    expect(settingsReducer(expectedState, action)).toEqual(objectCreatedState);
   });
 });
