@@ -271,16 +271,6 @@ const loadRecentFilesFromDisk = () => {
 };
 
 const readDataFromByte = (filePath, start, numberOfBytes) => {
-  /*let filePath =
-    'C:\\Users\\Pontus Doverstav\\Documents\\Code\\lologoggenerator\\app\\lologog\\exampleLog';
-  let buffer = Buffer.alloc(100);
-  open(filePath, 'r', (err, fd) => {
-    let file
-
-    read(fd, buffer, 0, buffer.length, 0, (err, bytesRead, buffer) => {
-      console.log(buffer.toString('utf8', 0, bytesRead));
-    });
-  });*/
   return new Promise((resolve, reject) => {
     stat(filePath, function(error, stats) {
       open(filePath, 'r', function(error, fd) {
