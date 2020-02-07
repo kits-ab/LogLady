@@ -120,7 +120,7 @@ describe('Fetching a buffer from a file', () => {
     return readDataFromByte(
       'C:\\Users\\Pontus Doverstav\\Documents\\Code\\lologoggenerator\\app\\lologog\\exampleLog',
       1000000,
-      100000
+      1000
     ).then(data => {
       console.log(data);
     });
