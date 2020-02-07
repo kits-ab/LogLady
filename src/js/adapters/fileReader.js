@@ -1,4 +1,12 @@
-const { createReadStream, statSync, readFile, writeFile } = require('fs');
+const {
+  createReadStream,
+  statSync,
+  readFile,
+  writeFile,
+  open,
+  read,
+  stat
+} = require('fs');
 const app = require('electron').app;
 const path = require('path');
 const createBackwardsStream = require('fs-backwards-stream');
@@ -262,6 +270,34 @@ const loadRecentFilesFromDisk = () => {
   return readFileAsync(recentFiles());
 };
 
+const readDataFromByte = (filePath, start, numberOfBytes) => {
+  /*let filePath =
+    'C:\\Users\\Pontus Doverstav\\Documents\\Code\\lologoggenerator\\app\\lologog\\exampleLog';
+  let buffer = Buffer.alloc(100);
+  open(filePath, 'r', (err, fd) => {
+    let file
+
+    read(fd, buffer, 0, buffer.length, 0, (err, bytesRead, buffer) => {
+      console.log(buffer.toString('utf8', 0, bytesRead));
+    });
+  });*/
+  return new Promise((resolve, reject) => {
+    stat(filePath, function(error, stats) {
+      open(filePath, 'r', function(error, fd) {
+        var buffer = Buffer.alloc(numberOfBytes);
+        read(fd, buffer, 0, buffer.length, start, function(
+          error,
+          bytesRead,
+          buffer
+        ) {
+          var data = buffer.toString('utf8');
+          resolve(data);
+        });
+      });
+    });
+  });
+};
+
 module.exports = {
   readFile,
   readNLastLines,
@@ -278,5 +314,6 @@ module.exports = {
   saveStateToDisk,
   loadStateFromDisk,
   saveRecentFilesToDisk,
-  loadRecentFilesFromDisk
+  loadRecentFilesFromDisk,
+  readDataFromByte
 };
