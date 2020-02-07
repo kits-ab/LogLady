@@ -1,7 +1,8 @@
 import {
   parseLines,
   parseLinesBackwards,
-  countLinesInBuffer
+  countLinesInBuffer,
+  readDataFromByte
 } from './fileReader';
 
 describe('parseLines', () => {
@@ -111,5 +112,17 @@ describe('countLinesInBuffer', () => {
     const expectedResult = 7;
 
     expect(countLinesInBuffer(string)).toEqual(expectedResult);
+  });
+});
+
+describe('Fetching a buffer from a file', () => {
+  it('should not take too long', () => {
+    return readDataFromByte('src/resources/testFile', 100000, 1000).then(
+      data => {
+        console.log(data.lines);
+        console.log(data.linesStartAt);
+        console.log(data.linesEndAt);
+      }
+    );
   });
 });

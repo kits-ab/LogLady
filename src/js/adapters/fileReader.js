@@ -1,4 +1,12 @@
-const { createReadStream, statSync, readFile, writeFile } = require('fs');
+const {
+  createReadStream,
+  statSync,
+  readFile,
+  writeFile,
+  open,
+  read,
+  stat
+} = require('fs');
 const app = require('electron').app;
 const path = require('path');
 const createBackwardsStream = require('fs-backwards-stream');
@@ -262,6 +270,54 @@ const loadRecentFilesFromDisk = () => {
   return readFileAsync(recentFiles());
 };
 
+const readDataFromByte = (filePath, start, numberOfBytes) => {
+  return new Promise((resolve, reject) => {
+    stat(filePath, function(error, stats) {
+      if (error) {
+        reject(error);
+      }
+
+      open(filePath, 'r', function(error, fd) {
+        if (error) {
+          reject(error);
+        }
+
+        var buffer = Buffer.alloc(numberOfBytes);
+        read(fd, buffer, 0, buffer.length, start, function(
+          error,
+          bytesRead,
+          buffer
+        ) {
+          if (error) {
+            reject(error);
+          }
+
+          var data = buffer.toString('utf8');
+          resolve(parseSelectedData(data, start, numberOfBytes));
+        });
+      });
+    });
+  });
+};
+
+const parseSelectedData = (data, start, numberOfBytes) => {
+  const lines = data.split(/\r?\n/);
+  const lineSizeTop = Buffer.byteLength(lines[0], 'utf8');
+  const lineSizeBottom = Buffer.byteLength(lines[lines.length - 1], 'utf8');
+
+  let linesStartAt = start + lineSizeTop;
+  let linesEndAt = start + numberOfBytes - lineSizeBottom;
+
+  lines.shift();
+  lines.pop();
+
+  return {
+    lines,
+    linesStartAt,
+    linesEndAt
+  };
+};
+
 module.exports = {
   readFile,
   readNLastLines,
@@ -278,5 +334,6 @@ module.exports = {
   saveStateToDisk,
   loadStateFromDisk,
   saveRecentFilesToDisk,
-  loadRecentFilesFromDisk
+  loadRecentFilesFromDisk,
+  readDataFromByte
 };
