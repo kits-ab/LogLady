@@ -147,6 +147,37 @@ const handleShowOpenDialog = async (state, sender) => {
     });
 };
 
+const readLinesStartingAtByte = (path, startByte, lines) => {
+  const APPROXIMATE_BYTES_PER_LINE = 150;
+  const SCREENS_TO_FETCH = 3;
+  let dataToReturn = {
+    lines: [],
+    linesEndAt: 0
+  };
+
+  // Convert lines to amount of bytes using approximation
+  let bytesPerScreen = lines * APPROXIMATE_BYTES_PER_LINE;
+  // Fetch lines from one screen back to current position
+  let startBytesMinusOneScreen = startByte - bytesPerScreen;
+  // Fetch three screens total
+  let bytesToFetch = bytesPerScreen * SCREENS_TO_FETCH;
+
+  // Fetch data from adapter
+  while (dataToReturn.lines.length < lines) {
+    let byteToReadFrom = startBytesMinusOneScreen + dataToReturn.linesEndAt - 1;
+    // Om inte, hämta fler rader
+    let data = fileReader.readDataFromByte(path, byteToReadFrom, bytesToFetch);
+
+    if (!dataToReturn.linesStartAt) {
+      dataToReturn.linesStartAt = data.linesStartAt;
+    }
+    dataToReturn.linesEndAt = data.linesEndAt;
+    dataToReturn.lines = dataToReturn.lines.concat(data.lines);
+  }
+
+  return dataToReturn;
+};
+
 const sendError = (sender, message, error) => {
   const errorSender = error => {
     const action = {
