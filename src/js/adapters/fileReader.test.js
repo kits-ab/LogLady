@@ -117,7 +117,7 @@ describe('countLinesInBuffer', () => {
 
 describe('Fetching a buffer from a file', () => {
   it('should not take too long', () => {
-    return readDataFromByte('src\\resources\\testFile', 100000, 1000).then(
+    return readDataFromByte('src/resources/testFile', 100000, 1000).then(
       data => {
         console.log(data.lines);
         console.log(data.linesStartAt);
