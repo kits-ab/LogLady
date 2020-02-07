@@ -273,13 +273,25 @@ const loadRecentFilesFromDisk = () => {
 const readDataFromByte = (filePath, start, numberOfBytes) => {
   return new Promise((resolve, reject) => {
     stat(filePath, function(error, stats) {
+      if (error) {
+        reject(error);
+      }
+
       open(filePath, 'r', function(error, fd) {
+        if (error) {
+          reject(error);
+        }
+
         var buffer = Buffer.alloc(numberOfBytes);
         read(fd, buffer, 0, buffer.length, start, function(
           error,
           bytesRead,
           buffer
         ) {
+          if (error) {
+            reject(error);
+          }
+
           var data = buffer.toString('utf8');
           resolve(parseSelectedData(data, start, numberOfBytes));
         });
