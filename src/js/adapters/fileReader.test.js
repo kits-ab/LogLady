@@ -122,7 +122,9 @@ describe('Fetching a buffer from a file', () => {
       1000000,
       1000
     ).then(data => {
-      console.log(data);
+      console.log(data.lines);
+      console.log(data.linesStartAt);
+      console.log(data.linesEndAt);
     });
   });
 });

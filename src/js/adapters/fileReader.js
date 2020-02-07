@@ -291,18 +291,29 @@ const readDataFromByte = (filePath, start, numberOfBytes) => {
           buffer
         ) {
           var data = buffer.toString('utf8');
-          resolve(parseSelectedData(data));
+          resolve(parseSelectedData(data, start, numberOfBytes));
         });
       });
     });
   });
 };
 
-const parseSelectedData = data => {
+const parseSelectedData = (data, start, numberOfBytes) => {
   const lines = data.split(/\r?\n/);
+  const lineSizeTop = Buffer.byteLength(lines[0], 'utf8');
+  const lineSizeBottom = Buffer.byteLength(lines[lines.length - 1], 'utf8');
+
+  let linesStartAt = start + lineSizeTop;
+  let linesEndAt = start + numberOfBytes - lineSizeBottom;
+
   lines.shift();
   lines.pop();
-  return lines;
+
+  return {
+    lines,
+    linesStartAt,
+    linesEndAt
+  };
 };
 
 module.exports = {
