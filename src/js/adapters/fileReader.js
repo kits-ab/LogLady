@@ -291,11 +291,18 @@ const readDataFromByte = (filePath, start, numberOfBytes) => {
           buffer
         ) {
           var data = buffer.toString('utf8');
-          resolve(data);
+          resolve(parseSelectedData(data));
         });
       });
     });
   });
+};
+
+const parseSelectedData = data => {
+  const lines = data.split(/\r?\n/);
+  lines.shift();
+  lines.pop();
+  return lines;
 };
 
 module.exports = {
