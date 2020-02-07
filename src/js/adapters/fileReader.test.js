@@ -117,14 +117,12 @@ describe('countLinesInBuffer', () => {
 
 describe('Fetching a buffer from a file', () => {
   it('should not take too long', () => {
-    return readDataFromByte(
-      'C:\\Users\\Pontus Doverstav\\Documents\\Code\\lologoggenerator\\app\\lologog\\exampleLog',
-      1000000,
-      1000
-    ).then(data => {
-      console.log(data.lines);
-      console.log(data.linesStartAt);
-      console.log(data.linesEndAt);
-    });
+    return readDataFromByte('src\\resources\\testFile', 100000, 1000).then(
+      data => {
+        console.log(data.lines);
+        console.log(data.linesStartAt);
+        console.log(data.linesEndAt);
+      }
+    );
   });
 });
