@@ -147,6 +147,55 @@ const handleShowOpenDialog = async (state, sender) => {
     });
 };
 
+const readLinesStartingAtByte = async data => {
+  const APPROXIMATE_BYTES_PER_LINE = 150;
+  const SCREENS_TO_FETCH = 3;
+  const { path, startByte, lines } = data;
+  const [fileSize] = await getFileInfo(path);
+
+  let dataToReturn = {
+    lines: [],
+    linesEndAt: 0
+  };
+
+  // Convert lines to amount of bytes using approximation
+  let bytesPerScreen = lines * APPROXIMATE_BYTES_PER_LINE;
+  // Fetch lines from one screen back to current position
+  let startBytesMinusOneScreen =
+    startByte - bytesPerScreen > 0 ? startByte - bytesPerScreen : 0;
+  // Fetch three screens total
+  let bytesToFetch = bytesPerScreen * SCREENS_TO_FETCH;
+  let byteToReadFrom = startBytesMinusOneScreen;
+
+  // If too few lines are returned and we have not
+  // reached the end of file, keep reading lines
+  while (
+    dataToReturn.lines.length < lines * SCREENS_TO_FETCH &&
+    dataToReturn.linesEndAt < fileSize
+  ) {
+    // Fetch data from adapter
+    let data = await fileReader.readDataFromByte(
+      path,
+      byteToReadFrom,
+      bytesToFetch
+    );
+
+    // Save data
+    if (!dataToReturn.linesStartAt) {
+      dataToReturn.linesStartAt = data.linesStartAt;
+    }
+    dataToReturn.linesEndAt = data.linesEndAt;
+    dataToReturn.lines = dataToReturn.lines.concat(data.lines);
+
+    // Calculate next byte to read from
+    // Remove one byte to get one character from previous line,
+    // which will be discarded by the adapter
+    byteToReadFrom = dataToReturn.linesEndAt - 1;
+  }
+
+  return dataToReturn;
+};
+
 const sendError = (sender, message, error) => {
   const errorSender = error => {
     const action = {
@@ -189,6 +238,9 @@ const createEventHandler = state => {
         break;
       case 'STATE_LOAD':
         loadStateFromDisk(state, sender);
+        break;
+      case 'TEST_BYTE_READ':
+        readLinesStartingAtByte(_argObj.data);
         break;
       default:
     }

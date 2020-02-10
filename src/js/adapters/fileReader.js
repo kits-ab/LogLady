@@ -305,11 +305,21 @@ const parseSelectedData = (data, start, numberOfBytes) => {
   const lineSizeTop = Buffer.byteLength(lines[0], 'utf8');
   const lineSizeBottom = Buffer.byteLength(lines[lines.length - 1], 'utf8');
 
-  let linesStartAt = start + lineSizeTop;
-  let linesEndAt = start + numberOfBytes - lineSizeBottom;
+  let linesStartAt = start;
+  let linesEndAt = start + numberOfBytes;
 
-  lines.shift();
-  lines.pop();
+  // We aren't reading from the beginning of the file
+  if (start !== 0) {
+    linesStartAt = start + lineSizeTop;
+    lines.shift();
+  }
+
+  // If lines does not end in a newline, last line is incomplete
+  // and should be removed
+  if (!isLF(data.charAt(data.length - 1))) {
+    linesEndAt = start + numberOfBytes - lineSizeBottom;
+    lines.pop();
+  }
 
   return {
     lines,
