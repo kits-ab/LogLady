@@ -162,7 +162,7 @@ const readLinesStartingAtByte = async data => {
   let bytesPerScreen = lines * APPROXIMATE_BYTES_PER_LINE;
   // Fetch lines from one screen back to current position
   let startBytesMinusOneScreen =
-    startByte - bytesPerScreen > 0 ? startByte - bytesPerScreen : 1;
+    startByte - bytesPerScreen > 0 ? startByte - bytesPerScreen : 0;
   // Fetch three screens total
   let bytesToFetch = bytesPerScreen * SCREENS_TO_FETCH;
   let byteToReadFrom = startBytesMinusOneScreen;
@@ -188,6 +188,8 @@ const readLinesStartingAtByte = async data => {
     dataToReturn.lines = dataToReturn.lines.concat(data.lines);
 
     // Calculate next byte to read from
+    // Remove one byte to get one character from previous line,
+    // which will be discarded by the adapter
     byteToReadFrom = dataToReturn.linesEndAt - 1;
   }
 
