@@ -170,7 +170,7 @@ const readLinesStartingAtByte = async data => {
   // If too few lines are returned and we have not
   // reached the end of file, keep reading lines
   while (
-    dataToReturn.lines.length < lines &&
+    dataToReturn.lines.length < lines * SCREENS_TO_FETCH &&
     dataToReturn.linesEndAt < fileSize
   ) {
     // Fetch data from adapter
