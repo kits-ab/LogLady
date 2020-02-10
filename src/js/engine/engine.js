@@ -147,10 +147,12 @@ const handleShowOpenDialog = async (state, sender) => {
     });
 };
 
-const readLinesStartingAtByte = data => {
-  let { path, startByte, lines } = data;
+const readLinesStartingAtByte = async data => {
   const APPROXIMATE_BYTES_PER_LINE = 150;
   const SCREENS_TO_FETCH = 3;
+  const { path, startByte, lines } = data;
+  const [fileSize] = await getFileInfo(path);
+
   let dataToReturn = {
     lines: [],
     linesEndAt: 0
@@ -163,21 +165,33 @@ const readLinesStartingAtByte = data => {
     startByte - bytesPerScreen > 0 ? startByte - bytesPerScreen : 1;
   // Fetch three screens total
   let bytesToFetch = bytesPerScreen * SCREENS_TO_FETCH;
+  let byteToReadFrom = startBytesMinusOneScreen;
 
-  // Fetch data from adapter
-  let byteToReadFrom = startBytesMinusOneScreen + dataToReturn.linesEndAt - 1;
+  // If too few lines are returned and we have not
+  // reached the end of file, keep reading lines
+  while (
+    dataToReturn.lines.length < lines &&
+    dataToReturn.linesEndAt < fileSize
+  ) {
+    // Fetch data from adapter
+    let data = await fileReader.readDataFromByte(
+      path,
+      byteToReadFrom,
+      bytesToFetch
+    );
 
-  fileReader.readDataFromByte(path, byteToReadFrom, bytesToFetch).then(data => {
+    // Save data
     if (!dataToReturn.linesStartAt) {
       dataToReturn.linesStartAt = data.linesStartAt;
     }
     dataToReturn.linesEndAt = data.linesEndAt;
     dataToReturn.lines = dataToReturn.lines.concat(data.lines);
 
-    console.log(dataToReturn);
+    // Calculate next byte to read from
+    byteToReadFrom = dataToReturn.linesEndAt - 1;
+  }
 
-    return dataToReturn;
-  });
+  return dataToReturn;
 };
 
 const sendError = (sender, message, error) => {
