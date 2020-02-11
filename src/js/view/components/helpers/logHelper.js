@@ -1,4 +1,5 @@
 import { calculateWrappedHeight } from './measureHelper';
+import { sendRequestToBackend } from 'js/view/ipcPublisher';
 
 export const createHeightReducer = (charSize, elWidth) => {
   return (map, next) => {
@@ -19,4 +20,16 @@ export const createRegexReducer = regex => {
 
 export const scrollToBottom = (el, list) => {
   el.scrollAround(list.length - 1);
+};
+
+export const fetchTextBasedOnByteFromScrollPosition = (
+  path,
+  startByte,
+  lines
+) => {
+  const argObj = {
+    function: 'READ_LINES_AT_BYTE',
+    data: { path, startByte, lines }
+  };
+  sendRequestToBackend(argObj);
 };
