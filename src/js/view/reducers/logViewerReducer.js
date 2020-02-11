@@ -37,6 +37,18 @@ export const logViewerReducer = (state = initialState, action) => {
           [sourcePath]: log ? [...log, ...lines] : [...lines]
         }
       };
+    case 'LOGVIEWER_ADD_LINES_FROM_BYTE_POSITION': {
+      const { lines, sourcePath } = action.data;
+      const log = state.logs[sourcePath];
+
+      return {
+        ...state,
+        logs: {
+          ...state.logs,
+          [sourcePath]: log ? [...lines, ...log] : [...lines]
+        }
+      };
+    }
 
     default:
       return state;
