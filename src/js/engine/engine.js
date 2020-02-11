@@ -147,7 +147,7 @@ const handleShowOpenDialog = async (state, sender) => {
     });
 };
 
-const readLinesStartingAtByte = async data => {
+const readLinesStartingAtByte = async (sender, data) => {
   const APPROXIMATE_BYTES_PER_LINE = 150;
   const SCREENS_TO_FETCH = 3;
   const { path, startByte, lines } = data;
@@ -192,8 +192,11 @@ const readLinesStartingAtByte = async data => {
     // which will be discarded by the adapter
     byteToReadFrom = dataToReturn.linesEndAt - 1;
   }
-
-  return dataToReturn;
+  const action = {
+    type: 'LINES_FROM_BYTE',
+    data: { dataToReturn, path }
+  };
+  sender.send(ipcChannel, action);
 };
 
 const sendError = (sender, message, error) => {
@@ -239,8 +242,8 @@ const createEventHandler = state => {
       case 'STATE_LOAD':
         loadStateFromDisk(state, sender);
         break;
-      case 'TEST_BYTE_READ':
-        readLinesStartingAtByte(_argObj.data);
+      case 'READ_LINES_AT_BYTE':
+        readLinesStartingAtByte(sender, _argObj.data);
         break;
       default:
     }

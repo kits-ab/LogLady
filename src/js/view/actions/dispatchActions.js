@@ -191,3 +191,21 @@ export const showSnackBar = (dispatch, message, level) => {
     }
   });
 };
+
+export const addLinesFetchedFromBytePosition = (
+  dispatch,
+  lines,
+  linesStartAt,
+  linesEndAt,
+  sourcePath
+) => {
+  dispatch({
+    type: 'LOGVIEWER_ADD_LINES_FROM_BYTE_POSITION',
+    data: {
+      lines,
+      linesStartAt,
+      linesEndAt,
+      sourcePath
+    }
+  });
+};

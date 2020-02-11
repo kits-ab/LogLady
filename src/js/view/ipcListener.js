@@ -4,7 +4,8 @@ import {
   showSnackBar,
   addNewLines,
   increaseSize,
-  setLastSeenLogSizeToSize
+  setLastSeenLogSizeToSize,
+  addLinesFetchedFromBytePosition
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
@@ -71,6 +72,17 @@ const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
   increaseSize(dispatch, sourcePath, size);
 };
 
+const handleLinesFromByte = (dispatch, { dataToReturn, path }) => {
+  console.log(dataToReturn, path);
+  addLinesFetchedFromBytePosition(
+    dispatch,
+    dataToReturn.lines,
+    dataToReturn.linesStartAt,
+    dataToReturn.linesEndAt,
+    path
+  );
+};
+
 const handleError = (dispatch, { message, error }) => {
   const errorMessage = prettifyErrorMessage(message, error);
   showSnackBar(dispatch, errorMessage, 'error');
@@ -98,6 +110,9 @@ export const ipcListener = (store, publisher) => {
         break;
       case 'LINES_NEW':
         handleNewLines(dispatch, action.data);
+        break;
+      case 'LINES_FROM_BYTE':
+        handleLinesFromByte(dispatch, action.data);
         break;
       default:
         console.log('Warning: Unrecognized message, ', action);
