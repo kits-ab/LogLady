@@ -73,7 +73,6 @@ const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
 };
 
 const handleLinesFromByte = (dispatch, { dataToReturn, path }) => {
-  console.log(dataToReturn, path);
   addLinesFetchedFromBytePosition(
     dispatch,
     dataToReturn.lines,
