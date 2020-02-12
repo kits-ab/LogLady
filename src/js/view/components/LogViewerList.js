@@ -73,6 +73,32 @@ const LogViewerList = props => {
   }, []);
 
   useEffect(() => {
+    // Handler for reacting to scroll events
+    const debouncedScrollHandler = _.debounce(() => {
+      if (logViewerListContainerRef.current) {
+        console.log('scrolling');
+        console.log(
+          logViewerListContainerRef.current.scrollTop /
+            logViewerListContainerRef.current.scrollHeight
+        );
+      }
+    }, 200);
+
+    logViewerListContainerRef.current.addEventListener(
+      'scroll',
+      debouncedScrollHandler
+    );
+
+    // Return cleanup function
+    return () => {
+      logViewerListContainerRef.current.removeEventListener(
+        'scroll',
+        debouncedScrollHandler
+      );
+    };
+  }, []);
+
+  useEffect(() => {
     // Update the width to use for the list to fit the longest line if wraplines isn't set
     setLogLineElementWidth(
       props.wrapLines
