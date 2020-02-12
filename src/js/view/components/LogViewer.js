@@ -21,6 +21,9 @@ const LogViewer = props => {
   const tailSwitch = props.settings[props.source.path]
     ? props.settings[props.source.path].tailSwitch
     : 'true';
+  const logSize = props.logSizes[props.source.path]
+    ? props.logSizes[props.source.path]
+    : 0;
 
   const [filteredAndHighlightedLines, setLines] = useState([]); // Used to save and update the current filtered and highlighted lines
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
@@ -111,6 +114,8 @@ const LogViewer = props => {
         wrapLines={wrapLineOn}
         scrollToBottom={tailSwitch}
         lines={filteredAndHighlightedLines}
+        sourcePath={props.source.path}
+        logSize={logSize}
       />
     </LogViewerContainer>
   );
@@ -119,12 +124,14 @@ const LogViewer = props => {
 const mapStateToProps = ({
   topPanelState: { settings },
   settingsState: { tabSettings },
-  logViewerState: { logs }
+  logViewerState: { logs },
+  logInfoState: { logSizes }
 }) => {
   return {
     settings,
     tabSettings,
-    logs
+    logs,
+    logSizes
   };
 };
 
