@@ -6,6 +6,7 @@ import {
   LogLineRuler
 } from '../styledComponents/LogViewerListStyledComponents';
 import SingleLogLineTranslator from './SingleLogLine';
+import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
 
 import _ from 'lodash';
 import { List } from 'office-ui-fabric-react';
@@ -76,10 +77,17 @@ const LogViewerList = props => {
     // Handler for reacting to scroll events
     const debouncedScrollHandler = _.debounce(() => {
       if (logViewerListContainerRef.current) {
-        console.log('scrolling');
-        console.log(
+        // Calculate what percantage of the file we have scrolled to
+        const scrollPercentage =
           logViewerListContainerRef.current.scrollTop /
-            logViewerListContainerRef.current.scrollHeight
+          logViewerListContainerRef.current.scrollHeight;
+        // Calculate what byte to fetch from
+        const byteToFetchFrom = Math.round(props.logSize * scrollPercentage);
+
+        fetchTextBasedOnByteFromScrollPosition(
+          props.sourcePath,
+          byteToFetchFrom,
+          10
         );
       }
     }, 200);
@@ -96,7 +104,10 @@ const LogViewerList = props => {
         debouncedScrollHandler
       );
     };
-  }, []);
+    // Rerun effect when logSize updates so the handler is correclty updated
+    // Only running once gives the handler the incorrect logsize and thus it
+    // will not work
+  }, [props.logSize]);
 
   useEffect(() => {
     // Update the width to use for the list to fit the longest line if wraplines isn't set
