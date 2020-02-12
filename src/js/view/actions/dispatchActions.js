@@ -79,7 +79,8 @@ export const setFileData = (dispatch, filePath, fileSize, history) => {
     type: 'LOGVIEWER_SET_LOG',
     data: {
       sourcePath: filePath,
-      log: history
+      log: history,
+      size: fileSize
     }
   });
 

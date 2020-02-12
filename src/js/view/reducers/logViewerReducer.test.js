@@ -31,6 +31,8 @@ describe('logviewer reducer', () => {
   });
   it('should set log on source', () => {
     const log = ['hej4', 'hej5'];
+    // Size is zero to avoid ghost lines
+    const size = 0;
     const state = {
       logs: { test: ['hej1', 'hej2', 'hej3'] }
     };
@@ -40,7 +42,7 @@ describe('logviewer reducer', () => {
     const sourcePath = 'test';
     const action = {
       type: 'LOGVIEWER_SET_LOG',
-      data: { sourcePath, log }
+      data: { sourcePath, log, size }
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });

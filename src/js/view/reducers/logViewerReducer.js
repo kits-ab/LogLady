@@ -1,5 +1,12 @@
 const initialState = { logs: {} };
 
+const createGhostLines = fileSize => {
+  const amountOfGhostLines =
+    fileSize / 150 < 10000 ? Math.round(fileSize / 150) : 10000;
+  // Set ghostline to invisible unicode character (U+2800) to ensure that they are rendered
+  return Array(amountOfGhostLines).fill('⠀');
+};
+
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'LOGVIEWER_REMOVE_LOG': {
@@ -22,8 +29,13 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     case 'LOGVIEWER_SET_LOG': {
       console.log('SETTING');
-      const { sourcePath, log } = action.data;
-      return { ...state, logs: { ...state.logs, [sourcePath]: [...log] } };
+      const { sourcePath, log, size } = action.data;
+      const ghostLines = createGhostLines(size);
+
+      return {
+        ...state,
+        logs: { ...state.logs, [sourcePath]: [...ghostLines, ...log] }
+      };
     }
     case 'LOGVIEWER_ADD_LINES':
       console.log('ADDING');
