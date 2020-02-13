@@ -178,6 +178,7 @@ const LogViewer = props => {
         value={sliderPosition}
         onChange={value => {
           setSliderPosition(value);
+          fetchTextBasedOnByteFromScrollPosition(props.source.path, value, 10);
         }}
       ></Slider>
     </LogViewerContainer>
