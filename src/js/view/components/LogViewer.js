@@ -5,6 +5,7 @@ import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
 import { Slider } from 'office-ui-fabric-react';
+import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -28,6 +29,7 @@ const LogViewer = props => {
 
   const [filteredAndHighlightedLines, setLines] = useState([]); // Used to save and update the current filtered and highlighted lines
   const [sliderPosition, setSliderPosition] = useState(0);
+  const [currentTimeout, setCurrentTimeout] = useState();
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
   const logViewerContainerRef = useRef();
 
@@ -129,6 +131,32 @@ const LogViewer = props => {
       logViewerContainerRef.current.removeEventListener('wheel', wheelHandler);
     };
   }, [sliderPosition, logSize]);
+
+  useEffect(() => {
+    const readBytesHandler = () => {
+      // CLear timeout so we don't read from files too often
+      clearTimeout(currentTimeout);
+      // Set new timeout to read from file in an appropriate amount of time
+      let timeout = setTimeout(() => {
+        fetchTextBasedOnByteFromScrollPosition(
+          props.source.path,
+          sliderPosition,
+          10
+        );
+      }, 200);
+      // Save timeout so it can be cleared if needed
+      setCurrentTimeout(timeout);
+    };
+
+    logViewerContainerRef.current.addEventListener('wheel', readBytesHandler);
+
+    return () => {
+      logViewerContainerRef.current.removeEventListener(
+        'wheel',
+        readBytesHandler
+      );
+    };
+  }, [sliderPosition, currentTimeout]);
 
   return (
     <LogViewerContainer ref={logViewerContainerRef}>
