@@ -29,12 +29,11 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     case 'LOGVIEWER_SET_LOG': {
       console.log('SETTING');
-      const { sourcePath, log, size } = action.data;
-      const ghostLines = createGhostLines(size);
+      const { sourcePath, log } = action.data;
 
       return {
         ...state,
-        logs: { ...state.logs, [sourcePath]: [...ghostLines, ...log] }
+        logs: { ...state.logs, [sourcePath]: [...log] }
       };
     }
     case 'LOGVIEWER_ADD_LINES':
