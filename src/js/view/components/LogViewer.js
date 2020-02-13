@@ -4,6 +4,7 @@ import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponent
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
+import { Slider } from 'office-ui-fabric-react';
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -26,7 +27,9 @@ const LogViewer = props => {
     : 0;
 
   const [filteredAndHighlightedLines, setLines] = useState([]); // Used to save and update the current filtered and highlighted lines
+  const [sliderPosition, setSliderPosition] = useState(0);
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
+  const logViewerContainerRef = useRef();
 
   const sendMessageToHiddenWindow = args => {
     /* Send a message to the hidden window that it should filter the logs.
@@ -106,8 +109,29 @@ const LogViewer = props => {
     });
   }, [props.source.path]);
 
+  useEffect(() => {
+    const wheelHandler = event => {
+      if (logViewerContainerRef.current) {
+        let newSliderPosition = sliderPosition + event.deltaY;
+        if (newSliderPosition > logSize) {
+          newSliderPosition = logSize;
+        } else if (newSliderPosition <= 0) {
+          newSliderPosition = 0;
+        }
+
+        setSliderPosition(newSliderPosition);
+      }
+    };
+
+    logViewerContainerRef.current.addEventListener('wheel', wheelHandler);
+
+    return () => {
+      logViewerContainerRef.current.removeEventListener('wheel', wheelHandler);
+    };
+  }, [sliderPosition, logSize]);
+
   return (
-    <LogViewerContainer>
+    <LogViewerContainer ref={logViewerContainerRef}>
       <LogViewerList
         key={props.source.index}
         highlightColor={highlightColor}
@@ -117,6 +141,17 @@ const LogViewer = props => {
         sourcePath={props.source.path}
         logSize={logSize}
       />
+      <Slider
+        min={0}
+        max={logSize}
+        step={1}
+        vertical
+        showValue={false}
+        value={sliderPosition}
+        onChange={value => {
+          setSliderPosition(value);
+        }}
+      ></Slider>
     </LogViewerContainer>
   );
 };
