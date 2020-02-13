@@ -74,42 +74,6 @@ const LogViewerList = props => {
   }, []);
 
   useEffect(() => {
-    // Handler for reacting to scroll events
-    const debouncedScrollHandler = _.debounce(() => {
-      if (logViewerListContainerRef.current) {
-        // Calculate what percantage of the file we have scrolled to
-        const scrollPercentage =
-          logViewerListContainerRef.current.scrollTop /
-          logViewerListContainerRef.current.scrollHeight;
-        // Calculate what byte to fetch from
-        const byteToFetchFrom = Math.round(props.logSize * scrollPercentage);
-
-        fetchTextBasedOnByteFromScrollPosition(
-          props.sourcePath,
-          byteToFetchFrom,
-          10
-        );
-      }
-    }, 200);
-
-    logViewerListContainerRef.current.addEventListener(
-      'scroll',
-      debouncedScrollHandler
-    );
-
-    // Return cleanup function
-    return () => {
-      logViewerListContainerRef.current.removeEventListener(
-        'scroll',
-        debouncedScrollHandler
-      );
-    };
-    // Rerun effect when logSize updates so the handler is correclty updated
-    // Only running once gives the handler the incorrect logsize and thus it
-    // will not work
-  }, [props.logSize]);
-
-  useEffect(() => {
     // Update the width to use for the list to fit the longest line if wraplines isn't set
     setLogLineElementWidth(
       props.wrapLines
