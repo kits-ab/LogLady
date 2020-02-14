@@ -36,7 +36,8 @@ const sendFileOpened = async (
   filePath,
   fileSize,
   endIndex,
-  history
+  history,
+  metaData
 ) => {
   const action = {
     type: 'SOURCE_OPENED',
@@ -45,7 +46,8 @@ const sendFileOpened = async (
       filePath,
       fileSize,
       endIndex,
-      history
+      history,
+      metaData
     }
   };
 
@@ -56,8 +58,8 @@ const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
     sendSourcePicked(sender, filePath);
-    const history = await getFileHistory(filePath, endIndex, 10);
-    sendFileOpened(sender, filePath, fileSize, endIndex, history);
+    const [history, metaData] = await getFileHistory(filePath, endIndex, 10);
+    sendFileOpened(sender, filePath, fileSize, endIndex, history, metaData);
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
     return false;

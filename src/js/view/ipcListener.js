@@ -50,10 +50,10 @@ const handleStateSet = (publisher, state) => {
 
 const handleFileOpened = (
   dispatch,
-  { filePath, fileSize, endIndex, history }
+  { filePath, fileSize, endIndex, history, metaData }
 ) => {
   // clearAllLogs(dispatch);
-  setFileData(dispatch, filePath, fileSize, history);
+  setFileData(dispatch, filePath, fileSize, history, metaData);
   setLastSeenLogSizeToSize(dispatch, filePath, fileSize);
 
   const followSource = {

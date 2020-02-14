@@ -74,13 +74,20 @@ export const updateLastSeenLogSizes = (dispatch, path, fileSize) => {
   });
 };
 
-export const setFileData = (dispatch, filePath, fileSize, history) => {
+export const setFileData = (
+  dispatch,
+  filePath,
+  fileSize,
+  history,
+  metaData
+) => {
   dispatch({
     type: 'LOGVIEWER_SET_LOG',
     data: {
       sourcePath: filePath,
       log: history,
-      size: fileSize
+      size: fileSize,
+      metaData
     }
   });
 
@@ -195,6 +202,7 @@ export const showSnackBar = (dispatch, message, level) => {
 
 export const addLinesFetchedFromBytePosition = (
   dispatch,
+  metaData,
   lines,
   linesStartAt,
   linesEndAt,
@@ -206,7 +214,8 @@ export const addLinesFetchedFromBytePosition = (
       lines,
       linesStartAt,
       linesEndAt,
-      sourcePath
+      sourcePath,
+      metaData
     }
   });
 };

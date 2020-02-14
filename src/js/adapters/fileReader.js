@@ -163,7 +163,10 @@ const readNLastLines = (filePath, numberOfLines, endIndex) => {
           result.unshift(unusedChars);
         }
 
-        resolve(result);
+        resolve([
+          result,
+          calculateMetaDataBackwards(result, getFileSizeInBytes(filePath))
+        ]);
       })
       .on('error', err => {
         reject(err);
