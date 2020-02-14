@@ -3,7 +3,8 @@ import styled from 'styled-components';
 export const LogViewerListContainer = styled.div`
   width: 100%;
   height: 100%;
-  overflow: auto;
+  /* overflow: auto; */
+  margin-bottom: 20%;
 `;
 
 export const LogLine = styled.div`

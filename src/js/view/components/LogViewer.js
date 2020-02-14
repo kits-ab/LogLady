@@ -134,13 +134,16 @@ const LogViewer = props => {
 
   useEffect(() => {
     const readBytesHandler = () => {
+      console.log('Byteposition: ', logSize - sliderPosition);
+
       // CLear timeout so we don't read from files too often
       clearTimeout(currentTimeout);
       // Set new timeout to read from file in an appropriate amount of time
       let timeout = setTimeout(() => {
         fetchTextBasedOnByteFromScrollPosition(
           props.source.path,
-          sliderPosition,
+          // Since slider starts at 0 we need to alter the value like this to get the correct byte position.
+          logSize - sliderPosition,
           10
         );
       }, 200);
@@ -158,6 +161,29 @@ const LogViewer = props => {
     };
   }, [sliderPosition, currentTimeout]);
 
+  const styles = {
+    // activeSection: { /*height: ?*/ color: 'lightgray' },
+    // container: {},
+    // inactiveSection: { background: 'lightgray' },
+    // line: { color: 'lightgray' },
+    // lineContainer: { width: '28px', background: 'lightgray' },
+    // root: { background: 'lightgray' },
+    // slideBox: {
+    //   color: 'lightgray',
+    //   width: '28px'
+    // },
+    // thumb: {
+    //   background: 'gray',
+    //   borderRadius: 'none',
+    //   width: '20px',
+    //   border: 'none',
+    //   margin: 'auto'
+    //   // height ? depending on filesize?
+    // },
+    // titleLabel: {},
+    // valueLabel: {},
+    // zeroTick: {}
+  };
   return (
     <LogViewerContainer ref={logViewerContainerRef}>
       <LogViewerList
@@ -178,8 +204,13 @@ const LogViewer = props => {
         value={sliderPosition}
         onChange={value => {
           setSliderPosition(value);
-          fetchTextBasedOnByteFromScrollPosition(props.source.path, value, 10);
+          fetchTextBasedOnByteFromScrollPosition(
+            props.source.path,
+            logSize - value,
+            10
+          );
         }}
+        styles={styles}
       ></Slider>
     </LogViewerContainer>
   );
