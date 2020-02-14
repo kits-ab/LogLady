@@ -155,7 +155,8 @@ const readLinesStartingAtByte = async (sender, data) => {
 
   let dataToReturn = {
     lines: [],
-    linesEndAt: 0
+    linesEndAt: 0,
+    metaData: []
   };
 
   // Convert lines to amount of bytes using approximation
@@ -186,6 +187,7 @@ const readLinesStartingAtByte = async (sender, data) => {
     }
     dataToReturn.linesEndAt = data.linesEndAt;
     dataToReturn.lines = dataToReturn.lines.concat(data.lines);
+    dataToReturn.metaData = dataToReturn.metaData.concat(data.metaData);
 
     // Calculate next byte to read from
     // Remove one byte to get one character from previous line,

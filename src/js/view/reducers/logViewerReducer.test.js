@@ -2,7 +2,7 @@ import { logViewerReducer } from './logViewerReducer';
 
 describe('logviewer reducer', () => {
   it('should return the initial state', () => {
-    const initialState = { logs: {} };
+    const initialState = { logs: {}, metaData: {} };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
   it('should reset all logs', () => {
@@ -16,7 +16,8 @@ describe('logviewer reducer', () => {
   it('should append lines to initial state', () => {
     const lines = ['hej1', 'hej2', 'hej3'];
     const expectedState = {
-      logs: { test: ['hej1', 'hej2', 'hej3'] }
+      logs: { test: ['hej1', 'hej2', 'hej3'] },
+      metaData: {}
     };
     const sourcePath = 'test';
 

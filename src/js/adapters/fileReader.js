@@ -321,11 +321,37 @@ const parseSelectedData = (data, start, numberOfBytes) => {
     lines.pop();
   }
 
+  const metaData = calculateMetaData(lines, linesStartAt);
+
   return {
+    metaData,
     lines,
     linesStartAt,
     linesEndAt
   };
+};
+
+const calculateMetaData = (lines, linesStartAt) => {
+  let metaData = [];
+  let currentLineStartByte = linesStartAt;
+  for (const line of lines) {
+    metaData.push(currentLineStartByte);
+    currentLineStartByte =
+      currentLineStartByte + Buffer.byteLength(line, 'utf8');
+  }
+  return metaData;
+};
+
+const calculateMetaDataBackwards = (lines, filesize) => {
+  let reversedLines = [...lines].reverse();
+  let metaData = [];
+  let currentLineStartByte = filesize - Buffer.byteLength(reversedLines[0]);
+  for (const line of reversedLines) {
+    metaData.unshift(currentLineStartByte);
+    currentLineStartByte =
+      currentLineStartByte - Buffer.byteLength(line, 'utf8');
+  }
+  return metaData;
 };
 
 module.exports = {
