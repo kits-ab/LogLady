@@ -151,8 +151,8 @@ const handleShowOpenDialog = async (state, sender) => {
 
 const readLinesStartingAtByte = async (sender, data) => {
   const APPROXIMATE_BYTES_PER_LINE = 150;
-  const SCREENS_TO_FETCH = 3;
-  const { path, startByte, lines } = data;
+  // const SCREENS_TO_FETCH = 3;
+  const { path, startByte, amountOfLines } = data;
   const [fileSize] = await getFileInfo(path);
 
   let dataToReturn = {
@@ -160,27 +160,29 @@ const readLinesStartingAtByte = async (sender, data) => {
     linesEndAt: 0,
     metaData: []
   };
-
+  console.log(amountOfLines);
   // Convert lines to amount of bytes using approximation
-  let bytesPerScreen = lines * APPROXIMATE_BYTES_PER_LINE;
+  let bytesPerScreen = amountOfLines * APPROXIMATE_BYTES_PER_LINE;
   // Fetch lines from one screen back to current position
   let startBytesMinusOneScreen =
     startByte - bytesPerScreen > 0 ? startByte - bytesPerScreen : 0;
   // Fetch three screens total
-  let bytesToFetch = bytesPerScreen * SCREENS_TO_FETCH;
+  // let bytesToFetch = bytesPerScreen; /* * SCREENS_TO_FETCH*/
   let byteToReadFrom = startBytesMinusOneScreen;
 
   // If too few lines are returned and we have not
   // reached the end of file, keep reading lines
   while (
-    dataToReturn.lines.length < lines * SCREENS_TO_FETCH &&
+    dataToReturn.lines.length < amountOfLines /* * SCREENS_TO_FETCH */ &&
     dataToReturn.linesEndAt < fileSize
   ) {
     // Fetch data from adapter
     let data = await fileReader.readDataFromByte(
       path,
-      byteToReadFrom,
-      bytesToFetch
+      // byteToReadFrom,
+      startByte,
+      // bytesToFetch,
+      bytesPerScreen
     );
 
     // Save data
@@ -196,6 +198,12 @@ const readLinesStartingAtByte = async (sender, data) => {
     // which will be discarded by the adapter
     byteToReadFrom = dataToReturn.linesEndAt - 1;
   }
+
+  // Checking that the amount of lines to return are not too many to be able to fit in the logview.
+  if (dataToReturn.lines.length > amountOfLines) {
+    dataToReturn.lines = dataToReturn.lines.slice(0, amountOfLines);
+  }
+
   const action = {
     type: 'LINES_FROM_BYTE',
     data: { dataToReturn, path }
