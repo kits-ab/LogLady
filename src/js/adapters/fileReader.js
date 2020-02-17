@@ -310,8 +310,11 @@ const readDataFromByte = (filePath, start, numberOfBytes) => {
 };
 
 const parseSelectedData = (data, start, numberOfBytes) => {
+  const BYTE_FOR_MISSING_NEWLINE = 1;
+
   const lines = data.split(/\r?\n/);
-  const lineSizeTop = Buffer.byteLength(lines[0], 'utf8');
+  const lineSizeTop =
+    Buffer.byteLength(lines[0], 'utf8') + BYTE_FOR_MISSING_NEWLINE;
   const lineSizeBottom = Buffer.byteLength(lines[lines.length - 1], 'utf8');
 
   let linesStartAt = start;
@@ -341,24 +344,32 @@ const parseSelectedData = (data, start, numberOfBytes) => {
 };
 
 const calculateMetaData = (lines, linesStartAt) => {
+  const BYTE_FOR_MISSING_NEWLINE = 1;
+
   let metaData = [];
   let currentLineStartByte = linesStartAt;
   for (const line of lines) {
     metaData.push(currentLineStartByte);
     currentLineStartByte =
-      currentLineStartByte + Buffer.byteLength(line, 'utf8');
+      currentLineStartByte +
+      Buffer.byteLength(line, 'utf8') +
+      BYTE_FOR_MISSING_NEWLINE;
   }
   return metaData;
 };
 
 const calculateMetaDataBackwards = (lines, filesize) => {
+  const BYTE_FOR_MISSING_NEWLINE = 1;
+
   let reversedLines = [...lines].reverse();
   let metaData = [];
-  let currentLineStartByte = filesize - Buffer.byteLength(reversedLines[0]);
+  let currentLineStartByte =
+    filesize - Buffer.byteLength(reversedLines[0] + BYTE_FOR_MISSING_NEWLINE);
   for (const line of reversedLines) {
     metaData.unshift(currentLineStartByte);
     currentLineStartByte =
-      currentLineStartByte - Buffer.byteLength(line, 'utf8');
+      currentLineStartByte -
+      (Buffer.byteLength(line, 'utf8') + BYTE_FOR_MISSING_NEWLINE);
   }
   return metaData;
 };
