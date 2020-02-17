@@ -4,6 +4,7 @@ const {
   readFile,
   writeFile,
   open,
+  close,
   read,
   stat
 } = require('fs');
@@ -291,6 +292,11 @@ const readDataFromByte = (filePath, start, numberOfBytes) => {
           bytesRead,
           buffer
         ) {
+          // Close file so we dont have too many open at once
+          close(fd, err => {
+            reject(error);
+          });
+
           if (error) {
             reject(error);
           }
