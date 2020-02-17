@@ -219,3 +219,13 @@ export const addLinesFetchedFromBytePosition = (
     }
   });
 };
+
+export const updateNumberOfLinesToRenderInLogView = (
+  dispatch,
+  numberOfLinesToFillLogView
+) => {
+  dispatch({
+    type: 'LOGVIEWER_UPDATE_CURRENT_NR_OF_LINES_IN_VIEWER',
+    data: { numberOfLinesToFillLogView }
+  });
+};

@@ -1,11 +1,11 @@
-const initialState = { logs: {}, metaData: {} };
+const initialState = { logs: {}, metaData: {}, nrOfLinesInViewer: null };
 
-const createGhostLines = fileSize => {
-  const amountOfGhostLines =
-    fileSize / 150 < 10000 ? Math.round(fileSize / 150) : 10000;
-  // Set ghostline to invisible unicode character (U+2800) to ensure that they are rendered
-  return Array(amountOfGhostLines).fill('⠀');
-};
+// const createGhostLines = fileSize => {
+//   const amountOfGhostLines =
+//     fileSize / 150 < 10000 ? Math.round(fileSize / 150) : 10000;
+//   // Set ghostline to invisible unicode character (U+2800) to ensure that they are rendered
+//   return Array(amountOfGhostLines).fill('⠀');
+// };
 
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -30,7 +30,7 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_SET_LOG': {
       console.log('SETTING');
       const { sourcePath, log, metaData } = action.data;
-      console.log(metaData);
+      // console.log(metaData);
       return {
         ...state,
         logs: { ...state.logs, [sourcePath]: [...log] },
@@ -55,13 +55,21 @@ export const logViewerReducer = (state = initialState, action) => {
       return {
         ...state,
         logs: {
-          ...state.logs,
+          ...state.logs[sourcePath],
           [sourcePath]: [...lines]
         },
         metaData: {
           ...state.metaData,
           [sourcePath]: [...metaData]
         }
+      };
+    }
+    case 'LOGVIEWER_UPDATE_CURRENT_NR_OF_LINES_IN_VIEWER': {
+      const { numberOfLinesToFillLogView } = action.data;
+
+      return {
+        ...state,
+        nrOfLinesInViewer: numberOfLinesToFillLogView
       };
     }
 
