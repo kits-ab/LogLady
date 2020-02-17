@@ -51,20 +51,16 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     case 'LOGVIEWER_ADD_LINES_FROM_BYTE_POSITION': {
       const { lines, sourcePath, metaData } = action.data;
-      const log = state.logs[sourcePath];
-      const meta = state.metaData[sourcePath];
-      console.log(lines);
-      console.log(metaData);
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: log ? [...lines, ...log] : [...lines]
+          [sourcePath]: [...lines]
         },
         metaData: {
           ...state.metaData,
-          [sourcePath]: meta ? [...metaData, ...meta] : [...metaData]
+          [sourcePath]: [...metaData]
         }
       };
     }

@@ -144,9 +144,9 @@ const LogViewer = props => {
           props.source.path,
           // Since slider starts at 0 we need to alter the value like this to get the correct byte position.
           logSize - sliderPosition,
-          10
+          25
         );
-      }, 200);
+      }, 50);
       // Save timeout so it can be cleared if needed
       setCurrentTimeout(timeout);
     };
@@ -184,6 +184,7 @@ const LogViewer = props => {
     // valueLabel: {},
     // zeroTick: {}
   };
+
   return (
     <LogViewerContainer ref={logViewerContainerRef}>
       <LogViewerList
@@ -207,7 +208,7 @@ const LogViewer = props => {
           fetchTextBasedOnByteFromScrollPosition(
             props.source.path,
             logSize - value,
-            10
+            25
           );
         }}
         styles={styles}

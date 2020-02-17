@@ -6,7 +6,7 @@ import {
   LogLineRuler
 } from '../styledComponents/LogViewerListStyledComponents';
 import SingleLogLineTranslator from './SingleLogLine';
-import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
+// import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
 
 import _ from 'lodash';
 import { List } from 'office-ui-fabric-react';
