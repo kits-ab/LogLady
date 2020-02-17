@@ -25,11 +25,11 @@ export const scrollToBottom = (el, list) => {
 export const fetchTextBasedOnByteFromScrollPosition = (
   path,
   startByte,
-  lines
+  amountOfLines
 ) => {
   const argObj = {
     function: 'READ_LINES_AT_BYTE',
-    data: { path, startByte, lines }
+    data: { path, startByte, amountOfLines }
   };
   sendRequestToBackend(argObj);
 };

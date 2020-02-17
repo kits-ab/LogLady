@@ -5,8 +5,11 @@ export const showOpenDialog = () => {
   sendRequestToBackend({ function: 'DIALOG_OPEN_SHOW' });
 };
 
-export const openFile = filePath => {
-  sendRequestToBackend({ function: 'FILE_OPEN', data: { filePath } });
+export const openFile = (filePath /*, initialAmountOfLines*/) => {
+  sendRequestToBackend({
+    function: 'FILE_OPEN',
+    data: { filePath /*, initialAmountOfLines */ }
+  });
 };
 
 export const closeFile = (dispatch, filePath) => {

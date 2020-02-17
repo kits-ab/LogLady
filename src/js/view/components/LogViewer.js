@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
 import { Slider } from 'office-ui-fabric-react';
 import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
+import _ from 'lodash';
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -30,6 +31,10 @@ const LogViewer = props => {
   const [filteredAndHighlightedLines, setLines] = useState([]); // Used to save and update the current filtered and highlighted lines
   const [sliderPosition, setSliderPosition] = useState(0);
   const [currentTimeout, setCurrentTimeout] = useState();
+  const [currentLogViewerContainerHeight, setCurrentContainerHeight] = useState(
+    0
+  );
+
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
   const logViewerContainerRef = useRef();
 
@@ -72,6 +77,19 @@ const LogViewer = props => {
         'hiddenWindowMessages',
         eventListenerIPCMessage
       );
+    };
+  }, []);
+
+  useEffect(() => {
+    // Rezise eventlistener registration to be able to keep track of the height of the container.
+    const logViewerContainerResizeHandler = _.debounce(() => {
+      setCurrentContainerHeight(logViewerContainerRef.current.offsetHeight);
+    }, 50);
+    logViewerContainerResizeHandler();
+    window.addEventListener('resize', logViewerContainerResizeHandler);
+
+    return () => {
+      window.removeEventListener('resize', logViewerContainerResizeHandler);
     };
   }, []);
 
@@ -140,11 +158,11 @@ const LogViewer = props => {
       clearTimeout(currentTimeout);
       // Set new timeout to read from file in an appropriate amount of time
       let timeout = setTimeout(() => {
+        // Since slider starts at 0 we need to calculate logsize - sliderPosition to get the correct byte position.
         fetchTextBasedOnByteFromScrollPosition(
           props.source.path,
-          // Since slider starts at 0 we need to alter the value like this to get the correct byte position.
           logSize - sliderPosition,
-          25
+          props.nroflines
         );
       }, 50);
       // Save timeout so it can be cleared if needed
@@ -159,31 +177,12 @@ const LogViewer = props => {
         readBytesHandler
       );
     };
-  }, [sliderPosition, currentTimeout]);
-
-  const styles = {
-    // activeSection: { /*height: ?*/ color: 'lightgray' },
-    // container: {},
-    // inactiveSection: { background: 'lightgray' },
-    // line: { color: 'lightgray' },
-    // lineContainer: { width: '28px', background: 'lightgray' },
-    // root: { background: 'lightgray' },
-    // slideBox: {
-    //   color: 'lightgray',
-    //   width: '28px'
-    // },
-    // thumb: {
-    //   background: 'gray',
-    //   borderRadius: 'none',
-    //   width: '20px',
-    //   border: 'none',
-    //   margin: 'auto'
-    //   // height ? depending on filesize?
-    // },
-    // titleLabel: {},
-    // valueLabel: {},
-    // zeroTick: {}
-  };
+  }, [
+    sliderPosition,
+    currentTimeout,
+    currentLogViewerContainerHeight,
+    props.nroflines
+  ]);
 
   return (
     <LogViewerContainer ref={logViewerContainerRef}>
@@ -195,6 +194,7 @@ const LogViewer = props => {
         lines={filteredAndHighlightedLines}
         sourcePath={props.source.path}
         logSize={logSize}
+        containerHeight={currentLogViewerContainerHeight}
       />
       <Slider
         min={0}
@@ -208,10 +208,10 @@ const LogViewer = props => {
           fetchTextBasedOnByteFromScrollPosition(
             props.source.path,
             logSize - value,
-            25
+            props.nroflines
           );
         }}
-        styles={styles}
+        // styles={styles}
       ></Slider>
     </LogViewerContainer>
   );
@@ -220,15 +220,42 @@ const LogViewer = props => {
 const mapStateToProps = ({
   topPanelState: { settings },
   settingsState: { tabSettings },
-  logViewerState: { logs },
+  logViewerState: { logs, nrOfLinesInViewer },
   logInfoState: { logSizes }
 }) => {
   return {
     settings,
     tabSettings,
     logs,
-    logSizes
+    logSizes,
+    nroflines: nrOfLinesInViewer
   };
 };
 
 export default connect(mapStateToProps)(LogViewer);
+
+// Styles object to be used when overriding slider styling later:
+
+// const styles = {
+// activeSection: { /*height: ?*/ color: 'lightgray' },
+// container: {},
+// inactiveSection: { background: 'lightgray' },
+// line: { color: 'lightgray' },
+// lineContainer: { width: '28px', background: 'lightgray' },
+// root: { background: 'lightgray' },
+// slideBox: {
+//   color: 'lightgray',
+//   width: '28px'
+// },
+// thumb: {
+//   background: 'gray',
+//   borderRadius: 'none',
+//   width: '20px',
+//   border: 'none',
+//   margin: 'auto'
+//   // height ? depending on filesize?
+// },
+// titleLabel: {},
+// valueLabel: {},
+// zeroTick: {}
+// };

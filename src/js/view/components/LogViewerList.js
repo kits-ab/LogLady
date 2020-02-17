@@ -6,8 +6,8 @@ import {
   LogLineRuler
 } from '../styledComponents/LogViewerListStyledComponents';
 import SingleLogLineTranslator from './SingleLogLine';
-// import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
-
+import { connect } from 'react-redux';
+import { updateNumberOfLinesToRenderInLogView } from '../actions/dispatchActions';
 import _ from 'lodash';
 import { List } from 'office-ui-fabric-react';
 
@@ -36,8 +36,12 @@ const LogViewerList = props => {
   const oneCharacterSizeRef = useRef();
   const [characterDimensions, setCharacterDimensions] = useState({
     width: 10,
-    height: 19
+    height: 17
   });
+
+  const [numberOfLinesToFillLogView, setNumberOfLinesToFillLogView] = useState(
+    Math.round(props.containerHeight / characterDimensions.height)
+  );
 
   // Itemdata used to send needed props and state from this component to the pure component that renders a single line
   const itemData = createItemData(
@@ -64,9 +68,7 @@ const LogViewerList = props => {
 
     // Calls are throttled to once every 200 ms
     const debouncedResizeHandler = _.debounce(handleResize, 200);
-
     window.addEventListener('resize', debouncedResizeHandler);
-
     // Return cleanup function
     return () => {
       window.removeEventListener('resize', debouncedResizeHandler);
@@ -110,6 +112,24 @@ const LogViewerList = props => {
     }
   }, [props.lines]);
 
+  useEffect(() => {
+    // Calculate the correct amount of lines needed to fill the page in the
+    setNumberOfLinesToFillLogView(
+      Math.round(props.containerHeight / characterDimensions.height)
+    );
+  }, [props.containerHeight]);
+
+  useEffect(() => {
+    // Just for keeping track of the state changes for now.
+    updateNumberOfLinesToRenderInLogView(
+      props.dispatch,
+      numberOfLinesToFillLogView
+    );
+    console.log(props.containerHeight);
+    console.log(characterDimensions.height);
+    console.log(numberOfLinesToFillLogView);
+  }, [numberOfLinesToFillLogView]);
+
   const _onRenderCell = (item, index) => {
     return (
       <SingleLogLineTranslator
@@ -130,4 +150,4 @@ const LogViewerList = props => {
   );
 };
 
-export default LogViewerList;
+export default connect()(LogViewerList);
