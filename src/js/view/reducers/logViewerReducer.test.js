@@ -53,15 +53,36 @@ describe('logviewer reducer', () => {
   it('should append lines to source', () => {
     const lines = ['hej4', 'hej5'];
     const state = {
-      logs: { test: ['hej1', 'hej2', 'hej3'] }
+      logs: { test: ['hej1', 'hej2', 'hej3'] },
+      nrOfLinesInViewer: 5
     };
     const expectedState = {
-      logs: { test: ['hej1', 'hej2', 'hej3', 'hej4', 'hej5'] }
+      logs: { test: ['hej1', 'hej2', 'hej3', 'hej4', 'hej5'] },
+      nrOfLinesInViewer: 5
     };
     const sourcePath = 'test';
+    const followTail = true;
     const action = {
       type: 'LOGVIEWER_ADD_LINES',
-      data: { sourcePath, lines }
+      data: { sourcePath, lines, followTail }
+    };
+    expect(logViewerReducer(state, action)).toEqual(expectedState);
+  });
+  it('should replace lines when overflowing viewer', () => {
+    const lines = ['hej4', 'hej5'];
+    const state = {
+      logs: { test: ['hej1', 'hej2', 'hej3'] },
+      nrOfLinesInViewer: 3
+    };
+    const expectedState = {
+      logs: { test: ['hej3', 'hej4', 'hej5'] },
+      nrOfLinesInViewer: 3
+    };
+    const sourcePath = 'test';
+    const followTail = true;
+    const action = {
+      type: 'LOGVIEWER_ADD_LINES',
+      data: { sourcePath, lines, followTail }
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });

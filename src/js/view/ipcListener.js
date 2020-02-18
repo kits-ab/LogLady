@@ -68,11 +68,11 @@ const handleFileOpened = (
 };
 
 const handleNewLines = (dispatch, { sourcePath, lines, size }, state) => {
-  let followTail = state.topPanelState.settings[sourcePath].tailSwitch;
+  let followTail = state.topPanelState.settings[sourcePath]
+    ? state.topPanelState.settings[sourcePath].tailSwitch
+    : true;
 
-  if (followTail) {
-    addNewLines(dispatch, sourcePath, lines);
-  }
+  addNewLines(dispatch, sourcePath, lines, followTail);
   increaseSize(dispatch, sourcePath, size);
 };
 

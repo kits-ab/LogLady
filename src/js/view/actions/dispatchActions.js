@@ -170,12 +170,13 @@ export const hideSnackBar = dispatch => {
   });
 };
 
-export const addNewLines = (dispatch, sourcePath, lines) => {
+export const addNewLines = (dispatch, sourcePath, lines, followTail) => {
   dispatch({
     type: 'LOGVIEWER_ADD_LINES',
     data: {
       sourcePath,
-      lines
+      lines,
+      followTail
     }
   });
 };
