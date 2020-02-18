@@ -55,7 +55,7 @@ export const logViewerReducer = (state = initialState, action) => {
       return {
         ...state,
         logs: {
-          ...state.logs[sourcePath],
+          ...state.logs,
           [sourcePath]: [...lines]
         },
         metaData: {
