@@ -67,8 +67,12 @@ const handleFileOpened = (
   sendRequestToBackend(followSource);
 };
 
-const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
-  addNewLines(dispatch, sourcePath, lines);
+const handleNewLines = (dispatch, { sourcePath, lines, size }, state) => {
+  let followTail = state.topPanelState.settings[sourcePath].tailSwitch;
+
+  if (followTail) {
+    addNewLines(dispatch, sourcePath, lines);
+  }
   increaseSize(dispatch, sourcePath, size);
 };
 
@@ -109,7 +113,7 @@ export const ipcListener = (store, publisher) => {
         handleError(dispatch, action.data);
         break;
       case 'LINES_NEW':
-        handleNewLines(dispatch, action.data);
+        handleNewLines(dispatch, action.data, store.getState());
         break;
       case 'LINES_FROM_BYTE':
         handleLinesFromByte(dispatch, action.data);

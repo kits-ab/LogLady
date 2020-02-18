@@ -37,18 +37,25 @@ export const logViewerReducer = (state = initialState, action) => {
         metaData: { ...state.metaData, [sourcePath]: [...metaData] }
       };
     }
-    case 'LOGVIEWER_ADD_LINES':
+    case 'LOGVIEWER_ADD_LINES': {
       console.log('ADDING');
       const { sourcePath, lines } = action.data;
-      const log = state.logs[sourcePath];
+      const log = state.logs[sourcePath] ? state.logs[sourcePath] : [];
+      const newLength = log.length + lines.length;
+
+      let newLines =
+        newLength > state.nrOfLinesInViewer
+          ? log.slice(lines.length).concat(lines)
+          : log.concat(lines);
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: log ? [...log, ...lines] : [...lines]
+          [sourcePath]: [...newLines]
         }
       };
+    }
     case 'LOGVIEWER_ADD_LINES_FROM_BYTE_POSITION': {
       const { lines, sourcePath, metaData } = action.data;
 
