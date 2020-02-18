@@ -8,6 +8,11 @@ import { Slider } from 'office-ui-fabric-react';
 import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
 import _ from 'lodash';
 
+const debouncedFunction = _.debounce((path, bytesToRead, nrOfLines) => {
+  console.log('debouncing');
+  fetchTextBasedOnByteFromScrollPosition(path, bytesToRead, nrOfLines);
+}, 100);
+
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
     ? props.settings[props.source.path].filterInput
@@ -205,7 +210,7 @@ const LogViewer = props => {
         value={sliderPosition}
         onChange={value => {
           setSliderPosition(value);
-          fetchTextBasedOnByteFromScrollPosition(
+          debouncedFunction(
             props.source.path,
             logSize - value,
             props.nroflines
