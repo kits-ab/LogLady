@@ -33,7 +33,7 @@ const LogViewer = props => {
     ? props.logSizes[props.source.path]
     : 0;
 
-  const [filteredAndHighlightedLines, setLines] = useState([]); // Used to save and update the current filtered and highlighted lines
+  const [filteredAndHighlightedLines, setLines] = useState([]);
   const [sliderPosition, setSliderPosition] = useState(0);
   const [currentTimeout, setCurrentTimeout] = useState();
   const [currentLogViewerContainerHeight, setCurrentContainerHeight] = useState(
@@ -86,7 +86,6 @@ const LogViewer = props => {
   }, []);
 
   useEffect(() => {
-    // Rezise eventlistener registration to be able to keep track of the height of the container.
     const logViewerContainerResizeHandler = _.debounce(() => {
       setCurrentContainerHeight(logViewerContainerRef.current.offsetHeight);
     }, 50);
@@ -157,8 +156,6 @@ const LogViewer = props => {
 
   useEffect(() => {
     const readBytesHandler = () => {
-      console.log('Byteposition: ', logSize - sliderPosition);
-
       // CLear timeout so we don't read from files too often
       clearTimeout(currentTimeout);
       // Set new timeout to read from file in an appropriate amount of time
@@ -216,8 +213,7 @@ const LogViewer = props => {
             props.nroflines
           );
         }}
-        // styles={styles}
-      ></Slider>
+      />
     </LogViewerContainer>
   );
 };
@@ -238,29 +234,3 @@ const mapStateToProps = ({
 };
 
 export default connect(mapStateToProps)(LogViewer);
-
-// Styles object to be used when overriding slider styling later:
-
-// const styles = {
-// activeSection: { /*height: ?*/ color: 'lightgray' },
-// container: {},
-// inactiveSection: { background: 'lightgray' },
-// line: { color: 'lightgray' },
-// lineContainer: { width: '28px', background: 'lightgray' },
-// root: { background: 'lightgray' },
-// slideBox: {
-//   color: 'lightgray',
-//   width: '28px'
-// },
-// thumb: {
-//   background: 'gray',
-//   borderRadius: 'none',
-//   width: '20px',
-//   border: 'none',
-//   margin: 'auto'
-//   // height ? depending on filesize?
-// },
-// titleLabel: {},
-// valueLabel: {},
-// zeroTick: {}
-// };

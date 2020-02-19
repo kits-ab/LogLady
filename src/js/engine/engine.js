@@ -151,7 +151,6 @@ const handleShowOpenDialog = async (state, sender) => {
 
 const readLinesStartingAtByte = async (sender, data) => {
   const APPROXIMATE_BYTES_PER_LINE = 150;
-  // const SCREENS_TO_FETCH = 3;
   const { path, startByte, amountOfLines } = data;
   const [fileSize] = await getFileInfo(path);
 
@@ -160,28 +159,19 @@ const readLinesStartingAtByte = async (sender, data) => {
     linesEndAt: 0,
     metaData: []
   };
-  console.log(amountOfLines);
   // Convert lines to amount of bytes using approximation
   let bytesPerScreen = amountOfLines * APPROXIMATE_BYTES_PER_LINE;
-  // Fetch lines from one screen back to current position
-  let startBytesMinusOneScreen =
-    startByte - bytesPerScreen > 0 ? startByte - bytesPerScreen : 0;
-  // Fetch three screens total
-  // let bytesToFetch = bytesPerScreen; /* * SCREENS_TO_FETCH*/
-  let byteToReadFrom = startBytesMinusOneScreen;
+  let byteToReadFrom = startByte;
 
   // If too few lines are returned and we have not
   // reached the end of file, keep reading lines
   while (
-    dataToReturn.lines.length < amountOfLines /* * SCREENS_TO_FETCH */ &&
+    dataToReturn.lines.length < amountOfLines &&
     dataToReturn.linesEndAt < fileSize
   ) {
-    // Fetch data from adapter
     let data = await fileReader.readDataFromByte(
       path,
-      // byteToReadFrom,
-      startByte,
-      // bytesToFetch,
+      byteToReadFrom,
       bytesPerScreen
     );
 
@@ -205,7 +195,7 @@ const readLinesStartingAtByte = async (sender, data) => {
   }
 
   const action = {
-    type: 'LINES_FROM_BYTE',
+    type: 'LOGLINES_FETCHED_FROM_BYTEPOSITION',
     data: { dataToReturn, path }
   };
   sender.send(ipcChannel, action);
@@ -242,7 +232,6 @@ const createEventHandler = state => {
         handleOpenFile(state, sender, _argObj.data);
         break;
       case 'SOURCE_FOLLOW':
-        // fileReader.stopAllWatchers();
         handleFollowSource(sender, _argObj.data);
         break;
       case 'SOURCE_UNFOLLOW':
@@ -254,7 +243,7 @@ const createEventHandler = state => {
       case 'STATE_LOAD':
         loadStateFromDisk(state, sender);
         break;
-      case 'READ_LINES_AT_BYTE':
+      case 'FETCH_LOGLINES_STARTING_AT_SCROLL_BYTE_POSITION':
         readLinesStartingAtByte(sender, _argObj.data);
         break;
       default:

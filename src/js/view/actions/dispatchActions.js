@@ -210,7 +210,7 @@ export const addLinesFetchedFromBytePosition = (
   sourcePath
 ) => {
   dispatch({
-    type: 'LOGVIEWER_ADD_LINES_FROM_BYTE_POSITION',
+    type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION',
     data: {
       lines,
       linesStartAt,

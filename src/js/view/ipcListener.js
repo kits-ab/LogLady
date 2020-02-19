@@ -76,7 +76,7 @@ const handleNewLines = (dispatch, { sourcePath, lines, size }, state) => {
   increaseSize(dispatch, sourcePath, size);
 };
 
-const handleLinesFromByte = (dispatch, { dataToReturn, path }) => {
+const handleLinesFromBytePosition = (dispatch, { dataToReturn, path }) => {
   addLinesFetchedFromBytePosition(
     dispatch,
     dataToReturn.metaData,
@@ -115,8 +115,8 @@ export const ipcListener = (store, publisher) => {
       case 'LINES_NEW':
         handleNewLines(dispatch, action.data, store.getState());
         break;
-      case 'LINES_FROM_BYTE':
-        handleLinesFromByte(dispatch, action.data);
+      case 'LOGLINES_FETCHED_FROM_BYTEPOSITION':
+        handleLinesFromBytePosition(dispatch, action.data);
         break;
       default:
         console.log('Warning: Unrecognized message, ', action);

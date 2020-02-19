@@ -28,7 +28,7 @@ export const fetchTextBasedOnByteFromScrollPosition = (
   amountOfLines
 ) => {
   const argObj = {
-    function: 'READ_LINES_AT_BYTE',
+    function: 'FETCH_LOGLINES_STARTING_AT_SCROLL_BYTE_POSITION',
     data: { path, startByte, amountOfLines }
   };
   sendRequestToBackend(argObj);

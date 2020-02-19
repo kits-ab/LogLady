@@ -1,12 +1,5 @@
 const initialState = { logs: {}, metaData: {}, nrOfLinesInViewer: null };
 
-// const createGhostLines = fileSize => {
-//   const amountOfGhostLines =
-//     fileSize / 150 < 10000 ? Math.round(fileSize / 150) : 10000;
-//   // Set ghostline to invisible unicode character (U+2800) to ensure that they are rendered
-//   return Array(amountOfGhostLines).fill('⠀');
-// };
-
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'LOGVIEWER_REMOVE_LOG': {
@@ -68,7 +61,7 @@ export const logViewerReducer = (state = initialState, action) => {
         }
       };
     }
-    case 'LOGVIEWER_ADD_LINES_FROM_BYTE_POSITION': {
+    case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION': {
       const { lines, sourcePath, metaData } = action.data;
 
       return {
