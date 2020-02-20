@@ -48,7 +48,7 @@ class LogsFiltererAndHighlighter {
           let highlightCount = 0;
           line =
             '[HLL]' +
-            line.replace(this.highlightRegex, match => {
+            line.trim().replace(this.highlightRegex, match => {
               return (
                 `[HLG${++highlightCount}]` + match + `[/HLG${highlightCount}]`
               );
