@@ -137,15 +137,18 @@ const LogViewer = props => {
 
   useEffect(() => {
     // Effect for checking if tailswitch is on. If it is - lock the sliderPosition to 0 and display the tail of the file.
+    const APPROXIMATE_AMOUNT_OF_BYTES_TO_FETCH = 10000;
+    const LINES_FROM_VIEWCONTAINER_BOTTOM = 5;
+
     if (logFileHasRunningStatus && tailSwitch) {
       setSliderPosition(0);
       debouncedFetchTextByBytePosition(
         props.source.path,
-        logSize - 10000,
-        props.nrOfLinesInViewer - 5
+        logSize - APPROXIMATE_AMOUNT_OF_BYTES_TO_FETCH,
+        props.nrOfLinesInViewer - LINES_FROM_VIEWCONTAINER_BOTTOM
       );
     }
-  }, [tailSwitch]);
+  }, [tailSwitch, logFileHasRunningStatus]);
 
   useEffect(() => {
     /* Effect for when another source is selected,
@@ -181,21 +184,20 @@ const LogViewer = props => {
       // Clear timeout so we don't read from files too often
       clearTimeout(currentTimeout);
       // Set new timeout to read from file in an appropriate amount of time
-      let timeout;
       if (tailSwitch && logFileHasRunningStatus) {
         setSliderPosition(0);
       } else {
-        timeout = setTimeout(() => {
+        let timeout = setTimeout(() => {
           // Slider base is 0 so we need to calculate logsize - sliderPosition in order to get the correct byte position.
           fetchTextBasedOnByteFromScrollPosition(
             props.source.path,
             logSize - sliderPosition,
             props.nrOfLinesInViewer
           );
+          // Save timeout so it can be cleared if needed
+          setCurrentTimeout(timeout);
         }, 50);
       }
-      // Save timeout so it can be cleared if needed
-      setCurrentTimeout(timeout);
     };
 
     logViewerContainerRef.current.addEventListener('wheel', readBytesHandler);
