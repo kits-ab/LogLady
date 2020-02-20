@@ -6,7 +6,6 @@ import {
   LogLineRuler
 } from '../styledComponents/LogViewerListStyledComponents';
 import SingleLogLineTranslator from './SingleLogLine';
-import { connect } from 'react-redux';
 import { updateNumberOfLinesToRenderInLogView } from '../actions/dispatchActions';
 import _ from 'lodash';
 import { List } from 'office-ui-fabric-react';
@@ -105,15 +104,10 @@ const LogViewerList = props => {
 
     setCurrentMaxLineLength(currentMaxLength);
     setLastLineCount(index);
-
-    if (props.scrollToBottom) {
-      logViewerListContainerRef.current.scrollTop =
-        logViewerListContainerRef.current.scrollHeight;
-    }
   }, [props.lines]);
 
   useEffect(() => {
-    // Calculate the correct amount of lines needed to fill the page in the logviewer
+    // Calculating the correct amount of lines needed to fill the page in the logviewer
     setNumberOfLinesToFillLogView(
       Math.round(props.containerHeight / characterDimensions.height)
     );
@@ -121,7 +115,7 @@ const LogViewerList = props => {
 
   useEffect(() => {
     updateNumberOfLinesToRenderInLogView(
-      props.dispatch,
+      props.dispatcher,
       numberOfLinesToFillLogView
     );
   }, [numberOfLinesToFillLogView]);
@@ -146,4 +140,4 @@ const LogViewerList = props => {
   );
 };
 
-export default connect()(LogViewerList);
+export default LogViewerList;

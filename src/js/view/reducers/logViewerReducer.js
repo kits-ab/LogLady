@@ -23,7 +23,6 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_SET_LOG': {
       console.log('SETTING');
       const { sourcePath, log, metaData } = action.data;
-      // console.log(metaData);
       return {
         ...state,
         logs: { ...state.logs, [sourcePath]: [...log] },
@@ -48,7 +47,7 @@ export const logViewerReducer = (state = initialState, action) => {
             : log.concat(lines);
       } else {
         // If we are not following tail, but have not filled the screen
-        // we are at the botton of the file and should update the logs
+        // we are at the bottom of the file and should update the logs
         newLines =
           log.length <= state.nrOfLinesInViewer ? log.concat(lines) : log;
       }
