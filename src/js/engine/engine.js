@@ -37,7 +37,7 @@ const sendFileOpened = async (
   fileSize,
   endIndex,
   history,
-  metaData
+  startByteOfLines
 ) => {
   const action = {
     type: 'SOURCE_OPENED',
@@ -47,7 +47,7 @@ const sendFileOpened = async (
       fileSize,
       endIndex,
       history,
-      metaData
+      startByteOfLines
     }
   };
 
@@ -58,8 +58,19 @@ const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
     sendSourcePicked(sender, filePath);
-    const [history, metaData] = await getFileHistory(filePath, endIndex, 10);
-    sendFileOpened(sender, filePath, fileSize, endIndex, history, metaData);
+    const [history, startByteOfLines] = await getFileHistory(
+      filePath,
+      endIndex,
+      10
+    );
+    sendFileOpened(
+      sender,
+      filePath,
+      fileSize,
+      endIndex,
+      history,
+      startByteOfLines
+    );
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
     return false;
@@ -157,7 +168,7 @@ const readLinesStartingAtByte = async (sender, data) => {
   let dataToReturn = {
     lines: [],
     linesEndAt: 0,
-    metaData: []
+    startByteOfLines: []
   };
   // Convert lines to amount of bytes using approximation
   let bytesPerScreen = amountOfLines * APPROXIMATE_BYTES_PER_LINE;
@@ -181,7 +192,9 @@ const readLinesStartingAtByte = async (sender, data) => {
     }
     dataToReturn.linesEndAt = data.linesEndAt;
     dataToReturn.lines = dataToReturn.lines.concat(data.lines);
-    dataToReturn.metaData = dataToReturn.metaData.concat(data.metaData);
+    dataToReturn.startByteOfLines = dataToReturn.startByteOfLines.concat(
+      data.startByteOfLines
+    );
 
     // Calculate next byte to read from
     // Remove one byte to get one character from previous line,

@@ -1,4 +1,8 @@
-const initialState = { logs: {}, metaData: {}, nrOfLinesInViewer: null };
+const initialState = {
+  logs: {},
+  startByteOfLines: {},
+  nrOfLinesInViewer: null
+};
 
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -22,11 +26,14 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     case 'LOGVIEWER_SET_LOG': {
       console.log('SETTING');
-      const { sourcePath, log, metaData } = action.data;
+      const { sourcePath, log, startByteOfLines } = action.data;
       return {
         ...state,
         logs: { ...state.logs, [sourcePath]: [...log] },
-        metaData: { ...state.metaData, [sourcePath]: [...metaData] }
+        startByteOfLines: {
+          ...state.startByteOfLines,
+          [sourcePath]: [...startByteOfLines]
+        }
       };
     }
     case 'LOGVIEWER_ADD_LINES': {
@@ -61,7 +68,7 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     }
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION': {
-      const { lines, sourcePath, metaData } = action.data;
+      const { lines, sourcePath, startByteOfLines } = action.data;
 
       return {
         ...state,
@@ -69,9 +76,9 @@ export const logViewerReducer = (state = initialState, action) => {
           ...state.logs,
           [sourcePath]: [...lines]
         },
-        metaData: {
-          ...state.metaData,
-          [sourcePath]: [...metaData]
+        startByteOfLines: {
+          ...state.startByteOfLines,
+          [sourcePath]: [...startByteOfLines]
         }
       };
     }

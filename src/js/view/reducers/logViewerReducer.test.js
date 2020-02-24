@@ -2,7 +2,11 @@ import { logViewerReducer } from './logViewerReducer';
 
 describe('logviewer reducer', () => {
   it('should return the initial state', () => {
-    const initialState = { logs: {}, metaData: {}, nrOfLinesInViewer: null };
+    const initialState = {
+      logs: {},
+      startByteOfLines: {},
+      nrOfLinesInViewer: null
+    };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
   it('should reset all logs', () => {
@@ -17,7 +21,7 @@ describe('logviewer reducer', () => {
     const lines = ['hej1', 'hej2', 'hej3'];
     const expectedState = {
       logs: { test: ['hej1', 'hej2', 'hej3'] },
-      metaData: {},
+      startByteOfLines: {},
       nrOfLinesInViewer: null
     };
     const sourcePath = 'test';
@@ -33,7 +37,7 @@ describe('logviewer reducer', () => {
   });
   it('should set log on source', () => {
     const log = ['hej4', 'hej5'];
-    const metaData = [1, 2];
+    const startByteOfLines = [1, 2];
     // Size is zero to avoid ghost lines
     const size = 0;
     const state = {
@@ -41,12 +45,12 @@ describe('logviewer reducer', () => {
     };
     const expectedState = {
       logs: { test: ['hej4', 'hej5'] },
-      metaData: { test: [1, 2] }
+      startByteOfLines: { test: [1, 2] }
     };
     const sourcePath = 'test';
     const action = {
       type: 'LOGVIEWER_SET_LOG',
-      data: { sourcePath, log, size, metaData }
+      data: { sourcePath, log, size, startByteOfLines }
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });

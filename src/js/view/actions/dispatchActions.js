@@ -79,7 +79,7 @@ export const setFileData = (
   filePath,
   fileSize,
   history,
-  metaData
+  startByteOfLines
 ) => {
   dispatch({
     type: 'LOGVIEWER_SET_LOG',
@@ -87,7 +87,7 @@ export const setFileData = (
       sourcePath: filePath,
       log: history,
       size: fileSize,
-      metaData
+      startByteOfLines
     }
   });
 
@@ -203,7 +203,7 @@ export const showSnackBar = (dispatch, message, level) => {
 
 export const addLinesFetchedFromBytePosition = (
   dispatch,
-  metaData,
+  startByteOfLines,
   lines,
   linesStartAt,
   linesEndAt,
@@ -216,7 +216,7 @@ export const addLinesFetchedFromBytePosition = (
       linesStartAt,
       linesEndAt,
       sourcePath,
-      metaData
+      startByteOfLines
     }
   });
 };

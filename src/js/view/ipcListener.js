@@ -50,10 +50,10 @@ const handleStateSet = (publisher, state) => {
 
 const handleFileOpened = (
   dispatch,
-  { filePath, fileSize, endIndex, history, metaData }
+  { filePath, fileSize, endIndex, history, startByteOfLines }
 ) => {
   // clearAllLogs(dispatch);
-  setFileData(dispatch, filePath, fileSize, history, metaData);
+  setFileData(dispatch, filePath, fileSize, history, startByteOfLines);
   setLastSeenLogSizeToSize(dispatch, filePath, fileSize);
 
   const followSource = {
@@ -79,7 +79,7 @@ const handleNewLines = (dispatch, { sourcePath, lines, size }, state) => {
 const handleLinesFromBytePosition = (dispatch, { dataToReturn, path }) => {
   addLinesFetchedFromBytePosition(
     dispatch,
-    dataToReturn.metaData,
+    dataToReturn.startByteOfLines,
     dataToReturn.lines,
     dataToReturn.linesStartAt,
     dataToReturn.linesEndAt,

@@ -166,7 +166,10 @@ const readNLastLines = (filePath, numberOfLines, endIndex) => {
 
         resolve([
           result,
-          calculateMetaDataBackwards(result, getFileSizeInBytes(filePath))
+          calculateStartByteOfLinesBackwards(
+            result,
+            getFileSizeInBytes(filePath)
+          )
         ]);
       })
       .on('error', err => {
@@ -302,14 +305,42 @@ const readDataFromByte = (filePath, start, numberOfBytes) => {
           }
 
           var data = buffer.toString('utf8');
-          resolve(parseSelectedData(data, start, numberOfBytes));
+          resolve(
+            parseByteDataIntoStringArrayWithStartByteOfLines(
+              data,
+              start,
+              numberOfBytes
+            )
+          );
         });
       });
     });
   });
 };
 
-const parseSelectedData = (data, start, numberOfBytes) => {
+const parseByteDataIntoStringArrayWithStartByteOfLines = (
+  data,
+  start,
+  numberOfBytes
+) => {
+  const linesData = parseByteDataIntoStringArray(data, start, numberOfBytes);
+  const lines = linesData.lines;
+  const linesStartAt = Math.round(linesData.linesStartAt);
+  const linesEndAt = linesData.linesEndAt;
+  const startByteOfLines = extractStartByteOfLinesFromByteData(
+    lines,
+    linesStartAt
+  );
+
+  return {
+    startByteOfLines,
+    lines,
+    linesStartAt,
+    linesEndAt
+  };
+};
+
+const parseByteDataIntoStringArray = (data, start, numberOfBytes) => {
   const BYTE_FOR_MISSING_NEWLINE = 1;
 
   const lines = data.split(/\r?\n/);
@@ -333,45 +364,37 @@ const parseSelectedData = (data, start, numberOfBytes) => {
     lines.pop();
   }
 
-  const metaData = calculateMetaData(lines, linesStartAt);
-
-  return {
-    metaData,
-    lines,
-    linesStartAt,
-    linesEndAt
-  };
+  return { lines, linesStartAt, linesEndAt };
 };
 
-const calculateMetaData = (lines, linesStartAt) => {
+const extractStartByteOfLinesFromByteData = (lines, linesStartAt) => {
   const BYTE_FOR_MISSING_NEWLINE = 1;
-
-  let metaData = [];
+  let startByteOfLines = [];
   let currentLineStartByte = linesStartAt;
   for (const line of lines) {
-    metaData.push(currentLineStartByte);
+    startByteOfLines.push(currentLineStartByte);
     currentLineStartByte =
       currentLineStartByte +
       Buffer.byteLength(line, 'utf8') +
       BYTE_FOR_MISSING_NEWLINE;
   }
-  return metaData;
+  return startByteOfLines;
 };
 
-const calculateMetaDataBackwards = (lines, filesize) => {
+const calculateStartByteOfLinesBackwards = (lines, filesize) => {
   const BYTE_FOR_MISSING_NEWLINE = 1;
 
   let reversedLines = [...lines].reverse();
-  let metaData = [];
+  let startByteOfLines = [];
   let currentLineStartByte =
     filesize - Buffer.byteLength(reversedLines[0] + BYTE_FOR_MISSING_NEWLINE);
   for (const line of reversedLines) {
-    metaData.unshift(currentLineStartByte);
+    startByteOfLines.unshift(currentLineStartByte);
     currentLineStartByte =
       currentLineStartByte -
       (Buffer.byteLength(line, 'utf8') + BYTE_FOR_MISSING_NEWLINE);
   }
-  return metaData;
+  return startByteOfLines;
 };
 
 module.exports = {

@@ -159,7 +159,7 @@ const LogViewer = props => {
   }, [props.source.path]);
 
   useEffect(() => {
-    const wheelHandler = event => {
+    const wheelScrollEventHandler = event => {
       if (logViewerContainerRef.current) {
         let newSliderPosition = sliderPosition + event.deltaY;
         if (newSliderPosition > logSize) {
@@ -172,10 +172,16 @@ const LogViewer = props => {
       }
     };
 
-    logViewerContainerRef.current.addEventListener('wheel', wheelHandler);
+    logViewerContainerRef.current.addEventListener(
+      'wheel',
+      wheelScrollEventHandler
+    );
 
     return () => {
-      logViewerContainerRef.current.removeEventListener('wheel', wheelHandler);
+      logViewerContainerRef.current.removeEventListener(
+        'wheel',
+        wheelScrollEventHandler
+      );
     };
   }, [sliderPosition, logSize]);
 
