@@ -3,8 +3,7 @@ import styled from 'styled-components';
 export const LogViewerRootContainer = styled.div`
   display: flex;
   flex: 1;
-  /* height: calc(100% - 32px); */
-  height: 80%;
+  height: calc(100% - 32px);
 `;
 
 export const LogViewerContainer = styled.div`

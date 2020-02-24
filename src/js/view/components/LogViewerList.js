@@ -35,7 +35,7 @@ const LogViewerList = props => {
   const oneCharacterSizeRef = useRef();
   const [characterDimensions, setCharacterDimensions] = useState({
     width: 10,
-    height: 17
+    height: 19
   });
 
   const [numberOfLinesToFillLogView, setNumberOfLinesToFillLogView] = useState(
@@ -107,11 +107,11 @@ const LogViewerList = props => {
   }, [props.lines]);
 
   useEffect(() => {
-    // Calculating the correct amount of lines needed to fill the page in the logviewer
+    // Calculating the amount of lines needed to fill the page in the logviewer
     setNumberOfLinesToFillLogView(
-      Math.round(props.containerHeight / characterDimensions.height - 2)
+      Math.round(props.containerHeight / characterDimensions.height)
     );
-  }, [props.containerHeight]);
+  }, [props.containerHeight, characterDimensions]);
 
   useEffect(() => {
     updateNumberOfLinesToRenderInLogView(

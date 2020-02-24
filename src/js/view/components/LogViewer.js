@@ -46,7 +46,6 @@ const LogViewer = props => {
   const [currentLogViewerContainerHeight, setCurrentContainerHeight] = useState(
     0
   );
-
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
   const logViewerContainerRef = useRef();
 
@@ -96,7 +95,7 @@ const LogViewer = props => {
 
   useEffect(() => {
     const logViewerContainerResizeHandler = _.debounce(() => {
-      setCurrentContainerHeight(logViewerContainerRef.current.offsetHeight);
+      setCurrentContainerHeight(logViewerContainerRef.current.clientHeight);
     }, 50);
     logViewerContainerResizeHandler();
     window.addEventListener('resize', logViewerContainerResizeHandler);
@@ -222,7 +221,7 @@ const LogViewer = props => {
     scrollPosition,
     currentTimeout,
     currentLogViewerContainerHeight,
-    props.nroflines
+    props.nrOfLinesInViewer
   ]);
 
   const handleCustomScrollBarOnChange = value => {
