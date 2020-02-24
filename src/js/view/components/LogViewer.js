@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from 'react';
 import {
-  LogViewerParent,
+  LogViewerRootContainer,
   LogViewerContainer
 } from '../styledComponents/LogViewerStyledComponents';
 import LogViewerList from './LogViewerList';
@@ -239,7 +239,7 @@ const LogViewer = props => {
   };
 
   return (
-    <LogViewerParent>
+    <LogViewerRootContainer>
       <LogViewerContainer ref={logViewerContainerRef}>
         <LogViewerList
           key={props.source.index}
@@ -258,7 +258,7 @@ const LogViewer = props => {
         scrollPosition={scrollPosition}
         step={1}
       />
-    </LogViewerParent>
+    </LogViewerRootContainer>
   );
 };
 

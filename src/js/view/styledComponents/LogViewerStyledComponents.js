@@ -1,14 +1,23 @@
 import styled from 'styled-components';
 
+export const LogViewerRootContainer = styled.div`
+  display: flex;
+  flex: 1;
+  /* height: calc(100% - 32px); */
+  height: 80%;
+`;
+
 export const LogViewerContainer = styled.div`
   display: flex;
   flex: 1;
   border: 1px solid white;
   color: #ccc;
   background: #444;
-  height: calc(100% - 32px);
+  height: 100%;
   overflow-anchor: none;
   min-width: 0;
+  overflow-y: hidden;
+  overflow-x: auto;
 `;
 
 export const CloseFileButton = styled.button`
