@@ -6,7 +6,7 @@ import {
   LogLineRuler
 } from '../styledComponents/LogViewerListStyledComponents';
 import SingleLogLineTranslator from './SingleLogLine';
-
+import { updateNumberOfLinesToRenderInLogView } from '../actions/dispatchActions';
 import _ from 'lodash';
 import { List } from 'office-ui-fabric-react';
 
@@ -35,8 +35,12 @@ const LogViewerList = props => {
   const oneCharacterSizeRef = useRef();
   const [characterDimensions, setCharacterDimensions] = useState({
     width: 10,
-    height: 19
+    height: 17
   });
+
+  const [numberOfLinesToFillLogView, setNumberOfLinesToFillLogView] = useState(
+    Math.round(props.containerHeight / characterDimensions.height)
+  );
 
   // Itemdata used to send needed props and state from this component to the pure component that renders a single line
   const itemData = createItemData(
@@ -63,9 +67,7 @@ const LogViewerList = props => {
 
     // Calls are throttled to once every 200 ms
     const debouncedResizeHandler = _.debounce(handleResize, 200);
-
     window.addEventListener('resize', debouncedResizeHandler);
-
     // Return cleanup function
     return () => {
       window.removeEventListener('resize', debouncedResizeHandler);
@@ -102,12 +104,21 @@ const LogViewerList = props => {
 
     setCurrentMaxLineLength(currentMaxLength);
     setLastLineCount(index);
-
-    if (props.scrollToBottom) {
-      logViewerListContainerRef.current.scrollTop =
-        logViewerListContainerRef.current.scrollHeight;
-    }
   }, [props.lines]);
+
+  useEffect(() => {
+    // Calculating the correct amount of lines needed to fill the page in the logviewer
+    setNumberOfLinesToFillLogView(
+      Math.round(props.containerHeight / characterDimensions.height)
+    );
+  }, [props.containerHeight]);
+
+  useEffect(() => {
+    updateNumberOfLinesToRenderInLogView(
+      props.dispatcher,
+      numberOfLinesToFillLogView
+    );
+  }, [numberOfLinesToFillLogView]);
 
   const _onRenderCell = (item, index) => {
     return (

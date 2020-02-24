@@ -4,6 +4,16 @@ import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponent
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
+import { Slider } from 'office-ui-fabric-react';
+import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
+import _ from 'lodash';
+
+const debouncedFetchTextByBytePosition = _.debounce(
+  (path, bytesToRead, nrOfLines) => {
+    fetchTextBasedOnByteFromScrollPosition(path, bytesToRead, nrOfLines);
+  },
+  100
+);
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -21,9 +31,22 @@ const LogViewer = props => {
   const tailSwitch = props.settings[props.source.path]
     ? props.settings[props.source.path].tailSwitch
     : 'true';
+  const logSize = props.logSizes[props.source.path]
+    ? props.logSizes[props.source.path]
+    : 0;
+  const lastSeenLogSize = props.lastSeenLogSizes[props.source.path];
 
-  const [filteredAndHighlightedLines, setLines] = useState([]); // Used to save and update the current filtered and highlighted lines
+  const [filteredAndHighlightedLines, setLines] = useState([]);
+  const [sliderPosition, setSliderPosition] = useState(0);
+  const [currentTimeout, setCurrentTimeout] = useState();
+  const [currentLogViewerContainerHeight, setCurrentContainerHeight] = useState(
+    0
+  );
+
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
+  const logViewerContainerRef = useRef();
+
+  let logFileHasRunningStatus = logSize > lastSeenLogSize;
 
   const sendMessageToHiddenWindow = args => {
     /* Send a message to the hidden window that it should filter the logs.
@@ -68,6 +91,18 @@ const LogViewer = props => {
   }, []);
 
   useEffect(() => {
+    const logViewerContainerResizeHandler = _.debounce(() => {
+      setCurrentContainerHeight(logViewerContainerRef.current.offsetHeight);
+    }, 50);
+    logViewerContainerResizeHandler();
+    window.addEventListener('resize', logViewerContainerResizeHandler);
+
+    return () => {
+      window.removeEventListener('resize', logViewerContainerResizeHandler);
+    };
+  }, []);
+
+  useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
     if (props.logs[props.source.path]) {
@@ -92,8 +127,28 @@ const LogViewer = props => {
         logs: newLines
       });
       previousLinesLength.current = props.logs.length;
+
+      // Checking if the follow switch is on and if the log file is running.
+      if (tailSwitch && logFileHasRunningStatus) {
+        setSliderPosition(0);
+      }
     }
   }, [props.logs]);
+
+  useEffect(() => {
+    // Effect for checking if tailswitch is on. If it is - lock the sliderPosition to 0 and display the tail of the file.
+    const APPROXIMATE_AMOUNT_OF_BYTES_TO_FETCH = 10000;
+    const LINES_FROM_VIEWCONTAINER_BOTTOM = 5;
+
+    if (logFileHasRunningStatus && tailSwitch) {
+      setSliderPosition(0);
+      debouncedFetchTextByBytePosition(
+        props.source.path,
+        logSize - APPROXIMATE_AMOUNT_OF_BYTES_TO_FETCH,
+        props.nrOfLinesInViewer - LINES_FROM_VIEWCONTAINER_BOTTOM
+      );
+    }
+  }, [tailSwitch, logFileHasRunningStatus]);
 
   useEffect(() => {
     /* Effect for when another source is selected,
@@ -103,14 +158,104 @@ const LogViewer = props => {
     });
   }, [props.source.path]);
 
+  useEffect(() => {
+    const wheelScrollEventHandler = event => {
+      if (logViewerContainerRef.current) {
+        let newSliderPosition = sliderPosition + event.deltaY;
+        if (newSliderPosition > logSize) {
+          newSliderPosition = logSize;
+        } else if (newSliderPosition <= 0) {
+          newSliderPosition = 0;
+        }
+
+        setSliderPosition(newSliderPosition);
+      }
+    };
+
+    logViewerContainerRef.current.addEventListener(
+      'wheel',
+      wheelScrollEventHandler
+    );
+
+    return () => {
+      logViewerContainerRef.current.removeEventListener(
+        'wheel',
+        wheelScrollEventHandler
+      );
+    };
+  }, [sliderPosition, logSize]);
+
+  useEffect(() => {
+    const readBytesHandler = () => {
+      // Clear timeout so we don't read from files too often
+      clearTimeout(currentTimeout);
+      // Set new timeout to read from file in an appropriate amount of time
+      if (tailSwitch && logFileHasRunningStatus) {
+        setSliderPosition(0);
+      } else {
+        let timeout = setTimeout(() => {
+          // Slider base is 0 so we need to calculate logsize - sliderPosition in order to get the correct byte position.
+          fetchTextBasedOnByteFromScrollPosition(
+            props.source.path,
+            logSize - sliderPosition,
+            props.nrOfLinesInViewer
+          );
+          // Save timeout so it can be cleared if needed
+          setCurrentTimeout(timeout);
+        }, 50);
+      }
+    };
+
+    logViewerContainerRef.current.addEventListener('wheel', readBytesHandler);
+
+    return () => {
+      logViewerContainerRef.current.removeEventListener(
+        'wheel',
+        readBytesHandler
+      );
+    };
+  }, [
+    sliderPosition,
+    currentTimeout,
+    currentLogViewerContainerHeight,
+    props.nroflines
+  ]);
+
+  const handleSliderOnChange = value => {
+    if (tailSwitch && logFileHasRunningStatus) {
+      setSliderPosition(0);
+    } else {
+      setSliderPosition(value);
+      debouncedFetchTextByBytePosition(
+        props.source.path,
+        logSize - value,
+        props.nrOfLinesInViewer
+      );
+    }
+  };
+
   return (
-    <LogViewerContainer>
+    <LogViewerContainer ref={logViewerContainerRef}>
       <LogViewerList
         key={props.source.index}
+        dispatcher={props.dispatch}
         highlightColor={highlightColor}
         wrapLines={wrapLineOn}
-        scrollToBottom={tailSwitch}
         lines={filteredAndHighlightedLines}
+        sourcePath={props.source.path}
+        logSize={logSize}
+        containerHeight={currentLogViewerContainerHeight}
+      />
+      <Slider
+        min={0}
+        max={logSize}
+        step={1}
+        vertical
+        showValue={false}
+        value={sliderPosition}
+        onChange={value => {
+          handleSliderOnChange(value);
+        }}
       />
     </LogViewerContainer>
   );
@@ -119,12 +264,16 @@ const LogViewer = props => {
 const mapStateToProps = ({
   topPanelState: { settings },
   settingsState: { tabSettings },
-  logViewerState: { logs }
+  logViewerState: { logs, nrOfLinesInViewer },
+  logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
   return {
     settings,
     tabSettings,
-    logs
+    logs,
+    logSizes,
+    lastSeenLogSizes,
+    nrOfLinesInViewer
   };
 };
 

@@ -36,7 +36,8 @@ const sendFileOpened = async (
   filePath,
   fileSize,
   endIndex,
-  history
+  history,
+  startByteOfLines
 ) => {
   const action = {
     type: 'SOURCE_OPENED',
@@ -45,7 +46,8 @@ const sendFileOpened = async (
       filePath,
       fileSize,
       endIndex,
-      history
+      history,
+      startByteOfLines
     }
   };
 
@@ -56,8 +58,19 @@ const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
     sendSourcePicked(sender, filePath);
-    const history = await getFileHistory(filePath, endIndex, 10);
-    sendFileOpened(sender, filePath, fileSize, endIndex, history);
+    const [history, startByteOfLines] = await getFileHistory(
+      filePath,
+      endIndex,
+      10
+    );
+    sendFileOpened(
+      sender,
+      filePath,
+      fileSize,
+      endIndex,
+      history,
+      startByteOfLines
+    );
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
     return false;
@@ -149,35 +162,28 @@ const handleShowOpenDialog = async (state, sender) => {
 
 const readLinesStartingAtByte = async (sender, data) => {
   const APPROXIMATE_BYTES_PER_LINE = 150;
-  const SCREENS_TO_FETCH = 3;
-  const { path, startByte, lines } = data;
+  const { path, startByte, amountOfLines } = data;
   const [fileSize] = await getFileInfo(path);
 
   let dataToReturn = {
     lines: [],
-    linesEndAt: 0
+    linesEndAt: 0,
+    startByteOfLines: []
   };
-
   // Convert lines to amount of bytes using approximation
-  let bytesPerScreen = lines * APPROXIMATE_BYTES_PER_LINE;
-  // Fetch lines from one screen back to current position
-  let startBytesMinusOneScreen =
-    startByte - bytesPerScreen > 0 ? startByte - bytesPerScreen : 0;
-  // Fetch three screens total
-  let bytesToFetch = bytesPerScreen * SCREENS_TO_FETCH;
-  let byteToReadFrom = startBytesMinusOneScreen;
+  let bytesPerScreen = amountOfLines * APPROXIMATE_BYTES_PER_LINE;
+  let byteToReadFrom = startByte;
 
   // If too few lines are returned and we have not
   // reached the end of file, keep reading lines
   while (
-    dataToReturn.lines.length < lines * SCREENS_TO_FETCH &&
+    dataToReturn.lines.length < amountOfLines &&
     dataToReturn.linesEndAt < fileSize
   ) {
-    // Fetch data from adapter
     let data = await fileReader.readDataFromByte(
       path,
       byteToReadFrom,
-      bytesToFetch
+      bytesPerScreen
     );
 
     // Save data
@@ -186,14 +192,23 @@ const readLinesStartingAtByte = async (sender, data) => {
     }
     dataToReturn.linesEndAt = data.linesEndAt;
     dataToReturn.lines = dataToReturn.lines.concat(data.lines);
+    dataToReturn.startByteOfLines = dataToReturn.startByteOfLines.concat(
+      data.startByteOfLines
+    );
 
     // Calculate next byte to read from
     // Remove one byte to get one character from previous line,
     // which will be discarded by the adapter
     byteToReadFrom = dataToReturn.linesEndAt - 1;
   }
+
+  // Checking that the amount of lines to return are not too many to be able to fit in the logview.
+  if (dataToReturn.lines.length > amountOfLines) {
+    dataToReturn.lines = dataToReturn.lines.slice(0, amountOfLines);
+  }
+
   const action = {
-    type: 'LINES_FROM_BYTE',
+    type: 'LOGLINES_FETCHED_FROM_BYTEPOSITION',
     data: { dataToReturn, path }
   };
   sender.send(ipcChannel, action);
@@ -230,7 +245,6 @@ const createEventHandler = state => {
         handleOpenFile(state, sender, _argObj.data);
         break;
       case 'SOURCE_FOLLOW':
-        // fileReader.stopAllWatchers();
         handleFollowSource(sender, _argObj.data);
         break;
       case 'SOURCE_UNFOLLOW':
@@ -242,7 +256,7 @@ const createEventHandler = state => {
       case 'STATE_LOAD':
         loadStateFromDisk(state, sender);
         break;
-      case 'READ_LINES_AT_BYTE':
+      case 'FETCH_LOGLINES_STARTING_AT_SCROLL_BYTE_POSITION':
         readLinesStartingAtByte(sender, _argObj.data);
         break;
       default:

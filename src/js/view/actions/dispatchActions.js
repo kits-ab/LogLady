@@ -74,12 +74,20 @@ export const updateLastSeenLogSizes = (dispatch, path, fileSize) => {
   });
 };
 
-export const setFileData = (dispatch, filePath, fileSize, history) => {
+export const setFileData = (
+  dispatch,
+  filePath,
+  fileSize,
+  history,
+  startByteOfLines
+) => {
   dispatch({
     type: 'LOGVIEWER_SET_LOG',
     data: {
       sourcePath: filePath,
-      log: history
+      log: history,
+      size: fileSize,
+      startByteOfLines
     }
   });
 
@@ -162,12 +170,13 @@ export const hideSnackBar = dispatch => {
   });
 };
 
-export const addNewLines = (dispatch, sourcePath, lines) => {
+export const addNewLines = (dispatch, sourcePath, lines, followTail) => {
   dispatch({
     type: 'LOGVIEWER_ADD_LINES',
     data: {
       sourcePath,
-      lines
+      lines,
+      followTail
     }
   });
 };
@@ -194,18 +203,30 @@ export const showSnackBar = (dispatch, message, level) => {
 
 export const addLinesFetchedFromBytePosition = (
   dispatch,
+  startByteOfLines,
   lines,
   linesStartAt,
   linesEndAt,
   sourcePath
 ) => {
   dispatch({
-    type: 'LOGVIEWER_ADD_LINES_FROM_BYTE_POSITION',
+    type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION',
     data: {
       lines,
       linesStartAt,
       linesEndAt,
-      sourcePath
+      sourcePath,
+      startByteOfLines
     }
+  });
+};
+
+export const updateNumberOfLinesToRenderInLogView = (
+  dispatch,
+  numberOfLinesToFillLogView
+) => {
+  dispatch({
+    type: 'LOGVIEWER_UPDATE_CURRENT_NR_OF_LINES_IN_VIEWER',
+    data: { numberOfLinesToFillLogView }
   });
 };

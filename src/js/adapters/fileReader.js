@@ -4,6 +4,7 @@ const {
   readFile,
   writeFile,
   open,
+  close,
   read,
   stat
 } = require('fs');
@@ -163,7 +164,13 @@ const readNLastLines = (filePath, numberOfLines, endIndex) => {
           result.unshift(unusedChars);
         }
 
-        resolve(result);
+        resolve([
+          result,
+          calculateStartByteOfLinesBackwards(
+            result,
+            getFileSizeInBytes(filePath)
+          )
+        ]);
       })
       .on('error', err => {
         reject(err);
@@ -288,21 +295,57 @@ const readDataFromByte = (filePath, start, numberOfBytes) => {
           bytesRead,
           buffer
         ) {
+          // Close file so we dont have too many open at once
+          close(fd, err => {
+            reject(error);
+          });
+
           if (error) {
             reject(error);
           }
 
           var data = buffer.toString('utf8');
-          resolve(parseSelectedData(data, start, numberOfBytes));
+          resolve(
+            parseByteDataIntoStringArrayWithStartByteOfLines(
+              data,
+              start,
+              numberOfBytes
+            )
+          );
         });
       });
     });
   });
 };
 
-const parseSelectedData = (data, start, numberOfBytes) => {
+const parseByteDataIntoStringArrayWithStartByteOfLines = (
+  data,
+  start,
+  numberOfBytes
+) => {
+  const linesData = parseByteDataIntoStringArray(data, start, numberOfBytes);
+  const lines = linesData.lines;
+  const linesStartAt = Math.round(linesData.linesStartAt);
+  const linesEndAt = linesData.linesEndAt;
+  const startByteOfLines = extractStartByteOfLinesFromByteData(
+    lines,
+    linesStartAt
+  );
+
+  return {
+    startByteOfLines,
+    lines,
+    linesStartAt,
+    linesEndAt
+  };
+};
+
+const parseByteDataIntoStringArray = (data, start, numberOfBytes) => {
+  const BYTE_FOR_MISSING_NEWLINE = 1;
+
   const lines = data.split(/\r?\n/);
-  const lineSizeTop = Buffer.byteLength(lines[0], 'utf8');
+  const lineSizeTop =
+    Buffer.byteLength(lines[0], 'utf8') + BYTE_FOR_MISSING_NEWLINE;
   const lineSizeBottom = Buffer.byteLength(lines[lines.length - 1], 'utf8');
 
   let linesStartAt = start;
@@ -321,11 +364,37 @@ const parseSelectedData = (data, start, numberOfBytes) => {
     lines.pop();
   }
 
-  return {
-    lines,
-    linesStartAt,
-    linesEndAt
-  };
+  return { lines, linesStartAt, linesEndAt };
+};
+
+const extractStartByteOfLinesFromByteData = (lines, linesStartAt) => {
+  const BYTE_FOR_MISSING_NEWLINE = 1;
+  let startByteOfLines = [];
+  let currentLineStartByte = linesStartAt;
+  for (const line of lines) {
+    startByteOfLines.push(currentLineStartByte);
+    currentLineStartByte =
+      currentLineStartByte +
+      Buffer.byteLength(line, 'utf8') +
+      BYTE_FOR_MISSING_NEWLINE;
+  }
+  return startByteOfLines;
+};
+
+const calculateStartByteOfLinesBackwards = (lines, filesize) => {
+  const BYTE_FOR_MISSING_NEWLINE = 1;
+
+  let reversedLines = [...lines].reverse();
+  let startByteOfLines = [];
+  let currentLineStartByte =
+    filesize - Buffer.byteLength(reversedLines[0] + BYTE_FOR_MISSING_NEWLINE);
+  for (const line of reversedLines) {
+    startByteOfLines.unshift(currentLineStartByte);
+    currentLineStartByte =
+      currentLineStartByte -
+      (Buffer.byteLength(line, 'utf8') + BYTE_FOR_MISSING_NEWLINE);
+  }
+  return startByteOfLines;
 };
 
 module.exports = {

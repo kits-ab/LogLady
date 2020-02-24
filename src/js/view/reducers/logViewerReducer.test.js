@@ -2,7 +2,11 @@ import { logViewerReducer } from './logViewerReducer';
 
 describe('logviewer reducer', () => {
   it('should return the initial state', () => {
-    const initialState = { logs: {} };
+    const initialState = {
+      logs: {},
+      startByteOfLines: {},
+      nrOfLinesInViewer: null
+    };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
   it('should reset all logs', () => {
@@ -16,7 +20,9 @@ describe('logviewer reducer', () => {
   it('should append lines to initial state', () => {
     const lines = ['hej1', 'hej2', 'hej3'];
     const expectedState = {
-      logs: { test: ['hej1', 'hej2', 'hej3'] }
+      logs: { test: ['hej1', 'hej2', 'hej3'] },
+      startByteOfLines: {},
+      nrOfLinesInViewer: null
     };
     const sourcePath = 'test';
 
@@ -31,31 +37,56 @@ describe('logviewer reducer', () => {
   });
   it('should set log on source', () => {
     const log = ['hej4', 'hej5'];
+    const startByteOfLines = [1, 2];
+    // Size is zero to avoid ghost lines
+    const size = 0;
     const state = {
       logs: { test: ['hej1', 'hej2', 'hej3'] }
     };
     const expectedState = {
-      logs: { test: ['hej4', 'hej5'] }
+      logs: { test: ['hej4', 'hej5'] },
+      startByteOfLines: { test: [1, 2] }
     };
     const sourcePath = 'test';
     const action = {
       type: 'LOGVIEWER_SET_LOG',
-      data: { sourcePath, log }
+      data: { sourcePath, log, size, startByteOfLines }
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
   it('should append lines to source', () => {
     const lines = ['hej4', 'hej5'];
     const state = {
-      logs: { test: ['hej1', 'hej2', 'hej3'] }
+      logs: { test: ['hej1', 'hej2', 'hej3'] },
+      nrOfLinesInViewer: 5
     };
     const expectedState = {
-      logs: { test: ['hej1', 'hej2', 'hej3', 'hej4', 'hej5'] }
+      logs: { test: ['hej1', 'hej2', 'hej3', 'hej4', 'hej5'] },
+      nrOfLinesInViewer: 5
     };
     const sourcePath = 'test';
+    const followTail = true;
     const action = {
       type: 'LOGVIEWER_ADD_LINES',
-      data: { sourcePath, lines }
+      data: { sourcePath, lines, followTail }
+    };
+    expect(logViewerReducer(state, action)).toEqual(expectedState);
+  });
+  it('should replace lines when overflowing viewer', () => {
+    const lines = ['hej4', 'hej5'];
+    const state = {
+      logs: { test: ['hej1', 'hej2', 'hej3'] },
+      nrOfLinesInViewer: 3
+    };
+    const expectedState = {
+      logs: { test: ['hej3', 'hej4', 'hej5'] },
+      nrOfLinesInViewer: 3
+    };
+    const sourcePath = 'test';
+    const followTail = true;
+    const action = {
+      type: 'LOGVIEWER_ADD_LINES',
+      data: { sourcePath, lines, followTail }
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });

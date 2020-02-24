@@ -50,10 +50,10 @@ const handleStateSet = (publisher, state) => {
 
 const handleFileOpened = (
   dispatch,
-  { filePath, fileSize, endIndex, history }
+  { filePath, fileSize, endIndex, history, startByteOfLines }
 ) => {
   // clearAllLogs(dispatch);
-  setFileData(dispatch, filePath, fileSize, history);
+  setFileData(dispatch, filePath, fileSize, history, startByteOfLines);
   setLastSeenLogSizeToSize(dispatch, filePath, fileSize);
 
   const followSource = {
@@ -67,15 +67,19 @@ const handleFileOpened = (
   sendRequestToBackend(followSource);
 };
 
-const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
-  addNewLines(dispatch, sourcePath, lines);
+const handleNewLines = (dispatch, { sourcePath, lines, size }, state) => {
+  let followTail = state.topPanelState.settings[sourcePath]
+    ? state.topPanelState.settings[sourcePath].tailSwitch
+    : true;
+
+  addNewLines(dispatch, sourcePath, lines, followTail);
   increaseSize(dispatch, sourcePath, size);
 };
 
-const handleLinesFromByte = (dispatch, { dataToReturn, path }) => {
-  console.log(dataToReturn, path);
+const handleLinesFromBytePosition = (dispatch, { dataToReturn, path }) => {
   addLinesFetchedFromBytePosition(
     dispatch,
+    dataToReturn.startByteOfLines,
     dataToReturn.lines,
     dataToReturn.linesStartAt,
     dataToReturn.linesEndAt,
@@ -109,10 +113,10 @@ export const ipcListener = (store, publisher) => {
         handleError(dispatch, action.data);
         break;
       case 'LINES_NEW':
-        handleNewLines(dispatch, action.data);
+        handleNewLines(dispatch, action.data, store.getState());
         break;
-      case 'LINES_FROM_BYTE':
-        handleLinesFromByte(dispatch, action.data);
+      case 'LOGLINES_FETCHED_FROM_BYTEPOSITION':
+        handleLinesFromBytePosition(dispatch, action.data);
         break;
       default:
         console.log('Warning: Unrecognized message, ', action);
