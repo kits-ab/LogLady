@@ -254,7 +254,7 @@ const saveStateToDisk = _reduxStateValue => {
     if (err) {
       throw err;
     }
-    console.log('LogLady: state has been succefully saved to disk.');
+    console.log('LogLady: state has been successfully saved to disk.');
     return 'success';
   });
 };
@@ -268,7 +268,7 @@ const saveRecentFilesToDisk = _recentFiles => {
     if (err) {
       throw err;
     }
-    console.log('LogLady: recent files have been succefully saved to disk.');
+    console.log('LogLady: recent files have been successfully saved to disk.');
     return 'success';
   });
 };
