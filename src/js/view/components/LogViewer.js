@@ -13,7 +13,11 @@ import _ from 'lodash';
 
 const debouncedFetchTextByBytePosition = _.debounce(
   (path, bytesToRead, nrOfLines) => {
-    fetchTextBasedOnByteFromScrollPosition(path, bytesToRead, nrOfLines);
+    fetchTextBasedOnByteFromScrollPosition(
+      path,
+      Math.round(bytesToRead),
+      nrOfLines
+    );
   },
   100
 );
@@ -200,12 +204,12 @@ const LogViewer = props => {
           // Slider base is 0 so we need to calculate logsize - sliderPosition in order to get the correct byte position.
           fetchTextBasedOnByteFromScrollPosition(
             props.source.path,
-            logSize - scrollPosition,
+            Math.round(logSize - scrollPosition),
             props.nrOfLinesInViewer
           );
           // Save timeout so it can be cleared if needed
-          setCurrentTimeout(timeout);
         }, 50);
+        setCurrentTimeout(timeout);
       }
     };
 
