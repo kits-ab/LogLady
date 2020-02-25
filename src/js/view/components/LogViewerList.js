@@ -42,9 +42,15 @@ const LogViewerList = props => {
     Math.round(props.containerHeight / characterDimensions.height)
   );
 
+  // Invisible character U+2800 being used in replace
+  const replaceEmptyLinesWithHiddenChar = () => {
+    return props.lines.map(line => {
+      return line === '' ? line.replace('', '⠀') : line;
+    });
+  };
   // Itemdata used to send needed props and state from this component to the pure component that renders a single line
   const itemData = createItemData(
-    props.lines,
+    replaceEmptyLinesWithHiddenChar(),
     props.highlightColor,
     logLineElementWidth,
     props.wrapLines
@@ -135,7 +141,10 @@ const LogViewerList = props => {
       <LogLineRuler ref={oneCharacterSizeRef}>
         <span>A</span>
       </LogLineRuler>
-      <List items={props.lines} onRenderCell={_onRenderCell} />
+      <List
+        items={replaceEmptyLinesWithHiddenChar()}
+        onRenderCell={_onRenderCell}
+      />
     </LogViewerListContainer>
   );
 };
