@@ -56,7 +56,7 @@ const sendFileOpened = async (
 // Invisible character U+2800 being used in replace
 const replaceEmptyLinesWithHiddenChar = arr => {
   return arr.map(line => {
-    return line === '' ? line.replace('', '⠀') : line;
+    return line.replace('', '⠀');
   });
 };
 
@@ -69,6 +69,8 @@ const openFile = async (sender, filePath) => {
       endIndex,
       10
     );
+
+    //Lines in history that contains empty spaces does not display properly. replaceEmptyLinesWithHiddenChar(history) returns an array where this has been taken care of by replacing each space with a hidden character, and makes those lines display correctly in LogViewer.
     sendFileOpened(
       sender,
       filePath,
