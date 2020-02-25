@@ -53,6 +53,12 @@ const sendFileOpened = async (
 
   sender.send(ipcChannel, action);
 };
+// Invisible character U+2800 being used in replace
+const replaceEmptyLinesWithHiddenChar = arr => {
+  return arr.map(line => {
+    return line === '' ? line.replace('', '⠀') : line;
+  });
+};
 
 const openFile = async (sender, filePath) => {
   try {
@@ -68,7 +74,7 @@ const openFile = async (sender, filePath) => {
       filePath,
       fileSize,
       endIndex,
-      history,
+      replaceEmptyLinesWithHiddenChar(history),
       startByteOfLines
     );
   } catch (error) {
@@ -206,6 +212,7 @@ const readLinesStartingAtByte = async (sender, data) => {
   if (dataToReturn.lines.length > amountOfLines) {
     dataToReturn.lines = dataToReturn.lines.slice(0, amountOfLines);
   }
+  dataToReturn.lines = replaceEmptyLinesWithHiddenChar(dataToReturn.lines);
 
   const action = {
     type: 'LOGLINES_FETCHED_FROM_BYTEPOSITION',
