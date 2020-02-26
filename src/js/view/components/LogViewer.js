@@ -9,6 +9,7 @@ import CustomScrollBar from './CustomScrollBar';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
 import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
+import { handleTailSwitch } from '../actions/dispatchActions';
 import _ from 'lodash';
 
 const debouncedFetchTextByBytePosition = _.debounce(
@@ -21,6 +22,17 @@ const debouncedFetchTextByBytePosition = _.debounce(
   },
   100
 );
+
+const toggleTailSwitchToOffOnScroll = (
+  tailSwitch,
+  logFileIsRunning,
+  dispatch,
+  sourcePath
+) => {
+  if (tailSwitch && logFileIsRunning) {
+    handleTailSwitch(dispatch, { sourcePath });
+  }
+};
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -37,7 +49,7 @@ const LogViewer = props => {
     : 'false';
   const tailSwitch = props.settings[props.source.path]
     ? props.settings[props.source.path].tailSwitch
-    : 'true';
+    : 'false';
   const logSize = props.logSizes[props.source.path]
     ? props.logSizes[props.source.path]
     : 0;
@@ -178,6 +190,13 @@ const LogViewer = props => {
           newScrollPosition = minScrollPositionValue;
         }
 
+        toggleTailSwitchToOffOnScroll(
+          tailSwitch,
+          logFileHasRunningStatus,
+          props.dispatch,
+          props.source.path
+        );
+
         setScrollPosition(newScrollPosition);
       }
     };
@@ -232,16 +251,18 @@ const LogViewer = props => {
   ]);
 
   const handleCustomScrollBarOnChange = value => {
-    if (tailSwitch && logFileHasRunningStatus) {
-      setScrollPosition(minScrollPositionValue);
-    } else {
-      setScrollPosition(value);
-      debouncedFetchTextByBytePosition(
-        props.source.path,
-        logSize - value,
-        props.nrOfLinesInViewer
-      );
-    }
+    toggleTailSwitchToOffOnScroll(
+      tailSwitch,
+      logFileHasRunningStatus,
+      props.dispatch,
+      props.source.path
+    );
+    setScrollPosition(value);
+    debouncedFetchTextByBytePosition(
+      props.source.path,
+      logSize - value,
+      props.nrOfLinesInViewer
+    );
   };
 
   return (
@@ -272,7 +293,7 @@ const LogViewer = props => {
 const mapStateToProps = ({
   topPanelState: { settings },
   settingsState: { tabSettings },
-  logViewerState: { logs, nrOfLinesInViewer },
+  logViewerState: { logs, nrOfLinesInViewer, startByteOfLines },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
   return {
@@ -281,7 +302,8 @@ const mapStateToProps = ({
     logs,
     logSizes,
     lastSeenLogSizes,
-    nrOfLinesInViewer
+    nrOfLinesInViewer,
+    startByteOfLines
   };
 };
 
