@@ -44,9 +44,11 @@ const LogViewer = props => {
   const lastSeenLogSize = props.lastSeenLogSizes[props.source.path];
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
-  // Scroll position base is minScrollValue, top is logSize
-  const minScrollValue = 3000;
-  const [scrollPosition, setScrollPosition] = useState(minScrollValue);
+
+  // Scroll position base is minScrollValue, top is logSize.
+  // Calculating nrOfLinesInViewer * 100 in order to make the minimum value responsive to the resizing of the viewer.
+  const minScrollPositionValue = props.nrOfLinesInViewer * 100;
+  const [scrollPosition, setScrollPosition] = useState(minScrollPositionValue);
   const [currentTimeout, setCurrentTimeout] = useState();
   const [currentLogViewerContainerHeight, setCurrentContainerHeight] = useState(
     0
@@ -138,7 +140,7 @@ const LogViewer = props => {
 
       // Checking if the follow switch is on and if the log file is running.
       if (tailSwitch && logFileHasRunningStatus) {
-        setScrollPosition(minScrollValue);
+        setScrollPosition(minScrollPositionValue);
       }
     }
   }, [props.logs]);
@@ -149,7 +151,7 @@ const LogViewer = props => {
     const LINES_FROM_VIEWCONTAINER_BOTTOM = 5;
 
     if (logFileHasRunningStatus && tailSwitch) {
-      setScrollPosition(minScrollValue);
+      setScrollPosition(minScrollPositionValue);
       debouncedFetchTextByBytePosition(
         props.source.path,
         logSize - APPROXIMATE_AMOUNT_OF_BYTES_TO_FETCH,
@@ -172,8 +174,8 @@ const LogViewer = props => {
         let newScrollPosition = scrollPosition + event.deltaY;
         if (newScrollPosition > logSize) {
           newScrollPosition = logSize;
-        } else if (newScrollPosition <= minScrollValue) {
-          newScrollPosition = minScrollValue;
+        } else if (newScrollPosition <= minScrollPositionValue) {
+          newScrollPosition = minScrollPositionValue;
         }
 
         setScrollPosition(newScrollPosition);
@@ -199,7 +201,7 @@ const LogViewer = props => {
       clearTimeout(currentTimeout);
       // Set new timeout to read from file in an appropriate amount of time
       if (tailSwitch && logFileHasRunningStatus) {
-        setScrollPosition(minScrollValue);
+        setScrollPosition(minScrollPositionValue);
       } else {
         let timeout = setTimeout(() => {
           // Scroll base value is minScrollValue so we need to calculate logsize - scrollPosition in order to get the correct byte position.
@@ -231,7 +233,7 @@ const LogViewer = props => {
 
   const handleCustomScrollBarOnChange = value => {
     if (tailSwitch && logFileHasRunningStatus) {
-      setScrollPosition(minScrollValue);
+      setScrollPosition(minScrollPositionValue);
     } else {
       setScrollPosition(value);
       debouncedFetchTextByBytePosition(
@@ -259,7 +261,7 @@ const LogViewer = props => {
       <CustomScrollBar
         handleOnChange={handleCustomScrollBarOnChange}
         max={logSize}
-        min={minScrollValue}
+        min={minScrollPositionValue}
         value={scrollPosition}
         step={1}
       />
