@@ -53,10 +53,15 @@ const sendFileOpened = async (
 
   sender.send(ipcChannel, action);
 };
-// Invisible character U+2800 being used in replace
+
+// Invisible character U+2800 being used in line.replace
 const replaceEmptyLinesWithHiddenChar = arr => {
+  const regexList = [/^\s*$/];
   return arr.map(line => {
-    return line.replace('', '⠀');
+    const isMatch = regexList.some(rx => {
+      rx.test(line);
+    });
+    return isMatch ? line.replace(regexList[0], '⠀') : line;
   });
 };
 
