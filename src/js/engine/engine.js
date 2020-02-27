@@ -82,12 +82,15 @@ const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
     sendSourcePicked(sender, filePath);
-    const [
+    const {
       startByteOfLines,
       lines,
       linesStartAt,
       linesEndAt
-    ] = await getFileHistory(filePath, fileSize);
+    } = await getFileHistory(filePath, fileSize);
+
+    // Save read data to cache
+    updateCache(filePath, lines, startByteOfLines);
 
     //Lines in history that contains empty spaces does not display properly. replaceEmptyLinesWithHiddenChar(history) returns an array where this has been taken care of by replacing each space with a hidden character, and makes those lines display correctly in LogViewer.
     sendFileOpened(
@@ -95,7 +98,7 @@ const openFile = async (sender, filePath) => {
       filePath,
       fileSize,
       endIndex,
-      replaceEmptyLinesWithHiddenChar(lines),
+      replaceEmptyLinesWithHiddenChar(lines.slice(lines.length - 10)),
       startByteOfLines
     );
   } catch (error) {
