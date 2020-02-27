@@ -59,7 +59,7 @@ const replaceEmptyLinesWithHiddenChar = arr => {
   const regexList = [/^\s*$/];
   return arr.map(line => {
     const isMatch = regexList.some(rx => {
-      rx.test(line);
+      return rx.test(line);
     });
     return isMatch ? line.replace(regexList[0], '⠀') : line;
   });
