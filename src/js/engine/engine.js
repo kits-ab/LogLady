@@ -54,6 +54,17 @@ const sendFileOpened = async (
   sender.send(ipcChannel, action);
 };
 
+// Invisible character U+2800 being used in line.replace
+const replaceEmptyLinesWithHiddenChar = arr => {
+  const regexList = [/^\s*$/];
+  return arr.map(line => {
+    const isMatch = regexList.some(rx => {
+      return rx.test(line);
+    });
+    return isMatch ? line.replace(regexList[0], '⠀') : line;
+  });
+};
+
 const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
@@ -63,12 +74,14 @@ const openFile = async (sender, filePath) => {
       endIndex,
       10
     );
+
+    //Lines in history that contains empty spaces does not display properly. replaceEmptyLinesWithHiddenChar(history) returns an array where this has been taken care of by replacing each space with a hidden character, and makes those lines display correctly in LogViewer.
     sendFileOpened(
       sender,
       filePath,
       fileSize,
       endIndex,
-      history,
+      replaceEmptyLinesWithHiddenChar(history),
       startByteOfLines
     );
   } catch (error) {
@@ -206,6 +219,7 @@ const readLinesStartingAtByte = async (sender, data) => {
   if (dataToReturn.lines.length > amountOfLines) {
     dataToReturn.lines = dataToReturn.lines.slice(0, amountOfLines);
   }
+  dataToReturn.lines = replaceEmptyLinesWithHiddenChar(dataToReturn.lines);
 
   const action = {
     type: 'LOGLINES_FETCHED_FROM_BYTEPOSITION',
