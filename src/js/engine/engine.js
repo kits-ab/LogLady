@@ -4,6 +4,12 @@ const { ipcMain, dialog } = require('electron');
 const { createMenu } = require('../electron/menu');
 const ipcChannel = 'backendMessages';
 const { addRecentFile } = require('./../helpers/recentFilesHelper');
+const {
+  createCache,
+  searchCache,
+  updateCache,
+  flushCache
+} = require('./cache');
 
 const updateRecentFiles = recentFiles => {
   createMenu(recentFiles);
@@ -17,8 +23,14 @@ const getFileInfo = async filePath => {
   return Promise.all([fileSize, endIndex]);
 };
 
-const getFileHistory = (filePath, endIndex, numberOfLines) => {
-  return fileReader.readNLastLines(filePath, numberOfLines, endIndex);
+const getFileHistory = (filePath, fileSize) => {
+  const START_READ_FROM_BYTE = fileSize - 30000;
+  const NR_OF_BYTES = 30000;
+  return fileReader.readDataFromByte(
+    filePath,
+    START_READ_FROM_BYTE,
+    NR_OF_BYTES
+  );
 };
 
 const sendSourcePicked = (sender, sourcePath) => {
@@ -70,11 +82,12 @@ const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
     sendSourcePicked(sender, filePath);
-    const [history, startByteOfLines] = await getFileHistory(
-      filePath,
-      endIndex,
-      10
-    );
+    const [
+      startByteOfLines,
+      lines,
+      linesStartAt,
+      linesEndAt
+    ] = await getFileHistory(filePath, fileSize);
 
     //Lines in history that contains empty spaces does not display properly. replaceEmptyLinesWithHiddenChar(history) returns an array where this has been taken care of by replacing each space with a hidden character, and makes those lines display correctly in LogViewer.
     sendFileOpened(
@@ -82,7 +95,7 @@ const openFile = async (sender, filePath) => {
       filePath,
       fileSize,
       endIndex,
-      replaceEmptyLinesWithHiddenChar(history),
+      replaceEmptyLinesWithHiddenChar(lines),
       startByteOfLines
     );
   } catch (error) {
