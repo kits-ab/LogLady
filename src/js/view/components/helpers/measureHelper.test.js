@@ -96,11 +96,7 @@ describe('maxLengthReducer', () => {
   });
 
   it('should work on arrays', () => {
-    const array = [
-      [1, 2, 3],
-      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      [4, 5, 6, 7]
-    ];
+    const array = [[1, 2, 3], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [4, 5, 6, 7]];
     const expectedResult = 10;
 
     expect(array.reduce(maxLengthReducer, 0)).toEqual(expectedResult);

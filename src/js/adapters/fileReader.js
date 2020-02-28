@@ -1,27 +1,8 @@
-const {
-  createReadStream,
-  statSync,
-  readFile,
-  writeFile,
-  open,
-  close,
-  read,
-  stat
-} = require('fs');
-const app = require('electron').app;
-const path = require('path');
+const { createReadStream, statSync, open, close, read, stat } = require('fs');
 const createBackwardsStream = require('fs-backwards-stream');
 const chokidar = require('chokidar');
 
 let watchers = [];
-
-const reduxStateFile = () => {
-  return path.join(app.getPath('userData'), 'reduxState.json');
-};
-
-const recentFiles = () => {
-  return path.join(app.getPath('userData'), 'recentFiles.json');
-};
 
 const isLF = b => {
   return b === 10;
@@ -233,48 +214,8 @@ const getLineCount = (filePath, endIndex) => {
   });
 };
 
-const readFileAsync = filePath => {
-  return new Promise((resolve, reject) => {
-    readFile(filePath, 'utf8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-};
-
 const getFileSizeInBytes = filePath => {
   return statSync(filePath).size;
-};
-
-const saveStateToDisk = _reduxStateValue => {
-  writeFile(reduxStateFile(), _reduxStateValue, err => {
-    if (err) {
-      throw err;
-    }
-    console.log('LogLady: state has been successfully saved to disk.');
-    return 'success';
-  });
-};
-
-const loadStateFromDisk = () => {
-  return readFileAsync(reduxStateFile());
-};
-
-const saveRecentFilesToDisk = _recentFiles => {
-  writeFile(recentFiles(), _recentFiles, err => {
-    if (err) {
-      throw err;
-    }
-    console.log('LogLady: recent files have been successfully saved to disk.');
-    return 'success';
-  });
-};
-
-const loadRecentFilesFromDisk = () => {
-  return readFileAsync(recentFiles());
 };
 
 const readDataFromByte = (filePath, start, numberOfBytes) => {
@@ -398,21 +339,15 @@ const calculateStartByteOfLinesBackwards = (lines, filesize) => {
 };
 
 module.exports = {
-  readFile,
   readNLastLines,
   getLineCount,
   followFile,
   parseLinesBackwards,
   countLinesInBuffer,
   parseLines,
-  readFileAsync,
   getFileSizeInBytes,
   getLastNewLineIndex,
   stopWatcher,
   stopAllWatchers,
-  saveStateToDisk,
-  loadStateFromDisk,
-  saveRecentFilesToDisk,
-  loadRecentFilesFromDisk,
   readDataFromByte
 };
