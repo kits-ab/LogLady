@@ -23,7 +23,7 @@ const debouncedFetchTextByBytePosition = _.debounce(
   100
 );
 
-const toggleTailSwitchToOffOnScroll = (
+const toggleTailSwitchToOffOnScrollWhenFileIsRunning = (
   tailSwitch,
   logFileIsRunning,
   dispatch,
@@ -53,14 +53,29 @@ const LogViewer = props => {
   const logSize = props.logSizes[props.source.path]
     ? props.logSizes[props.source.path]
     : 0;
-  const lastSeenLogSize = props.lastSeenLogSizes[props.source.path];
+  const lastSeenLogSize = props.lastSeenLogSizes[props.source.path]
+    ? props.lastSeenLogSizes[props.source.path]
+    : 0;
+  let meanByteValueOfCurrentLines = props.meanByteValuesOfLines[
+    props.source.path
+  ]
+    ? props.meanByteValuesOfLines[props.source.path]
+    : 100;
 
-  const [filteredAndHighlightedLines, setLines] = useState([]);
+  // Calculating nrOfLinesInViewer * meanByteValues for a line in the file in order to make the base value of the scroll responsive to the resizing of the viewer and the current file line lenghts.
+  const AMOUNT_OF_LINES_FROM_BOTTOM = 5;
+  const minScrollPositionValue = props.meanByteValuesOfInitialLines[
+    props.source.path
+  ]
+    ? props.nrOfLinesInViewer *
+        props.meanByteValuesOfInitialLines[props.source.path] -
+      props.meanByteValuesOfInitialLines[props.source.path] *
+        AMOUNT_OF_LINES_FROM_BOTTOM
+    : 0;
 
   // Scroll position base is minScrollValue, top is logSize.
-  // Calculating nrOfLinesInViewer * 100 in order to make the minimum value responsive to the resizing of the viewer.
-  const minScrollPositionValue = props.nrOfLinesInViewer * 100;
   const [scrollPosition, setScrollPosition] = useState(minScrollPositionValue);
+  const [filteredAndHighlightedLines, setLines] = useState([]);
   const [currentTimeout, setCurrentTimeout] = useState();
   const [currentLogViewerContainerHeight, setCurrentContainerHeight] = useState(
     0
@@ -102,7 +117,6 @@ const LogViewer = props => {
   useEffect(() => {
     // Register the eventlistener for a message from the hidden window
     window.ipcRenderer.on('hiddenWindowMessages', eventListenerIPCMessage);
-
     // Return cleanup function for React to run when suited
     return () => {
       window.ipcRenderer.removeListener(
@@ -123,6 +137,10 @@ const LogViewer = props => {
       window.removeEventListener('resize', logViewerContainerResizeHandler);
     };
   }, []);
+
+  useEffect(() => {
+    setScrollPosition(minScrollPositionValue);
+  }, [props.meanByteValuesOfInitialLines[props.source.path]]);
 
   useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
@@ -182,15 +200,20 @@ const LogViewer = props => {
 
   useEffect(() => {
     const wheelScrollEventHandler = event => {
+      let amountOfPositionsToScroll =
+        event.deltaY > 0
+          ? -meanByteValueOfCurrentLines
+          : meanByteValueOfCurrentLines;
+
       if (logViewerContainerRef.current) {
-        let newScrollPosition = scrollPosition + event.deltaY;
+        let newScrollPosition = scrollPosition + amountOfPositionsToScroll;
         if (newScrollPosition > logSize) {
           newScrollPosition = logSize;
         } else if (newScrollPosition <= minScrollPositionValue) {
           newScrollPosition = minScrollPositionValue;
         }
 
-        toggleTailSwitchToOffOnScroll(
+        toggleTailSwitchToOffOnScrollWhenFileIsRunning(
           tailSwitch,
           logFileHasRunningStatus,
           props.dispatch,
@@ -219,20 +242,16 @@ const LogViewer = props => {
       // Clear timeout so we don't read from files too often
       clearTimeout(currentTimeout);
       // Set new timeout to read from file in an appropriate amount of time
-      if (tailSwitch && logFileHasRunningStatus) {
-        setScrollPosition(minScrollPositionValue);
-      } else {
-        let timeout = setTimeout(() => {
-          // Scroll base value is minScrollValue so we need to calculate logsize - scrollPosition in order to get the correct byte position.
-          fetchTextBasedOnByteFromScrollPosition(
-            props.source.path,
-            Math.round(logSize - scrollPosition),
-            props.nrOfLinesInViewer
-          );
-          // Save timeout so it can be cleared if needed
-        }, 50);
-        setCurrentTimeout(timeout);
-      }
+      let timeout = setTimeout(() => {
+        // Scroll base value is minScrollPositionValue, we need to calculate logsize - scrollPosition to invert the values and get the text in the right order.
+        fetchTextBasedOnByteFromScrollPosition(
+          props.source.path,
+          Math.round(logSize - scrollPosition),
+          props.nrOfLinesInViewer
+        );
+        // Save timeout so it can be cleared if needed
+      }, 50);
+      setCurrentTimeout(timeout);
     };
 
     logViewerContainerRef.current.addEventListener('wheel', readBytesHandler);
@@ -251,7 +270,7 @@ const LogViewer = props => {
   ]);
 
   const handleCustomScrollBarOnChange = value => {
-    toggleTailSwitchToOffOnScroll(
+    toggleTailSwitchToOffOnScrollWhenFileIsRunning(
       tailSwitch,
       logFileHasRunningStatus,
       props.dispatch,
@@ -293,7 +312,13 @@ const LogViewer = props => {
 const mapStateToProps = ({
   topPanelState: { settings },
   settingsState: { tabSettings },
-  logViewerState: { logs, nrOfLinesInViewer, startByteOfLines },
+  logViewerState: {
+    logs,
+    nrOfLinesInViewer,
+    startByteOfLines,
+    meanByteValuesOfInitialLines,
+    meanByteValuesOfLines
+  },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
   return {
@@ -303,7 +328,9 @@ const mapStateToProps = ({
     logSizes,
     lastSeenLogSizes,
     nrOfLinesInViewer,
-    startByteOfLines
+    startByteOfLines,
+    meanByteValuesOfInitialLines,
+    meanByteValuesOfLines
   };
 };
 

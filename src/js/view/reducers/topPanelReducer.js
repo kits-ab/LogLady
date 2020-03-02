@@ -1,5 +1,5 @@
 const initialTabState = {
-  tailSwitch: false,
+  tailSwitch: true,
   highlightInput: '',
   filterInput: ''
 };

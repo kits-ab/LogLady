@@ -1,7 +1,9 @@
 const initialState = {
   logs: {},
   startByteOfLines: {},
-  nrOfLinesInViewer: null
+  nrOfLinesInViewer: null,
+  meanByteValuesOfInitialLines: {},
+  meanByteValuesOfLines: {}
 };
 
 export const logViewerReducer = (state = initialState, action) => {
@@ -27,12 +29,28 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_SET_LOG': {
       console.log('SETTING');
       const { sourcePath, log, startByteOfLines } = action.data;
+      let meanByteValueOfInitialLines = 0;
+      log.forEach(line => {
+        meanByteValueOfInitialLines = meanByteValueOfInitialLines + line.length;
+      });
+      meanByteValueOfInitialLines = Math.round(
+        meanByteValueOfInitialLines / log.length
+      );
+
       return {
         ...state,
         logs: { ...state.logs, [sourcePath]: [...log] },
         startByteOfLines: {
           ...state.startByteOfLines,
           [sourcePath]: [...startByteOfLines]
+        },
+        meanByteValuesOfInitialLines: {
+          ...state.meanByteValuesOfInitialLines,
+          [sourcePath]: meanByteValueOfInitialLines
+        },
+        meanByteValuesOfLines: {
+          ...state.meanByteValuesOfLines,
+          [sourcePath]: meanByteValueOfInitialLines
         }
       };
     }
@@ -69,7 +87,11 @@ export const logViewerReducer = (state = initialState, action) => {
     }
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION': {
       const { lines, sourcePath, startByteOfLines } = action.data;
-
+      let meanByteValueOfLines = 0;
+      lines.forEach(line => {
+        meanByteValueOfLines = meanByteValueOfLines + line.length;
+      });
+      meanByteValueOfLines = Math.round(meanByteValueOfLines / lines.length);
       return {
         ...state,
         logs: {
@@ -79,6 +101,10 @@ export const logViewerReducer = (state = initialState, action) => {
         startByteOfLines: {
           ...state.startByteOfLines,
           [sourcePath]: [...startByteOfLines]
+        },
+        meanByteValuesOfLines: {
+          ...state.meanByteValuesOfLines,
+          [sourcePath]: meanByteValueOfLines
         }
       };
     }

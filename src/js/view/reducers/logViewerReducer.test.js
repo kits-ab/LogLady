@@ -4,6 +4,8 @@ describe('logviewer reducer', () => {
   it('should return the initial state', () => {
     const initialState = {
       logs: {},
+      meanByteValuesOfInitialLines: {},
+      meanByteValuesOfLines: {},
       startByteOfLines: {},
       nrOfLinesInViewer: null
     };
@@ -21,6 +23,8 @@ describe('logviewer reducer', () => {
     const lines = ['hej1', 'hej2', 'hej3'];
     const expectedState = {
       logs: { test: ['hej1', 'hej2', 'hej3'] },
+      meanByteValuesOfInitialLines: {},
+      meanByteValuesOfLines: {},
       startByteOfLines: {},
       nrOfLinesInViewer: null
     };
@@ -45,6 +49,8 @@ describe('logviewer reducer', () => {
     };
     const expectedState = {
       logs: { test: ['hej4', 'hej5'] },
+      meanByteValuesOfInitialLines: { test: 4 },
+      meanByteValuesOfLines: { test: 4 },
       startByteOfLines: { test: [1, 2] }
     };
     const sourcePath = 'test';
@@ -119,6 +125,7 @@ describe('logviewer reducer', () => {
     };
     const expectedState = {
       logs: { test: ['hej1', 'hej2'] },
+      meanByteValuesOfLines: { test: 4 },
       startByteOfLines: { test: [1, 2] },
       nrOfLinesInViewer: 2
     };
