@@ -36,8 +36,7 @@ export const logViewerReducer = (state = initialState, action) => {
       console.log('SETTING');
       const { sourcePath, log, startByteOfLines } = action.data;
       let meanByteValueOfInitialLines = calculateMeanValueOfBytesPerLine(
-        startByteOfLines,
-        sourcePath
+        startByteOfLines
       );
       return {
         ...state,
@@ -91,8 +90,7 @@ export const logViewerReducer = (state = initialState, action) => {
       console.log('ADDING FROM BYTE POS');
       const { lines, sourcePath, startByteOfLines } = action.data;
       let meanByteValueOfLines = calculateMeanValueOfBytesPerLine(
-        startByteOfLines,
-        sourcePath
+        startByteOfLines
       );
 
       return {
