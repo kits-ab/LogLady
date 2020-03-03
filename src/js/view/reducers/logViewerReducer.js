@@ -6,6 +6,12 @@ const initialState = {
   meanByteValuesOfLines: {}
 };
 
+const calculateMeanValueOfBytesPerLine = startBytes => {
+  return Math.round(
+    (startBytes[startBytes.length - 1] - startBytes[0]) / startBytes.length
+  );
+};
+
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'LOGVIEWER_REMOVE_LOG': {
@@ -29,17 +35,13 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_SET_LOG': {
       console.log('SETTING');
       const { sourcePath, log, startByteOfLines } = action.data;
-      let meanByteValueOfInitialLines = 0;
-      log.forEach(line => {
-        meanByteValueOfInitialLines = meanByteValueOfInitialLines + line.length;
-      });
-      meanByteValueOfInitialLines = Math.round(
-        meanByteValueOfInitialLines / log.length
+      let meanByteValueOfInitialLines = calculateMeanValueOfBytesPerLine(
+        startByteOfLines,
+        sourcePath
       );
-
       return {
         ...state,
-        logs: { ...state.logs, [sourcePath]: [...log] },
+        logs: { ...state.logs, [sourcePath]: log },
         startByteOfLines: {
           ...state.startByteOfLines,
           [sourcePath]: [...startByteOfLines]
@@ -86,12 +88,13 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     }
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION': {
+      console.log('ADDING FROM BYTE POS');
       const { lines, sourcePath, startByteOfLines } = action.data;
-      let meanByteValueOfLines = 0;
-      lines.forEach(line => {
-        meanByteValueOfLines = meanByteValueOfLines + line.length;
-      });
-      meanByteValueOfLines = Math.round(meanByteValueOfLines / lines.length);
+      let meanByteValueOfLines = calculateMeanValueOfBytesPerLine(
+        startByteOfLines,
+        sourcePath
+      );
+
       return {
         ...state,
         logs: {

@@ -62,7 +62,9 @@ const LogViewer = props => {
     ? props.meanByteValuesOfLines[props.source.path]
     : 100;
 
-  // Calculating nrOfLinesInViewer * meanByteValues for a line in the file in order to make the base value of the scroll responsive to the resizing of the viewer and the current file line lenghts.
+  // Calculating nrOfLinesInViewer * meanByteValues for a line in the file,
+  // in order to make the base value of the scroll responsive to the size of the viewer
+  // and the current file line lenghts.
   const AMOUNT_OF_LINES_FROM_BOTTOM = 5;
   const minScrollPositionValue = props.meanByteValuesOfInitialLines[
     props.source.path
@@ -83,7 +85,8 @@ const LogViewer = props => {
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
   const logViewerContainerRef = useRef();
 
-  let logFileHasRunningStatus = logSize > lastSeenLogSize;
+  let logFileHasRunningStatus =
+    logSize > 0 && lastSeenLogSize > 0 && logSize > lastSeenLogSize;
 
   const sendMessageToHiddenWindow = args => {
     /* Send a message to the hidden window that it should filter the logs.
@@ -139,10 +142,6 @@ const LogViewer = props => {
   }, []);
 
   useEffect(() => {
-    setScrollPosition(minScrollPositionValue);
-  }, [props.meanByteValuesOfInitialLines[props.source.path]]);
-
-  useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
     if (props.logs[props.source.path]) {
@@ -168,7 +167,7 @@ const LogViewer = props => {
       });
       previousLinesLength.current = props.logs.length;
 
-      // Checking if the follow switch is on and if the log file is running.
+      // Checking if the follow switch is on and if the log file is running, then keep the scrollbar at the base to follow.
       if (tailSwitch && logFileHasRunningStatus) {
         setScrollPosition(minScrollPositionValue);
       }
@@ -176,10 +175,9 @@ const LogViewer = props => {
   }, [props.logs]);
 
   useEffect(() => {
-    // Effect for checking if tailswitch is on. If it is - lock the sliderPosition to 0 and display the tail of the file.
+    // Effect for checking if tailswitch is on. If it is, and the file is running - lock the sliderPosition to the base and display the tail of the file.
     const APPROXIMATE_AMOUNT_OF_BYTES_TO_FETCH = 10000;
     const LINES_FROM_VIEWCONTAINER_BOTTOM = 5;
-
     if (logFileHasRunningStatus && tailSwitch) {
       setScrollPosition(minScrollPositionValue);
       debouncedFetchTextByBytePosition(
@@ -243,7 +241,8 @@ const LogViewer = props => {
       clearTimeout(currentTimeout);
       // Set new timeout to read from file in an appropriate amount of time
       let timeout = setTimeout(() => {
-        // Scroll base value is minScrollPositionValue, we need to calculate logsize - scrollPosition to invert the values and get the text in the right order.
+        // Scroll base value is minScrollPositionValue,
+        //we need to calculate logsize - scrollPosition to invert the values and get the text in the right order.
         fetchTextBasedOnByteFromScrollPosition(
           props.source.path,
           Math.round(logSize - scrollPosition),
