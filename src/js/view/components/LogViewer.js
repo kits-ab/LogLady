@@ -176,14 +176,14 @@ const LogViewer = props => {
 
   useEffect(() => {
     // Effect for checking if tailswitch is on. If it is, and the file is running - lock the sliderPosition to the base and display the tail of the file.
-    const APPROXIMATE_AMOUNT_OF_BYTES_TO_FETCH = 10000;
-    const LINES_FROM_VIEWCONTAINER_BOTTOM = 5;
+    const BYTE_AMOUNT_TO_FETCH =
+      (props.nrOfLinesInViewer - 3) * meanByteValueOfCurrentLines;
     if (logFileHasRunningStatus && tailSwitch) {
       setScrollPosition(minScrollPositionValue);
       debouncedFetchTextByBytePosition(
         props.source.path,
-        logSize - APPROXIMATE_AMOUNT_OF_BYTES_TO_FETCH,
-        props.nrOfLinesInViewer - LINES_FROM_VIEWCONTAINER_BOTTOM
+        logSize - BYTE_AMOUNT_TO_FETCH,
+        props.nrOfLinesInViewer
       );
     }
   }, [tailSwitch, logFileHasRunningStatus]);
