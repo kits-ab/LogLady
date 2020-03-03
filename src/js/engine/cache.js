@@ -13,61 +13,136 @@
 //      ...
 //}
 
-const CACHE = {};
-const createCache = data => {};
-const searchCache = data => {
-  /*cache hit or miss*/
-};
-const updateCache = (filePath, lines, startByteOfLines) => {
-  let cacheLines = _formatCacheLines(lines, startByteOfLines);
+let cache = {};
 
-  if (CACHE[filePath]) {
-    let currentCacheLines = CACHE[filePath];
-
-    if (cacheLines[0].startsAtByte < currentCacheLines[0].startsAtByte) {
-      if (
-        cacheLines[cacheLines.length - 1].startsAtByte <
-        currentCacheLines[0].startsAtByte
-      ) {
-        // # 1
-        CACHE[filePath] = [...cacheLines, ...CACHE[filePath]];
-      } else {
-        // # 2
-      }
-    } else if (
-      cacheLines[cacheLines.length - 1].startsAtByte >
-      currentCacheLines[currentCacheLines.length - 1].startsAtByte
-    ) {
-    } else {
-      // # 5
-    }
-
-    /*
-    current: x ... y
-
-    new: a ... b
-
-    #1 a ... b .. x ... y
-    #2 a .. x .. b .. y
-
-    #3 x ... y .. a ... b
-    #4 x .. a .. y .. b
-
-    #5 x .. a ... b .. y
-
-    a < x => new starts before current
-      #1 b < x => new is entirely before current
-      #2 b > x => new is partially before current
-    b > y => new ends after current
-      #3 a > y => new ends entirely after current
-      #4 a < y => new ends partially after current
-    #5 a > x && b < y === !(a < x) && !(b > y) => new is contained within current
-    */
+const searchCache = (filepath, position, length) => {
+  const result = cache[filepath]
+    ? cache[filepath].lines
+        .filter(line => {
+          return line.startsAtByte > position;
+        })
+        .slice(0, length)
+    : [];
+  if (result.length < length) {
+    return 'miss';
   } else {
-    CACHE[filePath] = [...cacheLines];
+    return parseResult(result);
   }
 };
-const flushCache = data => {};
+
+const updateCache = (filepath, lines, startByteOfLines) => {
+  let cacheLines = _formatCacheLines(lines, startByteOfLines);
+
+  if (cache[filepath]) {
+    let currentCacheLines = cache[filepath].lines;
+
+    const newLinesStartsBeforeCurrentLines =
+      cacheLines[0].startsAtByte < currentCacheLines[0].startsAtByte;
+
+    const newLinesIsEntirelyBeforeCurrent =
+      cacheLines[cacheLines.length - 1].startsAtByte <
+      currentCacheLines[0].startsAtByte;
+
+    const newLinesEndEntirelyAfterCurrent =
+      cacheLines[0].startsAtByte >
+      currentCacheLines[currentCacheLines.length - 1].startsAtByte;
+
+    const newLinesEndsAfterCurrent =
+      cacheLines[cacheLines.length - 1].startsAtByte >
+      currentCacheLines[currentCacheLines.length - 1].startsAtByte;
+
+    if (newLinesStartsBeforeCurrentLines) {
+      if (newLinesIsEntirelyBeforeCurrent) {
+        addNewLinesBeforeCurrentLines(filepath, cacheLines, currentCacheLines);
+      } else {
+        addNewLinesPartiallyBeforeCurrent(
+          filepath,
+          cacheLines,
+          currentCacheLines
+        );
+      }
+    } else if (newLinesEndsAfterCurrent) {
+      if (newLinesEndEntirelyAfterCurrent) {
+        addNewLinesAfterCurrentLines(filepath, cacheLines, currentCacheLines);
+      } else {
+        addNewLinesEndingPartiallyAfterCurrent(
+          filepath,
+          cacheLines,
+          currentCacheLines
+        );
+      }
+    } else {
+      addCurrentLinesBeforeAndAfterNewLines(
+        filepath,
+        cacheLines,
+        currentCacheLines
+      );
+    }
+  } else {
+    cache[filepath] = { lines: cacheLines };
+  }
+};
+const addNewLinesPartiallyBeforeCurrent = (
+  filepath,
+  cacheLines,
+  currentCacheLines
+) => {
+  console.log('new is partially before current');
+  const filteredLines = currentCacheLines.filter(line => {
+    return line.startsAtByte > cacheLines[cacheLines.length - 1].startsAtByte;
+  });
+  cache[filepath] = { lines: [...cacheLines, ...filteredLines] };
+};
+
+const addNewLinesBeforeCurrentLines = (
+  filepath,
+  cacheLines,
+  currentCacheLines
+) => {
+  cache[filepath] = {
+    lines: [...cacheLines, ...cache[filepath].lines]
+  };
+};
+const addNewLinesAfterCurrentLines = (
+  filepath,
+  cacheLines,
+  currentCacheLines
+) => {
+  cache[filepath] = { lines: [...cache[filepath].lines, ...cacheLines] };
+};
+
+const addNewLinesEndingPartiallyAfterCurrent = (
+  filepath,
+  cacheLines,
+  currentCacheLines
+) => {
+  console.log('new ends partially after current');
+  const filteredLines = currentCacheLines.filter(line => {
+    return line.startsAtByte < cacheLines[0].startsAtByte;
+  });
+  cache[filepath] = { lines: [...filteredLines, ...cacheLines] };
+};
+
+const addCurrentLinesBeforeAndAfterNewLines = (
+  filepath,
+  cacheLines,
+  currentCacheLines
+) => {
+  console.log('new is contained within current');
+  const filteredLinesStart = currentCacheLines.filter(line => {
+    return line.startsAtByte > cacheLines[0].startsAtByte;
+  });
+  const filteredLinesEnd = currentCacheLines.filter(line => {
+    return line.startsAtByte < cacheLines[cacheLines.length - 1].startsAtByte;
+  });
+  cache[filepath] = {
+    lines: [...filteredLinesEnd, ...cacheLines, ...filteredLinesStart]
+  };
+};
+
+const flushCache = data => {
+  cache = {};
+};
 const _checkCacheSize = cache => {
   /*check if cache has reached the limit of 100mb*/
 };
@@ -78,8 +153,17 @@ const _formatCacheLines = (lines, startByteOfLines) => {
   });
 };
 
+const parseResult = result => {
+  const startsAtByte = result.map(byte => {
+    return byte.startsAtByte;
+  });
+  const lines = result.map(line => {
+    return line.line;
+  });
+  return { lines, startsAtByte };
+};
+
 module.exports = {
-  createCache,
   updateCache,
   flushCache,
   searchCache
