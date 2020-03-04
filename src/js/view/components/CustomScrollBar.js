@@ -2,7 +2,7 @@ import React from 'react';
 import { Slider } from 'office-ui-fabric-react';
 
 /*
-Custom scroll bar created from fabric-ui slider component.
+Custom scrollbar created from fabric-ui slider component.
 With this we are able to connect the position of the slider thumb to specific bytes in the file. 
 */
 
@@ -44,15 +44,15 @@ const CustomScrollBar = props => {
 
   return (
     <Slider
-      min={0}
-      max={props.logSize}
+      min={props.min}
+      max={props.max}
       onChange={value => {
         props.handleOnChange(value);
       }}
       showValue={false}
       step={props.step}
       styles={overrideStyles}
-      value={props.scrollPosition}
+      value={props.value}
       vertical
     />
   );
