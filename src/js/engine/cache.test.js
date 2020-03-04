@@ -1,4 +1,9 @@
-import { updateCache, searchCache, flushCache } from './cache';
+import {
+  updateCache,
+  searchCache,
+  flushCache,
+  _checkIfCacheIsWithinSizeLimit
+} from './cache';
 describe('update cache', () => {
   const cache = {
     filepath: 'test/testfile',
@@ -142,5 +147,17 @@ describe('update cache', () => {
     expect(searchCache(caseCache.filepath, caseCache.position, 5)).toEqual(
       expectedResult
     );
+  });
+});
+
+describe('_checkIfCacheIsWithinSizeLimit', () => {
+  it('should return true if cache is within limit', () => {
+    const cache = {
+      filepath: 'test/testfile',
+      lines: ['rad 1', 'rad 2'],
+      startByteOfLines: [10, 20],
+      position: 15
+    };
+    expect(_checkIfCacheIsWithinSizeLimit(cache)).toEqual(true);
   });
 });
