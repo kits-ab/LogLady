@@ -1,4 +1,5 @@
 const fileReader = require('../adapters/fileReader');
+const diskPersistance = require('../electron/persistToDisk');
 const { ipcMain, dialog } = require('electron');
 const { createMenu } = require('../electron/menu');
 const ipcChannel = 'backendMessages';
@@ -100,17 +101,17 @@ const handleOpenFile = async (state, sender, { filePath }) => {
 };
 
 const saveRecentFilesToDisk = recentFiles => {
-  fileReader.saveRecentFilesToDisk(JSON.stringify(recentFiles));
+  diskPersistance.saveRecentFilesToDisk(JSON.stringify(recentFiles));
 };
 
 const loadRecentFilesFromDisk = () => {
-  return fileReader.loadRecentFilesFromDisk().then(files => {
+  return diskPersistance.loadRecentFilesFromDisk().then(files => {
     return JSON.parse(files);
   });
 };
 
 const loadStateFromDisk = async (state, sender) => {
-  fileReader
+  diskPersistance
     .loadStateFromDisk()
     .then(_data => {
       const action = {
@@ -265,7 +266,7 @@ const createEventHandler = state => {
         fileReader.stopWatcher(_argObj.filePath);
         break;
       case 'STATE_SAVE':
-        fileReader.saveStateToDisk(_argObj.reduxStateValue);
+        diskPersistance.saveStateToDisk(_argObj.reduxStateValue);
         break;
       case 'STATE_LOAD':
         loadStateFromDisk(state, sender);
