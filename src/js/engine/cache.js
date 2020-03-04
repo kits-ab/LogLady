@@ -26,7 +26,7 @@ const searchCache = (filepath, position, length) => {
   if (result.length < length) {
     return 'miss';
   } else {
-    return parseResult(result);
+    return _parseResult(result);
   }
 };
 
@@ -143,8 +143,12 @@ const addCurrentLinesBeforeAndAfterNewLines = (
 const flushCache = data => {
   cache = {};
 };
-const _checkCacheSize = cache => {
-  /*check if cache has reached the limit of 100mb*/
+
+const _checkIfCacheIsWithinSizeLimit = cache => {
+  /*check if cache has reached the limit of 100mb (a hundred millon bytes)*/
+  const cacheSize = Buffer.byteLength(JSON.stringify(cache), 'utf8');
+  const sizeLimit = 100000000000;
+  return cacheSize < sizeLimit ? true : false;
 };
 
 const _formatCacheLines = (lines, startByteOfLines) => {
@@ -153,7 +157,7 @@ const _formatCacheLines = (lines, startByteOfLines) => {
   });
 };
 
-const parseResult = result => {
+const _parseResult = result => {
   const startsAtByte = result.map(byte => {
     return byte.startsAtByte;
   });
@@ -166,5 +170,6 @@ const parseResult = result => {
 module.exports = {
   updateCache,
   flushCache,
-  searchCache
+  searchCache,
+  _checkIfCacheIsWithinSizeLimit
 };
