@@ -1,7 +1,15 @@
 const initialState = {
   logs: {},
   startByteOfLines: {},
-  nrOfLinesInViewer: null
+  nrOfLinesInViewer: null,
+  meanByteValuesOfInitialLines: {},
+  meanByteValuesOfLines: {}
+};
+
+const calculateMeanValueOfBytesPerLine = startBytes => {
+  return Math.round(
+    (startBytes[startBytes.length - 1] - startBytes[0]) / startBytes.length
+  );
 };
 
 export const logViewerReducer = (state = initialState, action) => {
@@ -27,12 +35,23 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_SET_LOG': {
       console.log('SETTING');
       const { sourcePath, log, startByteOfLines } = action.data;
+      let meanByteValueOfInitialLines = calculateMeanValueOfBytesPerLine(
+        startByteOfLines
+      );
       return {
         ...state,
-        logs: { ...state.logs, [sourcePath]: [...log] },
+        logs: { ...state.logs, [sourcePath]: log },
         startByteOfLines: {
           ...state.startByteOfLines,
           [sourcePath]: [...startByteOfLines]
+        },
+        meanByteValuesOfInitialLines: {
+          ...state.meanByteValuesOfInitialLines,
+          [sourcePath]: meanByteValueOfInitialLines
+        },
+        meanByteValuesOfLines: {
+          ...state.meanByteValuesOfLines,
+          [sourcePath]: meanByteValueOfInitialLines
         }
       };
     }
@@ -68,7 +87,11 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     }
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION': {
+      console.log('ADDING FROM BYTE POS');
       const { lines, sourcePath, startByteOfLines } = action.data;
+      let meanByteValueOfLines = calculateMeanValueOfBytesPerLine(
+        startByteOfLines
+      );
 
       return {
         ...state,
@@ -79,6 +102,10 @@ export const logViewerReducer = (state = initialState, action) => {
         startByteOfLines: {
           ...state.startByteOfLines,
           [sourcePath]: [...startByteOfLines]
+        },
+        meanByteValuesOfLines: {
+          ...state.meanByteValuesOfLines,
+          [sourcePath]: meanByteValueOfLines
         }
       };
     }
