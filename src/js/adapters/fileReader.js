@@ -218,7 +218,7 @@ const getFileSizeInBytes = filePath => {
   return statSync(filePath).size;
 };
 
-const readDataFromByte = (filePath, start, numberOfBytes) => {
+const readDataFromByte = (filePath, startReadFromByte, numberOfBytes) => {
   return new Promise((resolve, reject) => {
     stat(filePath, function(error, stats) {
       if (error) {
@@ -231,7 +231,7 @@ const readDataFromByte = (filePath, start, numberOfBytes) => {
         }
 
         var buffer = Buffer.alloc(numberOfBytes);
-        read(fd, buffer, 0, buffer.length, start, function(
+        read(fd, buffer, 0, buffer.length, startReadFromByte, function(
           error,
           bytesRead,
           buffer
@@ -249,7 +249,7 @@ const readDataFromByte = (filePath, start, numberOfBytes) => {
           resolve(
             parseByteDataIntoStringArrayWithStartByteOfLines(
               data,
-              start,
+              startReadFromByte,
               numberOfBytes
             )
           );

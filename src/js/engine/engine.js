@@ -16,21 +16,28 @@ const updateRecentFiles = recentFiles => {
   saveRecentFilesToDisk(recentFiles);
 };
 
-const getFileInfo = async filePath => {
-  const fileSize = await fileReader.getFileSizeInBytes(filePath);
+const getFileInfo = filePath => {
+  const fileSize = fileReader.getFileSizeInBytes(filePath);
   const endIndex = fileReader.getLastNewLineIndex(filePath, fileSize);
 
   return Promise.all([fileSize, endIndex]);
 };
 
-const getFileHistory = (filePath, fileSize) => {
-  const START_READ_FROM_BYTE = fileSize - 30000;
+const getFileHistory = async (filePath, fileSize) => {
   const NR_OF_BYTES = 30000;
-  return fileReader.readDataFromByte(
+  const START_READ_FROM_BYTE =
+    fileSize - NR_OF_BYTES < 0 ? 0 : fileSize - NR_OF_BYTES;
+  const {
+    startByteOfLines,
+    lines,
+    linesStartAt,
+    linesEndAt
+  } = await fileReader.readDataFromByte(
     filePath,
     START_READ_FROM_BYTE,
     NR_OF_BYTES
   );
+  return { startByteOfLines, lines, linesStartAt, linesEndAt };
 };
 
 const sendSourcePicked = (sender, sourcePath) => {
@@ -90,6 +97,7 @@ const openFile = async (sender, filePath) => {
     } = await getFileHistory(filePath, fileSize);
 
     // Save read data to cache
+    // TODO: call updateCache in filereader instead
     updateCache(filePath, lines, startByteOfLines);
 
     //Lines in history that contains empty spaces does not display properly. replaceEmptyLinesWithHiddenChar(history) returns an array where this has been taken care of by replacing each space with a hidden character, and makes those lines display correctly in LogViewer.
@@ -99,7 +107,7 @@ const openFile = async (sender, filePath) => {
       fileSize,
       endIndex,
       replaceEmptyLinesWithHiddenChar(lines.slice(lines.length - 10)),
-      startByteOfLines
+      startByteOfLines.slice(startByteOfLines.length - 10)
     );
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
