@@ -4,7 +4,38 @@ import {
   flushCache,
   _checkIfCacheIsWithinSizeLimit
 } from './cache';
-describe('update cache', () => {
+
+describe('searchCache', () => {
+  const cache = {
+    filepath: 'test/testfile',
+    lines: ['rad 1', 'rad 2'],
+    startByteOfLines: [10, 20],
+    position: 15
+  };
+
+  beforeEach(() => {
+    updateCache(cache.filepath, cache.lines, cache.startByteOfLines);
+  });
+  afterEach(() => {
+    flushCache();
+  });
+
+  it('should return miss', () => {
+    expect(searchCache(cache.filepath, cache.position, 10)).toEqual('miss');
+  });
+
+  it('should return result', () => {
+    const expectedResult = {
+      lines: ['rad 2'],
+      startsAtByte: [20]
+    };
+
+    expect(searchCache(cache.filepath, cache.position, 1)).toEqual(
+      expectedResult
+    );
+  });
+});
+describe('updateCache', () => {
   const cache = {
     filepath: 'test/testfile',
     lines: ['rad 1', 'rad 2'],
@@ -20,22 +51,7 @@ describe('update cache', () => {
     flushCache();
   });
 
-  it('searchCache should return miss', () => {
-    expect(searchCache(cache.filepath, cache.position, 10)).toEqual('miss');
-  });
-
-  it('searchCache should return result', () => {
-    const expectedResult = {
-      lines: ['rad 2'],
-      startsAtByte: [20]
-    };
-
-    expect(searchCache(cache.filepath, cache.position, 1)).toEqual(
-      expectedResult
-    );
-  });
-
-  it('updateCache should add new lines before current', () => {
+  it('should add new lines before current', () => {
     const caseCache = {
       filepath: 'test/testfile',
       lines: ['rad 3', 'rad 4', 'rad 5'],
@@ -58,7 +74,7 @@ describe('update cache', () => {
     );
   });
 
-  it('updateCache should add new lines partially before current', () => {
+  it('should add new lines partially before current', () => {
     const caseCache = {
       filepath: 'test/testfile',
       lines: ['rad 3', 'rad 4', 'rad 5'],
@@ -81,7 +97,7 @@ describe('update cache', () => {
     );
   });
 
-  it('updateCache should add new lines after current', () => {
+  it('should add new lines after current', () => {
     const caseCache = {
       filepath: 'test/testfile',
       lines: ['rad 3', 'rad 4'],
@@ -103,7 +119,7 @@ describe('update cache', () => {
     );
   });
 
-  it('updateCache should add new lines partially after current', () => {
+  it('should add new lines partially after current', () => {
     const caseCache = {
       filepath: 'test/testfile',
       lines: ['rad 3', 'rad 4', 'rad 5'],
@@ -126,7 +142,7 @@ describe('update cache', () => {
     );
   });
 
-  it('updateCache should add new lines within current', () => {
+  it('should add new lines within current', () => {
     const caseCache = {
       filepath: 'test/testfile',
       lines: ['rad 3', 'rad 4', 'rad 5'],
@@ -159,5 +175,9 @@ describe('_checkIfCacheIsWithinSizeLimit', () => {
       position: 15
     };
     expect(_checkIfCacheIsWithinSizeLimit(cache)).toEqual(true);
+  });
+  it('should return false if cache is outside limit', () => {
+    const cache = Buffer.alloc(100000001);
+    expect(_checkIfCacheIsWithinSizeLimit(cache)).toEqual(false);
   });
 });

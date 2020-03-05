@@ -147,7 +147,7 @@ const flushCache = data => {
 const _checkIfCacheIsWithinSizeLimit = cache => {
   /*check if cache has reached the limit of 100mb (a hundred millon bytes)*/
   const cacheSize = Buffer.byteLength(JSON.stringify(cache), 'utf8');
-  const sizeLimit = 100000000000;
+  const sizeLimit = 100000000;
   return cacheSize < sizeLimit ? true : false;
 };
 
