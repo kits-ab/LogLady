@@ -96,10 +96,6 @@ const openFile = async (sender, filePath) => {
       linesEndAt
     } = await getFileHistory(filePath, fileSize);
 
-    // Save read data to cache
-    // TODO: call updateCache in filereader instead
-    updateCache(filePath, lines, startByteOfLines);
-
     //Lines in history that contains empty spaces does not display properly. replaceEmptyLinesWithHiddenChar(history) returns an array where this has been taken care of by replacing each space with a hidden character, and makes those lines display correctly in LogViewer.
     sendFileOpened(
       sender,
@@ -199,8 +195,16 @@ const handleShowOpenDialog = async (state, sender) => {
 };
 
 const readLinesStartingAtByte = async (sender, data) => {
-  const APPROXIMATE_BYTES_PER_LINE = 150;
+  // TODO:
+  // searchCache(filePath, position, amountOfLines) finns datan i cache? -> Returnera från cache
+  // finns datan inte i cache? -> läs in updateCache
+  // kolla strl på cache
+  // för stor -> flushCache -> updateCache
+  // strl ok -> searchCache
+  // Returnera resultatet från searchCache
+
   const { path, startByte, amountOfLines } = data;
+  const APPROXIMATE_BYTES_PER_LINE = 150;
   const [fileSize] = await getFileInfo(path);
 
   let dataToReturn = {
@@ -218,26 +222,30 @@ const readLinesStartingAtByte = async (sender, data) => {
     dataToReturn.lines.length < amountOfLines &&
     dataToReturn.linesEndAt < fileSize
   ) {
-    let data = await fileReader.readDataFromByte(
-      path,
-      byteToReadFrom,
-      bytesPerScreen
-    );
+    try {
+      let data = await fileReader.readDataFromByte(
+        path,
+        byteToReadFrom < 0 ? 0 : byteToReadFrom,
+        bytesPerScreen
+      );
 
-    // Save data
-    if (!dataToReturn.linesStartAt) {
-      dataToReturn.linesStartAt = data.linesStartAt;
+      // Save data
+      if (!dataToReturn.linesStartAt) {
+        dataToReturn.linesStartAt = data.linesStartAt;
+      }
+      dataToReturn.linesEndAt = data.linesEndAt;
+      dataToReturn.lines = dataToReturn.lines.concat(data.lines);
+      dataToReturn.startByteOfLines = dataToReturn.startByteOfLines.concat(
+        data.startByteOfLines
+      );
+
+      // Calculate next byte to read from
+      // Remove one byte to get one character from previous line,
+      // which will be discarded by the adapter
+      byteToReadFrom = dataToReturn.linesEndAt - 1;
+    } catch (error) {
+      console.log({ readLinesStartingAtByte }, error);
     }
-    dataToReturn.linesEndAt = data.linesEndAt;
-    dataToReturn.lines = dataToReturn.lines.concat(data.lines);
-    dataToReturn.startByteOfLines = dataToReturn.startByteOfLines.concat(
-      data.startByteOfLines
-    );
-
-    // Calculate next byte to read from
-    // Remove one byte to get one character from previous line,
-    // which will be discarded by the adapter
-    byteToReadFrom = dataToReturn.linesEndAt - 1;
   }
 
   // Checking that the amount of lines to return are not too many to be able to fit in the logview.

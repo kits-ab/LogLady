@@ -300,7 +300,7 @@ const LogViewer = props => {
         />
       </LogViewerContainer>
       <CustomScrollBar
-        handleOnChange={handleCustomScrollBarOnChange}
+        onChange={handleCustomScrollBarOnChange}
         max={logSize}
         min={minScrollPositionValue}
         value={scrollPosition}

@@ -1,5 +1,5 @@
 // Cache template
-// const CACHE = {
+// const cache = {
 //     sourcePath\1: {
 //         lines: [{
 //             line: 'line text',
@@ -15,15 +15,15 @@
 
 let cache = {};
 
-const searchCache = (filepath, position, length) => {
+const searchCache = (filepath, position, amountOfLines) => {
   const result = cache[filepath]
     ? cache[filepath].lines
         .filter(line => {
           return line.startsAtByte > position;
         })
-        .slice(0, length)
+        .slice(0, amountOfLines)
     : [];
-  if (result.length < length) {
+  if (result.length < amountOfLines) {
     return 'miss';
   } else {
     return _parseResult(result);
