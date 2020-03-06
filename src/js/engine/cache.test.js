@@ -2,49 +2,39 @@ import {
   updateCache,
   searchCache,
   flushCache,
-  _checkIfCacheIsWithinSizeLimit
+  flushCacheForOneFile,
+  checkIfCacheIsWithinSizeLimit
 } from './cache';
 
-describe('searchCache', () => {
-  const cache = {
-    filepath: 'test/testfile',
-    lines: ['rad 1', 'rad 2'],
-    startByteOfLines: [10, 20],
-    position: 15
-  };
+const FILEPATH = 'test/testfile';
+const LINES = ['rad 1', 'rad 2'];
+const STARTBYTEOFLINES = [10, 20];
+const POSITION = 15;
 
+describe('searchCache', () => {
   beforeEach(() => {
-    updateCache(cache.filepath, cache.lines, cache.startByteOfLines);
+    updateCache(FILEPATH, LINES, STARTBYTEOFLINES);
   });
   afterEach(() => {
     flushCache();
   });
 
   it('should return miss', () => {
-    expect(searchCache(cache.filepath, cache.position, 10)).toEqual('miss');
+    expect(searchCache(FILEPATH, POSITION, 10)).toEqual('miss');
   });
 
-  it('should return result', () => {
+  it('should return expected result', () => {
     const expectedResult = {
       lines: ['rad 2'],
       startsAtByte: [20]
     };
-
-    expect(searchCache(cache.filepath, cache.position, 1)).toEqual(
-      expectedResult
-    );
+    expect(searchCache(FILEPATH, POSITION, 1)).toEqual(expectedResult);
   });
 });
-describe('updateCache', () => {
-  const cache = {
-    filepath: 'test/testfile',
-    lines: ['rad 1', 'rad 2'],
-    startByteOfLines: [10, 20],
-    position: 15
-  };
 
+describe('updateCache', () => {
   beforeEach(() => {
-    updateCache(cache.filepath, cache.lines, cache.startByteOfLines);
+    updateCache(FILEPATH, LINES, STARTBYTEOFLINES);
   });
 
   afterEach(() => {
@@ -167,17 +157,65 @@ describe('updateCache', () => {
 });
 
 describe('_checkIfCacheIsWithinSizeLimit', () => {
-  it('should return true if cache is within limit', () => {
-    const cache = {
-      filepath: 'test/testfile',
-      lines: ['rad 1', 'rad 2'],
-      startByteOfLines: [10, 20],
-      position: 15
-    };
-    expect(_checkIfCacheIsWithinSizeLimit(cache)).toEqual(true);
+  const BytesAddedByJSONStringify = 2;
+  it('should return true if cache object size is within limit', () => {
+    const cacheSize = 99999999 - BytesAddedByJSONStringify;
+    const cache = Buffer.alloc(cacheSize)
+      .fill('a')
+      .toString();
+    expect(checkIfCacheIsWithinSizeLimit(cache)).toEqual(true);
   });
-  it('should return false if cache is outside limit', () => {
-    const cache = Buffer.alloc(100000001);
-    expect(_checkIfCacheIsWithinSizeLimit(cache)).toEqual(false);
+
+  it('should return false if cache object size is outside limit', () => {
+    const cacheSize = 100000001 - BytesAddedByJSONStringify;
+    const cache = Buffer.alloc(cacheSize)
+      .fill('a')
+      .toString();
+    expect(checkIfCacheIsWithinSizeLimit(cache)).toEqual(false);
+  });
+
+  it('should return false if cache object size is equal to the size limit', () => {
+    const cacheSize = 100000000 - BytesAddedByJSONStringify;
+    const cache = Buffer.alloc(cacheSize)
+      .fill('a')
+      .toString();
+    expect(checkIfCacheIsWithinSizeLimit(cache)).toEqual(false);
+  });
+});
+
+describe('flushCache', () => {
+  it('should empty the cache object', () => {
+    const resultOnHit = {
+      lines: ['rad 1'],
+      startsAtByte: [10]
+    };
+    const resultOnMiss = 'miss';
+    updateCache(FILEPATH, LINES, STARTBYTEOFLINES);
+    expect(searchCache(FILEPATH, 0, 1)).toEqual(resultOnHit);
+    flushCache();
+    expect(searchCache(FILEPATH, 0, 1)).toEqual(resultOnMiss);
+  });
+});
+
+describe('flushCacheForOneFile', () => {
+  beforeEach(() => {
+    updateCache(FILEPATH, LINES, STARTBYTEOFLINES);
+  });
+  afterEach(() => {
+    flushCache();
+  });
+  it('should remove cache for one file', () => {
+    const filepath = 'folder/file.log';
+    const lines = ['rad 1', 'rad 2'];
+    const startByteOfLines = [0, 2];
+    const resultOnHit = {
+      lines: ['rad 2'],
+      startsAtByte: [2]
+    };
+    const resultOnMiss = 'miss';
+    updateCache(filepath, lines, startByteOfLines);
+    expect(searchCache(filepath, 0, 1)).toEqual(resultOnHit);
+    flushCacheForOneFile(filepath);
+    expect(searchCache(filepath, 0, 1)).toEqual(resultOnMiss);
   });
 });

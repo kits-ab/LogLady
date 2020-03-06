@@ -39,20 +39,20 @@ const updateCache = (filepath, lines, startByteOfLines) => {
     const newLinesStartsBeforeCurrentLines =
       cacheLines[0].startsAtByte < currentCacheLines[0].startsAtByte;
 
-    const newLinesIsEntirelyBeforeCurrent =
+    const newLinesAreEntirelyBeforeCurrentLines =
       cacheLines[cacheLines.length - 1].startsAtByte <
       currentCacheLines[0].startsAtByte;
 
-    const newLinesEndEntirelyAfterCurrent =
+    const newLinesEndEntirelyAfterCurrentLines =
       cacheLines[0].startsAtByte >
       currentCacheLines[currentCacheLines.length - 1].startsAtByte;
 
-    const newLinesEndsAfterCurrent =
+    const newLinesEndAfterCurrentLines =
       cacheLines[cacheLines.length - 1].startsAtByte >
       currentCacheLines[currentCacheLines.length - 1].startsAtByte;
 
     if (newLinesStartsBeforeCurrentLines) {
-      if (newLinesIsEntirelyBeforeCurrent) {
+      if (newLinesAreEntirelyBeforeCurrentLines) {
         addNewLinesBeforeCurrentLines(filepath, cacheLines, currentCacheLines);
       } else {
         addNewLinesPartiallyBeforeCurrent(
@@ -61,8 +61,8 @@ const updateCache = (filepath, lines, startByteOfLines) => {
           currentCacheLines
         );
       }
-    } else if (newLinesEndsAfterCurrent) {
-      if (newLinesEndEntirelyAfterCurrent) {
+    } else if (newLinesEndAfterCurrentLines) {
+      if (newLinesEndEntirelyAfterCurrentLines) {
         addNewLinesAfterCurrentLines(filepath, cacheLines, currentCacheLines);
       } else {
         addNewLinesEndingPartiallyAfterCurrent(
@@ -82,6 +82,7 @@ const updateCache = (filepath, lines, startByteOfLines) => {
     cache[filepath] = { lines: cacheLines };
   }
 };
+
 const addNewLinesPartiallyBeforeCurrent = (
   filepath,
   cacheLines,
@@ -94,20 +95,13 @@ const addNewLinesPartiallyBeforeCurrent = (
   cache[filepath] = { lines: [...cacheLines, ...filteredLines] };
 };
 
-const addNewLinesBeforeCurrentLines = (
-  filepath,
-  cacheLines,
-  currentCacheLines
-) => {
+const addNewLinesBeforeCurrentLines = (filepath, cacheLines) => {
   cache[filepath] = {
     lines: [...cacheLines, ...cache[filepath].lines]
   };
 };
-const addNewLinesAfterCurrentLines = (
-  filepath,
-  cacheLines,
-  currentCacheLines
-) => {
+
+const addNewLinesAfterCurrentLines = (filepath, cacheLines) => {
   cache[filepath] = { lines: [...cache[filepath].lines, ...cacheLines] };
 };
 
@@ -144,7 +138,11 @@ const flushCache = data => {
   cache = {};
 };
 
-const _checkIfCacheIsWithinSizeLimit = cache => {
+const flushCacheForOneFile = filepath => {
+  delete cache[filepath];
+};
+
+const checkIfCacheIsWithinSizeLimit = cache => {
   /*check if cache has reached the limit of 100mb (a hundred millon bytes)*/
   const cacheSize = Buffer.byteLength(JSON.stringify(cache), 'utf8');
   const sizeLimit = 100000000;
@@ -170,6 +168,7 @@ const _parseResult = result => {
 module.exports = {
   updateCache,
   flushCache,
+  flushCacheForOneFile,
   searchCache,
-  _checkIfCacheIsWithinSizeLimit
+  checkIfCacheIsWithinSizeLimit
 };

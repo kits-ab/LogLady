@@ -28,7 +28,6 @@ const followFile = (filePath, startIndex, onLines, onError) => {
   });
 
   watchers[filePath] = watcher;
-  console.log({ watchers });
 };
 
 const stopWatcher = filePath => {
