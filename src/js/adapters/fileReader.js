@@ -126,7 +126,6 @@ const getLastNewLineIndex = (filePath, endIndex) => {
 };
 
 //This will count the lines until the end index, if the file is big this will take a lot of time!
-// TODO: Are we using this? Can it be used for something useful now?
 const getLineCount = (filePath, endIndex) => {
   return new Promise((resolve, reject) => {
     let lineCount = 0;
@@ -267,5 +266,7 @@ module.exports = {
   getLastNewLineIndex,
   stopWatcher,
   stopAllWatchers,
-  readDataFromByte
+  readDataFromByte,
+  extractStartByteOfLinesFromByteData,
+  parseByteDataIntoStringArray
 };
