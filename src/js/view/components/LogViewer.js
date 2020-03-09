@@ -142,6 +142,10 @@ const LogViewer = props => {
   }, []);
 
   useEffect(() => {
+    setScrollPosition(minScrollPositionValue);
+  }, [minScrollPositionValue]);
+
+  useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
     if (props.logs[props.source.path]) {
