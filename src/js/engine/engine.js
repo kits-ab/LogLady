@@ -18,9 +18,9 @@ const updateRecentFiles = recentFiles => {
   saveRecentFilesToDisk(recentFiles);
 };
 
-const getFileInfo = filePath => {
+const getFileInfo = async filePath => {
   const fileSize = fileReader.getFileSizeInBytes(filePath);
-  const endIndex = fileReader.getLastNewLineIndex(filePath, fileSize);
+  const endIndex = await fileReader.getLastNewLineIndex(filePath, fileSize);
 
   return Promise.all([fileSize, endIndex]);
 };
@@ -28,7 +28,7 @@ const getFileInfo = filePath => {
 const getFileHistory = async (filePath, fileSize) => {
   const NR_OF_BYTES = 30000;
   const START_READ_FROM_BYTE =
-    fileSize - NR_OF_BYTES < 0 ? 0 : fileSize - NR_OF_BYTES;
+    fileSize - NR_OF_BYTES <= 0 ? 0 : fileSize - NR_OF_BYTES;
   const {
     startByteOfLines,
     lines,
@@ -213,7 +213,7 @@ const readLinesStartingAtByte = async (sender, data) => {
   // );
   const numberOfBytes = 30000;
   let byteToReadFrom = startByte - 15000 < 0 ? 0 : startByte - 15000;
-  let cache = searchCache(path, startByte, amountOfLines);
+  let cache = searchCache(path, startByte, amountOfLines, fileSize);
 
   if (cache === 'miss') {
     console.log('cache = miss');
@@ -231,19 +231,21 @@ const readLinesStartingAtByte = async (sender, data) => {
 
       updateCache(path, lines, startByteOfLines);
 
-      //Check for size
+      // Check for size
       if (!checkIfCacheIsWithinSizeLimit()) {
         flushCacheForOneFile(path);
         updateCache(path, lines, startByteOfLines);
       }
 
-      cache = searchCache(path, byteToReadFrom, amountOfLines);
+      cache = searchCache(path, startByte, amountOfLines, fileSize);
+      console.log({ cache });
     } catch (error) {
       console.log({ readLinesStartingAtByte }, error);
     }
   }
 
   let { lines, startsAtByte } = cache;
+  // console.log({ lines });
   lines = replaceEmptyLinesWithHiddenChar(lines);
 
   const dataToReturn = { path, lines, startByteOfLines: startsAtByte };

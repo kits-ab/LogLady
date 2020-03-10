@@ -1,6 +1,7 @@
 // Cache template
 // const cache = {
 //     sourcePath\1: {
+//         cachedPartsInfo: [{startsAt: 0, endsAt: 10}, {startsAt: 100, endsAt: 150}]
 //         lines: [{
 //             line: 'line text',
 //             startsAtByte: 123
@@ -15,7 +16,26 @@
 
 let cache = {};
 
-const searchCache = (filepath, position, amountOfLines) => {
+const searchCache = (filepath, position, amountOfLines, fileSize) => {
+  // Kolla om raden med startbyten finns
+  // Alla rader som är större än startsAtByte kommer ju alltid att finnas..
+  if (cache[filepath]) {
+    const firstIndexOfCacheStartByte = cache[filepath].lines[0].startsAtByte;
+
+    console.log({
+      filepath: cache[filepath].lines.startsAtByte,
+      firstIndexOfCacheStartByte
+    });
+    const lastIndexOfCacheStartByte =
+      cache[filepath].lines[cache[filepath].lines.length - 1].startsAtByte;
+    console.log({ lastIndexOfCacheStartByte });
+    if (
+      position < firstIndexOfCacheStartByte ||
+      position > lastIndexOfCacheStartByte
+    ) {
+      return 'miss';
+    }
+  }
   const result = cache[filepath]
     ? cache[filepath].lines
         .filter(line => {
@@ -23,15 +43,8 @@ const searchCache = (filepath, position, amountOfLines) => {
         })
         .slice(0, amountOfLines)
     : [];
-  if (result.length < amountOfLines) {
-    return 'miss';
-  }
-  // else if (_parseResult(result).startsAtByte[0] - position > 150) {
-  //   return 'miss';
-  // }
-  else {
-    return _parseResult(result);
-  }
+  console.log({ searchCache, amountOfLines, resultLength: result.length });
+  return _parseResult(result);
 };
 
 const updateCache = (filepath, lines, startByteOfLines) => {
@@ -39,6 +52,7 @@ const updateCache = (filepath, lines, startByteOfLines) => {
 
   if (cache[filepath]) {
     let currentCacheLines = cache[filepath].lines;
+
     const newLinesStartsBeforeCurrentLines =
       cacheLines[0].startsAtByte < currentCacheLines[0].startsAtByte;
 
@@ -152,6 +166,7 @@ const checkIfCacheIsWithinSizeLimit = (cache = cacheInit) => {
   const sizeInMB = (cacheSize * Math.pow(10, -6)).toFixed(2);
   console.log('cacheSize ' + sizeInMB + 'mb');
   const sizeLimit = 100000000;
+  console.log({ withinLimit: cacheSize < sizeLimit });
   return cacheSize < sizeLimit ? true : false;
 };
 

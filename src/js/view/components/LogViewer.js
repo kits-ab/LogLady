@@ -13,11 +13,11 @@ import { handleTailSwitch } from '../actions/dispatchActions';
 import _ from 'lodash';
 
 const debouncedFetchTextByBytePosition = _.debounce(
-  (path, bytesToRead, nrOfLines) => {
-    console.log({ bytesToRead });
+  (path, position, nrOfLines) => {
+    console.log({ debouncedFetchTextByBytePosition, position, nrOfLines });
     fetchTextBasedOnByteFromScrollPosition(
       path,
-      Math.round(bytesToRead),
+      Math.round(position),
       nrOfLines
     );
   },
@@ -65,7 +65,7 @@ const LogViewer = props => {
 
   // Calculating nrOfLinesInViewer * meanByteValues for a line in the file,
   // in order to make the base value of the scroll responsive to the size of the viewer
-  // and the current file line lenghts.
+  // and the current file line lengths.
   const AMOUNT_OF_LINES_FROM_BOTTOM = 5;
   const minScrollPositionValue = props.meanByteValuesOfInitialLines[
     props.source.path
@@ -143,6 +143,11 @@ const LogViewer = props => {
   }, []);
 
   useEffect(() => {
+    setScrollPosition(minScrollPositionValue);
+    console.log({ minScrollPositionValue });
+  }, [minScrollPositionValue]);
+
+  useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
     if (props.logs[props.source.path]) {
@@ -181,11 +186,12 @@ const LogViewer = props => {
     const BYTE_AMOUNT_TO_FETCH =
       (props.nrOfLinesInViewer - EMPTY_LINES_BELOW_LAST_LINE) *
       meanByteValueOfCurrentLines;
+    const position = logSize - BYTE_AMOUNT_TO_FETCH;
     if (logFileHasRunningStatus && tailSwitch) {
       setScrollPosition(minScrollPositionValue);
       debouncedFetchTextByBytePosition(
         props.source.path,
-        logSize - BYTE_AMOUNT_TO_FETCH,
+        position,
         props.nrOfLinesInViewer
       );
     }
@@ -213,7 +219,6 @@ const LogViewer = props => {
         } else if (newScrollPosition <= minScrollPositionValue) {
           newScrollPosition = minScrollPositionValue;
         }
-
         toggleTailSwitchToOffOnScrollWhenFileIsRunning(
           tailSwitch,
           logFileHasRunningStatus,
@@ -222,6 +227,12 @@ const LogViewer = props => {
         );
 
         setScrollPosition(newScrollPosition);
+        console.log({
+          newScrollPosition,
+          minScrollPositionValue,
+          scrollPosition,
+          amountOfLinesInViewer: props.nrOfLinesInViewer
+        });
       }
     };
 
@@ -251,8 +262,8 @@ const LogViewer = props => {
           Math.round(logSize - scrollPosition),
           props.nrOfLinesInViewer
         );
-        let test = Math.round(logSize - scrollPosition);
-        console.log({ test });
+        let logSizeMinusScrollPos = Math.round(logSize - scrollPosition);
+        console.log({ logSizeMinusScrollPos });
         // Save timeout so it can be cleared if needed
       }, 50);
       setCurrentTimeout(timeout);
@@ -281,9 +292,10 @@ const LogViewer = props => {
       props.source.path
     );
     setScrollPosition(value);
+    const position = logSize - value;
     debouncedFetchTextByBytePosition(
       props.source.path,
-      logSize - value,
+      position,
       props.nrOfLinesInViewer
     );
   };
