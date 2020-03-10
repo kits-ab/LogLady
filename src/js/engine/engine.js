@@ -8,7 +8,9 @@ const {
   createCache,
   searchCache,
   updateCache,
-  flushCache
+  flushCache,
+  checkIfCacheIsWithinSizeLimit,
+  flushCacheForOneFile
 } = require('./cache');
 
 const updateRecentFiles = recentFiles => {
@@ -96,6 +98,8 @@ const openFile = async (sender, filePath) => {
       linesEndAt
     } = await getFileHistory(filePath, fileSize);
 
+    updateCache(filePath, lines, startByteOfLines);
+
     //Lines in history that contains empty spaces does not display properly. replaceEmptyLinesWithHiddenChar(history) returns an array where this has been taken care of by replacing each space with a hidden character, and makes those lines display correctly in LogViewer.
     sendFileOpened(
       sender,
@@ -173,7 +177,6 @@ const handleFollowFile = (sender, { filePath, fromIndex }) => {
   };
 
   const onError = sendError(sender, "Couldn't keep following source");
-
   fileReader.followFile(filePath, fromIndex, onLines, onError);
 };
 
@@ -204,56 +207,46 @@ const readLinesStartingAtByte = async (sender, data) => {
   // Returnera resultatet från searchCache
 
   const { path, startByte, amountOfLines } = data;
-  const APPROXIMATE_BYTES_PER_LINE = 150;
   const [fileSize] = await getFileInfo(path);
+  // .catch(error =>
+  //   console.error(error)
+  // );
+  const numberOfBytes = 30000;
+  let byteToReadFrom = startByte - 15000 < 0 ? 0 : startByte - 15000;
+  let cache = searchCache(path, startByte, amountOfLines);
 
-  let dataToReturn = {
-    lines: [],
-    linesEndAt: 0,
-    startByteOfLines: []
-  };
-  // Convert lines to amount of bytes using approximation
-  let bytesPerScreen = amountOfLines * APPROXIMATE_BYTES_PER_LINE;
-  let byteToReadFrom = startByte;
-
-  // If too few lines are returned and we have not
-  // reached the end of file, keep reading lines
-  while (
-    dataToReturn.lines.length < amountOfLines &&
-    dataToReturn.linesEndAt < fileSize
-  ) {
+  if (cache === 'miss') {
+    console.log('cache = miss');
     try {
-      let data = await fileReader.readDataFromByte(
+      const {
+        startByteOfLines,
+        lines,
+        linesStartAt,
+        linesEndAt
+      } = await fileReader.readDataFromByte(
         path,
-        byteToReadFrom < 0 ? 0 : byteToReadFrom,
-        bytesPerScreen
+        byteToReadFrom,
+        numberOfBytes
       );
 
-      // Save data
-      if (!dataToReturn.linesStartAt) {
-        dataToReturn.linesStartAt = data.linesStartAt;
+      updateCache(path, lines, startByteOfLines);
+
+      //Check for size
+      if (!checkIfCacheIsWithinSizeLimit()) {
+        flushCacheForOneFile(path);
+        updateCache(path, lines, startByteOfLines);
       }
-      dataToReturn.linesEndAt = data.linesEndAt;
-      dataToReturn.lines = dataToReturn.lines.concat(data.lines);
-      dataToReturn.startByteOfLines = dataToReturn.startByteOfLines.concat(
-        data.startByteOfLines
-      );
 
-      // Calculate next byte to read from
-      // Remove one byte to get one character from previous line,
-      // which will be discarded by the adapter
-      byteToReadFrom = dataToReturn.linesEndAt - 1;
+      cache = searchCache(path, byteToReadFrom, amountOfLines);
     } catch (error) {
       console.log({ readLinesStartingAtByte }, error);
     }
   }
 
-  // Checking that the amount of lines to return are not too many to be able to fit in the logview.
-  if (dataToReturn.lines.length > amountOfLines) {
-    dataToReturn.lines = dataToReturn.lines.slice(0, amountOfLines);
-  }
-  dataToReturn.lines = replaceEmptyLinesWithHiddenChar(dataToReturn.lines);
+  let { lines, startsAtByte } = cache;
+  lines = replaceEmptyLinesWithHiddenChar(lines);
 
+  const dataToReturn = { path, lines, startByteOfLines: startsAtByte };
   const action = {
     type: 'LOGLINES_FETCHED_FROM_BYTEPOSITION',
     data: { dataToReturn, path }
@@ -305,6 +298,9 @@ const createEventHandler = state => {
         break;
       case 'FETCH_LOGLINES_STARTING_AT_SCROLL_BYTE_POSITION':
         readLinesStartingAtByte(sender, _argObj.data);
+        // .catch(err =>
+        //   console.error(err)
+        // );
         break;
       default:
     }

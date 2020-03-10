@@ -19,11 +19,13 @@ const searchCache = (filepath, position, amountOfLines) => {
   const result = cache[filepath]
     ? cache[filepath].lines
         .filter(line => {
-          return line.startsAtByte > position;
+          return line.startsAtByte >= position;
         })
         .slice(0, amountOfLines)
     : [];
   if (result.length < amountOfLines) {
+    return 'miss';
+  } else if (_parseResult(result).startsAtByte[0] - position > 150) {
     return 'miss';
   } else {
     return _parseResult(result);
@@ -35,7 +37,6 @@ const updateCache = (filepath, lines, startByteOfLines) => {
 
   if (cache[filepath]) {
     let currentCacheLines = cache[filepath].lines;
-
     const newLinesStartsBeforeCurrentLines =
       cacheLines[0].startsAtByte < currentCacheLines[0].startsAtByte;
 
@@ -134,7 +135,7 @@ const addCurrentLinesBeforeAndAfterNewLines = (
   };
 };
 
-const flushCache = data => {
+const flushCache = () => {
   cache = {};
 };
 
@@ -142,9 +143,13 @@ const flushCacheForOneFile = filepath => {
   delete cache[filepath];
 };
 
-const checkIfCacheIsWithinSizeLimit = cache => {
+const cacheInit = cache;
+const checkIfCacheIsWithinSizeLimit = (cache = cacheInit) => {
   /*check if cache has reached the limit of 100mb (a hundred millon bytes)*/
   const cacheSize = Buffer.byteLength(JSON.stringify(cache), 'utf8');
+  // const sizeInMB = (cacheSize / (1024 * 1024)).toFixed(2);
+  const sizeInMB = (cacheSize * Math.pow(10, -6)).toFixed(2);
+  console.log('cacheSize ' + sizeInMB + 'mb');
   const sizeLimit = 100000000;
   return cacheSize < sizeLimit ? true : false;
 };
