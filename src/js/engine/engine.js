@@ -297,10 +297,9 @@ const createEventHandler = state => {
         loadStateFromDisk(state, sender);
         break;
       case 'FETCH_LOGLINES_STARTING_AT_SCROLL_BYTE_POSITION':
-        readLinesStartingAtByte(sender, _argObj.data);
-        // .catch(err =>
-        //   console.error(err)
-        // );
+        readLinesStartingAtByte(sender, _argObj.data).catch(err => {
+          console.error(err);
+        });
         break;
       default:
     }

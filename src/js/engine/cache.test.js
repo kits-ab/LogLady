@@ -197,25 +197,25 @@ describe('flushCache', () => {
   });
 });
 
-// describe('flushCacheForOneFile', () => {
-//   beforeEach(() => {
-//     updateCache(FILEPATH, LINES, STARTBYTEOFLINES);
-//   });
-//   afterEach(() => {
-//     flushCache();
-//   });
-//   it('should remove cache for one file', () => {
-//     const filepath = 'folder/file.log';
-//     const lines = ['rad 1', 'rad 2'];
-//     const startByteOfLines = [0, 2];
-//     const resultOnHit = {
-//       lines: ['rad 2'],
-//       startsAtByte: [2]
-//     };
-//     const resultOnMiss = 'miss';
-//     updateCache(filepath, lines, startByteOfLines);
-//     expect(searchCache(filepath, 0, 1)).toEqual(resultOnHit);
-//     flushCacheForOneFile(filepath);
-//     expect(searchCache(filepath, 0, 1)).toEqual(resultOnMiss);
-//   });
-// });
+describe('flushCacheForOneFile', () => {
+  beforeEach(() => {
+    updateCache(FILEPATH, LINES, STARTBYTEOFLINES);
+  });
+  afterEach(() => {
+    flushCache();
+  });
+  it('should remove cache for one file', () => {
+    const filepath = 'folder/file.log';
+    const lines = ['rad 1', 'rad 2'];
+    const startByteOfLines = [0, 2];
+    const resultOnHit = {
+      lines: ['rad 1'],
+      startsAtByte: [0]
+    };
+    const resultOnMiss = 'miss';
+    updateCache(filepath, lines, startByteOfLines);
+    expect(searchCache(filepath, 0, 1)).toEqual(resultOnHit);
+    flushCacheForOneFile(filepath);
+    expect(searchCache(filepath, 0, 1)).toEqual(resultOnMiss);
+  });
+});
