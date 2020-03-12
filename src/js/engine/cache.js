@@ -16,26 +16,21 @@
 
 let cache = {};
 
-const searchCache = (filepath, position, amountOfLines, fileSize) => {
-  // Kolla om raden med startbyten finns
-  // Alla rader som är större än startsAtByte kommer ju alltid att finnas..
+const searchCache = (filepath, position, amountOfLines) => {
   if (cache[filepath]) {
-    const firstIndexOfCacheStartByte = cache[filepath].lines[0].startsAtByte;
+    const positionIsOutsideOfCache = cache[filepath].cachedPartsInfo.every(
+      chunk => {
+        return position < chunk.startsAt || position > chunk.endsAt;
+      }
+    );
 
-    console.log({
-      filepath: cache[filepath].lines.startsAtByte,
-      firstIndexOfCacheStartByte
-    });
-    const lastIndexOfCacheStartByte =
-      cache[filepath].lines[cache[filepath].lines.length - 1].startsAtByte;
-    console.log({ lastIndexOfCacheStartByte });
-    if (
-      position < firstIndexOfCacheStartByte ||
-      position > lastIndexOfCacheStartByte
-    ) {
+    if (positionIsOutsideOfCache) {
       return 'miss';
     }
+  } else {
+    return 'miss';
   }
+
   const result = cache[filepath]
     ? cache[filepath].lines
         .filter(line => {
@@ -43,16 +38,14 @@ const searchCache = (filepath, position, amountOfLines, fileSize) => {
         })
         .slice(0, amountOfLines)
     : [];
-  console.log({ searchCache, amountOfLines, resultLength: result.length });
   return _parseResult(result);
 };
 
 const updateCache = (filepath, lines, startByteOfLines) => {
   let cacheLines = _formatCacheLines(lines, startByteOfLines);
-
+  let cachedPartsInfo = _formatCachedPartsInfo(startByteOfLines);
   if (cache[filepath]) {
     let currentCacheLines = cache[filepath].lines;
-
     const newLinesStartsBeforeCurrentLines =
       cacheLines[0].startsAtByte < currentCacheLines[0].startsAtByte;
 
@@ -70,84 +63,112 @@ const updateCache = (filepath, lines, startByteOfLines) => {
 
     if (newLinesStartsBeforeCurrentLines) {
       if (newLinesAreEntirelyBeforeCurrentLines) {
-        addNewLinesBeforeCurrentLines(filepath, cacheLines, currentCacheLines);
+        addNewLinesBeforeCurrentLines(filepath, cacheLines, cachedPartsInfo);
       } else {
         addNewLinesPartiallyBeforeCurrent(
           filepath,
           cacheLines,
-          currentCacheLines
+          currentCacheLines,
+          cachedPartsInfo
         );
       }
     } else if (newLinesEndAfterCurrentLines) {
       if (newLinesEndEntirelyAfterCurrentLines) {
-        addNewLinesAfterCurrentLines(filepath, cacheLines, currentCacheLines);
+        addNewLinesAfterCurrentLines(filepath, cacheLines, cachedPartsInfo);
       } else {
         addNewLinesEndingPartiallyAfterCurrent(
           filepath,
           cacheLines,
-          currentCacheLines
+          currentCacheLines,
+          cachedPartsInfo
         );
       }
     } else {
       addCurrentLinesBeforeAndAfterNewLines(
         filepath,
         cacheLines,
-        currentCacheLines
+        currentCacheLines,
+        cachedPartsInfo
       );
     }
   } else {
-    cache[filepath] = { lines: cacheLines };
+    cache[filepath] = { lines: cacheLines, cachedPartsInfo };
   }
 };
 
 const addNewLinesPartiallyBeforeCurrent = (
   filepath,
   cacheLines,
-  currentCacheLines
+  currentCacheLines,
+  cachedPartsInfo
 ) => {
   console.log('new is partially before current');
   const filteredLines = currentCacheLines.filter(line => {
     return line.startsAtByte > cacheLines[cacheLines.length - 1].startsAtByte;
   });
-  cache[filepath] = { lines: [...cacheLines, ...filteredLines] };
-};
 
-const addNewLinesBeforeCurrentLines = (filepath, cacheLines) => {
   cache[filepath] = {
-    lines: [...cacheLines, ...cache[filepath].lines]
+    lines: [...cacheLines, ...filteredLines],
+    cachedPartsInfo: [...cachedPartsInfo, ...cache[filepath].cachedPartsInfo]
   };
 };
 
-const addNewLinesAfterCurrentLines = (filepath, cacheLines) => {
-  cache[filepath] = { lines: [...cache[filepath].lines, ...cacheLines] };
+const addNewLinesBeforeCurrentLines = (
+  filepath,
+  cacheLines,
+  cachedPartsInfo
+) => {
+  cache[filepath] = {
+    lines: [...cacheLines, ...cache[filepath].lines],
+    cachedPartsInfo: [...cachedPartsInfo, ...cache[filepath].cachedPartsInfo]
+  };
+};
+
+const addNewLinesAfterCurrentLines = (
+  filepath,
+  cacheLines,
+  cachedPartsInfo
+) => {
+  cache[filepath] = {
+    lines: [...cache[filepath].lines, ...cacheLines],
+    cachedPartsInfo: [...cache[filepath].cachedPartsInfo, ...cachedPartsInfo]
+  };
 };
 
 const addNewLinesEndingPartiallyAfterCurrent = (
   filepath,
   cacheLines,
-  currentCacheLines
+  currentCacheLines,
+  cachedPartsInfo
 ) => {
   console.log('new ends partially after current');
   const filteredLines = currentCacheLines.filter(line => {
     return line.startsAtByte < cacheLines[0].startsAtByte;
   });
-  cache[filepath] = { lines: [...filteredLines, ...cacheLines] };
+  cache[filepath] = {
+    lines: [...filteredLines, ...cacheLines],
+    cachedPartsInfo: [...cache[filepath].cachedPartsInfo, ...cachedPartsInfo]
+  };
 };
 
 const addCurrentLinesBeforeAndAfterNewLines = (
   filepath,
   cacheLines,
-  currentCacheLines
+  currentCacheLines,
+  cachedPartsInfo
 ) => {
   console.log('new is contained within current');
+
   const filteredLinesStart = currentCacheLines.filter(line => {
     return line.startsAtByte < cacheLines[0].startsAtByte;
   });
   const filteredLinesEnd = currentCacheLines.filter(line => {
     return line.startsAtByte > cacheLines[cacheLines.length - 1].startsAtByte;
   });
+
   cache[filepath] = {
-    lines: [...filteredLinesStart, ...cacheLines, ...filteredLinesEnd]
+    lines: [...filteredLinesStart, ...cacheLines, ...filteredLinesEnd],
+    cachedPartsInfo: [...cachedPartsInfo, ...cache[filepath].cachedPartsInfo]
   };
 };
 
@@ -163,10 +184,8 @@ const cacheInit = cache;
 const checkIfCacheIsWithinSizeLimit = (cache = cacheInit) => {
   /*check if cache has reached the limit of 100mb (a hundred millon bytes)*/
   const cacheSize = Buffer.byteLength(JSON.stringify(cache), 'utf8');
-  const sizeInMB = (cacheSize * Math.pow(10, -6)).toFixed(2);
-  console.log('cacheSize ' + sizeInMB + 'mb');
   const sizeLimit = 100000000;
-  console.log({ withinLimit: cacheSize < sizeLimit });
+  // console.log({ withinLimit: cacheSize < sizeLimit });
   return cacheSize < sizeLimit ? true : false;
 };
 
@@ -174,6 +193,12 @@ const _formatCacheLines = (lines, startByteOfLines) => {
   return lines.map((line, index) => {
     return { line: line, startsAtByte: startByteOfLines[index] };
   });
+};
+
+const _formatCachedPartsInfo = startByteOfLines => {
+  const startsAt = startByteOfLines[0];
+  const endsAt = startByteOfLines[startByteOfLines.length - 1];
+  return [{ startsAt, endsAt }];
 };
 
 const _parseResult = result => {
