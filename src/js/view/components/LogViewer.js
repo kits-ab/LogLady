@@ -207,32 +207,30 @@ const LogViewer = props => {
 
   useEffect(() => {
     const wheelScrollEventHandler = event => {
-      let amountOfPositionsToScroll =
-        event.deltaY > 0
-          ? -meanByteValueOfCurrentLines
-          : meanByteValueOfCurrentLines;
+      const isVerticalScrollEvent = event.deltaY !== -0;
+      if (isVerticalScrollEvent) {
+        let amountOfPositionsToScroll =
+          event.deltaY > 0
+            ? -meanByteValueOfCurrentLines
+            : meanByteValueOfCurrentLines;
 
-      if (logViewerContainerRef.current) {
-        let newScrollPosition = scrollPosition + amountOfPositionsToScroll;
-        if (newScrollPosition > logSize) {
-          newScrollPosition = logSize;
-        } else if (newScrollPosition <= minScrollPositionValue) {
-          newScrollPosition = minScrollPositionValue;
+        if (logViewerContainerRef.current) {
+          let newScrollPosition = scrollPosition + amountOfPositionsToScroll;
+          if (newScrollPosition > logSize) {
+            newScrollPosition = logSize;
+          } else if (newScrollPosition <= minScrollPositionValue) {
+            newScrollPosition = minScrollPositionValue;
+          }
+
+          toggleTailSwitchToOffOnScrollWhenFileIsRunning(
+            tailSwitch,
+            logFileHasRunningStatus,
+            props.dispatch,
+            props.source.path
+          );
+
+          setScrollPosition(newScrollPosition);
         }
-        toggleTailSwitchToOffOnScrollWhenFileIsRunning(
-          tailSwitch,
-          logFileHasRunningStatus,
-          props.dispatch,
-          props.source.path
-        );
-
-        setScrollPosition(newScrollPosition);
-        console.log({
-          newScrollPosition,
-          minScrollPositionValue,
-          scrollPosition,
-          amountOfLinesInViewer: props.nrOfLinesInViewer
-        });
       }
     };
 
