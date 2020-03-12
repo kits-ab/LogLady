@@ -213,7 +213,7 @@ const readLinesStartingAtByte = async (sender, data) => {
   // );
   const numberOfBytes = 30000;
   let byteToReadFrom = startByte - 15000 < 0 ? 0 : startByte - 15000;
-  let cache = searchCache(path, startByte, amountOfLines, fileSize);
+  let cache = searchCache(path, startByte, amountOfLines);
 
   if (cache === 'miss') {
     console.log('cache = miss');
@@ -237,15 +237,13 @@ const readLinesStartingAtByte = async (sender, data) => {
         updateCache(path, lines, startByteOfLines);
       }
 
-      cache = searchCache(path, startByte, amountOfLines, fileSize);
-      console.log({ cache });
+      cache = searchCache(path, startByte, amountOfLines);
     } catch (error) {
       console.log({ readLinesStartingAtByte }, error);
     }
   }
 
   let { lines, startsAtByte } = cache;
-  // console.log({ lines });
   lines = replaceEmptyLinesWithHiddenChar(lines);
 
   const dataToReturn = { path, lines, startByteOfLines: startsAtByte };
