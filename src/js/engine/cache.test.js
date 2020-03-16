@@ -10,10 +10,7 @@ const FILEPATH = 'test/testfile';
 const LINES = ['rad 1', 'rad 2'];
 const STARTBYTEOFLINES = [10, 20];
 const POSITION = 15;
-//TODO: Make the tests work with the new search cache logic
-describe('', () => {
-  it('', () => {});
-});
+
 describe('searchCache', () => {
   beforeEach(() => {
     updateCache(FILEPATH, LINES, STARTBYTEOFLINES);

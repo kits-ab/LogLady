@@ -198,25 +198,13 @@ const handleShowOpenDialog = async (state, sender) => {
 };
 
 const readLinesStartingAtByte = async (sender, data) => {
-  // TODO:
-  // searchCache(filePath, position, amountOfLines) finns datan i cache? -> Returnera från cache
-  // finns datan inte i cache? -> läs in updateCache
-  // kolla strl på cache
-  // för stor -> flushCache -> updateCache
-  // strl ok -> searchCache
-  // Returnera resultatet från searchCache
-
   const { path, startByte, amountOfLines } = data;
   const [fileSize] = await getFileInfo(path);
-  // .catch(error =>
-  //   console.error(error)
-  // );
   const numberOfBytes = 30000;
   let byteToReadFrom = startByte - 15000 < 0 ? 0 : startByte - 15000;
-  let cache = searchCache(path, startByte, amountOfLines);
+  let cache = searchCache(path, startByte, amountOfLines, fileSize);
 
   if (cache === 'miss') {
-    console.log('cache = miss');
     try {
       const {
         startByteOfLines,
@@ -228,7 +216,6 @@ const readLinesStartingAtByte = async (sender, data) => {
         byteToReadFrom,
         numberOfBytes
       );
-
       updateCache(path, lines, startByteOfLines);
 
       // Check for size
@@ -237,7 +224,7 @@ const readLinesStartingAtByte = async (sender, data) => {
         updateCache(path, lines, startByteOfLines);
       }
 
-      cache = searchCache(path, startByte, amountOfLines);
+      cache = searchCache(path, startByte, amountOfLines, fileSize);
     } catch (error) {
       console.log({ readLinesStartingAtByte }, error);
     }

@@ -16,31 +16,44 @@
 
 let cache = {};
 
-const searchCache = (filepath, position, amountOfLines) => {
+const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
   if (cache[filepath]) {
-    const positionIsOutsideOfCache = cache[filepath].cachedPartsInfo.every(
-      chunk => {
-        return position < chunk.startsAt || position > chunk.endsAt;
-      }
-    );
+    const info = cache[filepath].cachedPartsInfo;
+    for (let part of info) {
+      const positionIsWithinLimit =
+        position >= part.startsAt && position <= part.endsAt;
+      if (positionIsWithinLimit) {
+        const filtered = part.startByteOfLines.filter(x => {
+          return x >= position;
+        });
+        console.log({
+          position,
+          amountOfLines,
+          filtLength: filtered.length
+        });
 
-    if (positionIsOutsideOfCache) {
-      return 'miss';
+        const result = cache[filepath].lines
+          .filter(line => {
+            return line.startsAtByte >= position;
+          })
+          .slice(0, amountOfLines);
+
+        if (amountOfLines > filtered.length) {
+          if (position >= fileSize - 30000) {
+            return _parseResult(result);
+          } else {
+            return 'miss';
+          }
+        } else {
+          return _parseResult(result);
+        }
+      }
     }
+    return 'miss';
   } else {
     return 'miss';
   }
-
-  const result = cache[filepath]
-    ? cache[filepath].lines
-        .filter(line => {
-          return line.startsAtByte >= position;
-        })
-        .slice(0, amountOfLines)
-    : [];
-  return _parseResult(result);
 };
-
 const updateCache = (filepath, lines, startByteOfLines) => {
   let cacheLines = _formatCacheLines(lines, startByteOfLines);
   let cachedPartsInfo = _formatCachedPartsInfo(startByteOfLines);
@@ -198,7 +211,7 @@ const _formatCacheLines = (lines, startByteOfLines) => {
 const _formatCachedPartsInfo = startByteOfLines => {
   const startsAt = startByteOfLines[0];
   const endsAt = startByteOfLines[startByteOfLines.length - 1];
-  return [{ startsAt, endsAt }];
+  return [{ startsAt, endsAt, startByteOfLines }];
 };
 
 const _parseResult = result => {
