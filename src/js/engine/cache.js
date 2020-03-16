@@ -26,11 +26,6 @@ const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
         const filtered = part.startByteOfLines.filter(x => {
           return x >= position;
         });
-        console.log({
-          position,
-          amountOfLines,
-          filtLength: filtered.length
-        });
 
         const result = cache[filepath].lines
           .filter(line => {
