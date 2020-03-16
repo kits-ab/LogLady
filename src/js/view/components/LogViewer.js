@@ -144,7 +144,6 @@ const LogViewer = props => {
 
   useEffect(() => {
     setScrollPosition(minScrollPositionValue);
-    console.log({ minScrollPositionValue });
   }, [minScrollPositionValue]);
 
   useEffect(() => {
