@@ -72,53 +72,6 @@ describe('countLinesInBuffer', () => {
 });
 
 describe('readDataFromByte', () => {
-  it('should return an object with the expected content', async () => {
-    const filePath = 'src/resources/logFileForTests';
-    const startReadFromByte = 0;
-    const numberOfBytes = 500;
-    const expectedResult = {
-      startByteOfLines: [0, 115, 232, 344],
-      lines: [
-        '2020-02-03 14:50:17.916  INFO  16639 --- [        Thread1] o.s.d.r.w.RepositoryRestHandlerAdapter   : Changed data',
-        '2020-02-03 14:50:18.252  INFO  379   --- [        Thread2] o.s.b.w.embedded.tomcat.TomcatWebServer  : info message 1',
-        '2020-02-03 14:50:18.588  INFO  3675  --- [        Thread1] o.s.d.r.w.RepositoryRestHandlerMapping   : Forbidden',
-        '2020-02-03 14:50:18.926  INFO  12772 --- [        Thread1] o.s.d.r.w.RepositoryRestHandlerMapping   : Changed data'
-      ],
-      linesStartAt: 0,
-      linesEndAt: 459
-    };
-    const testResult = await readDataFromByte(
-      filePath,
-      startReadFromByte,
-      numberOfBytes
-    );
-
-    expect(testResult).toEqual(expectedResult);
-  });
-
-  it('should not return first row when byte to read from starts after 0 and before new line', async () => {
-    const filePath = 'src/resources/logFileForTests';
-    const startReadFromByte = 20;
-    const numberOfBytes = 500;
-    const expectedResult = {
-      startByteOfLines: [115, 232, 344],
-      lines: [
-        '2020-02-03 14:50:18.252  INFO  379   --- [        Thread2] o.s.b.w.embedded.tomcat.TomcatWebServer  : info message 1',
-        '2020-02-03 14:50:18.588  INFO  3675  --- [        Thread1] o.s.d.r.w.RepositoryRestHandlerMapping   : Forbidden',
-        '2020-02-03 14:50:18.926  INFO  12772 --- [        Thread1] o.s.d.r.w.RepositoryRestHandlerMapping   : Changed data'
-      ],
-      linesStartAt: 115,
-      linesEndAt: 459
-    };
-    const testResult = await readDataFromByte(
-      filePath,
-      startReadFromByte,
-      numberOfBytes
-    );
-    expect(testResult.startByteOfLines[0]).not.toEqual(startReadFromByte);
-    expect(testResult).toEqual(expectedResult);
-  });
-
   it('should return result with startByteOfLines[0] and linesStartAt being the same value', async () => {
     const filePath = 'src/resources/logFileForTests';
     const startReadFromByte = 115;
@@ -156,13 +109,5 @@ describe('parseByteDataIntoStringArray', () => {
     );
     const expectedResult = ['hello', 'world', 'hello', 'world'];
     expect(result.lines).toEqual(expectedResult);
-  });
-});
-
-describe('getFileSizeInBytes', () => {
-  it('should return the correct size value', () => {
-    const actualFileSize = 394855;
-    const result = getFileSizeInBytes('src/resources/logFileForTests');
-    expect(result).toEqual(actualFileSize);
   });
 });
