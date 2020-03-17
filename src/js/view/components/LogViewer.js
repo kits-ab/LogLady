@@ -258,7 +258,6 @@ const LogViewer = props => {
           Math.round(logSize - scrollPosition),
           props.nrOfLinesInViewer
         );
-        let logSizeMinusScrollPos = Math.round(logSize - scrollPosition);
         // Save timeout so it can be cleared if needed
       }, 50);
       setCurrentTimeout(timeout);
