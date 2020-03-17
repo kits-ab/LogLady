@@ -1,19 +1,3 @@
-// Cache template
-// const cache = {
-//     sourcePath\1: {
-//         cachedPartsInfo: [{startsAt: 0, endsAt: 10}, {startsAt: 100, endsAt: 150}]
-//         lines: [{
-//             line: 'line text',
-//             startsAtByte: 123
-//         },
-//         {
-//             line: 'line text',
-//             startsAtByte: 234
-//         }
-//         ],
-//      ...
-//}
-
 let cache = {};
 
 const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
@@ -193,7 +177,6 @@ const checkIfCacheIsWithinSizeLimit = (cache = cacheInit) => {
   /*check if cache has reached the limit of 100mb (a hundred millon bytes)*/
   const cacheSize = Buffer.byteLength(JSON.stringify(cache), 'utf8');
   const sizeLimit = 100000000;
-  // console.log({ withinLimit: cacheSize < sizeLimit });
   return cacheSize < sizeLimit ? true : false;
 };
 

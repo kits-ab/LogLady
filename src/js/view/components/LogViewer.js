@@ -14,7 +14,6 @@ import _ from 'lodash';
 
 const debouncedFetchTextByBytePosition = _.debounce(
   (path, position, nrOfLines) => {
-    console.log({ debouncedFetchTextByBytePosition, position, nrOfLines });
     fetchTextBasedOnByteFromScrollPosition(
       path,
       Math.round(position),
@@ -260,7 +259,6 @@ const LogViewer = props => {
           props.nrOfLinesInViewer
         );
         let logSizeMinusScrollPos = Math.round(logSize - scrollPosition);
-        console.log({ logSizeMinusScrollPos });
         // Save timeout so it can be cleared if needed
       }, 50);
       setCurrentTimeout(timeout);
