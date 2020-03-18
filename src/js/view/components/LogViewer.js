@@ -59,7 +59,7 @@ const LogViewer = props => {
   const lastSeenLogSize = props.lastSeenLogSizes[props.source.path]
     ? props.lastSeenLogSizes[props.source.path]
     : 0;
-  const scrollPositionFromReducer = props.scrollPositions[props.source.path]
+  const scrollPosition = props.scrollPositions[props.source.path]
     ? props.scrollPositions[props.source.path]
     : 0;
   let meanByteValueOfCurrentLines = props.meanByteValuesOfLines[
@@ -221,8 +221,7 @@ const LogViewer = props => {
             : meanByteValueOfCurrentLines;
 
         if (logViewerContainerRef.current) {
-          let newScrollPosition =
-            scrollPositionFromReducer + amountOfPositionsToScroll;
+          let newScrollPosition = scrollPosition + amountOfPositionsToScroll;
           if (newScrollPosition > logSize) {
             newScrollPosition = logSize;
           } else if (newScrollPosition <= minScrollPositionValue) {
@@ -242,7 +241,6 @@ const LogViewer = props => {
             props.source.path,
             newScrollPosition
           );
-          console.log({ scrollPositionFromReducer });
         }
       }
     };
@@ -258,7 +256,7 @@ const LogViewer = props => {
         wheelScrollEventHandler
       );
     };
-  }, [scrollPositionFromReducer, logSize]);
+  }, [scrollPosition, logSize]);
 
   useEffect(() => {
     const readBytesHandler = () => {
@@ -270,7 +268,7 @@ const LogViewer = props => {
         //we need to calculate logsize - scrollPosition to invert the values and get the text in the right order.
         fetchTextBasedOnByteFromScrollPosition(
           props.source.path,
-          Math.round(logSize - scrollPositionFromReducer),
+          Math.round(logSize - scrollPosition),
           props.nrOfLinesInViewer
         );
         // Save timeout so it can be cleared if needed
@@ -287,7 +285,7 @@ const LogViewer = props => {
       );
     };
   }, [
-    scrollPositionFromReducer,
+    scrollPosition,
     currentTimeout,
     currentLogViewerContainerHeight,
     props.nrOfLinesInViewer
@@ -327,7 +325,7 @@ const LogViewer = props => {
         handleOnChange={handleCustomScrollBarOnChange}
         max={logSize}
         min={minScrollPositionValue}
-        value={scrollPositionFromReducer}
+        value={scrollPosition}
         step={1}
       />
     </LogViewerRootContainer>

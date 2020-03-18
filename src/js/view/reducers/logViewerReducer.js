@@ -119,7 +119,6 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     }
 
-    //updateScrollPosition action passed by Reducer
     case 'LOGVIEWER_UPDATE_SCROLL_POSITION': {
       const { sourcePath, scrollPosition } = action.data;
 
