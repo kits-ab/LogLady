@@ -296,7 +296,9 @@ const LogViewer = props => {
       props.dispatch,
       props.source.path
     );
+
     updateScrollPosition(props.dispatch, props.source.path, value);
+
     debouncedFetchTextByBytePosition(
       props.source.path,
       logSize - value,
@@ -337,8 +339,7 @@ const mapStateToProps = ({
     nrOfLinesInViewer,
     startByteOfLines,
     meanByteValuesOfInitialLines,
-    meanByteValuesOfLines,
-    scrollPositions
+    meanByteValuesOfLines
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -351,8 +352,7 @@ const mapStateToProps = ({
     nrOfLinesInViewer,
     startByteOfLines,
     meanByteValuesOfInitialLines,
-    meanByteValuesOfLines,
-    scrollPositions
+    meanByteValuesOfLines
   };
 };
 

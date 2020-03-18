@@ -176,7 +176,7 @@ describe('logviewer reducer', () => {
     };
 
     const action = {
-      type: 'LOGVIEWER_UPDATE_SCROLL_POSITION',
+      type: 'LOGVIEWER_UPDATE_CURRENT_NR_OF_LINES_IN_VIEWER',
       data: { sourcePath, scrollPosition }
     };
 
