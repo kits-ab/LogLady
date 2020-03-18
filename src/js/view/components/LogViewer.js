@@ -339,7 +339,8 @@ const mapStateToProps = ({
     nrOfLinesInViewer,
     startByteOfLines,
     meanByteValuesOfInitialLines,
-    meanByteValuesOfLines
+    meanByteValuesOfLines,
+    scrollPositions
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -352,7 +353,8 @@ const mapStateToProps = ({
     nrOfLinesInViewer,
     startByteOfLines,
     meanByteValuesOfInitialLines,
-    meanByteValuesOfLines
+    meanByteValuesOfLines,
+    scrollPositions
   };
 };
 
