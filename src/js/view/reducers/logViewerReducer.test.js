@@ -7,16 +7,13 @@ describe('logviewer reducer', () => {
       meanByteValuesOfInitialLines: {},
       meanByteValuesOfLines: {},
       startByteOfLines: {},
-      nrOfLinesInViewer: null,
-      scrollPositions: {}
+      nrOfLinesInViewer: null
     };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
   it('should reset all logs', () => {
     const state = { logs: ['lalala', 'lililil'] };
-    const expectedState = {
-      logs: {}
-    };
+    const expectedState = { logs: {} };
     const action = {
       type: 'LOGVIEWER_CLEAR'
     };
@@ -24,15 +21,14 @@ describe('logviewer reducer', () => {
   });
   it('should append lines to initial state', () => {
     const lines = ['hej1', 'hej2', 'hej3'];
-    const sourcePath = 'test';
     const expectedState = {
       logs: { test: ['hej1', 'hej2', 'hej3'] },
       meanByteValuesOfInitialLines: {},
       meanByteValuesOfLines: {},
       startByteOfLines: {},
-      nrOfLinesInViewer: null,
-      scrollPositions: {}
+      nrOfLinesInViewer: null
     };
+    const sourcePath = 'test';
 
     const action = {
       type: 'LOGVIEWER_ADD_LINES',
@@ -45,28 +41,19 @@ describe('logviewer reducer', () => {
   });
   it('should set log on source', () => {
     const log = ['hej4', 'hej5'];
-    const sourcePath = 'test';
     const startByteOfLines = [1, 2];
-    const scrollPosition = 10;
     // Size is zero to avoid ghost lines
     const size = 0;
     const state = {
-      logs: { test: ['hej1', 'hej2', 'hej3'] },
-      //logs: {},
-      scrollPositions: {
-        [sourcePath]: scrollPosition
-      }
+      logs: { test: ['hej1', 'hej2', 'hej3'] }
     };
     const expectedState = {
       logs: { test: ['hej4', 'hej5'] },
-      //logs: {},
       meanByteValuesOfInitialLines: { test: 1 },
       meanByteValuesOfLines: { test: 1 },
-      startByteOfLines: { test: [1, 2] },
-      scrollPositions: {
-        [sourcePath]: scrollPosition
-      }
+      startByteOfLines: { test: [1, 2] }
     };
+    const sourcePath = 'test';
     const action = {
       type: 'LOGVIEWER_SET_LOG',
       data: { sourcePath, log, size, startByteOfLines }
@@ -148,28 +135,24 @@ describe('logviewer reducer', () => {
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
-  it('should update scrollPosition in each log', () => {
-    const sourcePath = 'test';
-    const scrollPosition = 10;
+  it('should update the current number of lines in the viewer', () => {
+    const numberOfLinesToFillLogView = 10;
     const state = {
       logs: {},
       startByteOfLines: {},
-      scrollPositions: {
-        [sourcePath]: 0
-      }
+      nrOfLinesInViewer: 5
     };
     const expectedState = {
       logs: {},
       startByteOfLines: {},
-      scrollPositions: {
-        [sourcePath]: scrollPosition
-      }
+      nrOfLinesInViewer: 10
     };
 
     const action = {
-      type: 'LOGVIEWER_UPDATE_SCROLL_POSITION',
-      data: { sourcePath, scrollPosition }
+      type: 'LOGVIEWER_UPDATE_CURRENT_NR_OF_LINES_IN_VIEWER',
+      data: { numberOfLinesToFillLogView }
     };
+
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
 });

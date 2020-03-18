@@ -9,10 +9,7 @@ import CustomScrollBar from './CustomScrollBar';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
 import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
-import {
-  handleTailSwitch,
-  updateScrollPosition
-} from '../actions/dispatchActions';
+import { handleTailSwitch } from '../actions/dispatchActions';
 import _ from 'lodash';
 
 const debouncedFetchTextByBytePosition = _.debounce(
@@ -59,9 +56,6 @@ const LogViewer = props => {
   const lastSeenLogSize = props.lastSeenLogSizes[props.source.path]
     ? props.lastSeenLogSizes[props.source.path]
     : 0;
-  const scrollPosition = props.scrollPositions[props.source.path]
-    ? props.scrollPositions[props.source.path]
-    : 0;
   let meanByteValueOfCurrentLines = props.meanByteValuesOfLines[
     props.source.path
   ]
@@ -82,6 +76,7 @@ const LogViewer = props => {
     : 0;
 
   // Scroll position base is minScrollValue, top is logSize.
+  const [scrollPosition, setScrollPosition] = useState(minScrollPositionValue);
   const [filteredAndHighlightedLines, setLines] = useState([]);
   const [currentTimeout, setCurrentTimeout] = useState();
   const [currentLogViewerContainerHeight, setCurrentContainerHeight] = useState(
@@ -147,6 +142,10 @@ const LogViewer = props => {
   }, []);
 
   useEffect(() => {
+    setScrollPosition(minScrollPositionValue);
+  }, [minScrollPositionValue]);
+
+  useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
     if (props.logs[props.source.path]) {
@@ -174,11 +173,7 @@ const LogViewer = props => {
 
       // Checking if the follow switch is on and if the log file is running, then keep the scrollbar at the base to follow.
       if (tailSwitch && logFileHasRunningStatus) {
-        updateScrollPosition(
-          props.dispatch,
-          props.source.path,
-          minScrollPositionValue
-        );
+        setScrollPosition(minScrollPositionValue);
       }
     }
   }, [props.logs]);
@@ -190,11 +185,7 @@ const LogViewer = props => {
       (props.nrOfLinesInViewer - EMPTY_LINES_BELOW_LAST_LINE) *
       meanByteValueOfCurrentLines;
     if (logFileHasRunningStatus && tailSwitch) {
-      updateScrollPosition(
-        props.dispatch,
-        props.source.path,
-        minScrollPositionValue
-      );
+      setScrollPosition(minScrollPositionValue);
       debouncedFetchTextByBytePosition(
         props.source.path,
         logSize - BYTE_AMOUNT_TO_FETCH,
@@ -235,12 +226,7 @@ const LogViewer = props => {
             props.source.path
           );
 
-          //update scroll position when file is running ...
-          updateScrollPosition(
-            props.dispatch,
-            props.source.path,
-            newScrollPosition
-          );
+          setScrollPosition(newScrollPosition);
         }
       }
     };
@@ -298,8 +284,7 @@ const LogViewer = props => {
       props.dispatch,
       props.source.path
     );
-    //update scroll position in each scroll down or up for specific log
-    updateScrollPosition(props.dispatch, props.source.path, value);
+    setScrollPosition(value);
     debouncedFetchTextByBytePosition(
       props.source.path,
       logSize - value,
@@ -340,8 +325,7 @@ const mapStateToProps = ({
     nrOfLinesInViewer,
     startByteOfLines,
     meanByteValuesOfInitialLines,
-    meanByteValuesOfLines,
-    scrollPositions
+    meanByteValuesOfLines
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -354,8 +338,7 @@ const mapStateToProps = ({
     nrOfLinesInViewer,
     startByteOfLines,
     meanByteValuesOfInitialLines,
-    meanByteValuesOfLines,
-    scrollPositions
+    meanByteValuesOfLines
   };
 };
 
