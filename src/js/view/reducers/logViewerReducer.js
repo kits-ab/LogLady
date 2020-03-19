@@ -3,7 +3,8 @@ const initialState = {
   startByteOfLines: {},
   nrOfLinesInViewer: null,
   meanByteValuesOfInitialLines: {},
-  meanByteValuesOfLines: {}
+  meanByteValuesOfLines: {},
+  scrollPositions: {}
 };
 
 const calculateMeanValueOfBytesPerLine = startBytes => {
@@ -118,6 +119,17 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     }
 
+    case 'LOGVIEWER_UPDATE_SCROLL_POSITION': {
+      const { sourcePath, scrollPosition } = action.data;
+
+      return {
+        ...state,
+        scrollPositions: {
+          ...state.scrollPositions,
+          [sourcePath]: scrollPosition
+        }
+      };
+    }
     default:
       return state;
   }
