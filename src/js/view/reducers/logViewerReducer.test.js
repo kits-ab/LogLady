@@ -179,7 +179,6 @@ describe('logviewer reducer', () => {
       type: 'LOGVIEWER_UPDATE_SCROLL_POSITION',
       data: { sourcePath, scrollPosition }
     };
-
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
 });
