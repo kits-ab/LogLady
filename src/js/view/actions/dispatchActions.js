@@ -231,7 +231,6 @@ export const updateNumberOfLinesToRenderInLogView = (
   });
 };
 
-//updateScrollPosition action used to update scrollPosition on each log in independent way with other logs.
 export const updateScrollPosition = (dispatch, sourcePath, scrollPosition) => {
   dispatch({
     type: 'LOGVIEWER_UPDATE_SCROLL_POSITION',

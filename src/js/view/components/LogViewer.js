@@ -10,8 +10,8 @@ import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
 import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
 import {
-  handleTailSwitch,
-  updateScrollPosition
+  updateScrollPosition,
+  handleTailSwitch
 } from '../actions/dispatchActions';
 import _ from 'lodash';
 
@@ -81,7 +81,6 @@ const LogViewer = props => {
         AMOUNT_OF_LINES_FROM_BOTTOM
     : 0;
 
-  // Scroll position base is minScrollValue, top is logSize.
   const [filteredAndHighlightedLines, setLines] = useState([]);
   const [currentTimeout, setCurrentTimeout] = useState();
   const [currentLogViewerContainerHeight, setCurrentContainerHeight] = useState(
@@ -235,7 +234,6 @@ const LogViewer = props => {
             props.source.path
           );
 
-          //update scroll position when file is running ...
           updateScrollPosition(
             props.dispatch,
             props.source.path,
@@ -298,7 +296,6 @@ const LogViewer = props => {
       props.dispatch,
       props.source.path
     );
-    //update scroll position in each scroll down or up for specific log
     updateScrollPosition(props.dispatch, props.source.path, value);
     debouncedFetchTextByBytePosition(
       props.source.path,

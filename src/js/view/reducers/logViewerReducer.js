@@ -4,6 +4,7 @@ const initialState = {
   nrOfLinesInViewer: null,
   meanByteValuesOfInitialLines: {},
   meanByteValuesOfLines: {},
+  scrollPosition: null,
   scrollPositions: {}
 };
 
