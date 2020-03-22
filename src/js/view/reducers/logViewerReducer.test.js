@@ -7,7 +7,8 @@ describe('logviewer reducer', () => {
       meanByteValuesOfInitialLines: {},
       meanByteValuesOfLines: {},
       startByteOfLines: {},
-      nrOfLinesInViewer: null
+      nrOfLinesInViewer: null,
+      scrollPositions: {}
     };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
@@ -26,7 +27,8 @@ describe('logviewer reducer', () => {
       meanByteValuesOfInitialLines: {},
       meanByteValuesOfLines: {},
       startByteOfLines: {},
-      nrOfLinesInViewer: null
+      nrOfLinesInViewer: null,
+      scrollPositions: {}
     };
     const sourcePath = 'test';
 
@@ -151,6 +153,29 @@ describe('logviewer reducer', () => {
     const action = {
       type: 'LOGVIEWER_UPDATE_CURRENT_NR_OF_LINES_IN_VIEWER',
       data: { numberOfLinesToFillLogView }
+    };
+
+    expect(logViewerReducer(state, action)).toEqual(expectedState);
+  });
+  it('should update the scroll position in each log', () => {
+    const sourcePath = 'test';
+    const scrollPosition = 10;
+    const state = {
+      logs: {},
+      scrollPositions: {
+        [sourcePath]: 0
+      }
+    };
+    const expectedState = {
+      logs: {},
+      scrollPositions: {
+        [sourcePath]: scrollPosition
+      }
+    };
+
+    const action = {
+      type: 'LOGVIEWER_UPDATE_SCROLL_POSITION',
+      data: { sourcePath, scrollPosition }
     };
 
     expect(logViewerReducer(state, action)).toEqual(expectedState);
