@@ -2,10 +2,49 @@ const { createReadStream, statSync, open, close, read, stat } = require('fs');
 const createBackwardsStream = require('fs-backwards-stream');
 const chokidar = require('chokidar');
 
-let watchers = [];
+let watchers = {};
 
 const isLF = b => {
   return b === 10;
+};
+
+//start a watcher and read the new lines starting from the last newline index
+//whenever there is a change to the file.
+const followFile = (filePath, startIndex, onLines, onError) => {
+  let currentIndex = startIndex;
+
+  if (watchers[filePath] !== undefined) {
+    watchers[filePath].close();
+  }
+
+  /* UsePolling gives better results while the file is appended continously, but might give a hit to performance */
+  let watcher = chokidar.watch(filePath, {
+    persistent: true,
+    usePolling: true
+  });
+
+  watcher.on('change', async () => {
+    currentIndex = await readTail(filePath, currentIndex, onLines, onError);
+  });
+
+  watchers[filePath] = watcher;
+};
+
+const stopWatcher = filePath => {
+  try {
+    watchers[filePath].close();
+    delete watchers[filePath];
+    return `successfully closed watcher on file ${filePath}`; //if we want to send a confirmation to the frontend.
+  } catch (err) {
+    return err;
+  }
+};
+
+const stopAllWatchers = () => {
+  for (var key in watchers) {
+    watchers[key].close();
+  }
+  watchers = {};
 };
 
 const readTail = (filePath, startIndex, onLines, onError) => {
@@ -38,48 +77,6 @@ const readTail = (filePath, startIndex, onLines, onError) => {
   });
 };
 
-//start a watcher and read the new lines starting from the last newline index
-//whenever there is a change to the file.
-const followFile = (filePath, startIndex, onLines, onError) => {
-  let currentIndex = startIndex;
-
-  if (watchers[filePath] !== undefined) {
-    watchers[filePath].close();
-  }
-
-  /* UsePolling gives better results while the file is appended continously, but might give a hit to performance */
-  let watcher = chokidar.watch(filePath, {
-    persistent: true,
-    usePolling: true
-  });
-
-  watcher.on('change', async () => {
-    currentIndex = await readTail(filePath, currentIndex, onLines, onError);
-  });
-
-  watchers[filePath] = watcher;
-};
-
-/**parseLinesBackwards
- * @param {string} chunk
- * @param {string} trailingChars are any unused characters from the previous chunk
- * @returns {[string[], string]}
- */
-const parseLinesBackwards = (chunk, trailingChars) => {
-  // Move over the previous chunk character to check for CRLF
-  if (trailingChars.length > 0) {
-    chunk = chunk + trailingChars[0];
-    trailingChars = trailingChars.slice(1);
-  }
-
-  const lines = chunk.split(/\r?\n/);
-  lines[lines.length - 1] += trailingChars;
-  const unusedChars = lines[0];
-  lines.shift();
-
-  return [lines, unusedChars];
-};
-
 /**
  * parseLines parses a string into an array of lines, and also returns any unused characters
  * @param {string} chunk
@@ -99,64 +96,6 @@ const parseLines = (chunk, trailingChars) => {
   lines.pop();
 
   return [lines, unusedChars];
-};
-
-const stopAllWatchers = () => {
-  for (var key in watchers) {
-    watchers[key].close();
-  }
-  watchers = {};
-};
-
-const stopWatcher = filePath => {
-  try {
-    watchers[filePath].close();
-    delete watchers[filePath];
-    return `successfully closed watcher on file ${filePath}`; //if we want to send a confirmation to the frontend.
-  } catch (err) {
-    return err;
-  }
-};
-
-const readNLastLines = (filePath, numberOfLines, endIndex) => {
-  return new Promise((resolve, reject) => {
-    let unusedChars = '';
-    let result = [];
-    let backwardsStream = createBackwardsStream(filePath, {
-      start: endIndex - 1
-    });
-    backwardsStream
-      .on('data', buffer => {
-        const chunk = buffer.toString('utf-8');
-        const [lines, trailingChars] = parseLinesBackwards(chunk, unusedChars);
-        unusedChars = trailingChars;
-        if (lines.length > 0) {
-          if (result.length + lines.length >= numberOfLines) {
-            const offset = lines.length - (numberOfLines - result.length);
-            result = [...lines.slice(Math.max(offset, 0)), ...result];
-            backwardsStream.emit('end');
-            return;
-          }
-          result = [...lines, ...result];
-        }
-      })
-      .on('end', () => {
-        if (result.length < numberOfLines && unusedChars) {
-          result.unshift(unusedChars);
-        }
-
-        resolve([
-          result,
-          calculateStartByteOfLinesBackwards(
-            result,
-            getFileSizeInBytes(filePath)
-          )
-        ]);
-      })
-      .on('error', err => {
-        reject(err);
-      });
-  });
 };
 
 const getLastNewLineIndex = (filePath, endIndex) => {
@@ -186,16 +125,6 @@ const getLastNewLineIndex = (filePath, endIndex) => {
   });
 };
 
-const countLinesInBuffer = buffer => {
-  let lineCount = 0;
-
-  for (let i = -1; i < buffer.length; i++) {
-    if (isLF(buffer[i])) lineCount++;
-  }
-
-  return lineCount;
-};
-
 //This will count the lines until the end index, if the file is big this will take a lot of time!
 const getLineCount = (filePath, endIndex) => {
   return new Promise((resolve, reject) => {
@@ -214,11 +143,19 @@ const getLineCount = (filePath, endIndex) => {
   });
 };
 
+const countLinesInBuffer = buffer => {
+  let lineCount = 0;
+  for (let i = -1; i < buffer.length; i++) {
+    if (isLF(buffer[i])) lineCount++;
+  }
+  return lineCount;
+};
+
 const getFileSizeInBytes = filePath => {
   return statSync(filePath).size;
 };
 
-const readDataFromByte = (filePath, start, numberOfBytes) => {
+const readDataFromByte = (filePath, startReadFromByte, numberOfBytes) => {
   return new Promise((resolve, reject) => {
     stat(filePath, function(error, stats) {
       if (error) {
@@ -231,7 +168,7 @@ const readDataFromByte = (filePath, start, numberOfBytes) => {
         }
 
         var buffer = Buffer.alloc(numberOfBytes);
-        read(fd, buffer, 0, buffer.length, start, function(
+        read(fd, buffer, 0, buffer.length, startReadFromByte, function(
           error,
           bytesRead,
           buffer
@@ -249,7 +186,7 @@ const readDataFromByte = (filePath, start, numberOfBytes) => {
           resolve(
             parseByteDataIntoStringArrayWithStartByteOfLines(
               data,
-              start,
+              startReadFromByte,
               numberOfBytes
             )
           );
@@ -312,42 +249,24 @@ const extractStartByteOfLinesFromByteData = (lines, linesStartAt) => {
   const BYTE_FOR_MISSING_NEWLINE = 1;
   let startByteOfLines = [];
   let currentLineStartByte = linesStartAt;
-  for (const line of lines) {
+  lines.forEach(line => {
     startByteOfLines.push(currentLineStartByte);
-    currentLineStartByte =
-      currentLineStartByte +
-      Buffer.byteLength(line, 'utf8') +
-      BYTE_FOR_MISSING_NEWLINE;
-  }
-  return startByteOfLines;
-};
-
-const calculateStartByteOfLinesBackwards = (lines, filesize) => {
-  const BYTE_FOR_MISSING_NEWLINE = 1;
-
-  let reversedLines = [...lines].reverse();
-  let startByteOfLines = [];
-  let currentLineStartByte =
-    filesize - Buffer.byteLength(reversedLines[0] + BYTE_FOR_MISSING_NEWLINE);
-  for (const line of reversedLines) {
-    startByteOfLines.unshift(currentLineStartByte);
-    currentLineStartByte =
-      currentLineStartByte -
-      (Buffer.byteLength(line, 'utf8') + BYTE_FOR_MISSING_NEWLINE);
-  }
+    currentLineStartByte +=
+      Buffer.byteLength(line, 'utf8') + BYTE_FOR_MISSING_NEWLINE;
+  });
   return startByteOfLines;
 };
 
 module.exports = {
-  readNLastLines,
   getLineCount,
   followFile,
-  parseLinesBackwards,
   countLinesInBuffer,
   parseLines,
   getFileSizeInBytes,
   getLastNewLineIndex,
   stopWatcher,
   stopAllWatchers,
-  readDataFromByte
+  readDataFromByte,
+  extractStartByteOfLinesFromByteData,
+  parseByteDataIntoStringArray
 };

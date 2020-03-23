@@ -4,6 +4,14 @@ const { ipcMain, dialog } = require('electron');
 const { createMenu } = require('../electron/menu');
 const ipcChannel = 'backendMessages';
 const { addRecentFile } = require('./../helpers/recentFilesHelper');
+const {
+  createCache,
+  searchCache,
+  updateCache,
+  flushCache,
+  checkIfCacheIsWithinSizeLimit,
+  flushCacheForOneFile
+} = require('./cache');
 
 const updateRecentFiles = recentFiles => {
   createMenu(recentFiles);
@@ -11,14 +19,27 @@ const updateRecentFiles = recentFiles => {
 };
 
 const getFileInfo = async filePath => {
-  const fileSize = await fileReader.getFileSizeInBytes(filePath);
-  const endIndex = fileReader.getLastNewLineIndex(filePath, fileSize);
+  const fileSize = fileReader.getFileSizeInBytes(filePath);
+  const endIndex = await fileReader.getLastNewLineIndex(filePath, fileSize);
 
   return Promise.all([fileSize, endIndex]);
 };
 
-const getFileHistory = (filePath, endIndex, numberOfLines) => {
-  return fileReader.readNLastLines(filePath, numberOfLines, endIndex);
+const getFileHistory = async (filePath, fileSize) => {
+  const NR_OF_BYTES = 30000;
+  const START_READ_FROM_BYTE =
+    fileSize - NR_OF_BYTES <= 0 ? 0 : fileSize - NR_OF_BYTES;
+  const {
+    startByteOfLines,
+    lines,
+    linesStartAt,
+    linesEndAt
+  } = await fileReader.readDataFromByte(
+    filePath,
+    START_READ_FROM_BYTE,
+    NR_OF_BYTES
+  );
+  return { startByteOfLines, lines, linesStartAt, linesEndAt };
 };
 
 const sendSourcePicked = (sender, sourcePath) => {
@@ -70,11 +91,14 @@ const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
     sendSourcePicked(sender, filePath);
-    const [history, startByteOfLines] = await getFileHistory(
-      filePath,
-      endIndex,
-      10
-    );
+    const {
+      startByteOfLines,
+      lines,
+      linesStartAt,
+      linesEndAt
+    } = await getFileHistory(filePath, fileSize);
+
+    updateCache(filePath, lines, startByteOfLines);
 
     //Lines in history that contains empty spaces does not display properly. replaceEmptyLinesWithHiddenChar(history) returns an array where this has been taken care of by replacing each space with a hidden character, and makes those lines display correctly in LogViewer.
     sendFileOpened(
@@ -82,8 +106,8 @@ const openFile = async (sender, filePath) => {
       filePath,
       fileSize,
       endIndex,
-      replaceEmptyLinesWithHiddenChar(history),
-      startByteOfLines
+      replaceEmptyLinesWithHiddenChar(lines.slice(lines.length - 10)),
+      startByteOfLines.slice(startByteOfLines.length - 10)
     );
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
@@ -153,7 +177,6 @@ const handleFollowFile = (sender, { filePath, fromIndex }) => {
   };
 
   const onError = sendError(sender, "Couldn't keep following source");
-
   fileReader.followFile(filePath, fromIndex, onLines, onError);
 };
 
@@ -175,53 +198,42 @@ const handleShowOpenDialog = async (state, sender) => {
 };
 
 const readLinesStartingAtByte = async (sender, data) => {
-  const APPROXIMATE_BYTES_PER_LINE = 150;
   const { path, startByte, amountOfLines } = data;
   const [fileSize] = await getFileInfo(path);
+  const numberOfBytes = 30000;
+  let byteToReadFrom = startByte - 15000 < 0 ? 0 : startByte - 15000;
+  let cache = searchCache(path, startByte, amountOfLines, fileSize);
 
-  let dataToReturn = {
-    lines: [],
-    linesEndAt: 0,
-    startByteOfLines: []
-  };
-  // Convert lines to amount of bytes using approximation
-  let bytesPerScreen = amountOfLines * APPROXIMATE_BYTES_PER_LINE;
-  let byteToReadFrom = startByte;
+  if (cache === 'miss') {
+    try {
+      const {
+        startByteOfLines,
+        lines,
+        linesStartAt,
+        linesEndAt
+      } = await fileReader.readDataFromByte(
+        path,
+        byteToReadFrom,
+        numberOfBytes
+      );
+      updateCache(path, lines, startByteOfLines);
 
-  // If too few lines are returned and we have not
-  // reached the end of file, keep reading lines
-  while (
-    dataToReturn.lines.length < amountOfLines &&
-    dataToReturn.linesEndAt < fileSize
-  ) {
-    let data = await fileReader.readDataFromByte(
-      path,
-      byteToReadFrom,
-      bytesPerScreen
-    );
+      // Check for size
+      if (!checkIfCacheIsWithinSizeLimit()) {
+        flushCacheForOneFile(path);
+        updateCache(path, lines, startByteOfLines);
+      }
 
-    // Save data
-    if (!dataToReturn.linesStartAt) {
-      dataToReturn.linesStartAt = data.linesStartAt;
+      cache = searchCache(path, startByte, amountOfLines, fileSize);
+    } catch (error) {
+      console.log({ readLinesStartingAtByte }, error);
     }
-    dataToReturn.linesEndAt = data.linesEndAt;
-    dataToReturn.lines = dataToReturn.lines.concat(data.lines);
-    dataToReturn.startByteOfLines = dataToReturn.startByteOfLines.concat(
-      data.startByteOfLines
-    );
-
-    // Calculate next byte to read from
-    // Remove one byte to get one character from previous line,
-    // which will be discarded by the adapter
-    byteToReadFrom = dataToReturn.linesEndAt - 1;
   }
 
-  // Checking that the amount of lines to return are not too many to be able to fit in the logview.
-  if (dataToReturn.lines.length > amountOfLines) {
-    dataToReturn.lines = dataToReturn.lines.slice(0, amountOfLines);
-  }
-  dataToReturn.lines = replaceEmptyLinesWithHiddenChar(dataToReturn.lines);
+  let { lines, startsAtByte } = cache;
+  lines = replaceEmptyLinesWithHiddenChar(lines);
 
+  const dataToReturn = { path, lines, startByteOfLines: startsAtByte };
   const action = {
     type: 'LOGLINES_FETCHED_FROM_BYTEPOSITION',
     data: { dataToReturn, path }
@@ -272,7 +284,9 @@ const createEventHandler = state => {
         loadStateFromDisk(state, sender);
         break;
       case 'FETCH_LOGLINES_STARTING_AT_SCROLL_BYTE_POSITION':
-        readLinesStartingAtByte(sender, _argObj.data);
+        readLinesStartingAtByte(sender, _argObj.data).catch(err => {
+          console.error(err);
+        });
         break;
       default:
     }
