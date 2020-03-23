@@ -6,7 +6,7 @@ Custom scrollbar created from fabric-ui slider component.
 With this we are able to connect the position of the slider thumb to specific bytes in the file. 
 */
 
-const CustomScrollBar = props => {
+const CustomScrollBar = ({ min, max, onChange, step, value }) => {
   // All elements of the slider that can have their styles overridden.
   const overrideStyles = {
     activeSection: { backgroundColor: 'transparent' },
@@ -44,15 +44,15 @@ const CustomScrollBar = props => {
 
   return (
     <Slider
-      min={props.min}
-      max={props.max}
+      min={min}
+      max={max}
       onChange={value => {
-        props.handleOnChange(value);
+        onChange(value);
       }}
       showValue={false}
-      step={props.step}
+      step={step}
       styles={overrideStyles}
-      value={props.value}
+      value={value}
       vertical
     />
   );

@@ -16,10 +16,10 @@ import {
 import _ from 'lodash';
 
 const debouncedFetchTextByBytePosition = _.debounce(
-  (path, bytesToRead, nrOfLines) => {
+  (path, position, nrOfLines) => {
     fetchTextBasedOnByteFromScrollPosition(
       path,
-      Math.round(bytesToRead),
+      Math.round(position),
       nrOfLines
     );
   },
@@ -70,7 +70,7 @@ const LogViewer = props => {
 
   // Calculating nrOfLinesInViewer * meanByteValues for a line in the file,
   // in order to make the base value of the scroll responsive to the size of the viewer
-  // and the current file line lenghts.
+  // and the current file line lengths.
   const AMOUNT_OF_LINES_FROM_BOTTOM = 5;
   const minScrollPositionValue = props.meanByteValuesOfInitialLines[
     props.source.path
@@ -188,6 +188,7 @@ const LogViewer = props => {
     const BYTE_AMOUNT_TO_FETCH =
       (props.nrOfLinesInViewer - EMPTY_LINES_BELOW_LAST_LINE) *
       meanByteValueOfCurrentLines;
+    const position = logSize - BYTE_AMOUNT_TO_FETCH;
     if (logFileHasRunningStatus && tailSwitch) {
       updateScrollPosition(
         props.dispatch,
@@ -196,7 +197,7 @@ const LogViewer = props => {
       );
       debouncedFetchTextByBytePosition(
         props.source.path,
-        logSize - BYTE_AMOUNT_TO_FETCH,
+        position,
         props.nrOfLinesInViewer
       );
     }
@@ -319,7 +320,7 @@ const LogViewer = props => {
         />
       </LogViewerContainer>
       <CustomScrollBar
-        handleOnChange={handleCustomScrollBarOnChange}
+        onChange={handleCustomScrollBarOnChange}
         max={logSize}
         min={minScrollPositionValue}
         value={scrollPosition}
