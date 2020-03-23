@@ -5,10 +5,8 @@ const { createMenu } = require('../electron/menu');
 const ipcChannel = 'backendMessages';
 const { addRecentFile } = require('./../helpers/recentFilesHelper');
 const {
-  createCache,
   searchCache,
   updateCache,
-  flushCache,
   checkIfCacheIsWithinSizeLimit,
   flushCacheForOneFile
 } = require('./cache');
@@ -26,7 +24,7 @@ const getFileInfo = async filePath => {
 };
 
 const getFileHistory = async (filePath, fileSize) => {
-  const NR_OF_BYTES = 30000;
+  const NR_OF_BYTES = 60000;
   const START_READ_FROM_BYTE =
     fileSize - NR_OF_BYTES <= 0 ? 0 : fileSize - NR_OF_BYTES;
   const {
@@ -39,6 +37,7 @@ const getFileHistory = async (filePath, fileSize) => {
     START_READ_FROM_BYTE,
     NR_OF_BYTES
   );
+
   return { startByteOfLines, lines, linesStartAt, linesEndAt };
 };
 
@@ -74,6 +73,25 @@ const sendFileOpened = async (
   };
 
   sender.send(ipcChannel, action);
+  sendLineCount(filePath, sender);
+};
+
+const sendLineCount = async (filePath, sender) => {
+  fileReader
+    .getLineCount(filePath)
+    .then(nrOfLines => {
+      const action = {
+        type: 'LINE_AMOUNT_CALCULATED',
+        data: {
+          filePath,
+          nrOfLines
+        }
+      };
+      sender.send(ipcChannel, action);
+    })
+    .catch(err => {
+      console.log({ sendLineCount, err });
+    });
 };
 
 // Invisible character U+2800 being used in line.replace
@@ -106,8 +124,8 @@ const openFile = async (sender, filePath) => {
       filePath,
       fileSize,
       endIndex,
-      replaceEmptyLinesWithHiddenChar(lines.slice(lines.length - 10)),
-      startByteOfLines.slice(startByteOfLines.length - 10)
+      replaceEmptyLinesWithHiddenChar(lines.slice(lines.length / 2)),
+      startByteOfLines.slice(startByteOfLines.length / 2)
     );
   } catch (error) {
     sendError(sender, "Couldn't read file", error);

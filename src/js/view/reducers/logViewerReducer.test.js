@@ -4,11 +4,8 @@ describe('logviewer reducer', () => {
   it('should return the initial state', () => {
     const initialState = {
       logs: {},
-      meanByteValuesOfInitialLines: {},
-      meanByteValuesOfLines: {},
       startByteOfLines: {},
-      nrOfLinesInViewer: null,
-      scrollPositions: {}
+      nrOfLinesOfOpenFiles: {}
     };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
@@ -24,11 +21,8 @@ describe('logviewer reducer', () => {
     const lines = ['hej1', 'hej2', 'hej3'];
     const expectedState = {
       logs: { test: ['hej1', 'hej2', 'hej3'] },
-      meanByteValuesOfInitialLines: {},
-      meanByteValuesOfLines: {},
       startByteOfLines: {},
-      nrOfLinesInViewer: null,
-      scrollPositions: {}
+      nrOfLinesOfOpenFiles: {}
     };
     const sourcePath = 'test';
 
@@ -51,8 +45,6 @@ describe('logviewer reducer', () => {
     };
     const expectedState = {
       logs: { test: ['hej4', 'hej5'] },
-      meanByteValuesOfInitialLines: { test: 1 },
-      meanByteValuesOfLines: { test: 1 },
       startByteOfLines: { test: [1, 2] }
     };
     const sourcePath = 'test';
@@ -80,56 +72,18 @@ describe('logviewer reducer', () => {
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
-  it('should replace lines when overflowing viewer', () => {
-    const lines = ['hej4', 'hej5'];
-    const state = {
-      logs: { test: ['hej1', 'hej2', 'hej3'] },
-      nrOfLinesInViewer: 3
-    };
-    const expectedState = {
-      logs: { test: ['hej3', 'hej4', 'hej5'] },
-      nrOfLinesInViewer: 3
-    };
-    const sourcePath = 'test';
-    const followTail = true;
-    const action = {
-      type: 'LOGVIEWER_ADD_LINES',
-      data: { sourcePath, lines, followTail }
-    };
-    expect(logViewerReducer(state, action)).toEqual(expectedState);
-  });
-  it('should not replace lines when not following tail', () => {
-    const lines = ['hej4', 'hej5'];
-    const state = {
-      logs: { test: ['hej1', 'hej2', 'hej3'] },
-      nrOfLinesInViewer: 3
-    };
-    const expectedState = {
-      logs: { test: ['hej1', 'hej2', 'hej3', 'hej4', 'hej5'] },
-      nrOfLinesInViewer: 3
-    };
-    const sourcePath = 'test';
-    const followTail = false;
-    const action = {
-      type: 'LOGVIEWER_ADD_LINES',
-      data: { sourcePath, lines, followTail }
-    };
-    expect(logViewerReducer(state, action)).toEqual(expectedState);
-  });
+
   it('should add lines and metadata from byte position to initial state', () => {
     const lines = ['hej1', 'hej2'];
     const sourcePath = 'test';
     const startByteOfLines = [1, 2];
     const state = {
       logs: {},
-      startByteOfLines: {},
-      nrOfLinesInViewer: 2
+      startByteOfLines: {}
     };
     const expectedState = {
       logs: { test: ['hej1', 'hej2'] },
-      meanByteValuesOfLines: { test: 1 },
-      startByteOfLines: { test: [1, 2] },
-      nrOfLinesInViewer: 2
+      startByteOfLines: { test: [1, 2] }
     };
     const action = {
       type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION',
@@ -137,47 +91,23 @@ describe('logviewer reducer', () => {
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
-  it('should update the current number of lines in the viewer', () => {
-    const numberOfLinesToFillLogView = 10;
+  it('should set the calculated number of lines of the open files', () => {
     const state = {
-      logs: {},
-      startByteOfLines: {},
-      nrOfLinesInViewer: 5
+      logs: { test: ['hej1', 'hej2', 'hej3'] },
+      startByteOfLines: { test: [1, 2, 3] },
+      nrOfLinesOfOpenFiles: {}
     };
     const expectedState = {
-      logs: {},
-      startByteOfLines: {},
-      nrOfLinesInViewer: 10
+      logs: { test: ['hej1', 'hej2', 'hej3'] },
+      startByteOfLines: { test: [1, 2, 3] },
+      nrOfLinesOfOpenFiles: { test: 10 }
     };
-
-    const action = {
-      type: 'LOGVIEWER_UPDATE_CURRENT_NR_OF_LINES_IN_VIEWER',
-      data: { numberOfLinesToFillLogView }
-    };
-
-    expect(logViewerReducer(state, action)).toEqual(expectedState);
-  });
-  it('should update the scroll position in each log', () => {
     const sourcePath = 'test';
-    const scrollPosition = 10;
-    const state = {
-      logs: {},
-      scrollPositions: {
-        [sourcePath]: 0
-      }
-    };
-    const expectedState = {
-      logs: {},
-      scrollPositions: {
-        [sourcePath]: scrollPosition
-      }
-    };
-
+    const nrOfLines = 10;
     const action = {
-      type: 'LOGVIEWER_UPDATE_SCROLL_POSITION',
-      data: { sourcePath, scrollPosition }
+      type: 'ADD_CALCULATED_LINE_AMOUNT_FOR_FILE',
+      data: { sourcePath, nrOfLines }
     };
-
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
 });
