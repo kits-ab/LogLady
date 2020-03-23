@@ -5,7 +5,8 @@ import {
   addNewLines,
   increaseSize,
   setLastSeenLogSizeToSize,
-  addLinesFetchedFromBytePosition
+  addLinesFetchedFromBytePosition,
+  addCalculatedAmountOfLines
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
@@ -67,12 +68,8 @@ const handleFileOpened = (
   sendRequestToBackend(followSource);
 };
 
-const handleNewLines = (dispatch, { sourcePath, lines, size }, state) => {
-  let followTail = state.topPanelState.settings[sourcePath]
-    ? state.topPanelState.settings[sourcePath].tailSwitch
-    : true;
-
-  addNewLines(dispatch, sourcePath, lines, followTail);
+const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
+  addNewLines(dispatch, sourcePath, lines);
   increaseSize(dispatch, sourcePath, size);
 };
 
@@ -85,6 +82,10 @@ const handleLinesFromBytePosition = (dispatch, { dataToReturn, path }) => {
     dataToReturn.linesEndAt,
     path
   );
+};
+
+const handleLineAmount = (dispatch, { filePath, nrOfLines }) => {
+  addCalculatedAmountOfLines(dispatch, filePath, nrOfLines);
 };
 
 const handleError = (dispatch, { message, error }) => {
@@ -108,6 +109,9 @@ export const ipcListener = (store, publisher) => {
         break;
       case 'SOURCE_OPENED':
         handleSourceOpened(dispatch, action.data);
+        break;
+      case 'LINE_AMOUNT_CALCULATED':
+        handleLineAmount(dispatch, action.data);
         break;
       case 'ERROR':
         handleError(dispatch, action.data);

@@ -6,7 +6,6 @@ import {
   LogLineRuler
 } from '../styledComponents/LogViewerListStyledComponents';
 import SingleLogLineTranslator from './SingleLogLine';
-import { updateNumberOfLinesToRenderInLogView } from '../actions/dispatchActions';
 import _ from 'lodash';
 import { List } from 'office-ui-fabric-react';
 
@@ -37,10 +36,6 @@ const LogViewerList = props => {
     width: 10,
     height: 19
   });
-
-  const [numberOfLinesToFillLogView, setNumberOfLinesToFillLogView] = useState(
-    Math.round(props.containerHeight / characterDimensions.height)
-  );
 
   // Itemdata used to send needed props and state from this component to the pure component that renders a single line
   const itemData = createItemData(
@@ -93,10 +88,10 @@ const LogViewerList = props => {
     let index = lastLineCount;
     for (; index < props.lines.length; index++) {
       // Remove all of the stuff hiddenWindow has added to it, as they shouldn't count towards the length of the string
-      let lineWithoutExtrasLength = props.lines[index].replace(
-        /\[\/?HL[LG\d]+\]/g,
-        ''
-      ).length;
+      let lineWithoutExtrasLength =
+        props.lines[index] !== undefined
+          ? props.lines[index].replace(/\[\/?HL[LG\d]+\]/g, '').length
+          : null;
       if (lineWithoutExtrasLength > currentMaxLength) {
         currentMaxLength = lineWithoutExtrasLength;
       }
@@ -105,20 +100,6 @@ const LogViewerList = props => {
     setCurrentMaxLineLength(currentMaxLength);
     setLastLineCount(index);
   }, [props.lines]);
-
-  useEffect(() => {
-    // Calculating the amount of lines needed to fill the page in the logviewer
-    setNumberOfLinesToFillLogView(
-      Math.round(props.containerHeight / characterDimensions.height)
-    );
-  }, [props.containerHeight, characterDimensions]);
-
-  useEffect(() => {
-    updateNumberOfLinesToRenderInLogView(
-      props.dispatcher,
-      numberOfLinesToFillLogView
-    );
-  }, [numberOfLinesToFillLogView]);
 
   const _onRenderCell = (item, index) => {
     return (

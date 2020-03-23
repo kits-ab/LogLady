@@ -221,19 +221,12 @@ export const addLinesFetchedFromBytePosition = (
   });
 };
 
-export const updateNumberOfLinesToRenderInLogView = (
-  dispatch,
-  numberOfLinesToFillLogView
-) => {
+export const addCalculatedAmountOfLines = (dispatch, sourcePath, nrOfLines) => {
   dispatch({
-    type: 'LOGVIEWER_UPDATE_CURRENT_NR_OF_LINES_IN_VIEWER',
-    data: { numberOfLinesToFillLogView }
-  });
-};
-
-export const updateScrollPosition = (dispatch, sourcePath, scrollPosition) => {
-  dispatch({
-    type: 'LOGVIEWER_UPDATE_SCROLL_POSITION',
-    data: { sourcePath, scrollPosition }
+    type: 'ADD_CALCULATED_LINE_AMOUNT_FOR_FILE',
+    data: {
+      sourcePath,
+      nrOfLines
+    }
   });
 };

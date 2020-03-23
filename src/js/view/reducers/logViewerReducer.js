@@ -1,16 +1,7 @@
 const initialState = {
   logs: {},
   startByteOfLines: {},
-  nrOfLinesInViewer: null,
-  meanByteValuesOfInitialLines: {},
-  meanByteValuesOfLines: {},
-  scrollPositions: {}
-};
-
-const calculateMeanValueOfBytesPerLine = startBytes => {
-  return Math.round(
-    (startBytes[startBytes.length - 1] - startBytes[0]) / startBytes.length
-  );
+  nrOfLinesOfOpenFiles: {}
 };
 
 export const logViewerReducer = (state = initialState, action) => {
@@ -36,63 +27,43 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_SET_LOG': {
       console.log('SETTING');
       const { sourcePath, log, startByteOfLines } = action.data;
-      let meanByteValueOfInitialLines = calculateMeanValueOfBytesPerLine(
-        startByteOfLines
-      );
+
       return {
         ...state,
         logs: { ...state.logs, [sourcePath]: log },
         startByteOfLines: {
           ...state.startByteOfLines,
           [sourcePath]: [...startByteOfLines]
-        },
-        meanByteValuesOfInitialLines: {
-          ...state.meanByteValuesOfInitialLines,
-          [sourcePath]: meanByteValueOfInitialLines
-        },
-        meanByteValuesOfLines: {
-          ...state.meanByteValuesOfLines,
-          [sourcePath]: meanByteValueOfInitialLines
+        }
+      };
+    }
+    case 'ADD_CALCULATED_LINE_AMOUNT_FOR_FILE': {
+      console.log('ADDING LINE AMOUNT');
+      const { sourcePath, nrOfLines } = action.data;
+      return {
+        ...state,
+        nrOfLinesOfOpenFiles: {
+          ...state.nrOfLinesOfOpenFiles,
+          [sourcePath]: nrOfLines
         }
       };
     }
     case 'LOGVIEWER_ADD_LINES': {
       console.log('ADDING');
-      const { sourcePath, lines, followTail } = action.data;
+      const { sourcePath, lines } = action.data;
       const log = state.logs[sourcePath] ? state.logs[sourcePath] : [];
-      const newLength = log.length + lines.length;
-
-      let newLines = [];
-      if (followTail) {
-        // If we are following tail and have not filled the screen,
-        // append new lines to logs. If the screen is filled, removes
-        // lines from the beginning of the logs and add to the
-        // end of them.
-        newLines =
-          newLength > state.nrOfLinesInViewer
-            ? log.slice(lines.length).concat(lines)
-            : log.concat(lines);
-      } else {
-        // If we are not following tail, but have not filled the screen
-        // we are at the bottom of the file and should update the logs
-        newLines =
-          log.length <= state.nrOfLinesInViewer ? log.concat(lines) : log;
-      }
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: [...newLines]
+          [sourcePath]: [...log, ...lines]
         }
       };
     }
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION': {
-      console.log('ADDING FROM BYTE POS');
+      console.log('ADDING LINES FROM BYTE POS');
       const { lines, sourcePath, startByteOfLines } = action.data;
-      let meanByteValueOfLines = calculateMeanValueOfBytesPerLine(
-        startByteOfLines
-      );
 
       return {
         ...state,
@@ -103,33 +74,10 @@ export const logViewerReducer = (state = initialState, action) => {
         startByteOfLines: {
           ...state.startByteOfLines,
           [sourcePath]: [...startByteOfLines]
-        },
-        meanByteValuesOfLines: {
-          ...state.meanByteValuesOfLines,
-          [sourcePath]: meanByteValueOfLines
         }
       };
     }
-    case 'LOGVIEWER_UPDATE_CURRENT_NR_OF_LINES_IN_VIEWER': {
-      const { numberOfLinesToFillLogView } = action.data;
 
-      return {
-        ...state,
-        nrOfLinesInViewer: numberOfLinesToFillLogView
-      };
-    }
-
-    case 'LOGVIEWER_UPDATE_SCROLL_POSITION': {
-      const { sourcePath, scrollPosition } = action.data;
-
-      return {
-        ...state,
-        scrollPositions: {
-          ...state.scrollPositions,
-          [sourcePath]: scrollPosition
-        }
-      };
-    }
     default:
       return state;
   }
