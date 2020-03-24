@@ -77,6 +77,19 @@ export const logViewerReducer = (state = initialState, action) => {
         }
       };
     }
+    case 'LOGVIEWER_SET_CACHE': {
+      console.log('SETTING INITIAL CACHE');
+      const { sourcePath, emptyLines } = action.data;
+      const log = state.logs[sourcePath] ? state.logs[sourcePath] : [];
+
+      return {
+        ...state,
+        logs: {
+          ...state.logs,
+          [sourcePath]: [...emptyLines, ...log]
+        }
+      };
+    }
 
     default:
       return state;
