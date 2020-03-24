@@ -16,6 +16,7 @@ import {
 import { closeFile, showOpenDialog } from './helpers/handleFileHelper';
 import Mousetrap from 'mousetrap';
 import { Stack, IconButton } from 'office-ui-fabric-react';
+import ArrowDownward from 'rmdi/lib/ArrowDownward';
 
 /**
  * Helper function to get actual modulo operation, as %-operator doesn't quite fit the bill
@@ -172,7 +173,10 @@ function customRenderer(
               openSources[source].index === currentSourceHandle ? true : false
             }
             activity={logSize !== lastSeenLogSize ? true : false}
-          />
+            viewBox="0 0 80 80"
+          >
+            <ArrowDownward size={80} color="#2e86de" />
+          </Indicator>
         </div>
       </span>
     );
