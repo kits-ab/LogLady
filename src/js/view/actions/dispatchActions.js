@@ -230,3 +230,13 @@ export const addCalculatedAmountOfLines = (dispatch, sourcePath, nrOfLines) => {
     }
   });
 };
+
+export const setInitialCache = (dispatch, sourcePath, emptyLines) => {
+  dispatch({
+    type: 'LOGVIEWER_SET_CACHE',
+    data: {
+      sourcePath,
+      emptyLines
+    }
+  });
+};

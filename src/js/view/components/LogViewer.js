@@ -4,9 +4,18 @@ import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponent
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
-import { initializeCache } from './helpers/cacheHelper';
-import { scrollToBottom } from './helpers/logHelper';
+// import { initializeCache } from './helpers/cacheHelper';
+import { setInitialCache } from '../actions/dispatchActions';
 
+const replaceEmptyLinesWithHiddenChar = arr => {
+  const regexList = [/^\s*$/];
+  return arr.map(line => {
+    const isMatch = regexList.some(rx => {
+      return rx.test(line);
+    });
+    return isMatch ? line.replace(regexList[0], '⠀') : line;
+  });
+};
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
     ? props.settings[props.source.path].filterInput
@@ -26,9 +35,9 @@ const LogViewer = props => {
   const logSize = props.logSizes[props.source.path]
     ? props.logSizes[props.source.path]
     : 0;
-  const nrOfLinesInFile = props.nrOfLinesOfOpenFiles[props.source.path]
-    ? props.nrOfLinesOfOpenFiles[props.source.path]
-    : 0;
+  // const startByteOfLines = props.startByteOfLines[props.source.path]
+  //   ? props.startByteOfLines[props.source.path]
+  //   : [];
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
 
@@ -76,31 +85,6 @@ const LogViewer = props => {
     };
   }, []);
 
-  // TODO: 1: when total amount of lines are calculated, add invisible lines to top to make the scrollbar have the right size.
-
-  // TODO: 2: Make the scrollbar scroll to bottom at start and when following a file.
-
-  // TODO: 3: Send a request for more lines if it is getting close to the start or the end of the lines.
-
-  // TODO: 4: Make the filtering feature work. Some kind of auto refill of the lines while scrolling?
-
-  // useEffect(() => {
-  //   const extraLinesLength =
-  //     nrOfLinesInFile - filteredAndHighlightedLines.length < 0
-  //       ? 0
-  //       : nrOfLinesInFile - filteredAndHighlightedLines.length;
-  //   const initalArray = [
-  //     ...new Array(extraLinesLength),
-  //     ...filteredAndHighlightedLines
-  //   ];
-  //   setLines(initalArray);
-  //   console.log({
-  //     extraLinesLength,
-  //     initalArrayLength: initalArray.length,
-  //     filteredLinesLength: filteredAndHighlightedLines.length
-  //   });
-  // }, [nrOfLinesInFile, props.logs[props.source.path]]);
-
   useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
@@ -136,6 +120,32 @@ const LogViewer = props => {
       logs: props.logs[props.source.path]
     });
   }, [props.source.path]);
+
+  // TODO: 1: when total amount of lines are calculated, itialize cache and add invisible lines to top of list, (dispatch to redux?) the scrollbar should scale to proper size. (small?)
+
+  // TODO: 2: Make the scrollbar scroll to bottom when first opening a file, and when following a file. (small?)
+
+  // TODO: 3: Depending on nr 1. Send a request for more lines if it is getting close to the start or the end of the list lines that contains the log text.
+  //          Add those rows to frontend cache in redux. (large?)
+
+  // TODO: 4: Depending on nr 3. Make the filtering feature work. Some kind of auto refill of the lines while scrolling? (large?)
+
+  useEffect(() => {
+    // Effect for adding the correct amount of empty lines above the initial log lines. Should make the scrollbar scale to the right height for the file size.
+    const nrOfLinesInFile = props.nrOfLinesOfOpenFiles[props.source.path];
+    if (props.logs[props.source.path]) {
+      const lengthOfListitems = props.logs[props.source.path].length;
+      if (nrOfLinesInFile > 0 && lengthOfListitems !== nrOfLinesInFile) {
+        const emptyLines = new Array(nrOfLinesInFile - lengthOfListitems).fill(
+          '.',
+          0
+        );
+
+        console.log(emptyLines.length, { lengthOfListitems, nrOfLinesInFile });
+        setInitialCache(props.dispatch, props.source.path, emptyLines);
+      }
+    }
+  }, [props.nrOfLinesOfOpenFiles[props.source.path]]);
 
   return (
     <LogViewerContainer ref={logViewerContainerRef}>
