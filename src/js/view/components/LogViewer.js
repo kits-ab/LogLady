@@ -7,15 +7,6 @@ import { parseRegExp } from './helpers/regexHelper';
 // import { initializeCache } from './helpers/cacheHelper';
 import { setInitialCache } from '../actions/dispatchActions';
 
-const replaceEmptyLinesWithHiddenChar = arr => {
-  const regexList = [/^\s*$/];
-  return arr.map(line => {
-    const isMatch = regexList.some(rx => {
-      return rx.test(line);
-    });
-    return isMatch ? line.replace(regexList[0], '⠀') : line;
-  });
-};
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
     ? props.settings[props.source.path].filterInput
@@ -43,6 +34,7 @@ const LogViewer = props => {
 
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
   const logViewerContainerRef = useRef();
+  const viewerListRef = useRef(null);
 
   const sendMessageToHiddenWindow = args => {
     /* Send a message to the hidden window that it should filter the logs.
@@ -150,7 +142,6 @@ const LogViewer = props => {
   return (
     <LogViewerContainer ref={logViewerContainerRef}>
       <LogViewerList
-        data-is-scrollable={true}
         key={props.source.index}
         dispatcher={props.dispatch}
         highlightColor={highlightColor}

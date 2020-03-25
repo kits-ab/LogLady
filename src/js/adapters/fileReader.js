@@ -133,6 +133,7 @@ const getLineCount = (filePath, endIndex) => {
     createReadStream(filePath, { end: endIndex })
       .on('data', chunk => {
         lineCount += countLinesInBuffer(chunk);
+        if (lineCount > 2000) resolve(lineCount);
       })
       .on('end', () => {
         resolve(lineCount);
