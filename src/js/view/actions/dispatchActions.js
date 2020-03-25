@@ -240,3 +240,10 @@ export const setInitialCache = (dispatch, sourcePath, emptyLines) => {
     }
   });
 };
+
+export const setTailSwitch = (dispatch, data) => {
+  dispatch({
+    type: 'LOGVIEWER_SET_TAILSWITCH',
+    data: data
+  });
+};

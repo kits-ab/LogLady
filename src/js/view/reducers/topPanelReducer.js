@@ -12,13 +12,25 @@ export const topPanelReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'tailSwitch': {
       const { sourcePath } = action.data;
-
       return {
         settings: {
           ...state.settings,
           [sourcePath]: {
             ...state.settings[sourcePath],
             tailSwitch: !state.settings[sourcePath].tailSwitch
+          }
+        }
+      };
+    }
+
+    case 'LOGVIEWER_SET_TAILSWITCH': {
+      const { sourcePath, isScrollerAtTheBottom } = action.data;
+      return {
+        settings: {
+          ...state.settings,
+          [sourcePath]: {
+            ...state.settings[sourcePath],
+            tailSwitch: isScrollerAtTheBottom
           }
         }
       };
