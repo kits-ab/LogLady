@@ -5,7 +5,7 @@ import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
 // import { initializeCache } from './helpers/cacheHelper';
-import { setInitialCache } from '../actions/dispatchActions';
+import { setInitialCache, setTailSwitch } from '../actions/dispatchActions';
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -139,8 +139,36 @@ const LogViewer = props => {
     }
   }, [props.nrOfLinesOfOpenFiles[props.source.path]]);
 
+  const scroller = useRef(logViewerContainerRef);
+
+  useEffect(() => {
+    //Effect for scrolling opened file to bottom
+    scroller.current.scrollTo(0, scroller.current.scrollHeight);
+  }, [props.source.path]);
+
+  useEffect(() => {
+    //Effect for scrolling to bottom when switching on tailswitch
+    if (tailSwitch) {
+      scroller.current.scrollTo(0, scroller.current.scrollHeight);
+    }
+  }, [filteredAndHighlightedLines, tailSwitch]);
+
+  useEffect(() => {
+    //Effect to set tailswitch to true when scrolling or clicking at the bottom
+    scroller.current.addEventListener('wheel', () => {
+      const isScrollerAtTheBottom =
+        scroller.current.scrollHeight ===
+        scroller.current.clientHeight + scroller.current.scrollTop;
+
+      setTailSwitch(props.dispatch, {
+        sourcePath: props.source.path,
+        isScrollerAtTheBottom
+      });
+    });
+  }, [props.source.path]);
+
   return (
-    <LogViewerContainer ref={logViewerContainerRef}>
+    <LogViewerContainer ref={scroller}>
       <LogViewerList
         key={props.source.index}
         dispatcher={props.dispatch}
