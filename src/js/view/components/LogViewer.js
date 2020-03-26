@@ -26,6 +26,9 @@ const LogViewer = props => {
   const logSize = props.logSizes[props.source.path]
     ? props.logSizes[props.source.path]
     : 0;
+  const lengthOfFetch = props.lengthOfInitialLineArrays[props.source.path]
+    ? props.lengthOfInitialLineArrays[props.source.path]
+    : 0;
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
 
@@ -210,7 +213,12 @@ const LogViewer = props => {
 const mapStateToProps = ({
   topPanelState: { settings },
   settingsState: { tabSettings },
-  logViewerState: { logs, startByteOfLines, nrOfLinesOfOpenFiles },
+  logViewerState: {
+    logs,
+    startByteOfLines,
+    nrOfLinesOfOpenFiles,
+    lengthOfInitialLineArrays
+  },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
   return {
@@ -220,7 +228,8 @@ const mapStateToProps = ({
     logSizes,
     lastSeenLogSizes,
     startByteOfLines,
-    nrOfLinesOfOpenFiles
+    nrOfLinesOfOpenFiles,
+    lengthOfInitialLineArrays
   };
 };
 
