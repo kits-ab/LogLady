@@ -1,11 +1,27 @@
-// TODO: Make function for calculating the position in the file based on the percentage position of the scrollbar.
 export const calculatePositionInFile = (
   scrollTop,
-  offsetHeight,
   clientHeight,
-  scrollheight,
-  fileSize
-) => {};
+  scrollHeight,
+  logSize
+) => {
+  const scrollPosPercent = getScrollPositionInPercent(
+    scrollTop,
+    scrollHeight,
+    clientHeight
+  );
+
+  const positionInFile = getBytePositionInFile(logSize, scrollPosPercent);
+
+  return positionInFile;
+};
+
+const getScrollPositionInPercent = (scrollTop, scrollHeight, clientHeight) => {
+  return (scrollTop / (scrollHeight - clientHeight)) * 100;
+};
+
+const getBytePositionInFile = (logSize, scrollPosPercent) => {
+  return Math.round((logSize / 100) * scrollPosPercent);
+};
 
 export const initializeCache = cache_size => {
   const insertRows = (cacheList, startIndex, contentList) => {
@@ -25,13 +41,6 @@ export const initializeCache = cache_size => {
     const numberOfEmptyItemsAtEnd =
       totalLength - startIndex - itemsToAdd.length;
 
-    console.log({
-      cache_size,
-      totalLength,
-      startIndex,
-      numberOfEmptyItemsAtEnd,
-      itemsToAddLength: itemsToAdd.length
-    });
     const addAtEnd =
       numberOfEmptyItemsAtEnd <= 0 ? [] : new Array(numberOfEmptyItemsAtEnd);
 
