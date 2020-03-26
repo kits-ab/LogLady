@@ -1,3 +1,12 @@
+// TODO: Make function for calculating the position in the file based on the percentage position of the scrollbar.
+export const calculatePositionInFile = (
+  scrollTop,
+  offsetHeight,
+  clientHeight,
+  scrollheight,
+  fileSize
+) => {};
+
 export const initializeCache = cache_size => {
   const insertRows = (cacheList, startIndex, contentList) => {
     const totalLength = cacheList.length;

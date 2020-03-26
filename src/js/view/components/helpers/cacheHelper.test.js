@@ -1,4 +1,4 @@
-import { initializeCache } from './cacheHelper';
+import { initializeCache, calculatePositionInFile } from './cacheHelper';
 
 const cache = initializeCache(2);
 
@@ -37,3 +37,11 @@ test('4 adds multiple rows starting at index', () => {
     nextResultList
   );
 });
+
+// TODO: make test for position calculation function
+// describe('calculatePositonInFile', () => {
+//   it('should return the byte position of the file based on the position of the scroller', () => {
+//     const result = calculatePositionInFile();
+//     const expectedResult = null;
+//   });
+// });
