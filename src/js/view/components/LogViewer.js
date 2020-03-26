@@ -4,7 +4,7 @@ import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponent
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
-// import { initializeCache } from './helpers/cacheHelper';
+import { calculatePositionInFile } from './helpers/cacheHelper';
 import { setInitialCache, setTailSwitch } from '../actions/dispatchActions';
 
 const LogViewer = props => {
@@ -104,6 +104,7 @@ const LogViewer = props => {
   useEffect(() => {
     /* Effect for when another source is selected,
     to send the correct lines to be filtered and highlighted and update the ref to be the correct source */
+
     sendMessageToHiddenWindow({
       logs: props.logs[props.source.path]
     });
@@ -125,6 +126,30 @@ const LogViewer = props => {
       }
     }
   }, [props.nrOfLinesOfOpenFiles[props.source.path]]);
+
+  // TODO: Use this to fetch new text from engine in a smart way.
+  useEffect(() => {
+    // Effect for handling calculation of the current position in the file based on the scroll position value (percentage from top).
+    // Might need another dependency than the logSize value later on.
+    if (logSize > 0) {
+      const handleScrollPositionEvent = () => {
+        calculatePositionInFile(
+          scroller.current.scrollTop,
+          scroller.current.clientHeight,
+          scroller.current.scrollHeight,
+          logSize
+        );
+      };
+      scroller.current.addEventListener('scroll', handleScrollPositionEvent);
+
+      return () => {
+        scroller.current.removeEventListener(
+          'scroll',
+          handleScrollPositionEvent
+        );
+      };
+    }
+  }, [logSize]);
 
   useEffect(() => {
     //Effect to set tailswitch to true when scrolling or clicking at the bottom
@@ -151,7 +176,7 @@ const LogViewer = props => {
     scroller.current.addEventListener('scroll', handleScrollEvent);
 
     return () => {
-      scroller.current.removeEventListener('scroll', handleScrollEvent());
+      scroller.current.removeEventListener('scroll', handleScrollEvent);
     };
   }, [props.source.path]);
 
