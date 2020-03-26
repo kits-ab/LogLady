@@ -26,15 +26,11 @@ const LogViewer = props => {
   const logSize = props.logSizes[props.source.path]
     ? props.logSizes[props.source.path]
     : 0;
-  // const startByteOfLines = props.startByteOfLines[props.source.path]
-  //   ? props.startByteOfLines[props.source.path]
-  //   : [];
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
 
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
-  const logViewerContainerRef = useRef();
-  const viewerListRef = useRef(null);
+  const scroller = useRef(); // A ref on the logViewerContainer used to keep track of scroll values.
 
   const sendMessageToHiddenWindow = args => {
     /* Send a message to the hidden window that it should filter the logs.
@@ -113,17 +109,8 @@ const LogViewer = props => {
     });
   }, [props.source.path]);
 
-  // TODO: 1: when total amount of lines are calculated, itialize cache and add invisible lines to top of list, (dispatch to redux?) the scrollbar should scale to proper size. (small?)
-
-  // TODO: 2: Make the scrollbar scroll to bottom when first opening a file, and when following a file. (small?)
-
-  // TODO: 3: Depending on nr 1. Send a request for more lines if it is getting close to the start or the end of the list lines that contains the log text.
-  //          Add those rows to frontend cache in redux. (large?)
-
-  // TODO: 4: Depending on nr 3. Make the filtering feature work. Some kind of auto refill of the lines while scrolling? (large?)
-
   useEffect(() => {
-    // Effect for adding the correct amount of empty lines above the initial log lines. Should make the scrollbar scale to the right height for the file size.
+    // Effect for adding the correct amount of empty lines above the initial log lines.
     const nrOfLinesInFile = props.nrOfLinesOfOpenFiles[props.source.path];
     if (props.logs[props.source.path]) {
       const lengthOfListitems = props.logs[props.source.path].length;
@@ -132,14 +119,41 @@ const LogViewer = props => {
           '.',
           0
         );
-
-        console.log(emptyLines.length, { lengthOfListitems, nrOfLinesInFile });
         setInitialCache(props.dispatch, props.source.path, emptyLines);
+        // scroll to bottom
+        scroller.current.scrollTo(0, scroller.current.scrollHeight);
       }
     }
   }, [props.nrOfLinesOfOpenFiles[props.source.path]]);
 
-  const scroller = useRef(logViewerContainerRef);
+  useEffect(() => {
+    //Effect to set tailswitch to true when scrolling or clicking at the bottom
+    const handleScrollEvent = () => {
+      const isScrollerAtTheBottom =
+        scroller.current.scrollHeight ===
+        scroller.current.clientHeight + scroller.current.scrollTop;
+
+      if (isScrollerAtTheBottom) {
+        setTailSwitch(props.dispatch, {
+          sourcePath: props.source.path,
+          isScrollerAtTheBottom // true
+        });
+      } else {
+        if (tailSwitch) {
+          setTailSwitch(props.dispatch, {
+            sourcePath: props.source.path,
+            isScrollerAtTheBottom // false
+          });
+        }
+      }
+    };
+
+    scroller.current.addEventListener('scroll', handleScrollEvent);
+
+    return () => {
+      scroller.current.removeEventListener('scroll', handleScrollEvent());
+    };
+  }, [props.source.path]);
 
   useEffect(() => {
     //Effect for scrolling opened file to bottom
@@ -152,20 +166,6 @@ const LogViewer = props => {
       scroller.current.scrollTo(0, scroller.current.scrollHeight);
     }
   }, [filteredAndHighlightedLines, tailSwitch]);
-
-  useEffect(() => {
-    //Effect to set tailswitch to true when scrolling or clicking at the bottom
-    scroller.current.addEventListener('wheel', () => {
-      const isScrollerAtTheBottom =
-        scroller.current.scrollHeight ===
-        scroller.current.clientHeight + scroller.current.scrollTop;
-
-      setTailSwitch(props.dispatch, {
-        sourcePath: props.source.path,
-        isScrollerAtTheBottom
-      });
-    });
-  }, [props.source.path]);
 
   return (
     <LogViewerContainer ref={scroller}>
