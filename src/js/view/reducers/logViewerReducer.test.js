@@ -5,7 +5,8 @@ describe('logviewer reducer', () => {
     const initialState = {
       logs: {},
       startByteOfLines: {},
-      nrOfLinesOfOpenFiles: {}
+      nrOfLinesOfOpenFiles: {},
+      lengthOfInitialLineArrays: {}
     };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
@@ -22,7 +23,8 @@ describe('logviewer reducer', () => {
     const expectedState = {
       logs: { test: ['hej1', 'hej2', 'hej3'] },
       startByteOfLines: {},
-      nrOfLinesOfOpenFiles: {}
+      nrOfLinesOfOpenFiles: {},
+      lengthOfInitialLineArrays: {}
     };
     const sourcePath = 'test';
 
@@ -45,7 +47,8 @@ describe('logviewer reducer', () => {
     };
     const expectedState = {
       logs: { test: ['hej4', 'hej5'] },
-      startByteOfLines: { test: [1, 2] }
+      startByteOfLines: { test: [1, 2] },
+      lengthOfInitialLineArrays: { test: 2 }
     };
     const sourcePath = 'test';
     const action = {

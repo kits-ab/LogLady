@@ -1,7 +1,8 @@
 const initialState = {
   logs: {},
   startByteOfLines: {},
-  nrOfLinesOfOpenFiles: {}
+  nrOfLinesOfOpenFiles: {},
+  lengthOfInitialLineArrays: {}
 };
 
 export const logViewerReducer = (state = initialState, action) => {
@@ -34,9 +35,14 @@ export const logViewerReducer = (state = initialState, action) => {
         startByteOfLines: {
           ...state.startByteOfLines,
           [sourcePath]: [...startByteOfLines]
+        },
+        lengthOfInitialLineArrays: {
+          ...state.lengthOfInitialLineArrays,
+          [sourcePath]: log.length
         }
       };
     }
+
     case 'ADD_CALCULATED_LINE_AMOUNT_FOR_FILE': {
       console.log('ADDING LINE AMOUNT');
       const { sourcePath, nrOfLines } = action.data;
