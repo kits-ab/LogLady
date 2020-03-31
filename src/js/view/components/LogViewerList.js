@@ -130,12 +130,19 @@ const LogViewerList = props => {
     );
   };
 
+  //listRef is used to get the reference to the List object so that we can use its method forceUpdate
+  const listRef = useRef();
+  //Force updates the List when wrapLines changes value
+  useEffect(() => {
+    listRef.current.forceUpdate();
+  }, [props.wrapLines]);
+
   return (
     <LogViewerListContainer ref={logViewerListContainerRef}>
       <LogLineRuler ref={oneCharacterSizeRef}>
         <span>A</span>
       </LogLineRuler>
-      <List items={props.lines} onRenderCell={_onRenderCell} />
+      <List items={props.lines} onRenderCell={_onRenderCell} ref={listRef} />
     </LogViewerListContainer>
   );
 };
