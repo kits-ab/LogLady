@@ -23,7 +23,6 @@
     "react-scripts": "^3.3.0",
     "react-tooltip": "^3.11.2",
     "redux": "^4.0.5",
-    "rmdi": "^1.0.1",
     "styled-components": "^5.0.0"
   },
   "devDependencies": {
