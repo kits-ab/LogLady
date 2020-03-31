@@ -1,12 +1,11 @@
 import { connect } from 'react-redux';
-import { GithubPicker } from 'react-color';
 import { SwitchButton } from 'js/view/components/common/buttons';
 import {
   handleShowSettings,
   handleHighlightColor,
   handleWrapLineOn
 } from '../actions/dispatchActions';
-import { Stack, IconButton, Label } from 'office-ui-fabric-react';
+import { Stack, IconButton, Label, ColorPicker } from 'office-ui-fabric-react';
 
 const { Component } = require('react');
 const React = require('react');
@@ -36,12 +35,11 @@ class TabSettings extends Component {
         <Stack horizontal tokens={stackTokens}>
           <Stack.Item>
             <Label>Color for highlights</Label>
-            <GithubPicker
+            <ColorPicker
               color={highlightColor}
-              triangle={'hide'}
-              onChangeComplete={e => {
+              onChange={(e, colorObj) => {
                 handleHighlightColor(this.props.dispatch, {
-                  color: e.hex,
+                  color: colorObj.str,
                   sourcePath
                 });
               }}
