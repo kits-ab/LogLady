@@ -11,6 +11,17 @@ const {
   flushCacheForOneFile
 } = require('./cache');
 
+// Invisible character U+2800 being used in line.replace
+const replaceEmptyLinesWithHiddenChar = arr => {
+  const regexList = [/^\s*$/];
+  return arr.map(line => {
+    const isMatch = regexList.some(rx => {
+      return rx.test(line);
+    });
+    return isMatch ? line.replace(regexList[0], '⠀') : line;
+  });
+};
+
 const updateRecentFiles = recentFiles => {
   createMenu(recentFiles);
   saveRecentFilesToDisk(recentFiles);
@@ -58,7 +69,7 @@ const sendFileOpened = async (
   fileSize,
   endIndex,
   history,
-  startByteOfLines
+  lineCount
 ) => {
   const action = {
     type: 'SOURCE_OPENED',
@@ -68,41 +79,30 @@ const sendFileOpened = async (
       fileSize,
       endIndex,
       history,
-      startByteOfLines
+      lineCount
     }
   };
 
   sender.send(ipcChannel, action);
-  sendLineCount(filePath, sender);
+  sendTotalLineCount(filePath, sender);
 };
 
-const sendLineCount = async (filePath, sender) => {
+const sendTotalLineCount = async (filePath, sender) => {
   fileReader
-    .getLineCount(filePath)
-    .then(nrOfLines => {
+    .getTotalLineCount(filePath)
+    .then(lineCount => {
       const action = {
-        type: 'LINE_AMOUNT_CALCULATED',
+        type: 'TOTAL_LINE_AMOUNT_CALCULATED',
         data: {
           filePath,
-          nrOfLines
+          lineCount
         }
       };
       sender.send(ipcChannel, action);
     })
     .catch(err => {
-      console.log({ sendLineCount, err });
+      console.log({ sendTotalLineCount, err });
     });
-};
-
-// Invisible character U+2800 being used in line.replace
-const replaceEmptyLinesWithHiddenChar = arr => {
-  const regexList = [/^\s*$/];
-  return arr.map(line => {
-    const isMatch = regexList.some(rx => {
-      return rx.test(line);
-    });
-    return isMatch ? line.replace(regexList[0], '⠀') : line;
-  });
 };
 
 const openFile = async (sender, filePath) => {
@@ -125,14 +125,17 @@ const openFile = async (sender, filePath) => {
     }
     //Lines in history that contains empty spaces does not display properly. replaceEmptyLinesWithHiddenChar(history) returns an array where this has been taken care of by replacing each space with a hidden character, and makes those lines display correctly in LogViewer.
     lines = replaceEmptyLinesWithHiddenChar(lines);
-    sendFileOpened(
-      sender,
-      filePath,
-      fileSize,
-      endIndex,
-      lines,
-      startByteOfLines
-    );
+
+    const lineCount = await fileReader
+      .getLineCountWithLimitOf5000(filePath)
+      .then(count => {
+        return count;
+      })
+      .catch(err => {
+        console.log(err);
+      });
+
+    sendFileOpened(sender, filePath, fileSize, endIndex, lines, lineCount);
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
     return false;
@@ -223,6 +226,7 @@ const handleShowOpenDialog = async (state, sender) => {
 
 const readLinesStartingAtByte = async (sender, data) => {
   const { path, startByte, amountOfLines } = data;
+  // TODO: what does engine need for calculating what position the lines should be read from?
   const [fileSize] = await getFileInfo(path);
   const numberOfBytes = 30000;
   let byteToReadFrom = startByte - 15000 < 0 ? 0 : startByte - 15000;

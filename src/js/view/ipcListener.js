@@ -51,10 +51,10 @@ const handleStateSet = (publisher, state) => {
 
 const handleFileOpened = (
   dispatch,
-  { filePath, fileSize, endIndex, history, startByteOfLines }
+  { filePath, fileSize, endIndex, history, lineCount }
 ) => {
   // clearAllLogs(dispatch);
-  setFileData(dispatch, filePath, fileSize, history, startByteOfLines);
+  setFileData(dispatch, filePath, fileSize, history, lineCount);
   setLastSeenLogSizeToSize(dispatch, filePath, fileSize);
 
   const followSource = {
@@ -84,8 +84,8 @@ const handleLinesFromBytePosition = (dispatch, { dataToReturn, path }) => {
   );
 };
 
-const handleLineAmount = (dispatch, { filePath, nrOfLines }) => {
-  addCalculatedAmountOfLines(dispatch, filePath, nrOfLines);
+const handleLineAmount = (dispatch, { filePath, lineCount }) => {
+  addCalculatedAmountOfLines(dispatch, filePath, lineCount);
 };
 
 const handleError = (dispatch, { message, error }) => {
@@ -110,7 +110,7 @@ export const ipcListener = (store, publisher) => {
       case 'SOURCE_OPENED':
         handleSourceOpened(dispatch, action.data);
         break;
-      case 'LINE_AMOUNT_CALCULATED':
+      case 'TOTAL_LINE_AMOUNT_CALCULATED':
         handleLineAmount(dispatch, action.data);
         break;
       case 'ERROR':

@@ -79,15 +79,12 @@ export const setFileData = (
   filePath,
   fileSize,
   history,
-  startByteOfLines
+  lineCount
 ) => {
   dispatch({
-    type: 'LOGVIEWER_SET_LOG',
+    type: 'CREATE_SETTINGS_OBJECT',
     data: {
-      sourcePath: filePath,
-      log: history,
-      size: fileSize,
-      startByteOfLines
+      sourcePath: filePath
     }
   });
 
@@ -100,9 +97,11 @@ export const setFileData = (
   });
 
   dispatch({
-    type: 'CREATE_SETTINGS_OBJECT',
+    type: 'LOGVIEWER_SET_LOG',
     data: {
-      sourcePath: filePath
+      sourcePath: filePath,
+      log: history,
+      lineCount
     }
   });
 };
@@ -221,22 +220,12 @@ export const addLinesFetchedFromBytePosition = (
   });
 };
 
-export const addCalculatedAmountOfLines = (dispatch, sourcePath, nrOfLines) => {
+export const addCalculatedAmountOfLines = (dispatch, sourcePath, lineCount) => {
   dispatch({
-    type: 'ADD_CALCULATED_LINE_AMOUNT_FOR_FILE',
+    type: 'LOGVIEWER_ADD_LINE_COUNT_FOR_FILE',
     data: {
       sourcePath,
-      nrOfLines
-    }
-  });
-};
-
-export const setInitialCache = (dispatch, sourcePath, emptyLines) => {
-  dispatch({
-    type: 'LOGVIEWER_SET_CACHE',
-    data: {
-      sourcePath,
-      emptyLines
+      lineCount
     }
   });
 };

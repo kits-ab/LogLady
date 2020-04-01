@@ -1,8 +1,10 @@
+// import { initializeCache } from '../components/helpers/cacheHelper';
+
 const initialState = {
   logs: {},
-  startByteOfLines: {},
-  nrOfLinesOfOpenFiles: {},
-  lengthOfInitialLineArrays: {}
+  nrOfLinesInFECache: {},
+  lengthOfInitialLogLineArrays: {},
+  totalNrOfLinesForFiles: {}
 };
 
 export const logViewerReducer = (state = initialState, action) => {
@@ -26,31 +28,37 @@ export const logViewerReducer = (state = initialState, action) => {
         logs: {}
       };
     case 'LOGVIEWER_SET_LOG': {
-      console.log('SETTING');
-      const { sourcePath, log, startByteOfLines } = action.data;
-
+      console.log('SETTING LOG');
+      const { sourcePath, log, lineCount } = action.data;
+      const emptyLinesLength = lineCount - log.length;
+      const emptyLines =
+        lineCount > 0
+          ? new Array(emptyLinesLength).fill('.', 0, emptyLinesLength)
+          : [];
+      const totalLineAmountInCache = lineCount + log.length;
       return {
         ...state,
-        logs: { ...state.logs, [sourcePath]: log },
-        startByteOfLines: {
-          ...state.startByteOfLines,
-          [sourcePath]: [...startByteOfLines]
+        logs: { ...state.logs, [sourcePath]: [...emptyLines, ...log] },
+        nrOfLinesInFECache: {
+          ...state.nrOfLinesInFECache,
+          [sourcePath]: totalLineAmountInCache
         },
-        lengthOfInitialLineArrays: {
-          ...state.lengthOfInitialLineArrays,
+        lengthOfInitialLogLineArrays: {
+          ...state.lengthOfInitialLogLineArrays,
           [sourcePath]: log.length
         }
       };
     }
 
-    case 'ADD_CALCULATED_LINE_AMOUNT_FOR_FILE': {
-      console.log('ADDING LINE AMOUNT');
-      const { sourcePath, nrOfLines } = action.data;
+    case 'LOGVIEWER_ADD_LINE_COUNT_FOR_FILE': {
+      console.log('ADDING LINE COUNT');
+      const { sourcePath, lineCount } = action.data;
+      const totalNrOfLines = lineCount ? lineCount : 0;
       return {
         ...state,
-        nrOfLinesOfOpenFiles: {
-          ...state.nrOfLinesOfOpenFiles,
-          [sourcePath]: nrOfLines
+        totalNrOfLinesForFiles: {
+          ...state.totalNrOfLinesForFiles,
+          [sourcePath]: totalNrOfLines
         }
       };
     }
@@ -70,7 +78,7 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION': {
       console.log('ADDING LINES FROM BYTE POS');
       const { lines, sourcePath, startByteOfLines } = action.data;
-
+      // TODO: Use initializeCache here to insert new lines in the frontend cache, change names of action types etc to something more fitting.
       return {
         ...state,
         logs: {
@@ -80,19 +88,6 @@ export const logViewerReducer = (state = initialState, action) => {
         startByteOfLines: {
           ...state.startByteOfLines,
           [sourcePath]: [...startByteOfLines]
-        }
-      };
-    }
-    case 'LOGVIEWER_SET_CACHE': {
-      console.log('SETTING INITIAL CACHE');
-      const { sourcePath, emptyLines } = action.data;
-      const log = state.logs[sourcePath] ? state.logs[sourcePath] : [];
-
-      return {
-        ...state,
-        logs: {
-          ...state.logs,
-          [sourcePath]: [...emptyLines, ...log]
         }
       };
     }
