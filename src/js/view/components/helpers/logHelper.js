@@ -22,14 +22,23 @@ export const scrollToBottom = (el, list) => {
   el.scrollAround(list.length - 1);
 };
 
-export const fetchTextBasedOnByteFromScrollPosition = (
-  path,
-  startByte,
-  amountOfLines
+export const fetchNewLinesFromBackendCache = (
+  sourcePath,
+  amountOfLogLinesToFetch,
+  totalFeCacheLength,
+  feCacheIndexForNewLines,
+  totalLineCountOfFile
 ) => {
   const argObj = {
-    function: 'FETCH_LOGLINES_STARTING_AT_SCROLL_BYTE_POSITION',
-    data: { path, startByte, amountOfLines }
+    function: 'FETCH_NEW_LINES_FROM_BACKEND_CACHE',
+    data: {
+      sourcePath,
+      amountOfLogLinesToFetch,
+      totalFeCacheLength,
+      feCacheIndexForNewLines,
+      totalLineCountOfFile
+    }
   };
-  sendRequestToBackend(argObj);
+  console.log({ argObj });
+  // sendRequestToBackend(argObj);
 };

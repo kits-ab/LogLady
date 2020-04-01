@@ -37,6 +37,9 @@ const LogViewerList = props => {
     height: 19
   });
 
+  const listRef = useRef();
+  const startItemIndexOnLastFetchRef = useRef();
+
   // Itemdata used to send needed props and state from this component to the pure component that renders a single line
   const itemData = createItemData(
     props.lines,
@@ -101,6 +104,62 @@ const LogViewerList = props => {
     setLastLineCount(index);
   }, [props.lines]);
 
+  useEffect(() => {
+    // Effect for setting the initial startItemIndex when opening a file.
+    const nrOfLinesInViewer = Math.round(
+      listDimensions.height / characterDimensions.height
+    );
+    startItemIndexOnLastFetchRef.current =
+      props.lines.length - nrOfLinesInViewer;
+    // console.log({
+    //   initialStartItemIndex: startItemIndexOnLastFetchRef.current
+    // });
+  }, [listDimensions.height, props.sourcePath]);
+
+  useEffect(() => {
+    // In this effect the amount of lines scrolled in either direction are evaluated and if exceeding a certain amount, new lines will be fetched from the backend cache.
+    const startItemIndexinView = listRef.current.getStartItemIndexInView();
+
+    const totalFileContentIsNotInTheFrontendCache =
+      props.logLinesLength !== props.lines.length;
+    const theLineArraysAreLongerThanZero =
+      props.logLinesLength > 0 && props.lines.length > 0;
+    // console.log({
+    //   totalFileContentIsNotInTheFrontendCache,
+    //   theLineArraysAreLongerThanZero
+    // });
+
+    // A fetch of new lines should only be triggered if the total file content is not contained in the list of lines.
+    if (
+      totalFileContentIsNotInTheFrontendCache &&
+      theLineArraysAreLongerThanZero
+    ) {
+      const currentAndLastStartItemIndexDiff =
+        startItemIndexinView - startItemIndexOnLastFetchRef.current;
+      console.log({ currentAndLastStartItemIndexDiff });
+      const halvedLogLinesLength = props.logLinesLength / 2;
+
+      if (
+        currentAndLastStartItemIndexDiff > halvedLogLinesLength ||
+        currentAndLastStartItemIndexDiff < -halvedLogLinesLength
+      ) {
+        // Update the ref with the current startItemIndexInView value for comparing against the new position after fetching new lines.
+        startItemIndexOnLastFetchRef.current = startItemIndexinView;
+
+        const feCacheIndexForNewLines =
+          startItemIndexinView - halvedLogLinesLength < 0
+            ? 0
+            : Math.round(startItemIndexinView - halvedLogLinesLength);
+
+        props.getMoreLogLines(
+          props.logLinesLength,
+          props.lines.length,
+          feCacheIndexForNewLines
+        );
+      }
+    }
+  }, [props.scrollTop]);
+
   const _onRenderCell = (item, index) => {
     return (
       <SingleLogLineTranslator
@@ -116,7 +175,7 @@ const LogViewerList = props => {
       <LogLineRuler ref={oneCharacterSizeRef}>
         <span>A</span>
       </LogLineRuler>
-      <List items={props.lines} onRenderCell={_onRenderCell} />
+      <List ref={listRef} items={props.lines} onRenderCell={_onRenderCell} />
     </LogViewerListContainer>
   );
 };

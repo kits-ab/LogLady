@@ -4,13 +4,13 @@ export const calculatePositionInFile = (
   scrollHeight,
   logSize
 ) => {
-  const scrollPosPercent = getScrollPositionInPercent(
+  const scrollPositionPerc = getScrollPositionInPercent(
     scrollTop,
     scrollHeight,
     clientHeight
   );
 
-  const positionInFile = getBytePositionInFile(logSize, scrollPosPercent);
+  const positionInFile = getBytePositionInFile(logSize, scrollPositionPerc);
 
   return positionInFile;
 };
@@ -19,8 +19,8 @@ const getScrollPositionInPercent = (scrollTop, scrollHeight, clientHeight) => {
   return (scrollTop / (scrollHeight - clientHeight)) * 100;
 };
 
-const getBytePositionInFile = (logSize, scrollPosPercent) => {
-  return Math.round((logSize / 100) * scrollPosPercent);
+const getBytePositionInFile = (logSize, scrollPositionPerc) => {
+  return Math.round((logSize / 100) * scrollPositionPerc);
 };
 
 export const initializeCache = cache_size => {

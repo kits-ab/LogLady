@@ -4,8 +4,8 @@ import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponent
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
-import { calculatePositionInFile } from './helpers/cacheHelper';
-import { setInitialCache, setTailSwitch } from '../actions/dispatchActions';
+import { setTailSwitch } from '../actions/dispatchActions';
+import { fetchNewLinesFromBackendCache } from './helpers/logHelper';
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -26,11 +26,15 @@ const LogViewer = props => {
   const logSize = props.logSizes[props.source.path]
     ? props.logSizes[props.source.path]
     : 0;
-  const lengthOfFetch = props.lengthOfInitialLineArrays[props.source.path]
-    ? props.lengthOfInitialLineArrays[props.source.path]
+  const logLinesLength = props.lengthOfInitialLogLineArrays[props.source.path]
+    ? props.lengthOfInitialLogLineArrays[props.source.path]
+    : 0;
+  const totalNrOfLinesInFile = props.totalNrOfLinesForFiles[props.source.path]
+    ? props.totalNrOfLinesForFiles[props.source.path]
     : 0;
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
+  const [currentScrollTop, setCurrentScrollTop] = useState(0);
 
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
   const scroller = useRef(); // A ref on the logViewerContainer used to keep track of scroll values.
@@ -114,48 +118,21 @@ const LogViewer = props => {
   }, [props.source.path]);
 
   useEffect(() => {
-    // Effect for adding the correct amount of empty lines above the initial log lines.
-    const nrOfLinesInFile = props.nrOfLinesOfOpenFiles[props.source.path];
-    if (props.logs[props.source.path]) {
-      const lengthOfListitems = props.logs[props.source.path].length;
-      if (nrOfLinesInFile > 0 && lengthOfListitems !== nrOfLinesInFile) {
-        const emptyLines = new Array(nrOfLinesInFile - lengthOfListitems).fill(
-          '.',
-          0
-        );
-        setInitialCache(props.dispatch, props.source.path, emptyLines);
-        // scroll to bottom
-        scroller.current.scrollTo(0, scroller.current.scrollHeight);
-      }
-    }
-  }, [props.nrOfLinesOfOpenFiles[props.source.path]]);
+    const handleScrollPositionEvent = event => {
+      setCurrentScrollTop(event.target.scrollTop);
+    };
+    scroller.current.addEventListener('scroll', event => {
+      return handleScrollPositionEvent(event);
+    });
 
-  // TODO: Use this to fetch new text from engine in a smart way.
-  useEffect(() => {
-    // Effect for handling calculation of the current position in the file based on the scroll position value (percentage from top).
-    // Might need another dependency than the logSize value later on.
-    if (logSize > 0) {
-      const handleScrollPositionEvent = () => {
-        calculatePositionInFile(
-          scroller.current.scrollTop,
-          scroller.current.clientHeight,
-          scroller.current.scrollHeight,
-          logSize
-        );
-      };
-      scroller.current.addEventListener('scroll', handleScrollPositionEvent);
-
-      return () => {
-        scroller.current.removeEventListener(
-          'scroll',
-          handleScrollPositionEvent
-        );
-      };
-    }
-  }, [logSize]);
+    return () => {
+      scroller.current.removeEventListener('scroll', handleScrollPositionEvent);
+    };
+  }, []);
 
   useEffect(() => {
     //Effect to set tailswitch to true when scrolling or clicking at the bottom
+    // TODO: dispatching to reducer happens every scroll event, needs to be limited!
     const handleScrollEvent = () => {
       const isScrollerAtTheBottom =
         scroller.current.scrollHeight ===
@@ -184,7 +161,7 @@ const LogViewer = props => {
   }, [props.source.path]);
 
   useEffect(() => {
-    //Effect for scrolling opened file to bottom
+    //Effect for scrolling to bottom when opening a file
     scroller.current.scrollTo(0, scroller.current.scrollHeight);
   }, [props.source.path]);
 
@@ -195,16 +172,32 @@ const LogViewer = props => {
     }
   }, [filteredAndHighlightedLines, tailSwitch]);
 
+  const _getMoreLogLines = (
+    amountOfLogLinesToFetch,
+    totalFeCacheLength,
+    feCacheIndexForNewLines
+  ) => {
+    console.log('get more lines');
+    fetchNewLinesFromBackendCache(
+      props.source.path,
+      amountOfLogLinesToFetch,
+      totalFeCacheLength,
+      feCacheIndexForNewLines,
+      totalNrOfLinesInFile
+    );
+  };
+
   return (
     <LogViewerContainer ref={scroller}>
       <LogViewerList
-        key={props.source.index}
-        dispatcher={props.dispatch}
         highlightColor={highlightColor}
         wrapLines={wrapLineOn}
         lines={filteredAndHighlightedLines}
         sourcePath={props.source.path}
         logSize={logSize}
+        scrollTop={currentScrollTop}
+        getMoreLogLines={_getMoreLogLines}
+        logLinesLength={logLinesLength}
       />
     </LogViewerContainer>
   );
@@ -215,9 +208,9 @@ const mapStateToProps = ({
   settingsState: { tabSettings },
   logViewerState: {
     logs,
-    startByteOfLines,
-    nrOfLinesOfOpenFiles,
-    lengthOfInitialLineArrays
+    lengthOfInitialLogLineArrays,
+    nrOfLinesInFECache,
+    totalNrOfLinesForFiles
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -227,9 +220,9 @@ const mapStateToProps = ({
     logs,
     logSizes,
     lastSeenLogSizes,
-    startByteOfLines,
-    nrOfLinesOfOpenFiles,
-    lengthOfInitialLineArrays
+    lengthOfInitialLogLineArrays,
+    nrOfLinesInFECache,
+    totalNrOfLinesForFiles
   };
 };
 
