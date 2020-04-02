@@ -15,7 +15,12 @@ import {
 } from '../actions/dispatchActions';
 import { closeFile, showOpenDialog } from './helpers/handleFileHelper';
 import Mousetrap from 'mousetrap';
-import { Stack, IconButton } from 'office-ui-fabric-react';
+import {
+  Spinner,
+  SpinnerSize,
+  Stack,
+  IconButton
+} from 'office-ui-fabric-react';
 
 /**
  * Helper function to get actual modulo operation, as %-operator doesn't quite fit the bill
@@ -158,21 +163,35 @@ function customRenderer(
     return (
       <span>
         {defaultRenderer(link)}
-        <div style={{ display: 'inline' }}>
-          <div
-            onClick={event => {
-              exitLog(openSources[source].path, event);
-            }}
-            style={{ display: 'inline-block', marginLeft: '10px' }}
-          >
-            <Icon iconName="Cancel" />
-          </div>
+        <div
+          style={{
+            display: 'inline'
+          }}
+        >
           <Indicator
             selected={
               openSources[source].index === currentSourceHandle ? true : false
             }
             activity={logSize !== lastSeenLogSize ? true : false}
-          />
+          >
+            <Spinner
+              size={SpinnerSize.small}
+              styles={{
+                circle: {
+                  borderColor: '#B2DFDB',
+                  borderRightColor: '#00796B'
+                }
+              }}
+            />
+          </Indicator>
+        </div>
+        <div
+          onClick={event => {
+            exitLog(openSources[source].path, event);
+          }}
+          style={{ display: 'inline-block', marginLeft: '15px' }}
+        >
+          <Icon iconName="Cancel" />
         </div>
       </span>
     );
