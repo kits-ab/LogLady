@@ -5,7 +5,7 @@ import {
   addNewLines,
   increaseSize,
   setLastSeenLogSizeToSize,
-  addLinesFetchedFromBytePosition,
+  addLinesFetchedFromBackendCache,
   addCalculatedAmountOfLines
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
@@ -73,14 +73,13 @@ const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
   increaseSize(dispatch, sourcePath, size);
 };
 
-const handleLinesFromBytePosition = (dispatch, { dataToReturn, path }) => {
-  addLinesFetchedFromBytePosition(
+const handleLinesFromBackendCache = (dispatch, { dataToReturn }) => {
+  addLinesFetchedFromBackendCache(
     dispatch,
-    dataToReturn.startByteOfLines,
-    dataToReturn.lines,
-    dataToReturn.linesStartAt,
-    dataToReturn.linesEndAt,
-    path
+    dataToReturn.sourcePath,
+    dataToReturn.newLines,
+    dataToReturn.indexForInsertingNewLines,
+    dataToReturn.totalFECacheLength
   );
 };
 
@@ -119,8 +118,8 @@ export const ipcListener = (store, publisher) => {
       case 'LINES_NEW':
         handleNewLines(dispatch, action.data, store.getState());
         break;
-      case 'LOGLINES_FETCHED_FROM_BYTEPOSITION':
-        handleLinesFromBytePosition(dispatch, action.data);
+      case 'LOGLINES_FETCHED_FROM_BACKEND_CACHE':
+        handleLinesFromBackendCache(dispatch, action.data);
         break;
       default:
         console.log('Warning: Unrecognized message, ', action);

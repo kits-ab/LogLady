@@ -1,4 +1,4 @@
-// import { initializeCache } from '../components/helpers/cacheHelper';
+import { initializeCache } from '../components/helpers/cacheHelper';
 
 const initialState = {
   logs: {},
@@ -75,19 +75,27 @@ export const logViewerReducer = (state = initialState, action) => {
         }
       };
     }
-    case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION': {
+
+    // TODO: Use initializeCache here to insert new lines in the frontend cache, change names of action types etc to something more fitting.
+    case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE': {
       console.log('ADDING LINES FROM BYTE POS');
-      const { lines, sourcePath, startByteOfLines } = action.data;
-      // TODO: Use initializeCache here to insert new lines in the frontend cache, change names of action types etc to something more fitting.
+      const {
+        sourcePath,
+        newLines,
+        indexForInsertingNewLines,
+        totalFECacheLength
+      } = action.data;
+      const currentCache = state.logs[sourcePath] ? state.logs[sourcePath] : [];
+      const updatedCache = initializeCache(totalFECacheLength).insertRows(
+        currentCache,
+        indexForInsertingNewLines,
+        newLines
+      );
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: [...lines]
-        },
-        startByteOfLines: {
-          ...state.startByteOfLines,
-          [sourcePath]: [...startByteOfLines]
+          [sourcePath]: updatedCache
         }
       };
     }

@@ -200,22 +200,20 @@ export const showSnackBar = (dispatch, message, level) => {
   });
 };
 
-export const addLinesFetchedFromBytePosition = (
+export const addLinesFetchedFromBackendCache = (
   dispatch,
-  startByteOfLines,
-  lines,
-  linesStartAt,
-  linesEndAt,
-  sourcePath
+  sourcePath,
+  newLines,
+  indexForInsertingNewLines,
+  totalFECacheLength
 ) => {
   dispatch({
-    type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION',
+    type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
     data: {
-      lines,
-      linesStartAt,
-      linesEndAt,
       sourcePath,
-      startByteOfLines
+      newLines,
+      indexForInsertingNewLines,
+      totalFECacheLength
     }
   });
 };
