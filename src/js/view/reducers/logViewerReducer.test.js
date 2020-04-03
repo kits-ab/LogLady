@@ -79,41 +79,22 @@ describe('logviewer reducer', () => {
   });
 
   // TODO: Update the tests to match the new reducer logic
-  // it('should add lines and metadata from byte position to initial state', () => {
-  //   const lines = ['hej1', 'hej2'];
-  //   const sourcePath = 'test';
-  //   const startByteOfLines = [1, 2];
-  //   const state = {
-  //     logs: {},
-  //     startByteOfLines: {}
-  //   };
-  //   const expectedState = {
-  //     logs: { test: ['hej1', 'hej2'] },
-  //     startByteOfLines: { test: [1, 2] }
-  //   };
-  //   const action = {
-  //     type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION',
-  //     data: { lines, sourcePath, startByteOfLines }
-  //   };
-  //   expect(logViewerReducer(state, action)).toEqual(expectedState);
-  // });
 
-  // it('should set the calculated number of lines of the open files', () => {
-  //   const state = {
-  //     logs: { test: ['hej1', 'hej2', 'hej3'] },
-  //     startByteOfLines: { test: [1, 2, 3] },
-  //     nrOfLinesOfOpenFiles: {}
-  //   };
-  //   const expectedState = {
-  //     logs: { test: ['hej1', 'hej2', 'hej3'] },
-  //     startByteOfLines: { test: [1, 2, 3] },
-  //     nrOfLinesOfOpenFiles: { test: 10 }
-  //   };
-  //   const sourcePath = 'test';
-  //   const nrOfLines = 10;
+  // it.only('should update the frontend cache with new lines from specified position', () => {
+  //   const sourcePath = 'testPath';
+  //   const newLines = [];
+  //   const indexForInsertingNewLines = 0;
+  //   const totalFECacheLength = 10;
+  //   const state = {};
+  //   const expectedState = {};
   //   const action = {
-  //     type: 'ADD_CALCULATED_LINE_AMOUNT_FOR_FILE',
-  //     data: { sourcePath, nrOfLines }
+  //     type: 'LOGVIEWER_ADD_LINES',
+  //     data: {
+  //       sourcePath,
+  //       newLines,
+  //       indexForInsertingNewLines,
+  //       totalFECacheLength
+  //     }
   //   };
   //   expect(logViewerReducer(state, action)).toEqual(expectedState);
   // });

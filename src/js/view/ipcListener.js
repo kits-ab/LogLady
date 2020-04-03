@@ -74,13 +74,14 @@ const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
 };
 
 const handleLinesFromBackendCache = (dispatch, { dataToReturn }) => {
-  addLinesFetchedFromBackendCache(
-    dispatch,
-    dataToReturn.sourcePath,
-    dataToReturn.newLines,
-    dataToReturn.indexForInsertingNewLines,
-    dataToReturn.totalFECacheLength
-  );
+  console.log({ dataToReturn });
+  // addLinesFetchedFromBackendCache(
+  //   dispatch,
+  //   dataToReturn.sourcePath,
+  //   dataToReturn.newLines,
+  //   dataToReturn.indexForInsertingNewLines,
+  //   dataToReturn.totalFECacheLength
+  // );
 };
 
 const handleLineAmount = (dispatch, { filePath, lineCount }) => {
