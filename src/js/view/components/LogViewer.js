@@ -32,6 +32,9 @@ const LogViewer = props => {
   const totalNrOfLinesInFile = props.totalNrOfLinesForFiles[props.source.path]
     ? props.totalNrOfLinesForFiles[props.source.path]
     : 0;
+  const emptyLinesLength = props.lengthOfEmptyLines[props.source.path]
+    ? props.lengthOfEmptyLines[props.source.path]
+    : 0;
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
   const [currentScrollTop, setCurrentScrollTop] = useState(0);
@@ -198,6 +201,7 @@ const LogViewer = props => {
         scrollTop={currentScrollTop}
         getMoreLogLines={_getMoreLogLines}
         logLinesLength={logLinesLength}
+        wholeFileNotInFeCache={emptyLinesLength > 0}
       />
     </LogViewerContainer>
   );
@@ -210,7 +214,8 @@ const mapStateToProps = ({
     logs,
     lengthOfInitialLogLineArrays,
     nrOfLinesInFECache,
-    totalNrOfLinesForFiles
+    totalNrOfLinesForFiles,
+    lengthOfEmptyLines
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -222,7 +227,8 @@ const mapStateToProps = ({
     lastSeenLogSizes,
     lengthOfInitialLogLineArrays,
     nrOfLinesInFECache,
-    totalNrOfLinesForFiles
+    totalNrOfLinesForFiles,
+    lengthOfEmptyLines
   };
 };
 

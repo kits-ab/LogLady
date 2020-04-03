@@ -4,6 +4,7 @@ const initialState = {
   logs: {},
   nrOfLinesInFECache: {},
   lengthOfInitialLogLineArrays: {},
+  lengthOfEmptyLines: {},
   totalNrOfLinesForFiles: {}
 };
 
@@ -46,6 +47,10 @@ export const logViewerReducer = (state = initialState, action) => {
         lengthOfInitialLogLineArrays: {
           ...state.lengthOfInitialLogLineArrays,
           [sourcePath]: log.length
+        },
+        lengthOfEmptyLines: {
+          ...state.lengthOfEmptyLines,
+          [sourcePath]: emptyLinesLength
         }
       };
     }

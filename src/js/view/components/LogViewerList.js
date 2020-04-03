@@ -119,37 +119,24 @@ const LogViewerList = props => {
   useEffect(() => {
     // In this effect the amount of lines scrolled in either direction are evaluated and if exceeding a certain amount, new lines will be fetched from the backend cache.
     const startItemIndexinView = listRef.current.getStartItemIndexInView();
-
-    const totalFileContentIsNotInTheFrontendCache =
-      props.logLinesLength !== props.lines.length;
-    const theLineArraysAreLongerThanZero =
-      props.logLinesLength > 0 && props.lines.length > 0;
-    // console.log({
-    //   totalFileContentIsNotInTheFrontendCache,
-    //   theLineArraysAreLongerThanZero
-    // });
-
     // A fetch of new lines should only be triggered if the total file content is not contained in the list of lines.
-    if (
-      totalFileContentIsNotInTheFrontendCache &&
-      theLineArraysAreLongerThanZero
-    ) {
+    if (props.wholeFileNotInFeCache) {
       const currentAndLastStartItemIndexDiff =
         startItemIndexinView - startItemIndexOnLastFetchRef.current;
       console.log({ currentAndLastStartItemIndexDiff });
-      const halvedLogLinesLength = props.logLinesLength / 2;
+      const maxAmountOfLinesToScroll = props.logLinesLength / 2;
 
       if (
-        currentAndLastStartItemIndexDiff > halvedLogLinesLength ||
-        currentAndLastStartItemIndexDiff < -halvedLogLinesLength
+        currentAndLastStartItemIndexDiff > maxAmountOfLinesToScroll ||
+        currentAndLastStartItemIndexDiff < -maxAmountOfLinesToScroll
       ) {
         // Update the ref with the current startItemIndexInView value for comparing against the new position after fetching new lines.
         startItemIndexOnLastFetchRef.current = startItemIndexinView;
 
         const feCacheIndexForNewLines =
-          startItemIndexinView - halvedLogLinesLength < 0
+          startItemIndexinView - maxAmountOfLinesToScroll < 0
             ? 0
-            : Math.round(startItemIndexinView - halvedLogLinesLength);
+            : Math.round(startItemIndexinView - maxAmountOfLinesToScroll);
 
         props.getMoreLogLines(
           props.logLinesLength,

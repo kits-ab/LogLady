@@ -282,7 +282,7 @@ const readLinesStartingAtByte = async (sender, data) => {
 
   const action = {
     type: 'LOGLINES_FETCHED_FROM_BACKEND_CACHE',
-    data: { dataToReturn, sourcePath }
+    data: { dataToReturn }
   };
   sender.send(ipcChannel, action);
 };

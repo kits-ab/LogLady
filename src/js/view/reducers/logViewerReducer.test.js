@@ -6,7 +6,8 @@ describe('logviewer reducer', () => {
       logs: {},
       nrOfLinesInFECache: {},
       totalNrOfLinesForFiles: {},
-      lengthOfInitialLogLineArrays: {}
+      lengthOfInitialLogLineArrays: {},
+      lengthOfEmptyLines: {}
     };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
@@ -26,7 +27,8 @@ describe('logviewer reducer', () => {
       logs: { test: ['hej1', 'hej2', 'hej3'] },
       nrOfLinesInFECache: {},
       totalNrOfLinesForFiles: {},
-      lengthOfInitialLogLineArrays: {}
+      lengthOfInitialLogLineArrays: {},
+      lengthOfEmptyLines: {}
     };
     const sourcePath = 'test';
 
@@ -50,7 +52,8 @@ describe('logviewer reducer', () => {
     const expectedState = {
       logs: { test: ['.', '.', 'hej4', 'hej5'] },
       lengthOfInitialLogLineArrays: { test: 2 },
-      nrOfLinesInFECache: { test: 6 }
+      nrOfLinesInFECache: { test: 6 },
+      lengthOfEmptyLines: { test: 2 }
     };
     const action = {
       type: 'LOGVIEWER_SET_LOG',
@@ -80,7 +83,7 @@ describe('logviewer reducer', () => {
 
   // TODO: Update the tests to match the new reducer logic
 
-  // it.only('should update the frontend cache with new lines from specified position', () => {
+  // it('should update the frontend cache with new lines from specified position', () => {
   //   const sourcePath = 'testPath';
   //   const newLines = [];
   //   const indexForInsertingNewLines = 0;
