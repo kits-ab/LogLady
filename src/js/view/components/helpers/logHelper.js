@@ -40,5 +40,5 @@ export const fetchNewLinesFromBackendCache = (
     }
   };
   console.log({ argObj });
-  // sendRequestToBackend(argObj);
+  sendRequestToBackend(argObj);
 };
