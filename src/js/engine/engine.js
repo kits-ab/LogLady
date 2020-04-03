@@ -225,46 +225,64 @@ const handleShowOpenDialog = async (state, sender) => {
 };
 
 const readLinesStartingAtByte = async (sender, data) => {
-  const { path, startByte, amountOfLines } = data;
-  // TODO: what does engine need for calculating what position the lines should be read from?
-  const [fileSize] = await getFileInfo(path);
+  const {
+    sourcePath,
+    amountOfLogLinesToFetch,
+    totalFeCacheLength,
+    feCacheIndexForNewLines,
+    totalLineCountOfFile
+  } = data;
+  const [fileSize] = await getFileInfo(sourcePath);
+  const startByte = (fileSize / totalFeCacheLength) * feCacheIndexForNewLines;
   const numberOfBytes = 30000;
   let byteToReadFrom = startByte - 15000 < 0 ? 0 : startByte - 15000;
-  let cache = searchCache(path, startByte, amountOfLines, fileSize);
+  let cache = searchCache(
+    sourcePath,
+    startByte,
+    amountOfLogLinesToFetch,
+    fileSize
+  );
 
   if (cache === 'miss') {
     try {
-      const {
-        startByteOfLines,
-        lines,
-        linesStartAt,
-        linesEndAt
-      } = await fileReader.readDataFromByte(
-        path,
+      const { startByteOfLines, lines } = await fileReader.readDataFromByte(
+        sourcePath,
         byteToReadFrom,
         numberOfBytes
       );
-      updateCache(path, lines, startByteOfLines);
+      updateCache(sourcePath, lines, startByteOfLines);
 
       // Check for size
       if (!checkIfCacheIsWithinSizeLimit()) {
-        flushCacheForOneFile(path);
-        updateCache(path, lines, startByteOfLines);
+        flushCacheForOneFile(sourcePath);
+        updateCache(sourcePath, lines, startByteOfLines);
       }
 
-      cache = searchCache(path, startByte, amountOfLines, fileSize);
+      cache = searchCache(
+        sourcePath,
+        startByte,
+        amountOfLogLinesToFetch,
+        fileSize
+      );
     } catch (error) {
       console.log({ readLinesStartingAtByte }, error);
     }
   }
 
-  let { lines, startsAtByte } = cache;
+  let { lines } = cache;
+
   lines = replaceEmptyLinesWithHiddenChar(lines);
 
-  const dataToReturn = { path, lines, startByteOfLines: startsAtByte };
+  const dataToReturn = {
+    sourcePath,
+    newLines: lines,
+    feCacheIndexForNewLines,
+    totalFeCacheLength
+  };
+
   const action = {
-    type: 'LOGLINES_FETCHED_FROM_BYTEPOSITION',
-    data: { dataToReturn, path }
+    type: 'LOGLINES_FETCHED_FROM_BACKEND_CACHE',
+    data: { dataToReturn, sourcePath }
   };
   sender.send(ipcChannel, action);
 };
@@ -311,7 +329,7 @@ const createEventHandler = state => {
       case 'STATE_LOAD':
         loadStateFromDisk(state, sender);
         break;
-      case 'FETCH_LOGLINES_STARTING_AT_SCROLL_BYTE_POSITION':
+      case 'FETCH_NEW_LINES_FROM_BACKEND_CACHE':
         readLinesStartingAtByte(sender, _argObj.data).catch(err => {
           console.error(err);
         });
