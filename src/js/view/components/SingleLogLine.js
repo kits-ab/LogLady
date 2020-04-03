@@ -11,8 +11,7 @@ const MemoedSingleLogLine = React.memo(props => {
   return (
     <LogLine
       style={{
-        ...props.style,
-        width: props.elementWidth + 'px'
+        ...props.style
       }}
       wrap={props.shouldWrap ? 'true' : undefined}
       index={props.index}
@@ -20,7 +19,7 @@ const MemoedSingleLogLine = React.memo(props => {
       {/^\[HLL\].*\[\/HLL\]$/.test(props.line) ? (
         <TextHighlightRegex text={props.line} color={props.highlightColor} />
       ) : (
-        <span>{props.line}</span>
+        props.line
       )}
     </LogLine>
   );

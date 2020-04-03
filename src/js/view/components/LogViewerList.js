@@ -135,7 +135,11 @@ const LogViewerList = props => {
       <LogLineRuler ref={oneCharacterSizeRef}>
         <span>A</span>
       </LogLineRuler>
-      <List items={props.lines} onRenderCell={_onRenderCell} />
+      <List
+        style={{ display: 'inline-block', minWidth: '100%' }}
+        items={props.lines}
+        onRenderCell={_onRenderCell}
+      />
     </LogViewerListContainer>
   );
 };
