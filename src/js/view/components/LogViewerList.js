@@ -92,13 +92,8 @@ const LogViewerList = props => {
     let currentMaxLength = maxLineLength;
     let index = lastLineCount;
     for (; index < props.lines.length; index++) {
-      // Remove all of the stuff hiddenWindow has added to it, as they shouldn't count towards the length of the string
-      let lineWithoutExtrasLength = props.lines[index].replace(
-        /\[\/?HL[LG\d]+\]/g,
-        ''
-      ).length;
-      if (lineWithoutExtrasLength > currentMaxLength) {
-        currentMaxLength = lineWithoutExtrasLength;
+      if (props.lines[index].length > currentMaxLength) {
+        currentMaxLength = props.lines[index].length;
       }
     }
 
