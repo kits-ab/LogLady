@@ -1,51 +1,20 @@
-export const calculatePositionInFile = (
-  scrollTop,
-  clientHeight,
-  scrollHeight,
-  logSize
-) => {
-  const scrollPositionPerc = getScrollPositionInPercent(
-    scrollTop,
-    scrollHeight,
-    clientHeight
-  );
-
-  const positionInFile = getBytePositionInFile(logSize, scrollPositionPerc);
-
-  return positionInFile;
-};
-
-const getScrollPositionInPercent = (scrollTop, scrollHeight, clientHeight) => {
-  return (scrollTop / (scrollHeight - clientHeight)) * 100;
-};
-
-const getBytePositionInFile = (logSize, scrollPositionPerc) => {
-  return Math.round((logSize / 100) * scrollPositionPerc);
-};
-
-export const initializeCache = cache_size => {
-  const insertRows = (cacheList, startIndex, contentList) => {
-    const totalLength = cacheList.length;
-
-    contentList.forEach((item, i) => {
-      cacheList[i + startIndex] = item;
-    });
-
-    const sliceIndex =
-      totalLength < startIndex + contentList.length
-        ? startIndex + contentList.length - cache_size
+export const updateLogViewerCache = cache_size => {
+  const insertRows = (startIndex, newLines) => {
+    const updatedCache = new Array(cache_size).fill('.', 0);
+    const fromIndex =
+      startIndex < 0
+        ? 0
+        : newLines.length + startIndex > cache_size
+        ? cache_size - newLines.length
         : startIndex;
 
-    const itemsToAdd = cacheList.slice(sliceIndex, sliceIndex + cache_size);
+    newLines.forEach((item, i) => {
+      updatedCache[i + fromIndex] = item;
+    });
 
-    const numberOfEmptyItemsAtEnd =
-      totalLength - startIndex - itemsToAdd.length;
+    // console.log({ updatedCache });
 
-    const addAtEnd =
-      numberOfEmptyItemsAtEnd <= 0 ? [] : new Array(numberOfEmptyItemsAtEnd);
-
-    return [...new Array(sliceIndex), ...itemsToAdd, ...addAtEnd];
+    return updatedCache;
   };
-
   return { insertRows };
 };

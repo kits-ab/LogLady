@@ -175,17 +175,13 @@ const LogViewer = props => {
     }
   }, [filteredAndHighlightedLines, tailSwitch]);
 
-  const _getMoreLogLines = (
-    amountOfLogLinesToFetch,
-    totalFeCacheLength,
-    feCacheIndexForNewLines
-  ) => {
+  const _getMoreLogLines = indexForNewLines => {
     console.log('get more lines');
     fetchNewLinesFromBackendCache(
       props.source.path,
-      amountOfLogLinesToFetch,
-      totalFeCacheLength,
-      feCacheIndexForNewLines,
+      logLinesLength,
+      props.nrOfLinesInFECache[props.source.path],
+      indexForNewLines,
       totalNrOfLinesInFile
     );
   };

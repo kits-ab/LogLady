@@ -126,14 +126,14 @@ const getLastNewLineIndex = (filePath, endIndex) => {
 };
 
 //This will count the lines until the end index, if the file is big this will take a lot of time!
-const getLineCountWithLimitOf5000 = (filePath, endIndex) => {
+
+const getTotalLineCount = (filePath, endIndex) => {
   return new Promise((resolve, reject) => {
     let lineCount = 0;
 
     createReadStream(filePath, { end: endIndex })
       .on('data', chunk => {
         lineCount += countLinesInBuffer(chunk);
-        if (lineCount > 5000) resolve(lineCount);
       })
       .on('end', () => {
         resolve(lineCount);
@@ -144,13 +144,14 @@ const getLineCountWithLimitOf5000 = (filePath, endIndex) => {
   });
 };
 
-const getTotalLineCount = (filePath, endIndex) => {
+const getLineCountWithLimitOf5000 = (filePath, endIndex) => {
   return new Promise((resolve, reject) => {
     let lineCount = 0;
 
     createReadStream(filePath, { end: endIndex })
       .on('data', chunk => {
         lineCount += countLinesInBuffer(chunk);
+        if (lineCount > 5000) resolve(lineCount);
       })
       .on('end', () => {
         resolve(lineCount);

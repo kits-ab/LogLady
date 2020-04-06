@@ -227,21 +227,16 @@ const handleShowOpenDialog = async (state, sender) => {
 const readLinesStartingAtByte = async (sender, data) => {
   const {
     sourcePath,
-    amountOfLogLinesToFetch,
-    totalFeCacheLength,
-    feCacheIndexForNewLines,
+    nrOfLogLines,
+    feCacheLength,
+    indexForNewLines,
     totalLineCountOfFile
   } = data;
   const [fileSize] = await getFileInfo(sourcePath);
-  const startByte = (fileSize / totalFeCacheLength) * feCacheIndexForNewLines;
+  const startByte = (fileSize / feCacheLength) * indexForNewLines;
   const numberOfBytes = 30000;
   let byteToReadFrom = startByte - 15000 < 0 ? 0 : startByte - 15000;
-  let cache = searchCache(
-    sourcePath,
-    startByte,
-    amountOfLogLinesToFetch,
-    fileSize
-  );
+  let cache = searchCache(sourcePath, startByte, nrOfLogLines, fileSize);
 
   if (cache === 'miss') {
     try {
@@ -258,12 +253,7 @@ const readLinesStartingAtByte = async (sender, data) => {
         updateCache(sourcePath, lines, startByteOfLines);
       }
 
-      cache = searchCache(
-        sourcePath,
-        startByte,
-        amountOfLogLinesToFetch,
-        fileSize
-      );
+      cache = searchCache(sourcePath, startByte, nrOfLogLines, fileSize);
     } catch (error) {
       console.log({ readLinesStartingAtByte }, error);
     }
@@ -276,8 +266,7 @@ const readLinesStartingAtByte = async (sender, data) => {
   const dataToReturn = {
     sourcePath,
     newLines: lines,
-    feCacheIndexForNewLines,
-    totalFeCacheLength
+    indexForNewLines
   };
 
   const action = {

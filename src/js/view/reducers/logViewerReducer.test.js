@@ -46,20 +46,21 @@ describe('logviewer reducer', () => {
     const sourcePath = 'test';
     const log = ['hej4', 'hej5'];
     const lineCount = 4;
-    const state = {
-      logs: { test: ['hej1', 'hej2', 'hej3'] }
-    };
+    // const state = {
+    //   logs: { test: ['hej1', 'hej2', 'hej3'] }
+    // };
     const expectedState = {
       logs: { test: ['.', '.', 'hej4', 'hej5'] },
       lengthOfInitialLogLineArrays: { test: 2 },
       nrOfLinesInFECache: { test: 6 },
-      lengthOfEmptyLines: { test: 2 }
+      lengthOfEmptyLines: { test: 2 },
+      totalNrOfLinesForFiles: {}
     };
     const action = {
       type: 'LOGVIEWER_SET_LOG',
       data: { sourcePath, log, lineCount }
     };
-    expect(logViewerReducer(state, action)).toEqual(expectedState);
+    expect(logViewerReducer(undefined, action)).toEqual(expectedState);
   });
 
   it('should append lines to source', () => {

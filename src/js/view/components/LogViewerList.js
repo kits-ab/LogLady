@@ -38,7 +38,7 @@ const LogViewerList = props => {
   });
 
   const listRef = useRef();
-  const startItemIndexOnLastFetchRef = useRef();
+  const startItemIndexRef = useRef();
 
   // Itemdata used to send needed props and state from this component to the pure component that renders a single line
   const itemData = createItemData(
@@ -109,40 +109,31 @@ const LogViewerList = props => {
     const nrOfLinesInViewer = Math.round(
       listDimensions.height / characterDimensions.height
     );
-    startItemIndexOnLastFetchRef.current =
-      props.lines.length - nrOfLinesInViewer;
-    // console.log({
-    //   initialStartItemIndex: startItemIndexOnLastFetchRef.current
-    // });
-  }, [listDimensions.height, props.sourcePath]);
+    startItemIndexRef.current = props.lines.length - nrOfLinesInViewer;
+  }, [listDimensions.height]);
 
   useEffect(() => {
     // In this effect the amount of lines scrolled in either direction are evaluated and if exceeding a certain amount, new lines will be fetched from the backend cache.
     const startItemIndexinView = listRef.current.getStartItemIndexInView();
     // A fetch of new lines should only be triggered if the total file content is not contained in the list of lines.
     if (props.wholeFileNotInFeCache) {
-      const currentAndLastStartItemIndexDiff =
-        startItemIndexinView - startItemIndexOnLastFetchRef.current;
-      console.log({ currentAndLastStartItemIndexDiff });
-      const maxAmountOfLinesToScroll = props.logLinesLength / 2;
+      const startItemIndexDiff =
+        startItemIndexinView - startItemIndexRef.current;
+      console.log({ startItemIndexDiff });
+      const maxLineNrToScroll = props.logLinesLength / 3;
 
       if (
-        currentAndLastStartItemIndexDiff > maxAmountOfLinesToScroll ||
-        currentAndLastStartItemIndexDiff < -maxAmountOfLinesToScroll
+        startItemIndexDiff > maxLineNrToScroll ||
+        startItemIndexDiff < -maxLineNrToScroll
       ) {
-        // Update the ref with the current startItemIndexInView value for comparing against the new position after fetching new lines.
-        startItemIndexOnLastFetchRef.current = startItemIndexinView;
+        startItemIndexRef.current = startItemIndexinView;
 
-        const feCacheIndexForNewLines =
-          startItemIndexinView - maxAmountOfLinesToScroll < 0
+        const indexForNewLines =
+          startItemIndexinView - maxLineNrToScroll < 0
             ? 0
-            : Math.round(startItemIndexinView - maxAmountOfLinesToScroll);
+            : Math.round(startItemIndexinView - maxLineNrToScroll);
 
-        props.getMoreLogLines(
-          props.logLinesLength,
-          props.lines.length,
-          feCacheIndexForNewLines
-        );
+        props.getMoreLogLines(indexForNewLines);
       }
     }
   }, [props.scrollTop]);

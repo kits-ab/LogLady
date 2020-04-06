@@ -1,4 +1,4 @@
-import { initializeCache } from '../components/helpers/cacheHelper';
+import { updateLogViewerCache } from '../components/helpers/cacheHelper';
 
 const initialState = {
   logs: {},
@@ -81,21 +81,16 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     }
 
-    // TODO: Use initializeCache here to insert new lines in the frontend cache, change names of action types etc to something more fitting.
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE': {
-      console.log('ADDING LINES FROM BYTE POS');
-      const {
-        sourcePath,
-        newLines,
-        indexForInsertingNewLines,
-        totalFECacheLength
-      } = action.data;
-      const currentCache = state.logs[sourcePath] ? state.logs[sourcePath] : [];
-      const updatedCache = initializeCache(totalFECacheLength).insertRows(
-        currentCache,
-        indexForInsertingNewLines,
-        newLines
-      );
+      console.log('UPDATE CACHE');
+      const { sourcePath, newLines, indexForNewLines } = action.data;
+      const cacheLength = state.nrOfLinesInFECache[sourcePath];
+      const updatedCache = newLines
+        ? updateLogViewerCache(cacheLength).insertRows(
+            indexForNewLines,
+            newLines
+          )
+        : state.logs[sourcePath];
       return {
         ...state,
         logs: {

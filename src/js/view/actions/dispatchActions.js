@@ -204,16 +204,14 @@ export const addLinesFetchedFromBackendCache = (
   dispatch,
   sourcePath,
   newLines,
-  indexForInsertingNewLines,
-  totalFECacheLength
+  indexForNewLines
 ) => {
   dispatch({
     type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
     data: {
       sourcePath,
       newLines,
-      indexForInsertingNewLines,
-      totalFECacheLength
+      indexForNewLines
     }
   });
 };

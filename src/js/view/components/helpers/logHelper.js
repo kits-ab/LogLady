@@ -24,18 +24,18 @@ export const scrollToBottom = (el, list) => {
 
 export const fetchNewLinesFromBackendCache = (
   sourcePath,
-  amountOfLogLinesToFetch,
-  totalFeCacheLength,
-  feCacheIndexForNewLines,
+  nrOfLogLines,
+  feCacheLength,
+  indexForNewLines,
   totalLineCountOfFile
 ) => {
   const argObj = {
     function: 'FETCH_NEW_LINES_FROM_BACKEND_CACHE',
     data: {
       sourcePath,
-      amountOfLogLinesToFetch,
-      totalFeCacheLength,
-      feCacheIndexForNewLines,
+      nrOfLogLines,
+      feCacheLength,
+      indexForNewLines,
       totalLineCountOfFile
     }
   };
