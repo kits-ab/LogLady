@@ -19,7 +19,7 @@ const MemoedSingleLogLine = React.memo(props => {
       {/^\[HLL\].*\[\/HLL\]$/.test(props.line) ? (
         <TextHighlightRegex text={props.line} color={props.highlightColor} />
       ) : (
-        props.line
+        <span>{props.line}</span>
       )}
     </LogLine>
   );
