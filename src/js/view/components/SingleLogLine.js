@@ -37,7 +37,6 @@ const SingleLogLineTranslator = React.memo(({ data, index, style }) => {
       style={style}
       line={line}
       highlightColor={data.highlightColor}
-      elementWidth={data.elementWidth}
       shouldWrap={data.shouldWrap}
       index={index}
     ></MemoedSingleLogLine>
