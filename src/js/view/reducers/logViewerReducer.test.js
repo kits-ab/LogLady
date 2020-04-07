@@ -46,9 +46,7 @@ describe('logviewer reducer', () => {
     const sourcePath = 'test';
     const log = ['hej4', 'hej5'];
     const lineCount = 4;
-    // const state = {
-    //   logs: { test: ['hej1', 'hej2', 'hej3'] }
-    // };
+
     const expectedState = {
       logs: { test: ['.', '.', 'hej4', 'hej5'] },
       lengthOfInitialLogLineArrays: { test: 2 },
@@ -82,24 +80,65 @@ describe('logviewer reducer', () => {
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
 
-  // TODO: Update the tests to match the new reducer logic
+  it('should update the frontend cache with new lines at the end of the log array', () => {
+    const sourcePath = 'testPath';
+    const newLines = ['c', 'd', 'e'];
+    const indexForNewLines = 5;
+    const state = {
+      logs: {
+        testPath: ['a', 'b', 'c', '.', '.', '.', '.', '.']
+      },
+      nrOfLinesInFECache: {
+        testPath: 8
+      }
+    };
+    const expectedState = {
+      logs: {
+        testPath: ['.', '.', '.', '.', '.', 'c', 'd', 'e']
+      },
+      nrOfLinesInFECache: {
+        testPath: 8
+      }
+    };
+    const action = {
+      type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
+      data: {
+        sourcePath,
+        newLines,
+        indexForNewLines
+      }
+    };
+    expect(logViewerReducer(state, action)).toEqual(expectedState);
+  });
 
-  // it('should update the frontend cache with new lines from specified position', () => {
-  //   const sourcePath = 'testPath';
-  //   const newLines = [];
-  //   const indexForInsertingNewLines = 0;
-  //   const totalFECacheLength = 10;
-  //   const state = {};
-  //   const expectedState = {};
-  //   const action = {
-  //     type: 'LOGVIEWER_ADD_LINES',
-  //     data: {
-  //       sourcePath,
-  //       newLines,
-  //       indexForInsertingNewLines,
-  //       totalFECacheLength
-  //     }
-  //   };
-  //   expect(logViewerReducer(state, action)).toEqual(expectedState);
-  // });
+  it('should update the frontend cache with new lines at the beginning of the log array', () => {
+    const sourcePath = 'testPath';
+    const newLines = ['a', 'b', 'c'];
+    const indexForNewLines = 0;
+    const state = {
+      logs: {
+        testPath: ['.', '.', '.', '.', '.', 'c', 'd', 'e']
+      },
+      nrOfLinesInFECache: {
+        testPath: 8
+      }
+    };
+    const expectedState = {
+      logs: {
+        testPath: ['a', 'b', 'c', '.', '.', '.', '.', '.']
+      },
+      nrOfLinesInFECache: {
+        testPath: 8
+      }
+    };
+    const action = {
+      type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
+      data: {
+        sourcePath,
+        newLines,
+        indexForNewLines
+      }
+    };
+    expect(logViewerReducer(state, action)).toEqual(expectedState);
+  });
 });
