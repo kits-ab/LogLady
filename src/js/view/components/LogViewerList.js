@@ -19,6 +19,9 @@ const createItemData = memoize((lines, highlightColor, shouldWrap) => {
 });
 
 const LogViewerList = props => {
+  //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
+  const listRef = useRef();
+
   const logViewerListContainerRef = useRef();
 
   const oneCharacterSizeRef = useRef();
@@ -69,6 +72,11 @@ const LogViewerList = props => {
     );
   }, [numberOfLinesToFillLogView]);
 
+  useEffect(() => {
+    //Force updates the List when the user toggles Wrap Lines
+    listRef.current.forceUpdate();
+  }, [props.wrapLines]);
+
   const _onRenderCell = (item, index) => {
     return (
       <SingleLogLineTranslator
@@ -85,9 +93,10 @@ const LogViewerList = props => {
         <span>A</span>
       </LogLineRuler>
       <List
-        style={{ display: 'inline-block', minWidth: '100%' }}
+        ref={listRef}
         items={props.lines}
         onRenderCell={_onRenderCell}
+        style={{ display: 'inline-block', minWidth: '100%' }}
       />
     </LogViewerListContainer>
   );

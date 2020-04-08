@@ -16,10 +16,10 @@ const MemoedSingleLogLine = React.memo(props => {
       wrap={props.shouldWrap ? 'true' : undefined}
       index={props.index}
     >
-      {/^\[HLL\].*\[\/HLL\]$/.test(props.line) ? (
-        <TextHighlightRegex text={props.line} color={props.highlightColor} />
+      {props.line.highlightLine ? (
+        <TextHighlightRegex line={props.line} color={props.highlightColor} />
       ) : (
-        <span>{props.line}</span>
+        <span>{props.line.sections[0].text}</span>
       )}
     </LogLine>
   );
