@@ -44,13 +44,13 @@ describe('logviewer reducer', () => {
 
   it('should set log on source', () => {
     const sourcePath = 'test';
-    const log = ['hej4', 'hej5'];
+    const log = ['hej1', 'hej2'];
     const lineCount = 4;
 
     const expectedState = {
-      logs: { test: ['.', '.', 'hej4', 'hej5'] },
+      logs: { test: ['hej1', 'hej2', '.', '.'] },
       lengthOfInitialLogLineArrays: { test: 2 },
-      nrOfLinesInFECache: { test: 6 },
+      nrOfLinesInFECache: { test: 4 },
       lengthOfEmptyLines: { test: 2 },
       totalNrOfLinesForFiles: {}
     };

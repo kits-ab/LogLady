@@ -8,6 +8,17 @@ const initialState = {
   totalNrOfLinesForFiles: {}
 };
 
+// Invisible character U+2800 being used in line.replace
+const replaceEmptyLinesWithHiddenChar = arr => {
+  const regexList = [/^\s*$/];
+  return arr.map(line => {
+    const isMatch = regexList.some(rx => {
+      return rx.test(line);
+    });
+    return isMatch ? line.replace(regexList[0], '⠀') : line;
+  });
+};
+
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'LOGVIEWER_REMOVE_LOG': {
@@ -36,10 +47,11 @@ export const logViewerReducer = (state = initialState, action) => {
         lineCount > 0
           ? new Array(emptyLinesLength).fill('.', 0, emptyLinesLength)
           : [];
-      const totalLineAmountInCache = lineCount + log.length;
+      const totalLineAmountInCache = emptyLinesLength + log.length;
+      const _log = replaceEmptyLinesWithHiddenChar(log);
       return {
         ...state,
-        logs: { ...state.logs, [sourcePath]: [...emptyLines, ...log] },
+        logs: { ...state.logs, [sourcePath]: [..._log, ...emptyLines] },
         nrOfLinesInFECache: {
           ...state.nrOfLinesInFECache,
           [sourcePath]: totalLineAmountInCache
@@ -91,11 +103,13 @@ export const logViewerReducer = (state = initialState, action) => {
             newLines
           )
         : state.logs[sourcePath];
+      const _updatedCache = replaceEmptyLinesWithHiddenChar(updatedCache);
+
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: updatedCache
+          [sourcePath]: _updatedCache
         }
       };
     }
