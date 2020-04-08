@@ -25,6 +25,9 @@ const LogViewerList = props => {
   const [maxLineLength, setCurrentMaxLineLength] = useState(1); // Used to save and update how many characters the longest line has
   const [lastLineCount, setLastLineCount] = useState(0); // Used to keep track of how many lines there were last render, for optimizing mainly calculation of new lines
 
+  //listRef is used to get the reference to the List object so that we can use its method forceUpdate
+  const listRef = useRef();
+
   const logViewerListContainerRef = useRef();
   const [listDimensions, setListDimensions] = useState({
     width: 575,
@@ -37,7 +40,6 @@ const LogViewerList = props => {
     height: 19
   });
 
-  const listRef = useRef();
   const startItemIndexRef = useRef();
 
   // Itemdata used to send needed props and state from this component to the pure component that renders a single line
@@ -90,13 +92,8 @@ const LogViewerList = props => {
     let currentMaxLength = maxLineLength;
     let index = lastLineCount;
     for (; index < props.lines.length; index++) {
-      // Remove all of the stuff hiddenWindow has added to it, as they shouldn't count towards the length of the string
-      let lineWithoutExtrasLength =
-        props.lines[index] !== null
-          ? props.lines[index].replace(/\[\/?HL[LG\d]+\]/g, '').length
-          : '';
-      if (lineWithoutExtrasLength > currentMaxLength) {
-        currentMaxLength = lineWithoutExtrasLength;
+      if (props.lines[index].length > currentMaxLength) {
+        currentMaxLength = props.lines[index].length;
       }
     }
 
@@ -148,12 +145,17 @@ const LogViewerList = props => {
     );
   };
 
+  //Force updates the List when wrapLines changes value
+  useEffect(() => {
+    listRef.current.forceUpdate();
+  }, [props.wrapLines]);
+
   return (
     <LogViewerListContainer ref={logViewerListContainerRef}>
       <LogLineRuler ref={oneCharacterSizeRef}>
         <span>A</span>
       </LogLineRuler>
-      <List ref={listRef} items={props.lines} onRenderCell={_onRenderCell} />
+      <List items={props.lines} onRenderCell={_onRenderCell} ref={listRef} />
     </LogViewerListContainer>
   );
 };

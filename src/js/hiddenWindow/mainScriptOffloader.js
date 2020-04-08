@@ -44,21 +44,30 @@ class LogsFiltererAndHighlighter {
         (this.filterRegex && this.filterRegex.test(line)) ||
         !this.filterRegex
       ) {
+        let lineObj = {};
         if (this.highlightRegex && this.highlightRegex.test(line)) {
-          let highlightCount = 0;
-          line =
-            '[HLL]' +
-            line.trim().replace(this.highlightRegex, match => {
-              return (
-                `[HLG${++highlightCount}]` + match + `[/HLG${highlightCount}]`
-              );
-            }) +
-            '[/HLL]';
-        }
-        if (sendLinesOneByOne) {
-          this._sendLineToMainWindow(line);
+          lineObj = {
+            highlightLine: true,
+            sections: line.split(this.highlightRegex).map(value => {
+              return {
+                text: value,
+                highlightSection: this.highlightRegex.test(value)
+              };
+            }),
+            length: line.length
+          };
         } else {
-          filteredAndHighlightedLines.push(line);
+          lineObj = {
+            highlightLine: false,
+            sections: [{ text: line, highlightSection: false }],
+            length: line.length
+          };
+        }
+
+        if (sendLinesOneByOne) {
+          this._sendLineToMainWindow(lineObj);
+        } else {
+          filteredAndHighlightedLines.push(lineObj);
         }
       }
     }
@@ -113,12 +122,12 @@ window.ipcRenderer.on('hiddenWindowMessages', (event, args) => {
     //  /\/(.*)\/(.*)/ is a regex for capturing two groups (pattern and flags) in a stringified regex, e.g "/(?:)/gi"
     if (args.filterRegexString) {
       let [, pattern, flags] = /\/(.*)\/(.*)/.exec(args.filterRegexString);
-      filterRegex = new RegExp(pattern, flags);
+      filterRegex = new RegExp(`(${pattern})`, flags);
     }
     if (args.highlightRegexString) {
       let [, pattern, flags] = /\/(.*)\/(.*)/.exec(args.highlightRegexString);
       flags = flags.indexOf('g') === -1 ? flags + 'g' : flags;
-      highlightRegex = new RegExp(pattern, flags);
+      highlightRegex = new RegExp(`(${pattern})`, flags);
     }
 
     // Create a new filterer and highlighter for this path in the logs that was sent and then start filtering
