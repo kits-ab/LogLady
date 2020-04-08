@@ -4,7 +4,7 @@ import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponent
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
-import { setTailSwitch } from '../actions/dispatchActions';
+import { handleTailSwitch } from '../actions/dispatchActions';
 import { fetchNewLinesFromBackendCache } from './helpers/logHelper';
 
 const LogViewer = props => {
@@ -135,24 +135,15 @@ const LogViewer = props => {
 
   useEffect(() => {
     //Effect to set tailswitch to true when scrolling or clicking at the bottom
-    // TODO: dispatching to reducer happens every scroll event, needs to be limited!
     const handleScrollEvent = () => {
       const isScrollerAtTheBottom =
         scroller.current.scrollHeight ===
         scroller.current.clientHeight + scroller.current.scrollTop;
 
-      if (isScrollerAtTheBottom) {
-        setTailSwitch(props.dispatch, {
-          sourcePath: props.source.path,
-          isScrollerAtTheBottom // true
-        });
-      } else {
-        if (tailSwitch) {
-          setTailSwitch(props.dispatch, {
-            sourcePath: props.source.path,
-            isScrollerAtTheBottom // false
-          });
-        }
+      if (isScrollerAtTheBottom && !tailSwitch) {
+        handleTailSwitch(props.dispatch, { sourcePath: props.source.path });
+      } else if (!isScrollerAtTheBottom && tailSwitch) {
+        handleTailSwitch(props.dispatch, { sourcePath: props.source.path });
       }
     };
 
@@ -161,19 +152,14 @@ const LogViewer = props => {
     return () => {
       scroller.current.removeEventListener('scroll', handleScrollEvent);
     };
-  }, [props.source.path]);
-
-  useEffect(() => {
-    //Effect for scrolling to bottom when opening a file
-    scroller.current.scrollTo(0, scroller.current.scrollHeight);
-  }, [props.source.path]);
+  }, [props.source.path, tailSwitch]);
 
   useEffect(() => {
     //Effect for scrolling to bottom when switching on tailswitch
     if (tailSwitch) {
       scroller.current.scrollTo(0, scroller.current.scrollHeight);
     }
-  }, [filteredAndHighlightedLines, tailSwitch]);
+  }, [tailSwitch]);
 
   const _getMoreLogLines = indexForNewLines => {
     console.log('get more lines');

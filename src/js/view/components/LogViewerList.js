@@ -40,7 +40,7 @@ const LogViewerList = props => {
     height: 19
   });
 
-  const startItemIndexRef = useRef();
+  const startItemIndexRef = useRef(0);
 
   // Itemdata used to send needed props and state from this component to the pure component that renders a single line
   const itemData = createItemData(
@@ -102,22 +102,18 @@ const LogViewerList = props => {
   }, [props.lines]);
 
   useEffect(() => {
-    // Effect for setting the initial startItemIndex when opening a file.
-    const nrOfLinesInViewer = Math.round(
-      listDimensions.height / characterDimensions.height
-    );
-    startItemIndexRef.current = props.lines.length - nrOfLinesInViewer;
-  }, [listDimensions.height]);
+    // In this effect the amount of lines scrolled in either direction are evaluated
+    // and if exceeding a certain amount, new lines will be fetched from the backend cache.
 
-  useEffect(() => {
-    // In this effect the amount of lines scrolled in either direction are evaluated and if exceeding a certain amount, new lines will be fetched from the backend cache.
     const startItemIndexinView = listRef.current.getStartItemIndexInView();
+
     // A fetch of new lines should only be triggered if the total file content is not contained in the list of lines.
     if (props.wholeFileNotInFeCache) {
       const startItemIndexDiff =
         startItemIndexinView - startItemIndexRef.current;
       console.log({ startItemIndexDiff });
-      const maxLineNrToScroll = props.logLinesLength / 3;
+      const maxLineNrToScroll =
+        listDimensions.height / characterDimensions.height / 2;
 
       if (
         startItemIndexDiff > maxLineNrToScroll ||
@@ -125,15 +121,21 @@ const LogViewerList = props => {
       ) {
         startItemIndexRef.current = startItemIndexinView;
 
+        const halvedLogLineLength = props.logLinesLength / 2;
         const indexForNewLines =
-          startItemIndexinView - maxLineNrToScroll < 0
+          startItemIndexinView - halvedLogLineLength < 0
             ? 0
-            : Math.round(startItemIndexinView - maxLineNrToScroll);
+            : Math.round(startItemIndexinView - halvedLogLineLength);
 
         props.getMoreLogLines(indexForNewLines);
       }
     }
   }, [props.scrollTop]);
+
+  //Force updates the List when wrapLines changes value
+  useEffect(() => {
+    listRef.current.forceUpdate();
+  }, [props.wrapLines]);
 
   const _onRenderCell = (item, index) => {
     return (
@@ -144,11 +146,6 @@ const LogViewerList = props => {
       ></SingleLogLineTranslator>
     );
   };
-
-  //Force updates the List when wrapLines changes value
-  useEffect(() => {
-    listRef.current.forceUpdate();
-  }, [props.wrapLines]);
 
   return (
     <LogViewerListContainer ref={logViewerListContainerRef}>

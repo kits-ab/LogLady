@@ -225,10 +225,3 @@ export const addCalculatedAmountOfLines = (dispatch, sourcePath, lineCount) => {
     }
   });
 };
-
-export const setTailSwitch = (dispatch, data) => {
-  dispatch({
-    type: 'LOGVIEWER_SET_TAILSWITCH',
-    data: data
-  });
-};
