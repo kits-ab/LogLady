@@ -11,17 +11,6 @@ const {
   flushCacheForOneFile
 } = require('./cache');
 
-// Invisible character U+2800 being used in line.replace
-const replaceEmptyLinesWithHiddenChar = arr => {
-  const regexList = [/^\s*$/];
-  return arr.map(line => {
-    const isMatch = regexList.some(rx => {
-      return rx.test(line);
-    });
-    return isMatch ? line.replace(regexList[0], '⠀') : line;
-  });
-};
-
 const updateRecentFiles = recentFiles => {
   createMenu(recentFiles);
   saveRecentFilesToDisk(recentFiles);
@@ -35,19 +24,17 @@ const getFileInfo = async filePath => {
 };
 
 const getFileHistory = async (filePath, fileSize) => {
-  const NR_OF_BYTES = 60000;
-  const START_READ_FROM_BYTE =
-    fileSize - NR_OF_BYTES <= 0 ? 0 : fileSize - NR_OF_BYTES;
+  const nrOfBytes = 60000;
+  const startFromByte = 0;
+  // replace startFromByte with commented code below to read from the end of the file instead.
+  // const START_READ_FROM_BYTE =
+  //   fileSize - NR_OF_BYTES <= 0 ? 0 : fileSize - NR_OF_BYTES;
   const {
     startByteOfLines,
     lines,
     linesStartAt,
     linesEndAt
-  } = await fileReader.readDataFromByte(
-    filePath,
-    START_READ_FROM_BYTE,
-    NR_OF_BYTES
-  );
+  } = await fileReader.readDataFromByte(filePath, startFromByte, nrOfBytes);
 
   return { startByteOfLines, lines, linesStartAt, linesEndAt };
 };
@@ -120,11 +107,9 @@ const openFile = async (sender, filePath) => {
 
     if (fileSize > 60000) {
       // Send half of the content if the file is bigger than the cached content.
-      lines = lines.slice(lines.length / 2);
-      startByteOfLines = startByteOfLines.slice(startByteOfLines.length / 2);
+      // lines = lines.slice(lines.length / 2); // uncomment this to send the end of the file.
+      lines = lines.slice(0, lines.length / 2);
     }
-    //Lines in history that contains empty spaces does not display properly. replaceEmptyLinesWithHiddenChar(history) returns an array where this has been taken care of by replacing each space with a hidden character, and makes those lines display correctly in LogViewer.
-    lines = replaceEmptyLinesWithHiddenChar(lines);
 
     const lineCount = await fileReader
       .getLineCountWithLimitOf5000(filePath)
@@ -224,7 +209,7 @@ const handleShowOpenDialog = async (state, sender) => {
     });
 };
 
-const readLinesStartingAtByte = async (sender, data) => {
+const getNewLinesFromCache = async (sender, data) => {
   const {
     sourcePath,
     nrOfLogLines,
@@ -232,19 +217,55 @@ const readLinesStartingAtByte = async (sender, data) => {
     indexForNewLines,
     totalLineCountOfFile
   } = data;
+
+  /**
+   * TODO: The current calculation works for files with a line count of ca 5 - 10 000.
+   * it should work on a larger file, for example with the size of 2.5gb as well.
+   *
+   * Maybe like this:
+   *
+   * Calculate the percentage position of the indexForNewLines in feCacheLenght
+   * Divide fileSize with totalLieneCount to get an approximate nr of bytes per row.
+   * Based on the percentage of the index, calculate which index of totalLineCount is on that percentage position.
+   * Multiply nr of bytes per row with the index = the byte to read from.
+   *
+   *
+   * TODO: check if the amount of lines returned from searchCache < nrOfLogLines => make an update and search again until the correct amount is returned. The backend should always return an array with the length of nrOfLogLines. This could probably fix the issue with the end of the file not always showing.
+   *
+   */
+
   const [fileSize] = await getFileInfo(sourcePath);
-  const startByte = (fileSize / feCacheLength) * indexForNewLines;
-  const numberOfBytes = 30000;
-  let byteToReadFrom = startByte - 15000 < 0 ? 0 : startByte - 15000;
-  let cache = searchCache(sourcePath, startByte, nrOfLogLines, fileSize);
+
+  const fromByte = Math.round((fileSize / feCacheLength) * indexForNewLines);
+
+  // first cache search
+  let cache = searchCache(sourcePath, fromByte, nrOfLogLines);
+
+  console.log({
+    sourcePath,
+    nrOfLogLines,
+    feCacheLength,
+    indexForNewLines,
+    fromByte
+  });
 
   if (cache === 'miss') {
     try {
+      const nrOfBytes = 60000;
+      let byteToReadFrom =
+        Math.round(fromByte - nrOfBytes / 2) < 0
+          ? 0
+          : Math.round(fromByte - nrOfBytes / 2);
+
+      console.log({ byteToReadFrom });
+
       const { startByteOfLines, lines } = await fileReader.readDataFromByte(
         sourcePath,
         byteToReadFrom,
-        numberOfBytes
+        nrOfBytes
       );
+
+      // update cache with the new content
       updateCache(sourcePath, lines, startByteOfLines);
 
       // Check for size
@@ -253,22 +274,21 @@ const readLinesStartingAtByte = async (sender, data) => {
         updateCache(sourcePath, lines, startByteOfLines);
       }
 
-      cache = searchCache(sourcePath, startByte, nrOfLogLines, fileSize);
+      // second cache search. Content should be found if above calculations are correct
+      cache = searchCache(sourcePath, fromByte, nrOfLogLines);
     } catch (error) {
-      console.log({ readLinesStartingAtByte }, error);
+      console.log({ getNewLinesFromCache }, error);
     }
   }
 
-  let { lines } = cache;
+  const newLines = cache.lines;
 
-  lines = replaceEmptyLinesWithHiddenChar(lines);
-
+  // Send result to frontend
   const dataToReturn = {
     sourcePath,
-    newLines: lines,
+    newLines,
     indexForNewLines
   };
-
   const action = {
     type: 'LOGLINES_FETCHED_FROM_BACKEND_CACHE',
     data: { dataToReturn }
@@ -319,7 +339,7 @@ const createEventHandler = state => {
         loadStateFromDisk(state, sender);
         break;
       case 'FETCH_NEW_LINES_FROM_BACKEND_CACHE':
-        readLinesStartingAtByte(sender, _argObj.data).catch(err => {
+        getNewLinesFromCache(sender, _argObj.data).catch(err => {
           console.error(err);
         });
         break;

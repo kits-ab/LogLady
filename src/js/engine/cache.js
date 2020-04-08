@@ -1,41 +1,33 @@
 let cache = {};
 
-const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
+const searchCache = (filepath, position, amountOfLines) => {
   if (cache[filepath]) {
     const info = cache[filepath].cachedPartsInfo;
+
     for (let part of info) {
       const positionIsWithinLimit =
         position >= part.startsAt && position <= part.endsAt;
-      if (positionIsWithinLimit) {
-        const filtered = part.startByteOfLines.filter(x => {
-          return x >= position;
-        });
 
+      if (positionIsWithinLimit) {
         const result = cache[filepath].lines
           .filter(line => {
             return line.startsAtByte >= position;
           })
           .slice(0, amountOfLines);
-
-        if (amountOfLines > filtered.length) {
-          if (position >= fileSize - 30000) {
-            return _parseResult(result);
-          } else {
-            return 'miss';
-          }
-        } else {
-          return _parseResult(result);
-        }
+        return _parseResult(result);
       }
     }
+
     return 'miss';
   } else {
     return 'miss';
   }
 };
+
 const updateCache = (filepath, lines, startByteOfLines) => {
   let cacheLines = _formatCacheLines(lines, startByteOfLines);
   let cachedPartsInfo = _formatCachedPartsInfo(startByteOfLines);
+
   if (cache[filepath]) {
     let currentCacheLines = cache[filepath].lines;
     const newLinesStartsBeforeCurrentLines =
@@ -110,6 +102,7 @@ const addNewLinesBeforeCurrentLines = (
   cacheLines,
   cachedPartsInfo
 ) => {
+  console.log('new is before current');
   cache[filepath] = {
     lines: [...cacheLines, ...cache[filepath].lines],
     cachedPartsInfo: [...cachedPartsInfo, ...cache[filepath].cachedPartsInfo]
@@ -121,6 +114,7 @@ const addNewLinesAfterCurrentLines = (
   cacheLines,
   cachedPartsInfo
 ) => {
+  console.log('new is after current');
   cache[filepath] = {
     lines: [...cache[filepath].lines, ...cacheLines],
     cachedPartsInfo: [...cache[filepath].cachedPartsInfo, ...cachedPartsInfo]
@@ -172,9 +166,9 @@ const flushCacheForOneFile = filepath => {
   delete cache[filepath];
 };
 
+/*check if cache has reached the limit of 100mb (a hundred millon bytes)*/
 const cacheInit = cache;
 const checkIfCacheIsWithinSizeLimit = (cache = cacheInit) => {
-  /*check if cache has reached the limit of 100mb (a hundred millon bytes)*/
   const cacheSize = Buffer.byteLength(JSON.stringify(cache), 'utf8');
   const sizeLimit = 100000000;
   return cacheSize < sizeLimit ? true : false;
