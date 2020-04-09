@@ -31,17 +31,6 @@ const LogViewerList = props => {
     props.wrapLines
   );
 
-  // Measure is a component that is used to measure the height of a character
-  const Measure = ({ onMeasured }) => {
-    const oneCharacterRef = useRef();
-
-    useEffect(() => {
-      onMeasured(oneCharacterRef.current.offsetHeight);
-    }, [onMeasured, oneCharacterRef]);
-
-    return <LogLineRuler ref={oneCharacterRef}>A</LogLineRuler>;
-  };
-
   useEffect(() => {
     // Calculating the amount of lines needed to fill the page in the logviewer
     setNbrOfLinesToFillLogView(
@@ -60,6 +49,17 @@ const LogViewerList = props => {
     //Force updates the List when the user toggles Wrap Lines
     listRef.current.forceUpdate();
   }, [props.wrapLines]);
+
+  // Measure is a component that is used to measure the height of a character
+  const Measure = ({ onMeasured }) => {
+    const oneCharacterRef = useRef();
+
+    useEffect(() => {
+      onMeasured(oneCharacterRef.current.offsetHeight);
+    }, [onMeasured, oneCharacterRef]);
+
+    return <LogLineRuler ref={oneCharacterRef}>A</LogLineRuler>;
+  };
 
   const _onRenderCell = (item, index) => {
     return (
