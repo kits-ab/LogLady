@@ -7,7 +7,6 @@ import {
 } from '../styledComponents/LogViewerListStyledComponents';
 import SingleLogLineTranslator from './SingleLogLine';
 import { updateNumberOfLinesToRenderInLogView } from '../actions/dispatchActions';
-import _ from 'lodash';
 import { List } from 'office-ui-fabric-react';
 
 const createItemData = memoize((lines, highlightColor, shouldWrap) => {
@@ -20,19 +19,10 @@ const createItemData = memoize((lines, highlightColor, shouldWrap) => {
 
 const LogViewerList = props => {
   const [measuredCharHeight, setMeasuredCharHeight] = useState(null);
+  const [nbrOfLinesToFillLogView, setNbrOfLinesToFillLogView] = useState(null);
 
   //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
   const listRef = useRef();
-
-  const logViewerListContainerRef = useRef();
-
-  const [characterDimensions, setCharacterDimensions] = useState({
-    height: 19
-  });
-
-  const [numberOfLinesToFillLogView, setNumberOfLinesToFillLogView] = useState(
-    Math.round(props.containerHeight / characterDimensions.height)
-  );
 
   // Itemdata used to send needed props and state from this component to the pure component that renders a single line
   const itemData = createItemData(
@@ -53,37 +43,18 @@ const LogViewerList = props => {
   };
 
   useEffect(() => {
-    // Handler to update the dimensions when needed
-    const handleResize = () => {
-      setCharacterDimensions({
-        height: measuredCharHeight
-      });
-    };
-    handleResize();
-
-    // Calls are throttled to once every 200 ms
-    const debouncedResizeHandler = _.debounce(handleResize, 200);
-    window.addEventListener('resize', debouncedResizeHandler);
-    // Return cleanup function
-    return () => {
-      window.removeEventListener('resize', debouncedResizeHandler);
-    };
-  }, []);
-
-  useEffect(() => {
     // Calculating the amount of lines needed to fill the page in the logviewer
-    setNumberOfLinesToFillLogView(
+    setNbrOfLinesToFillLogView(
       Math.round(props.containerHeight / measuredCharHeight)
     );
-    console.log(`Measure: ${measuredCharHeight}`);
-  }, [props.containerHeight, characterDimensions]);
+  }, [props.containerHeight, measuredCharHeight]);
 
   useEffect(() => {
     updateNumberOfLinesToRenderInLogView(
       props.dispatcher,
-      numberOfLinesToFillLogView
+      nbrOfLinesToFillLogView
     );
-  }, [numberOfLinesToFillLogView]);
+  }, [nbrOfLinesToFillLogView]);
 
   useEffect(() => {
     //Force updates the List when the user toggles Wrap Lines
@@ -101,7 +72,7 @@ const LogViewerList = props => {
   };
 
   return (
-    <LogViewerListContainer ref={logViewerListContainerRef}>
+    <LogViewerListContainer>
       {!measuredCharHeight && <Measure onMeasured={setMeasuredCharHeight} />}
       <List
         ref={listRef}
