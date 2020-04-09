@@ -5,7 +5,8 @@ const initialState = {
   nrOfLinesInFECache: {},
   lengthOfInitialLogLineArrays: {},
   lengthOfEmptyLines: {},
-  totalNrOfLinesForFiles: {}
+  totalNrOfLinesForFiles: {},
+  currentScrollTops: {}
 };
 
 // Invisible character U+2800 being used in line.replace
@@ -63,6 +64,10 @@ export const logViewerReducer = (state = initialState, action) => {
         lengthOfEmptyLines: {
           ...state.lengthOfEmptyLines,
           [sourcePath]: emptyLinesLength
+        },
+        currentScrollTops: {
+          ...state.currentScrollTops,
+          [sourcePath]: 0
         }
       };
     }
@@ -79,6 +84,7 @@ export const logViewerReducer = (state = initialState, action) => {
         }
       };
     }
+
     case 'LOGVIEWER_ADD_LINES': {
       console.log('ADDING');
       const { sourcePath, lines } = action.data;
@@ -100,16 +106,27 @@ export const logViewerReducer = (state = initialState, action) => {
       const updatedCache = newLines
         ? updateLogViewerCache(cacheLength).insertRows(
             indexForNewLines,
-            newLines
+            replaceEmptyLinesWithHiddenChar(newLines)
           )
         : state.logs[sourcePath];
-      const _updatedCache = replaceEmptyLinesWithHiddenChar(updatedCache);
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: _updatedCache
+          [sourcePath]: updatedCache
+        }
+      };
+    }
+
+    case 'LOGVIEWER_SAVE_CURRENT_SCROLLTOP': {
+      const { sourcePath, scrollTop } = action.data;
+
+      return {
+        ...state,
+        currentScrollTops: {
+          ...state.currentScrollTops,
+          [sourcePath]: scrollTop
         }
       };
     }

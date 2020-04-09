@@ -7,8 +7,8 @@ export const LogViewerContainer = styled.div`
   color: #ccc;
   background: #444;
   height: 100%;
-  overflow-anchor: none;
   min-width: 0;
+  overflow-anchor: none;
   overflow: auto;
 `;
 

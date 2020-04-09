@@ -218,19 +218,11 @@ const getNewLinesFromCache = async (sender, data) => {
     totalLineCountOfFile
   } = data;
 
-  /**
-   * TODO: The current calculation works for files with a line count of ca 5 - 10 000.
-   * it should work on a larger file, for example with the size of 2.5gb as well.
+  /*
    *
-   * Maybe like this:
-   *
-   * Calculate the percentage position of the indexForNewLines in feCacheLenght
-   * Divide fileSize with totalLieneCount to get an approximate nr of bytes per row.
-   * Based on the percentage of the index, calculate which index of totalLineCount is on that percentage position.
-   * Multiply nr of bytes per row with the index = the byte to read from.
-   *
-   *
-   * TODO: check if the amount of lines returned from searchCache < nrOfLogLines => make an update and search again until the correct amount is returned. The backend should always return an array with the length of nrOfLogLines. This could probably fix the issue with the end of the file not always showing.
+   * TODO: check if the amount of lines returned from searchCache < nrOfLogLines =>
+   * make an update and search again until the correct amount is returned.
+   * The backend should always return an array with the length of nrOfLogLines.
    *
    */
 
@@ -246,7 +238,8 @@ const getNewLinesFromCache = async (sender, data) => {
     nrOfLogLines,
     feCacheLength,
     indexForNewLines,
-    fromByte
+    fromByte,
+    totalLineCountOfFile
   });
 
   if (cache === 'miss') {

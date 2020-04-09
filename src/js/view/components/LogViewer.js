@@ -4,7 +4,10 @@ import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponent
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
-import { handleTailSwitch } from '../actions/dispatchActions';
+import {
+  handleTailSwitch,
+  saveCurrentScrollTop
+} from '../actions/dispatchActions';
 import { fetchNewLinesFromBackendCache } from './helpers/logHelper';
 
 const LogViewer = props => {
@@ -31,7 +34,7 @@ const LogViewer = props => {
     : 0;
   const totalNrOfLinesInFile = props.totalNrOfLinesForFiles[props.source.path]
     ? props.totalNrOfLinesForFiles[props.source.path]
-    : 0;
+    : false;
   const emptyLinesLength = props.lengthOfEmptyLines[props.source.path]
     ? props.lengthOfEmptyLines[props.source.path]
     : 0;
@@ -65,6 +68,7 @@ const LogViewer = props => {
       setLines(lines => {
         return lines.concat(args.line);
       });
+      console.log({ filteredAndHighlightedLines });
     } else if (args.type === 'serveFilteredLogsAllDone') {
       // Overwrite anything in the state
       setLines(args.lines);
@@ -121,6 +125,14 @@ const LogViewer = props => {
   }, [props.source.path]);
 
   useEffect(() => {
+    saveCurrentScrollTop(props.dispatch, props.source.path, currentScrollTop);
+  }, [currentScrollTop]);
+
+  useEffect(() => {
+    scroller.current.scrollTo(0, props.currentScrollTops[props.source.path]);
+  }, [props.source.path]);
+
+  useEffect(() => {
     const handleScrollPositionEvent = event => {
       setCurrentScrollTop(event.target.scrollTop);
     };
@@ -131,7 +143,7 @@ const LogViewer = props => {
     return () => {
       scroller.current.removeEventListener('scroll', handleScrollPositionEvent);
     };
-  }, []);
+  }, [totalNrOfLinesInFile]);
 
   useEffect(() => {
     //Effect to set tailswitch to true when scrolling or clicking at the bottom
@@ -197,7 +209,8 @@ const mapStateToProps = ({
     lengthOfInitialLogLineArrays,
     nrOfLinesInFECache,
     totalNrOfLinesForFiles,
-    lengthOfEmptyLines
+    lengthOfEmptyLines,
+    currentScrollTops
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -210,7 +223,8 @@ const mapStateToProps = ({
     lengthOfInitialLogLineArrays,
     nrOfLinesInFECache,
     totalNrOfLinesForFiles,
-    lengthOfEmptyLines
+    lengthOfEmptyLines,
+    currentScrollTops
   };
 };
 

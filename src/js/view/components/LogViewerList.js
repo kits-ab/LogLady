@@ -101,11 +101,18 @@ const LogViewerList = props => {
     setLastLineCount(index);
   }, [props.lines]);
 
+  // useEffect(() => {
+  //   startItemIndexRef.current = listRef.current.getStartItemIndexInView();
+  // }, [props.nrOfRowsInFile]);
+
   useEffect(() => {
     // In this effect the amount of lines scrolled in either direction are evaluated
     // and if exceeding a certain amount, new lines will be fetched from the backend cache.
 
     const startItemIndexinView = listRef.current.getStartItemIndexInView();
+    const totalListHeight = listRef.current.getTotalListHeight();
+    console.log({ totalListHeight });
+    // console.log({ startItemIndexinView });
 
     // A fetch of new lines should only be triggered if the total file content is not contained in the list of lines.
     if (props.wholeFileNotInFeCache) {
@@ -140,13 +147,13 @@ const LogViewerList = props => {
   const _onRenderCell = (item, index) => {
     return (
       <SingleLogLineTranslator
-        data={itemData}
+        data={itemData || ':)'}
         index={index}
         style={{ willChange: 'unset' }}
       ></SingleLogLineTranslator>
     );
   };
-
+  console.log({ propsLInes: props.lines });
   return (
     <LogViewerListContainer ref={logViewerListContainerRef}>
       <LogLineRuler ref={oneCharacterSizeRef}>

@@ -7,7 +7,8 @@ describe('logviewer reducer', () => {
       nrOfLinesInFECache: {},
       totalNrOfLinesForFiles: {},
       lengthOfInitialLogLineArrays: {},
-      lengthOfEmptyLines: {}
+      lengthOfEmptyLines: {},
+      currentScrollTops: {}
     };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
@@ -28,7 +29,8 @@ describe('logviewer reducer', () => {
       nrOfLinesInFECache: {},
       totalNrOfLinesForFiles: {},
       lengthOfInitialLogLineArrays: {},
-      lengthOfEmptyLines: {}
+      lengthOfEmptyLines: {},
+      currentScrollTops: {}
     };
     const sourcePath = 'test';
 
@@ -52,7 +54,8 @@ describe('logviewer reducer', () => {
       lengthOfInitialLogLineArrays: { test: 2 },
       nrOfLinesInFECache: { test: 4 },
       lengthOfEmptyLines: { test: 2 },
-      totalNrOfLinesForFiles: {}
+      totalNrOfLinesForFiles: {},
+      currentScrollTops: { test: 0 }
     };
     const action = {
       type: 'LOGVIEWER_SET_LOG',

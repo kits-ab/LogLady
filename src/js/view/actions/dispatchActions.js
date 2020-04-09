@@ -225,3 +225,13 @@ export const addCalculatedAmountOfLines = (dispatch, sourcePath, lineCount) => {
     }
   });
 };
+
+export const saveCurrentScrollTop = (dispatch, sourcePath, scrollTop) => {
+  dispatch({
+    type: 'LOGVIEWER_SAVE_CURRENT_SCROLLTOP',
+    data: {
+      sourcePath,
+      scrollTop
+    }
+  });
+};
