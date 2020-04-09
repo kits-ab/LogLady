@@ -34,7 +34,9 @@ const LogViewerList = props => {
   useEffect(() => {
     // Calculating the amount of lines needed to fill the page in the logviewer
     setNbrOfLinesToFillLogView(
-      Math.round(props.containerHeight / measuredCharHeight)
+      measuredCharHeight
+        ? Math.round(props.containerHeight / measuredCharHeight)
+        : null
     );
   }, [props.containerHeight, measuredCharHeight]);
 
