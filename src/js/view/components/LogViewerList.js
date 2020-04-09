@@ -19,12 +19,13 @@ const createItemData = memoize((lines, highlightColor, shouldWrap) => {
 });
 
 const LogViewerList = props => {
+  const [measuredCharHeight, setMeasuredCharHeight] = useState(null);
+
   //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
   const listRef = useRef();
 
   const logViewerListContainerRef = useRef();
 
-  const oneCharacterSizeRef = useRef();
   const [characterDimensions, setCharacterDimensions] = useState({
     height: 19
   });
@@ -40,11 +41,22 @@ const LogViewerList = props => {
     props.wrapLines
   );
 
+  // Measure is a component that is used to measure the height of a character
+  const Measure = ({ onMeasured }) => {
+    const oneCharacterRef = useRef();
+
+    useEffect(() => {
+      onMeasured(oneCharacterRef.current.offsetHeight);
+    }, [onMeasured, oneCharacterRef]);
+
+    return <LogLineRuler ref={oneCharacterRef}>A</LogLineRuler>;
+  };
+
   useEffect(() => {
     // Handler to update the dimensions when needed
     const handleResize = () => {
       setCharacterDimensions({
-        height: oneCharacterSizeRef.current.offsetHeight
+        height: measuredCharHeight
       });
     };
     handleResize();
@@ -61,8 +73,9 @@ const LogViewerList = props => {
   useEffect(() => {
     // Calculating the amount of lines needed to fill the page in the logviewer
     setNumberOfLinesToFillLogView(
-      Math.round(props.containerHeight / characterDimensions.height)
+      Math.round(props.containerHeight / measuredCharHeight)
     );
+    console.log(`Measure: ${measuredCharHeight}`);
   }, [props.containerHeight, characterDimensions]);
 
   useEffect(() => {
@@ -89,9 +102,7 @@ const LogViewerList = props => {
 
   return (
     <LogViewerListContainer ref={logViewerListContainerRef}>
-      <LogLineRuler ref={oneCharacterSizeRef}>
-        <span>A</span>
-      </LogLineRuler>
+      {!measuredCharHeight && <Measure onMeasured={setMeasuredCharHeight} />}
       <List
         ref={listRef}
         items={props.lines}
