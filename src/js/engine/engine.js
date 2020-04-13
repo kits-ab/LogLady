@@ -218,14 +218,6 @@ const getNewLinesFromCache = async (sender, data) => {
     totalLineCountOfFile
   } = data;
 
-  /*
-   *
-   * TODO: check if the amount of lines returned from searchCache < nrOfLogLines =>
-   * make an update and search again until the correct amount is returned.
-   * The backend should always return an array with the length of nrOfLogLines.
-   *
-   */
-
   const [fileSize] = await getFileInfo(sourcePath);
 
   const fromByte = Math.round((fileSize / feCacheLength) * indexForNewLines);
@@ -242,7 +234,7 @@ const getNewLinesFromCache = async (sender, data) => {
     totalLineCountOfFile
   });
 
-  if (cache === 'miss') {
+  if (cache === 'miss' || cache.lines.length < nrOfLogLines) {
     try {
       const nrOfBytes = 60000;
       let byteToReadFrom =
@@ -267,7 +259,7 @@ const getNewLinesFromCache = async (sender, data) => {
         updateCache(sourcePath, lines, startByteOfLines);
       }
 
-      // second cache search. Content should be found if above calculations are correct
+      // second cache search. Content should now be in the updated cache
       cache = searchCache(sourcePath, fromByte, nrOfLogLines);
     } catch (error) {
       console.log({ getNewLinesFromCache }, error);
