@@ -53,14 +53,12 @@ class LogsFiltererAndHighlighter {
                 text: value,
                 highlightSection: this.highlightRegex.test(value)
               };
-            }),
-            length: line.length
+            })
           };
         } else {
           lineObj = {
             highlightLine: false,
-            sections: [{ text: line, highlightSection: false }],
-            length: line.length
+            sections: [{ text: line, highlightSection: false }]
           };
         }
 

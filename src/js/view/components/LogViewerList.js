@@ -52,7 +52,7 @@ const LogViewerList = props => {
     listRef.current.forceUpdate();
   }, [props.wrapLines]);
 
-  // Measure is a component that is used to measure the height of a character
+  // Measure is used to measure the height of a character
   const Measure = ({ onMeasured }) => {
     const oneCharacterRef = useRef();
 
@@ -68,7 +68,6 @@ const LogViewerList = props => {
       <SingleLogLineTranslator
         data={itemData}
         index={index}
-        style={{ willChange: 'unset' }}
       ></SingleLogLineTranslator>
     );
   };
