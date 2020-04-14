@@ -50,10 +50,10 @@ describe('logviewer reducer', () => {
     const lineCount = 4;
 
     const expectedState = {
-      logs: { test: ['hej1', 'hej2', '.', '.'] },
+      logs: { test: ['hej1', 'hej2'] },
       lengthOfInitialLogLineArrays: { test: 2 },
-      nrOfLinesInFECache: { test: 4 },
-      lengthOfEmptyLines: { test: 2 },
+      nrOfLinesInFECache: {},
+      lengthOfEmptyLines: {},
       totalNrOfLinesForFiles: {},
       currentScrollTops: { test: 0 }
     };

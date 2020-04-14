@@ -52,6 +52,7 @@ const LogViewer = props => {
     For more information see mainScriptOffloader.js */
     let filterRegex = parseRegExp(filterInput),
       highlightRegex = parseRegExp(highlightInput);
+
     window.ipcRenderer.send('hiddenWindowMessages', {
       type: 'requestHelpFilterAndHighlightLines',
       filterRegexString: filterRegex ? filterRegex.toString() : '',
@@ -68,7 +69,6 @@ const LogViewer = props => {
       setLines(lines => {
         return lines.concat(args.line);
       });
-      console.log({ filteredAndHighlightedLines });
     } else if (args.type === 'serveFilteredLogsAllDone') {
       // Overwrite anything in the state
       setLines(args.lines);

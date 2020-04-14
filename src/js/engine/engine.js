@@ -26,9 +26,6 @@ const getFileInfo = async filePath => {
 const getFileHistory = async (filePath, fileSize) => {
   const nrOfBytes = 60000;
   const startFromByte = 0;
-  // replace startFromByte with commented code below to read from the end of the file instead.
-  // const START_READ_FROM_BYTE =
-  //   fileSize - NR_OF_BYTES <= 0 ? 0 : fileSize - NR_OF_BYTES;
   const {
     startByteOfLines,
     lines,
@@ -107,20 +104,10 @@ const openFile = async (sender, filePath) => {
 
     if (fileSize > 60000) {
       // Send half of the content if the file is bigger than the cached content.
-      // lines = lines.slice(lines.length / 2); // uncomment this to send the end of the file.
       lines = lines.slice(0, lines.length / 2);
     }
 
-    const lineCount = await fileReader
-      .getLineCountWithLimitOf5000(filePath)
-      .then(count => {
-        return count;
-      })
-      .catch(err => {
-        console.log(err);
-      });
-
-    sendFileOpened(sender, filePath, fileSize, endIndex, lines, lineCount);
+    sendFileOpened(sender, filePath, fileSize, endIndex, lines);
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
     return false;
@@ -220,29 +207,20 @@ const getNewLinesFromCache = async (sender, data) => {
 
   const [fileSize] = await getFileInfo(sourcePath);
 
-  const fromByte = Math.round((fileSize / feCacheLength) * indexForNewLines);
+  const searchFromByte = Math.round(
+    (fileSize / feCacheLength) * indexForNewLines
+  );
 
   // first cache search
-  let cache = searchCache(sourcePath, fromByte, nrOfLogLines);
-
-  console.log({
-    sourcePath,
-    nrOfLogLines,
-    feCacheLength,
-    indexForNewLines,
-    fromByte,
-    totalLineCountOfFile
-  });
+  let cache = searchCache(sourcePath, searchFromByte, nrOfLogLines);
 
   if (cache === 'miss' || cache.lines.length < nrOfLogLines) {
     try {
       const nrOfBytes = 60000;
       let byteToReadFrom =
-        Math.round(fromByte - nrOfBytes / 2) < 0
+        Math.round(searchFromByte - nrOfBytes / 2) < 0
           ? 0
-          : Math.round(fromByte - nrOfBytes / 2);
-
-      console.log({ byteToReadFrom });
+          : Math.round(searchFromByte - nrOfBytes / 2);
 
       const { startByteOfLines, lines } = await fileReader.readDataFromByte(
         sourcePath,
@@ -253,14 +231,14 @@ const getNewLinesFromCache = async (sender, data) => {
       // update cache with the new content
       updateCache(sourcePath, lines, startByteOfLines);
 
-      // Check for size
+      // Check for size and flush if cache is too big
       if (!checkIfCacheIsWithinSizeLimit()) {
         flushCacheForOneFile(sourcePath);
         updateCache(sourcePath, lines, startByteOfLines);
       }
 
-      // second cache search. Content should now be in the updated cache
-      cache = searchCache(sourcePath, fromByte, nrOfLogLines);
+      // Second cache search. Content should now be in the updated cache
+      cache = searchCache(sourcePath, searchFromByte, nrOfLogLines);
     } catch (error) {
       console.log({ getNewLinesFromCache }, error);
     }

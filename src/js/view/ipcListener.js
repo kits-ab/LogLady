@@ -54,7 +54,7 @@ const handleFileOpened = (
   { filePath, fileSize, endIndex, history, lineCount }
 ) => {
   // clearAllLogs(dispatch);
-  setFileData(dispatch, filePath, fileSize, history, lineCount);
+  setFileData(dispatch, filePath, fileSize, history);
   setLastSeenLogSizeToSize(dispatch, filePath, fileSize);
 
   const followSource = {

@@ -74,13 +74,7 @@ export const updateLastSeenLogSizes = (dispatch, path, fileSize) => {
   });
 };
 
-export const setFileData = (
-  dispatch,
-  filePath,
-  fileSize,
-  history,
-  lineCount
-) => {
+export const setFileData = (dispatch, filePath, fileSize, history) => {
   dispatch({
     type: 'CREATE_SETTINGS_OBJECT',
     data: {
@@ -100,8 +94,7 @@ export const setFileData = (
     type: 'LOGVIEWER_SET_LOG',
     data: {
       sourcePath: filePath,
-      log: history,
-      lineCount
+      log: history
     }
   });
 };
