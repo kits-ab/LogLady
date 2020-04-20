@@ -1,5 +1,3 @@
-// import { updateLogViewerCache } from '../components/helpers/logHelper';
-
 const initialState = {
   logs: {},
   lengthOfInitialLogLineArrays: {},
@@ -9,7 +7,7 @@ const initialState = {
   indexesForNewLines: {}
 };
 
-// Invisible character U+2800 being used in line.replace
+// Invisible character U+2800 being used in line.replace. Making the viewer display empty lines.
 const replaceEmptyLinesWithHiddenChar = arr => {
   const regexList = [/^\s*$/];
   return arr.map(line => {
@@ -35,11 +33,13 @@ export const logViewerReducer = (state = initialState, action) => {
 
       return { ...state, logs: { ...logsToKeep } };
     }
+
     case 'LOGVIEWER_CLEAR':
       return {
         ...state,
         logs: {}
       };
+
     case 'LOGVIEWER_SET_LOG': {
       console.log('SETTING LOG');
       const { sourcePath, log } = action.data;
@@ -75,18 +75,8 @@ export const logViewerReducer = (state = initialState, action) => {
           ? 0
           : lineCount - state.logs[sourcePath].length;
 
-      // Adding empty lines to initial cache
-      // const cache = updateLogViewerCache(totalNrOfLines).insertRows(
-      //   0,
-      //   state.logs[sourcePath]
-      // );
-
       return {
         ...state,
-        // logs: {
-        //   ...state.logs,
-        //   [sourcePath]: cache
-        // },
         totalNrOfLinesForFiles: {
           ...state.totalNrOfLinesForFiles,
           [sourcePath]: totalNrOfLines
@@ -115,19 +105,11 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE': {
       console.log('UPDATE CACHE');
       const { sourcePath, newLines, indexForNewLines } = action.data;
-      // const cacheLength = state.totalNrOfLinesForFiles[sourcePath];
-      // const updatedCache = newLines
-      //   ? updateLogViewerCache(cacheLength).insertRows(
-      //       indexForNewLines,
-      //       replaceEmptyLinesWithHiddenChar(newLines)
-      //     )
-      //   : state.logs[sourcePath];
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          // [sourcePath]: updatedCache
           [sourcePath]: newLines
         },
         indexesForNewLines: {

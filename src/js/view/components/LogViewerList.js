@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import memoize from 'memoize-one';
 import { LogViewerListContainer } from '../styledComponents/LogViewerListStyledComponents';
-import SingleLogLineTranslator from './SingleLogLine';
+import { MemoedSingleLogLine } from './SingleLogLine';
+import { LogLine } from '../styledComponents/LogViewerListStyledComponents';
 import { List } from 'office-ui-fabric-react';
 
-const createItemData = memoize((lines, highlightColor, shouldWrap) => {
+const memoizeProps = memoize((highlightColor, shouldWrap) => {
   return {
-    lines,
     highlightColor,
     shouldWrap
   };
@@ -18,11 +18,7 @@ const LogViewerList = props => {
   const startItemIndexRef = useRef(0);
 
   // Itemdata used to send needed props and state from this component to the pure component that renders a single line
-  const itemData = createItemData(
-    props.lines,
-    props.highlightColor,
-    props.wrapLines
-  );
+  const memoizedLineProps = memoizeProps(props.highlightColor, props.wrapLines);
 
   useEffect(() => {
     //Force updates the List when the user toggles Wrap Lines
@@ -39,7 +35,6 @@ const LogViewerList = props => {
     if (props.wholeFileNotInFeCache) {
       const startItemIndexDiff =
         startItemIndexinView - startItemIndexRef.current;
-      console.log({ startItemIndexDiff });
       const maxLineNrToScroll = props.logLinesLength / 3;
 
       if (
@@ -60,13 +55,18 @@ const LogViewerList = props => {
   }, [props.scrollTop]);
 
   const _onRenderCell = (item, index) => {
+    const { highlightColor, shouldWrap } = memoizedLineProps;
     return item !== undefined ? (
-      <SingleLogLineTranslator
-        data={itemData}
+      <MemoedSingleLogLine
         index={index}
-      ></SingleLogLineTranslator>
+        line={item}
+        highlightColor={highlightColor}
+        shouldWrap={shouldWrap}
+      />
     ) : (
-      <div> :) </div>
+      <LogLine emptyline index={index}>
+        <span>.</span>
+      </LogLine>
     );
   };
 

@@ -22,7 +22,7 @@ const LogViewer = props => {
     : '';
   const highlightColor = props.tabSettings[props.source.path]
     ? props.tabSettings[props.source.path].highlightColor
-    : 'red';
+    : '#a4262c';
   const wrapLineOn = props.tabSettings[props.source.path]
     ? props.tabSettings[props.source.path].wrapLineOn
     : 'false';
@@ -76,12 +76,7 @@ const LogViewer = props => {
         const newCache = updateLogViewerCache(
           props.totalNrOfLinesForFiles[props.source.path]
         ).insertRows(props.indexesForNewLines[props.source.path], args.lines);
-        console.log({
-          newCache,
-          totalNrOFLines: props.totalNrOfLinesForFiles[props.source.path],
-          lines: args.lines,
-          indexFornewLines: props.indexesForNewLines[props.source.path]
-        });
+
         setLines(newCache);
       } else {
         setLines(args.lines);

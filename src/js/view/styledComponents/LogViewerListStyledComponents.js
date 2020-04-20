@@ -8,6 +8,9 @@ export const LogViewerListContainer = styled.div`
 
 export const LogLine = styled.div`
   min-width: 100%;
+  color: ${props => {
+    return props.emptyline ? (props.index % 2 === 0 ? '#444' : '#303030') : '';
+  }};
   background-color: ${props => {
     return props.index % 2 === 0 ? '#444' : '#303030';
   }};

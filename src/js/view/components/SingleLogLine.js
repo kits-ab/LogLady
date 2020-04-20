@@ -7,7 +7,7 @@ import TextHighlightRegex from './TextHighlightRegex';
  * When the props are the same as an earlier call,
  * the function will not be called and the earlier result will be used.
  */
-const MemoedSingleLogLine = React.memo(props => {
+export const MemoedSingleLogLine = React.memo(props => {
   return (
     <LogLine
       style={{
@@ -24,23 +24,3 @@ const MemoedSingleLogLine = React.memo(props => {
     </LogLine>
   );
 });
-
-/**
- * Component to translate the entire data.lines array to just a single line,
- * so memoization can be used on the component for the single line.
- * Memoization probably doesn't do much for this, as data.lines is constantly changing.
- */
-const SingleLogLineTranslator = React.memo(({ data, index, style }) => {
-  let line = data.lines[index];
-  return (
-    <MemoedSingleLogLine
-      style={style}
-      line={line}
-      highlightColor={data.highlightColor}
-      shouldWrap={data.shouldWrap}
-      index={index}
-    ></MemoedSingleLogLine>
-  );
-});
-
-export default SingleLogLineTranslator;
