@@ -73,7 +73,7 @@ const sendFileOpened = async (
 
 const sendTotalLineCount = async (filePath, sender) => {
   fileReader
-    .getTotalLineCount(filePath)
+    .getLineCount(filePath)
     .then(lineCount => {
       const action = {
         type: 'TOTAL_LINE_AMOUNT_CALCULATED',
@@ -200,7 +200,6 @@ const getNewLinesFromCache = async (sender, data) => {
   const {
     sourcePath,
     nrOfLogLines,
-    feCacheLength,
     indexForNewLines,
     totalLineCountOfFile
   } = data;
@@ -208,7 +207,7 @@ const getNewLinesFromCache = async (sender, data) => {
   const [fileSize] = await getFileInfo(sourcePath);
 
   const searchFromByte = Math.round(
-    (fileSize / feCacheLength) * indexForNewLines
+    (fileSize / totalLineCountOfFile) * indexForNewLines
   );
 
   // first cache search

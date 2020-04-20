@@ -74,7 +74,6 @@ const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
 };
 
 const handleLinesFromBackendCache = (dispatch, { dataToReturn }) => {
-  console.log({ dataToReturn });
   addLinesFetchedFromBackendCache(
     dispatch,
     dataToReturn.sourcePath,

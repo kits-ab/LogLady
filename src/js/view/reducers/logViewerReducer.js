@@ -1,8 +1,7 @@
-import { updateLogViewerCache } from '../components/helpers/cacheHelper';
+import { updateLogViewerCache } from '../components/helpers/logHelper';
 
 const initialState = {
   logs: {},
-  nrOfLinesInFECache: {},
   lengthOfInitialLogLineArrays: {},
   lengthOfEmptyLines: {},
   totalNrOfLinesForFiles: {},
@@ -42,14 +41,14 @@ export const logViewerReducer = (state = initialState, action) => {
       };
     case 'LOGVIEWER_SET_LOG': {
       console.log('SETTING LOG');
-      const { sourcePath, log /*, lineCount*/ } = action.data;
+      const { sourcePath, log } = action.data;
       const _log = replaceEmptyLinesWithHiddenChar(log);
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: _log /*[..._log, ...emptyLines] }*/
+          [sourcePath]: _log
         },
         lengthOfInitialLogLineArrays: {
           ...state.lengthOfInitialLogLineArrays,
@@ -65,17 +64,14 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_ADD_LINE_COUNT_FOR_FILE': {
       console.log('ADDING LINE COUNT');
       const { sourcePath, lineCount } = action.data;
-      console.log({ lineCount }, state.logs[sourcePath].length);
       const totalNrOfLines = lineCount ? lineCount : 0;
       const emptyLinesLength =
         lineCount - state.logs[sourcePath].length < 0
           ? 0
           : lineCount - state.logs[sourcePath].length;
-      const totalLineAmountInCache =
-        emptyLinesLength + state.logs[sourcePath].length;
 
       // Adding empty lines to initial cache
-      const cache = updateLogViewerCache(totalLineAmountInCache).insertRows(
+      const cache = updateLogViewerCache(totalNrOfLines).insertRows(
         0,
         state.logs[sourcePath]
       );
@@ -93,10 +89,6 @@ export const logViewerReducer = (state = initialState, action) => {
         lengthOfEmptyLines: {
           ...state.lengthOfEmptyLines,
           [sourcePath]: emptyLinesLength
-        },
-        nrOfLinesInFECache: {
-          ...state.nrOfLinesInFECache,
-          [sourcePath]: totalLineAmountInCache
         }
       };
     }
@@ -118,7 +110,7 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE': {
       console.log('UPDATE CACHE');
       const { sourcePath, newLines, indexForNewLines } = action.data;
-      const cacheLength = state.nrOfLinesInFECache[sourcePath];
+      const cacheLength = state.totalNrOfLinesForFiles[sourcePath];
       const updatedCache = newLines
         ? updateLogViewerCache(cacheLength).insertRows(
             indexForNewLines,

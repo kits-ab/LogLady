@@ -26,9 +26,6 @@ const LogViewer = props => {
   const tailSwitch = props.settings[props.source.path]
     ? props.settings[props.source.path].tailSwitch
     : 'false';
-  const logSize = props.logSizes[props.source.path]
-    ? props.logSizes[props.source.path]
-    : 0;
   const logLinesLength = props.lengthOfInitialLogLineArrays[props.source.path]
     ? props.lengthOfInitialLogLineArrays[props.source.path]
     : 0;
@@ -178,7 +175,6 @@ const LogViewer = props => {
     fetchNewLinesFromBackendCache(
       props.source.path,
       logLinesLength,
-      props.nrOfLinesInFECache[props.source.path],
       indexForNewLines,
       totalNrOfLinesInFile
     );
@@ -190,8 +186,6 @@ const LogViewer = props => {
         highlightColor={highlightColor}
         wrapLines={wrapLineOn}
         lines={filteredAndHighlightedLines}
-        sourcePath={props.source.path}
-        logSize={logSize}
         scrollTop={currentScrollTop}
         getMoreLogLines={_getMoreLogLines}
         logLinesLength={logLinesLength}
@@ -207,7 +201,6 @@ const mapStateToProps = ({
   logViewerState: {
     logs,
     lengthOfInitialLogLineArrays,
-    nrOfLinesInFECache,
     totalNrOfLinesForFiles,
     lengthOfEmptyLines,
     currentScrollTops
@@ -221,7 +214,6 @@ const mapStateToProps = ({
     logSizes,
     lastSeenLogSizes,
     lengthOfInitialLogLineArrays,
-    nrOfLinesInFECache,
     totalNrOfLinesForFiles,
     lengthOfEmptyLines,
     currentScrollTops

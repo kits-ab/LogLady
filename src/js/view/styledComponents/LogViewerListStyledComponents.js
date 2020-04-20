@@ -17,10 +17,3 @@ export const LogLine = styled.div`
     return props.wrap ? 'normal' : 'nowrap';
   }};
 `;
-
-export const LogLineRuler = styled(LogLine)`
-  visibility: hidden;
-  min-width: unset;
-  position: fixed;
-  display: inline-block;
-`;

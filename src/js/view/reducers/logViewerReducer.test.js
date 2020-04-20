@@ -4,7 +4,6 @@ describe('logviewer reducer', () => {
   it('should return the initial state', () => {
     const initialState = {
       logs: {},
-      nrOfLinesInFECache: {},
       totalNrOfLinesForFiles: {},
       lengthOfInitialLogLineArrays: {},
       lengthOfEmptyLines: {},
@@ -26,7 +25,6 @@ describe('logviewer reducer', () => {
     const lines = ['hej1', 'hej2', 'hej3'];
     const expectedState = {
       logs: { test: ['hej1', 'hej2', 'hej3'] },
-      nrOfLinesInFECache: {},
       totalNrOfLinesForFiles: {},
       lengthOfInitialLogLineArrays: {},
       lengthOfEmptyLines: {},
@@ -52,7 +50,6 @@ describe('logviewer reducer', () => {
     const expectedState = {
       logs: { test: ['hej1', 'hej2'] },
       lengthOfInitialLogLineArrays: { test: 2 },
-      nrOfLinesInFECache: {},
       lengthOfEmptyLines: {},
       totalNrOfLinesForFiles: {},
       currentScrollTops: { test: 0 }
@@ -83,65 +80,65 @@ describe('logviewer reducer', () => {
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
 
-  it('should update the frontend cache with new lines at the end of the log array', () => {
-    const sourcePath = 'testPath';
-    const newLines = ['c', 'd', 'e'];
-    const indexForNewLines = 5;
-    const state = {
-      logs: {
-        testPath: ['a', 'b', 'c', '.', '.', '.', '.', '.']
-      },
-      nrOfLinesInFECache: {
-        testPath: 8
-      }
-    };
-    const expectedState = {
-      logs: {
-        testPath: ['.', '.', '.', '.', '.', 'c', 'd', 'e']
-      },
-      nrOfLinesInFECache: {
-        testPath: 8
-      }
-    };
-    const action = {
-      type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
-      data: {
-        sourcePath,
-        newLines,
-        indexForNewLines
-      }
-    };
-    expect(logViewerReducer(state, action)).toEqual(expectedState);
-  });
+  // it('should update the frontend cache with new lines at the end of the log array', () => {
+  //   const sourcePath = 'testPath';
+  //   const newLines = ['c', 'd', 'e'];
+  //   const indexForNewLines = 5;
+  //   const state = {
+  //     logs: {
+  //       testPath: ['a', 'b', 'c', '.', '.', '.', '.', '.']
+  //     },
+  //     nrOfLinesInFECache: {
+  //       testPath: 8
+  //     }
+  //   };
+  //   const expectedState = {
+  //     logs: {
+  //       testPath: ['.', '.', '.', '.', '.', 'c', 'd', 'e']
+  //     },
+  //     nrOfLinesInFECache: {
+  //       testPath: 8
+  //     }
+  //   };
+  //   const action = {
+  //     type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
+  //     data: {
+  //       sourcePath,
+  //       newLines,
+  //       indexForNewLines
+  //     }
+  //   };
+  //   expect(logViewerReducer(state, action)).toEqual(expectedState);
+  // });
 
-  it('should update the frontend cache with new lines at the beginning of the log array', () => {
-    const sourcePath = 'testPath';
-    const newLines = ['a', 'b', 'c'];
-    const indexForNewLines = 0;
-    const state = {
-      logs: {
-        testPath: ['.', '.', '.', '.', '.', 'c', 'd', 'e']
-      },
-      nrOfLinesInFECache: {
-        testPath: 8
-      }
-    };
-    const expectedState = {
-      logs: {
-        testPath: ['a', 'b', 'c', '.', '.', '.', '.', '.']
-      },
-      nrOfLinesInFECache: {
-        testPath: 8
-      }
-    };
-    const action = {
-      type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
-      data: {
-        sourcePath,
-        newLines,
-        indexForNewLines
-      }
-    };
-    expect(logViewerReducer(state, action)).toEqual(expectedState);
-  });
+  // it('should update the frontend cache with new lines at the beginning of the log array', () => {
+  //   const sourcePath = 'testPath';
+  //   const newLines = ['a', 'b', 'c'];
+  //   const indexForNewLines = 0;
+  //   const state = {
+  //     logs: {
+  //       testPath: ['.', '.', '.', '.', '.', 'c', 'd', 'e']
+  //     },
+  //     nrOfLinesInFECache: {
+  //       testPath: 8
+  //     }
+  //   };
+  //   const expectedState = {
+  //     logs: {
+  //       testPath: ['a', 'b', 'c', '.', '.', '.', '.', '.']
+  //     },
+  //     nrOfLinesInFECache: {
+  //       testPath: 8
+  //     }
+  //   };
+  //   const action = {
+  //     type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
+  //     data: {
+  //       sourcePath,
+  //       newLines,
+  //       indexForNewLines
+  //     }
+  //   };
+  //   expect(logViewerReducer(state, action)).toEqual(expectedState);
+  // });
 });

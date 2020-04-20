@@ -1,12 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import memoize from 'memoize-one';
-import {
-  LogViewerListContainer,
-  LogLineRuler
-} from '../styledComponents/LogViewerListStyledComponents';
+import { LogViewerListContainer } from '../styledComponents/LogViewerListStyledComponents';
 import SingleLogLineTranslator from './SingleLogLine';
-import { updateNumberOfLinesToRenderInLogView } from '../actions/dispatchActions';
 import { List } from 'office-ui-fabric-react';
 
 const createItemData = memoize((lines, highlightColor, shouldWrap) => {
@@ -18,24 +14,7 @@ const createItemData = memoize((lines, highlightColor, shouldWrap) => {
 });
 
 const LogViewerList = props => {
-  const [measuredCharHeight, setMeasuredCharHeight] = useState(null);
-  const [nbrOfLinesToFillLogView, setNbrOfLinesToFillLogView] = useState(null);
-
-  //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
-  const listRef = useRef();
-
-  const logViewerListContainerRef = useRef();
-  const [listDimensions, setListDimensions] = useState({
-    width: 575,
-    height: 145
-  });
-
-  const oneCharacterSizeRef = useRef();
-  const [characterDimensions, setCharacterDimensions] = useState({
-    width: 10,
-    height: 19
-  });
-
+  const listRef = useRef(); //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
   const startItemIndexRef = useRef(0);
 
   // Itemdata used to send needed props and state from this component to the pure component that renders a single line
@@ -44,22 +23,6 @@ const LogViewerList = props => {
     props.highlightColor,
     props.wrapLines
   );
-
-  useEffect(() => {
-    // Calculating the amount of lines needed to fill the page in the logviewer
-    setNbrOfLinesToFillLogView(
-      measuredCharHeight
-        ? Math.round(props.containerHeight / measuredCharHeight)
-        : null
-    );
-  }, [props.containerHeight, measuredCharHeight]);
-
-  useEffect(() => {
-    updateNumberOfLinesToRenderInLogView(
-      props.dispatcher,
-      nbrOfLinesToFillLogView
-    );
-  }, [nbrOfLinesToFillLogView]);
 
   useEffect(() => {
     //Force updates the List when the user toggles Wrap Lines
@@ -77,8 +40,7 @@ const LogViewerList = props => {
       const startItemIndexDiff =
         startItemIndexinView - startItemIndexRef.current;
       console.log({ startItemIndexDiff });
-      const maxLineNrToScroll =
-        listDimensions.height / characterDimensions.height / 2;
+      const maxLineNrToScroll = props.logLinesLength / 3;
 
       if (
         startItemIndexDiff > maxLineNrToScroll ||
@@ -97,17 +59,6 @@ const LogViewerList = props => {
     }
   }, [props.scrollTop]);
 
-  // Measure is used to measure the height of a character
-  const Measure = ({ onMeasured }) => {
-    const oneCharacterRef = useRef();
-
-    useEffect(() => {
-      onMeasured(oneCharacterRef.current.offsetHeight);
-    }, [onMeasured, oneCharacterRef]);
-
-    return <LogLineRuler ref={oneCharacterRef}>A</LogLineRuler>;
-  };
-
   const _onRenderCell = (item, index) => {
     return (
       <SingleLogLineTranslator
@@ -119,7 +70,6 @@ const LogViewerList = props => {
 
   return (
     <LogViewerListContainer>
-      {!measuredCharHeight && <Measure onMeasured={setMeasuredCharHeight} />}
       <List
         ref={listRef}
         items={props.lines}
