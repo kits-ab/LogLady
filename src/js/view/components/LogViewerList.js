@@ -60,11 +60,13 @@ const LogViewerList = props => {
   }, [props.scrollTop]);
 
   const _onRenderCell = (item, index) => {
-    return (
+    return item !== undefined ? (
       <SingleLogLineTranslator
         data={itemData}
         index={index}
       ></SingleLogLineTranslator>
+    ) : (
+      <div> :) </div>
     );
   };
 

@@ -1,11 +1,12 @@
-import { updateLogViewerCache } from '../components/helpers/logHelper';
+// import { updateLogViewerCache } from '../components/helpers/logHelper';
 
 const initialState = {
   logs: {},
   lengthOfInitialLogLineArrays: {},
   lengthOfEmptyLines: {},
   totalNrOfLinesForFiles: {},
-  currentScrollTops: {}
+  currentScrollTops: {},
+  indexesForNewLines: {}
 };
 
 // Invisible character U+2800 being used in line.replace
@@ -54,6 +55,10 @@ export const logViewerReducer = (state = initialState, action) => {
           ...state.lengthOfInitialLogLineArrays,
           [sourcePath]: log.length
         },
+        indexesForNewLines: {
+          ...state.indexesForNewLines,
+          [sourcePath]: 0
+        },
         currentScrollTops: {
           ...state.currentScrollTops,
           [sourcePath]: 0
@@ -71,17 +76,17 @@ export const logViewerReducer = (state = initialState, action) => {
           : lineCount - state.logs[sourcePath].length;
 
       // Adding empty lines to initial cache
-      const cache = updateLogViewerCache(totalNrOfLines).insertRows(
-        0,
-        state.logs[sourcePath]
-      );
+      // const cache = updateLogViewerCache(totalNrOfLines).insertRows(
+      //   0,
+      //   state.logs[sourcePath]
+      // );
 
       return {
         ...state,
-        logs: {
-          ...state.logs,
-          [sourcePath]: cache
-        },
+        // logs: {
+        //   ...state.logs,
+        //   [sourcePath]: cache
+        // },
         totalNrOfLinesForFiles: {
           ...state.totalNrOfLinesForFiles,
           [sourcePath]: totalNrOfLines
@@ -110,19 +115,24 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE': {
       console.log('UPDATE CACHE');
       const { sourcePath, newLines, indexForNewLines } = action.data;
-      const cacheLength = state.totalNrOfLinesForFiles[sourcePath];
-      const updatedCache = newLines
-        ? updateLogViewerCache(cacheLength).insertRows(
-            indexForNewLines,
-            replaceEmptyLinesWithHiddenChar(newLines)
-          )
-        : state.logs[sourcePath];
+      // const cacheLength = state.totalNrOfLinesForFiles[sourcePath];
+      // const updatedCache = newLines
+      //   ? updateLogViewerCache(cacheLength).insertRows(
+      //       indexForNewLines,
+      //       replaceEmptyLinesWithHiddenChar(newLines)
+      //     )
+      //   : state.logs[sourcePath];
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: updatedCache
+          // [sourcePath]: updatedCache
+          [sourcePath]: newLines
+        },
+        indexesForNewLines: {
+          ...state.indexesForNewLines,
+          [sourcePath]: indexForNewLines
         }
       };
     }

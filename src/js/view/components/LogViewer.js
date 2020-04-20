@@ -8,7 +8,10 @@ import {
   handleTailSwitch,
   saveCurrentScrollTop
 } from '../actions/dispatchActions';
-import { fetchNewLinesFromBackendCache } from './helpers/logHelper';
+import {
+  fetchNewLinesFromBackendCache,
+  updateLogViewerCache
+} from './helpers/logHelper';
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -68,7 +71,21 @@ const LogViewer = props => {
       });
     } else if (args.type === 'serveFilteredLogsAllDone') {
       // Overwrite anything in the state
-      setLines(args.lines);
+
+      if (props.totalNrOfLinesForFiles[props.source.path]) {
+        const newCache = updateLogViewerCache(
+          props.totalNrOfLinesForFiles[props.source.path]
+        ).insertRows(props.indexesForNewLines[props.source.path], args.lines);
+        console.log({
+          newCache,
+          totalNrOFLines: props.totalNrOfLinesForFiles[props.source.path],
+          lines: args.lines,
+          indexFornewLines: props.indexesForNewLines[props.source.path]
+        });
+        setLines(newCache);
+      } else {
+        setLines(args.lines);
+      }
     }
   };
 
@@ -82,7 +99,10 @@ const LogViewer = props => {
         eventListenerIPCMessage
       );
     };
-  }, []);
+  }, [
+    props.totalNrOfLinesForFiles[props.source.path],
+    props.indexesForNewLines[props.source.path]
+  ]);
 
   useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
@@ -203,7 +223,8 @@ const mapStateToProps = ({
     lengthOfInitialLogLineArrays,
     totalNrOfLinesForFiles,
     lengthOfEmptyLines,
-    currentScrollTops
+    currentScrollTops,
+    indexesForNewLines
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -216,7 +237,8 @@ const mapStateToProps = ({
     lengthOfInitialLogLineArrays,
     totalNrOfLinesForFiles,
     lengthOfEmptyLines,
-    currentScrollTops
+    currentScrollTops,
+    indexesForNewLines
   };
 };
 

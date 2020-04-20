@@ -24,7 +24,7 @@ const getFileInfo = async filePath => {
 };
 
 const getFileHistory = async (filePath, fileSize) => {
-  const nrOfBytes = 60000;
+  const nrOfBytes = 120000;
   const startFromByte = 0;
   const {
     startByteOfLines,
@@ -52,8 +52,7 @@ const sendFileOpened = async (
   filePath,
   fileSize,
   endIndex,
-  history,
-  lineCount
+  history
 ) => {
   const action = {
     type: 'SOURCE_OPENED',
@@ -62,8 +61,7 @@ const sendFileOpened = async (
       filePath,
       fileSize,
       endIndex,
-      history,
-      lineCount
+      history
     }
   };
 
@@ -93,16 +91,11 @@ const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
     sendSourcePicked(sender, filePath);
-    let {
-      startByteOfLines,
-      lines,
-      linesStartAt,
-      linesEndAt
-    } = await getFileHistory(filePath, fileSize);
+    let { startByteOfLines, lines } = await getFileHistory(filePath, fileSize);
 
     updateCache(filePath, lines, startByteOfLines);
 
-    if (fileSize > 60000) {
+    if (fileSize > 120000) {
       // Send half of the content if the file is bigger than the cached content.
       lines = lines.slice(0, lines.length / 2);
     }
@@ -215,7 +208,7 @@ const getNewLinesFromCache = async (sender, data) => {
 
   if (cache === 'miss' || cache.lines.length < nrOfLogLines) {
     try {
-      const nrOfBytes = 60000;
+      const nrOfBytes = 120000;
       let byteToReadFrom =
         Math.round(searchFromByte - nrOfBytes / 2) < 0
           ? 0
