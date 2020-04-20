@@ -102,9 +102,6 @@ const getHighlightedLineIfHighlightExistsAndMatches = (
   line
 ) => {
   let lineObj = {};
-  let length = typeof line !== 'undefined' ? line.length : 0;
-
-  console.log({ length });
   if (highlightRegex && highlightRegex.test(line)) {
     lineObj = {
       highlightLine: true,
@@ -113,14 +110,12 @@ const getHighlightedLineIfHighlightExistsAndMatches = (
           text: value,
           highlightSection: highlightRegex.test(value)
         };
-      }),
-      length
+      })
     };
   } else {
     lineObj = {
       highlightLine: false,
-      sections: [{ text: line, highlightSection: false }],
-      length
+      sections: [{ text: line, highlightSection: false }]
     };
   }
   return lineObj;

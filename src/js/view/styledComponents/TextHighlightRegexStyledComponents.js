@@ -13,19 +13,27 @@ export const Settings = styled.div`
 `;
 
 const matchingTextColor = {
-  '#b80000': '#eeefea',
-  '#db3e00': '#eeefea',
-  '#008b02': '#eeefea',
-  '#006b76': '#eeefea',
-  '#1273de': '#eeefea',
-  '#004dcf': '#eeefea',
-  '#5300eb': '#eeefea',
+  '#a4262c': '#222',
+  '#ca5010': '#222',
+  '#038387': '#222',
+  '#8764b8': '#222',
+  '#004e8c': '#222',
   default: '#222'
+};
+
+const backgroundColor = {
+  '#a4262c': '#a4262c',
+  '#ca5010': '#ca5010',
+  '#038387': '#038387',
+  '#8764b8': '#8764b8',
+  '#004e8c': '#004e8c',
+  default: '#a4262c'
 };
 
 export const HighlightText = styled.span`
   background: ${props => {
-    return props.color;
+    const bgColor = backgroundColor[props.color];
+    return bgColor ? bgColor : backgroundColor.default;
   }};
   color: ${props => {
     const textColor = matchingTextColor[props.color];

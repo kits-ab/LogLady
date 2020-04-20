@@ -11,8 +11,7 @@ const MemoedSingleLogLine = React.memo(props => {
   return (
     <LogLine
       style={{
-        ...props.style,
-        width: props.elementWidth + 'px'
+        ...props.style
       }}
       wrap={props.shouldWrap ? 'true' : undefined}
       index={props.index}
@@ -38,7 +37,6 @@ const SingleLogLineTranslator = React.memo(({ data, index, style }) => {
       style={style}
       line={line}
       highlightColor={data.highlightColor}
-      elementWidth={data.elementWidth}
       shouldWrap={data.shouldWrap}
       index={index}
     ></MemoedSingleLogLine>

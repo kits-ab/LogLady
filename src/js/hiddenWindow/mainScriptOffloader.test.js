@@ -14,8 +14,7 @@ describe('mainScriptOffLoader', () => {
           text: value,
           highlightSection: highlightRegex.test(value)
         };
-      }),
-      length: line.length
+      })
     };
     expect(
       getHighlightedLineIfHighlightExistsAndMatches(highlightRegex, line)
@@ -27,8 +26,7 @@ describe('mainScriptOffLoader', () => {
     const line = 'Line 1: blablabla';
     const expectedResult = {
       highlightLine: false,
-      sections: [{ text: line, highlightSection: false }],
-      length: line.length
+      sections: [{ text: line, highlightSection: false }]
     };
     expect(
       getHighlightedLineIfHighlightExistsAndMatches(highlightRegex, line)
@@ -50,8 +48,7 @@ describe('mainScriptOffLoader', () => {
     const line = list[0];
     const expectedResult = {
       highlightLine: false,
-      sections: [{ text: line, highlightSection: false }],
-      length: 0
+      sections: [{ text: line, highlightSection: false }]
     };
     expect(
       getHighlightedLineIfHighlightExistsAndMatches(highlightRegex, line)
