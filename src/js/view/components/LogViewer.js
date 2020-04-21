@@ -45,6 +45,15 @@ const LogViewer = props => {
   let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
   const scroller = useRef(); // A ref on the logViewerContainer used to keep track of scroll values.
 
+  const _getMoreLogLines = indexForNewLines => {
+    fetchNewLinesFromBackendCache(
+      props.source.path,
+      logLinesLength,
+      indexForNewLines,
+      totalNrOfLinesInFile
+    );
+  };
+
   const sendMessageToHiddenWindow = args => {
     /* Send a message to the hidden window that it should filter the logs.
     IPC messages go through the main process and are stringified,
@@ -70,17 +79,21 @@ const LogViewer = props => {
         return lines.concat(args.line);
       });
     } else if (args.type === 'serveFilteredLogsAllDone') {
-      // Overwrite anything in the state
+      overWriteState(args.lines);
+    }
+  };
 
-      if (props.totalNrOfLinesForFiles[props.source.path]) {
-        const newCache = updateLogViewerCache(
-          props.totalNrOfLinesForFiles[props.source.path]
-        ).insertRows(props.indexesForNewLines[props.source.path], args.lines);
-
-        setLines(newCache);
-      } else {
-        setLines(args.lines);
-      }
+  const overWriteState = newLogLines => {
+    if (props.totalNrOfLinesForFiles[props.source.path]) {
+      const cacheLength = props.totalNrOfLinesForFiles[props.source.path];
+      const startIndex = props.indexesForNewLines[props.source.path];
+      const newCache = updateLogViewerCache(cacheLength).insertRows(
+        startIndex,
+        newLogLines
+      );
+      setLines(newCache);
+    } else {
+      setLines(newLogLines);
     }
   };
 
@@ -130,7 +143,6 @@ const LogViewer = props => {
   useEffect(() => {
     /* Effect for when another source is selected,
     to send the correct lines to be filtered and highlighted and update the ref to be the correct source */
-
     sendMessageToHiddenWindow({
       logs: props.logs[props.source.path]
     });
@@ -151,15 +163,15 @@ const LogViewer = props => {
     scroller.current.addEventListener('scroll', event => {
       return handleScrollPositionEvent(event);
     });
-
     return () => {
       scroller.current.removeEventListener('scroll', handleScrollPositionEvent);
     };
   }, [totalNrOfLinesInFile]);
 
   useEffect(() => {
-    //Effect to set tailswitch to true when scrolling or clicking at the bottom
-    const handleScrollEvent = () => {
+    //Effect for toggling follow to on when scroller is at the bottom.
+    //Toggles to off when scrolling up again
+    const manageTailSwitchToggle = () => {
       const isScrollerAtTheBottom =
         scroller.current.scrollHeight ===
         scroller.current.clientHeight + scroller.current.scrollTop;
@@ -170,30 +182,18 @@ const LogViewer = props => {
         handleTailSwitch(props.dispatch, { sourcePath: props.source.path });
       }
     };
-
-    scroller.current.addEventListener('scroll', handleScrollEvent);
-
+    scroller.current.addEventListener('scroll', manageTailSwitchToggle);
     return () => {
-      scroller.current.removeEventListener('scroll', handleScrollEvent);
+      scroller.current.removeEventListener('scroll', manageTailSwitchToggle);
     };
   }, [props.source.path, tailSwitch]);
 
   useEffect(() => {
-    //Effect for scrolling to bottom when switching on tailswitch
+    //Effect for scrolling to bottom of the file when toggling follow to on
     if (tailSwitch) {
       scroller.current.scrollTo(0, scroller.current.scrollHeight);
     }
   }, [tailSwitch]);
-
-  const _getMoreLogLines = indexForNewLines => {
-    console.log('get more lines');
-    fetchNewLinesFromBackendCache(
-      props.source.path,
-      logLinesLength,
-      indexForNewLines,
-      totalNrOfLinesInFile
-    );
-  };
 
   return (
     <LogViewerContainer ref={scroller}>

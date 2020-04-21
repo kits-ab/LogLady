@@ -40,15 +40,17 @@ export const fetchNewLinesFromBackendCache = (
   sendRequestToBackend(argObj);
 };
 
-export const updateLogViewerCache = cache_size => {
+export const updateLogViewerCache = cache_length => {
   const insertRows = (startIndex, newLines) => {
-    const updatedCache = new Array(cache_size).fill(undefined, 0);
+    const updatedCache = new Array(cache_length).fill(undefined, 0);
 
+    // Check of the index to make sure that the beginning or the end of the file
+    // are not cut off at the top or bottom of the list.
     const fromIndex =
       startIndex < 0
         ? 0
-        : newLines.length + startIndex > cache_size
-        ? cache_size - newLines.length
+        : newLines.length + startIndex > cache_length
+        ? cache_length - newLines.length
         : startIndex;
 
     newLines.forEach((item, i) => {

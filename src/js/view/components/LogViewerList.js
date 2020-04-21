@@ -17,21 +17,11 @@ const LogViewerList = props => {
   const listRef = useRef(); //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
   const startItemIndexRef = useRef(0);
 
-  // Itemdata used to send needed props and state from this component to the pure component that renders a single line
+  // Used to send needed props and state from this component to the pure component that renders a single line
   const memoizedLineProps = memoizeProps(props.highlightColor, props.wrapLines);
 
-  useEffect(() => {
-    //Force updates the List when the user toggles Wrap Lines
-    listRef.current.forceUpdate();
-  }, [props.wrapLines]);
-
-  useEffect(() => {
-    // In this effect the amount of lines scrolled in either direction are evaluated
-    // and if exceeding a certain amount, new lines will be fetched from the backend cache.
-
-    const startItemIndexinView = listRef.current.getStartItemIndexInView();
-
-    // A fetch of new lines should only be triggered if the total file content is not contained in the list of lines.
+  const evaluateNrOfItemsScrolled = startItemIndexinView => {
+    // When the amount of items scrolled by are exceeding maxLineNrToScroll, a fetch of new lines from backend is triggered
     if (props.wholeFileNotInFeCache) {
       const startItemIndexDiff =
         startItemIndexinView - startItemIndexRef.current;
@@ -52,11 +42,21 @@ const LogViewerList = props => {
         props.getMoreLogLines(indexForNewLines);
       }
     }
+  };
+
+  useEffect(() => {
+    //Force updates the List when the user toggles Wrap Lines
+    listRef.current.forceUpdate();
+  }, [props.wrapLines]);
+
+  useEffect(() => {
+    const startItemIndexinView = listRef.current.getStartItemIndexInView();
+    evaluateNrOfItemsScrolled(startItemIndexinView);
   }, [props.scrollTop]);
 
   const _onRenderCell = (item, index) => {
     const { highlightColor, shouldWrap } = memoizedLineProps;
-    return item !== undefined ? (
+    return item ? (
       <MemoedSingleLogLine
         index={index}
         line={item}
