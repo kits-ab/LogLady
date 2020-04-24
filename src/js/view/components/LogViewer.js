@@ -4,10 +4,7 @@ import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponent
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
-import {
-  handleTailSwitch,
-  saveCurrentScrollTop
-} from '../actions/dispatchActions';
+import { saveCurrentScrollTop } from '../actions/dispatchActions';
 import {
   fetchNewLinesFromBackendCache,
   updateLogViewerCache
@@ -76,7 +73,9 @@ const LogViewer = props => {
     if (args.type === 'serveFilteredLogsOneDone') {
       // Update state using updater form, as the state in this function is stale
       setLines(lines => {
-        return lines.concat(args.line);
+        if (tailSwitch) {
+          return lines.concat(args.line);
+        }
       });
     } else if (args.type === 'serveFilteredLogsAllDone') {
       overWriteState(args.lines);
@@ -84,9 +83,14 @@ const LogViewer = props => {
   };
 
   const overWriteState = newLogLines => {
-    if (props.totalNrOfLinesForFiles[props.source.path]) {
+    const wholeFileIsNotInFeCache = emptyLinesLength > 0;
+    if (
+      props.totalNrOfLinesForFiles[props.source.path] &&
+      wholeFileIsNotInFeCache
+    ) {
       const cacheLength = props.totalNrOfLinesForFiles[props.source.path];
       const startIndex = props.indexesForNewLines[props.source.path];
+
       const newCache = updateLogViewerCache(cacheLength).insertRows(
         startIndex,
         newLogLines
@@ -169,29 +173,23 @@ const LogViewer = props => {
   }, [totalNrOfLinesInFile]);
 
   useEffect(() => {
-    //Effect for toggling follow to on when scroller is at the bottom.
-    //Toggles to off when scrolling up again
-    const manageTailSwitchToggle = () => {
-      const isScrollerAtTheBottom =
-        scroller.current.scrollHeight ===
-        scroller.current.clientHeight + scroller.current.scrollTop;
-
-      if (isScrollerAtTheBottom && !tailSwitch) {
-        handleTailSwitch(props.dispatch, { sourcePath: props.source.path });
-      } else if (!isScrollerAtTheBottom && tailSwitch) {
-        handleTailSwitch(props.dispatch, { sourcePath: props.source.path });
-      }
-    };
-    scroller.current.addEventListener('scroll', manageTailSwitchToggle);
-    return () => {
-      scroller.current.removeEventListener('scroll', manageTailSwitchToggle);
-    };
-  }, [props.source.path, tailSwitch]);
-
-  useEffect(() => {
-    //Effect for scrolling to bottom of the file when toggling follow to on
+    //Scrolls to bottom of the file on pressing tailswitch and keeps the scroller there if the tailswitch is on.
     if (tailSwitch) {
       scroller.current.scrollTo(0, scroller.current.scrollHeight);
+    }
+  }, [
+    tailSwitch,
+    props.logs[props.source.path],
+    props.totalNrOfLinesForFiles[props.source.path]
+  ]);
+
+  useEffect(() => {
+    if (tailSwitch && emptyLinesLength > 0) {
+      _getMoreLogLines(
+        props.totalNrOfLinesForFiles[props.source.path] -
+          props.logs[props.source.path].length -
+          2
+      );
     }
   }, [tailSwitch]);
 

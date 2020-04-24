@@ -91,21 +91,36 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_ADD_LINES': {
       console.log('ADDING');
       const { sourcePath, lines } = action.data;
-      const log = state.logs[sourcePath] ? state.logs[sourcePath] : [];
+      const logLines = state.logs[sourcePath] ? state.logs[sourcePath] : [];
+      const totalNrOfLines = state.totalNrOfLinesForFiles[sourcePath]
+        ? state.totalNrOfLinesForFiles[sourcePath]
+        : 0;
+      const newTotalLinesLength = totalNrOfLines + lines.length;
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: [...log, ...lines]
+          [sourcePath]: [...logLines, ...lines]
+        },
+        totalNrOfLinesForFiles: {
+          ...state.totalNrOfLinesForFiles,
+          [sourcePath]: newTotalLinesLength
         }
       };
     }
 
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE': {
       console.log('UPDATE CACHE');
-      const { sourcePath, newLines, indexForNewLines } = action.data;
-
+      const {
+        sourcePath,
+        newLines,
+        indexForNewLines,
+        isEndOfFile
+      } = action.data;
+      const newIndex = isEndOfFile
+        ? state.totalNrOfLinesForFiles[sourcePath] - newLines.length
+        : indexForNewLines;
       return {
         ...state,
         logs: {
@@ -114,7 +129,7 @@ export const logViewerReducer = (state = initialState, action) => {
         },
         indexesForNewLines: {
           ...state.indexesForNewLines,
-          [sourcePath]: indexForNewLines
+          [sourcePath]: newIndex
         }
       };
     }
