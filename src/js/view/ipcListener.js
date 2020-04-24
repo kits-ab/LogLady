@@ -78,7 +78,8 @@ const handleLinesFromBackendCache = (dispatch, { dataToReturn }) => {
     dispatch,
     dataToReturn.sourcePath,
     dataToReturn.newLines,
-    dataToReturn.indexForNewLines
+    dataToReturn.indexForNewLines,
+    dataToReturn.isEndOfFile
   );
 };
 
@@ -115,7 +116,7 @@ export const ipcListener = (store, publisher) => {
         handleError(dispatch, action.data);
         break;
       case 'LINES_NEW':
-        handleNewLines(dispatch, action.data, store.getState());
+        handleNewLines(dispatch, action.data);
         break;
       case 'LOGLINES_FETCHED_FROM_BACKEND_CACHE':
         handleLinesFromBackendCache(dispatch, action.data);

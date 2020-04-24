@@ -237,12 +237,20 @@ const getNewLinesFromCache = async (sender, data) => {
   }
 
   const newLines = cache.lines;
+  const startBytes = cache.startsAtByte;
+  const byteForLineBreak = 2;
+  const isEndOfFile =
+    Buffer.byteLength(newLines[newLines.length - 1], 'utf8') +
+      startBytes[startBytes.length - 1] +
+      byteForLineBreak >=
+    fileSize;
 
   // Send result to frontend
   const dataToReturn = {
     sourcePath,
     newLines,
-    indexForNewLines
+    indexForNewLines,
+    isEndOfFile
   };
   const action = {
     type: 'LOGLINES_FETCHED_FROM_BACKEND_CACHE',

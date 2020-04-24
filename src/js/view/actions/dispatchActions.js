@@ -162,13 +162,12 @@ export const hideSnackBar = dispatch => {
   });
 };
 
-export const addNewLines = (dispatch, sourcePath, lines, followTail) => {
+export const addNewLines = (dispatch, sourcePath, lines) => {
   dispatch({
     type: 'LOGVIEWER_ADD_LINES',
     data: {
       sourcePath,
-      lines,
-      followTail
+      lines
     }
   });
 };
@@ -197,14 +196,16 @@ export const addLinesFetchedFromBackendCache = (
   dispatch,
   sourcePath,
   newLines,
-  indexForNewLines
+  indexForNewLines,
+  isEndOfFile
 ) => {
   dispatch({
     type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
     data: {
       sourcePath,
       newLines,
-      indexForNewLines
+      indexForNewLines,
+      isEndOfFile
     }
   });
 };
