@@ -23,7 +23,7 @@ const getFileInfo = async filePath => {
   return Promise.all([fileSize, endIndex]);
 };
 
-const getFileHistory = async (filePath, fileSize) => {
+const getFileHistory = async filePath => {
   const nrOfBytes = 120000;
   const startFromByte = 0;
   const {
@@ -70,36 +70,33 @@ const sendFileOpened = async (
 };
 
 const sendTotalLineCount = async (filePath, sender) => {
-  fileReader
-    .getLineCount(filePath)
-    .then(lineCount => {
-      const action = {
-        type: 'TOTAL_LINE_AMOUNT_CALCULATED',
-        data: {
-          filePath,
-          lineCount
-        }
-      };
-      sender.send(ipcChannel, action);
-    })
-    .catch(err => {
-      console.log({ sendTotalLineCount, err });
-    });
+  try {
+    const lineCount = await fileReader.getLineCount(filePath);
+    const action = {
+      type: 'TOTAL_LINE_AMOUNT_CALCULATED',
+      data: {
+        filePath,
+        lineCount
+      }
+    };
+    sender.send(ipcChannel, action);
+  } catch (error) {
+    console.log({ sendTotalLineCount, error });
+  }
 };
 
 const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
     sendSourcePicked(sender, filePath);
-    let { startByteOfLines, lines } = await getFileHistory(filePath, fileSize);
 
+    let { startByteOfLines, lines } = await getFileHistory(filePath, fileSize);
     updateCache(filePath, lines, startByteOfLines);
 
+    // Send half of the content if the file is bigger than the cached content.
     if (fileSize > 120000) {
-      // Send half of the content if the file is bigger than the cached content.
       lines = lines.slice(0, lines.length / 2);
     }
-
     sendFileOpened(sender, filePath, fileSize, endIndex, lines);
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
@@ -120,10 +117,9 @@ const saveRecentFilesToDisk = recentFiles => {
   diskPersistance.saveRecentFilesToDisk(JSON.stringify(recentFiles));
 };
 
-const loadRecentFilesFromDisk = () => {
-  return diskPersistance.loadRecentFilesFromDisk().then(files => {
-    return JSON.parse(files);
-  });
+const loadRecentFilesFromDisk = async () => {
+  const files = await diskPersistance.loadRecentFilesFromDisk();
+  return JSON.parse(files);
 };
 
 const loadStateFromDisk = async (state, sender) => {
@@ -238,11 +234,13 @@ const getNewLinesFromCache = async (sender, data) => {
 
   const newLines = cache.lines;
   const startBytes = cache.startsAtByte;
-  const byteForLineBreak = 2;
+  // If the length of the last index in the array of lines + the start byte of the line > filesize,
+  // then we are returning the end of the file.
+  const newLineBytes = 2;
   const isEndOfFile =
     Buffer.byteLength(newLines[newLines.length - 1], 'utf8') +
       startBytes[startBytes.length - 1] +
-      byteForLineBreak >=
+      newLineBytes >=
     fileSize;
 
   // Send result to frontend

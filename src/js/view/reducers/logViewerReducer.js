@@ -96,12 +96,13 @@ export const logViewerReducer = (state = initialState, action) => {
         ? state.totalNrOfLinesForFiles[sourcePath]
         : 0;
       const newTotalLinesLength = totalNrOfLines + lines.length;
+      const _lines = replaceEmptyLinesWithHiddenChar(lines);
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: [...logLines, ...lines]
+          [sourcePath]: [...logLines, ..._lines]
         },
         totalNrOfLinesForFiles: {
           ...state.totalNrOfLinesForFiles,
@@ -118,6 +119,8 @@ export const logViewerReducer = (state = initialState, action) => {
         indexForNewLines,
         isEndOfFile
       } = action.data;
+      // If we have the end of the file in newLines, adjusting the index for where the new lines will be inserted
+      // takes away possible empty lines at the end of the file.
       const newIndex = isEndOfFile
         ? state.totalNrOfLinesForFiles[sourcePath] - newLines.length
         : indexForNewLines;

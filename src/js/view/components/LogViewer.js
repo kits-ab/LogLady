@@ -153,14 +153,6 @@ const LogViewer = props => {
   }, [props.source.path]);
 
   useEffect(() => {
-    saveCurrentScrollTop(props.dispatch, props.source.path, currentScrollTop);
-  }, [currentScrollTop]);
-
-  useEffect(() => {
-    scroller.current.scrollTo(0, props.currentScrollTops[props.source.path]);
-  }, [props.source.path]);
-
-  useEffect(() => {
     const handleScrollPositionEvent = event => {
       setCurrentScrollTop(event.target.scrollTop);
     };
@@ -173,32 +165,31 @@ const LogViewer = props => {
   }, [totalNrOfLinesInFile]);
 
   useEffect(() => {
-    //Scrolls to bottom of the file on pressing tailswitch and keeps the scroller there if the tailswitch is on.
-    if (tailSwitch) {
-      scroller.current.scrollTo(0, scroller.current.scrollHeight);
-    }
-  }, [
-    tailSwitch,
-    props.logs[props.source.path],
-    props.totalNrOfLinesForFiles[props.source.path]
-  ]);
-
-  useEffect(() => {
     if (tailSwitch && emptyLinesLength > 0) {
-      _getMoreLogLines(
-        props.totalNrOfLinesForFiles[props.source.path] -
-          props.logs[props.source.path].length -
-          2
-      );
+      _getMoreLogLines(totalNrOfLinesInFile - logLinesLength);
     }
   }, [tailSwitch]);
 
+  useEffect(() => {
+    if (tailSwitch) {
+      scroller.current.scrollTo(0, scroller.current.scrollHeight);
+    }
+  }, [tailSwitch, filteredAndHighlightedLines]);
+
+  useEffect(() => {
+    saveCurrentScrollTop(props.dispatch, props.source.path, currentScrollTop);
+  }, [currentScrollTop]);
+
+  useEffect(() => {
+    scroller.current.scrollTo(0, props.currentScrollTops[props.source.path]);
+  }, [props.source.path]);
+
   return (
-    <LogViewerContainer ref={scroller}>
+    <LogViewerContainer ref={scroller} data-is-scrollable="true">
       <LogViewerList
         highlightColor={highlightColor}
         wrapLines={wrapLineOn}
-        lines={filteredAndHighlightedLines}
+        lines={[...filteredAndHighlightedLines]}
         scrollTop={currentScrollTop}
         getMoreLogLines={_getMoreLogLines}
         logLinesLength={logLinesLength}
