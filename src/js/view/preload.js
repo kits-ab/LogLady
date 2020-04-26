@@ -2,6 +2,6 @@
 
 const { ipcRenderer } = require('electron');
 
-(function() {
+(function () {
   window.ipcRenderer = ipcRenderer;
 })();
