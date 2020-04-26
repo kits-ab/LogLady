@@ -22,14 +22,42 @@ export const scrollToBottom = (el, list) => {
   el.scrollAround(list.length - 1);
 };
 
-export const fetchTextBasedOnByteFromScrollPosition = (
-  path,
-  startByte,
-  amountOfLines
+export const fetchNewLinesFromBackendCache = (
+  sourcePath,
+  nrOfLogLines,
+  indexForNewLines,
+  totalLineCountOfFile
 ) => {
   const argObj = {
-    function: 'FETCH_LOGLINES_STARTING_AT_SCROLL_BYTE_POSITION',
-    data: { path, startByte, amountOfLines }
+    function: 'FETCH_NEW_LINES_FROM_BACKEND_CACHE',
+    data: {
+      sourcePath,
+      nrOfLogLines,
+      indexForNewLines,
+      totalLineCountOfFile
+    }
   };
   sendRequestToBackend(argObj);
+};
+
+export const updateLogViewerCache = cache_length => {
+  const insertRows = (startIndex, newLines) => {
+    const updatedCache = new Array(cache_length).fill(undefined, 0);
+
+    // Check of the index to make sure that the beginning or the end of the file
+    // are not cut off at the top or bottom of the list.
+    const fromIndex =
+      startIndex < 0
+        ? 0
+        : newLines.length + startIndex > cache_length
+        ? cache_length - newLines.length
+        : startIndex;
+
+    newLines.forEach((item, i) => {
+      updatedCache[i + fromIndex] = item;
+    });
+
+    return updatedCache;
+  };
+  return { insertRows };
 };

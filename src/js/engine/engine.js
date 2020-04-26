@@ -5,10 +5,8 @@ const { createMenu } = require('../electron/menu');
 const ipcChannel = 'backendMessages';
 const { addRecentFile } = require('./../helpers/recentFilesHelper');
 const {
-  createCache,
   searchCache,
   updateCache,
-  flushCache,
   checkIfCacheIsWithinSizeLimit,
   flushCacheForOneFile
 } = require('./cache');
@@ -26,19 +24,15 @@ const getFileInfo = async filePath => {
 };
 
 const getFileHistory = async (filePath, fileSize) => {
-  const NR_OF_BYTES = 30000;
-  const START_READ_FROM_BYTE =
-    fileSize - NR_OF_BYTES <= 0 ? 0 : fileSize - NR_OF_BYTES;
+  const nrOfBytes = 120000;
+  const startFromByte = 0;
   const {
     startByteOfLines,
     lines,
     linesStartAt,
     linesEndAt
-  } = await fileReader.readDataFromByte(
-    filePath,
-    START_READ_FROM_BYTE,
-    NR_OF_BYTES
-  );
+  } = await fileReader.readDataFromByte(filePath, startFromByte, nrOfBytes);
+
   return { startByteOfLines, lines, linesStartAt, linesEndAt };
 };
 
@@ -58,8 +52,7 @@ const sendFileOpened = async (
   filePath,
   fileSize,
   endIndex,
-  history,
-  startByteOfLines
+  history
 ) => {
   const action = {
     type: 'SOURCE_OPENED',
@@ -68,47 +61,46 @@ const sendFileOpened = async (
       filePath,
       fileSize,
       endIndex,
-      history,
-      startByteOfLines
+      history
     }
   };
 
   sender.send(ipcChannel, action);
+  sendTotalLineCount(filePath, sender);
 };
 
-// Invisible character U+2800 being used in line.replace
-const replaceEmptyLinesWithHiddenChar = arr => {
-  const regexList = [/^\s*$/];
-  return arr.map(line => {
-    const isMatch = regexList.some(rx => {
-      return rx.test(line);
+const sendTotalLineCount = async (filePath, sender) => {
+  fileReader
+    .getLineCount(filePath)
+    .then(lineCount => {
+      const action = {
+        type: 'TOTAL_LINE_AMOUNT_CALCULATED',
+        data: {
+          filePath,
+          lineCount
+        }
+      };
+      sender.send(ipcChannel, action);
+    })
+    .catch(err => {
+      console.log({ sendTotalLineCount, err });
     });
-    return isMatch ? line.replace(regexList[0], '⠀') : line;
-  });
 };
 
 const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
     sendSourcePicked(sender, filePath);
-    const {
-      startByteOfLines,
-      lines,
-      linesStartAt,
-      linesEndAt
-    } = await getFileHistory(filePath, fileSize);
+    let { startByteOfLines, lines } = await getFileHistory(filePath, fileSize);
 
     updateCache(filePath, lines, startByteOfLines);
 
-    //Lines in history that contains empty spaces does not display properly. replaceEmptyLinesWithHiddenChar(history) returns an array where this has been taken care of by replacing each space with a hidden character, and makes those lines display correctly in LogViewer.
-    sendFileOpened(
-      sender,
-      filePath,
-      fileSize,
-      endIndex,
-      replaceEmptyLinesWithHiddenChar(lines.slice(lines.length - 10)),
-      startByteOfLines.slice(startByteOfLines.length - 10)
-    );
+    if (fileSize > 120000) {
+      // Send half of the content if the file is bigger than the cached content.
+      lines = lines.slice(0, lines.length / 2);
+    }
+
+    sendFileOpened(sender, filePath, fileSize, endIndex, lines);
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
     return false;
@@ -197,46 +189,64 @@ const handleShowOpenDialog = async (state, sender) => {
     });
 };
 
-const readLinesStartingAtByte = async (sender, data) => {
-  const { path, startByte, amountOfLines } = data;
-  const [fileSize] = await getFileInfo(path);
-  const numberOfBytes = 30000;
-  let byteToReadFrom = startByte - 15000 < 0 ? 0 : startByte - 15000;
-  let cache = searchCache(path, startByte, amountOfLines, fileSize);
+const getNewLinesFromCache = async (sender, data) => {
+  const {
+    sourcePath,
+    nrOfLogLines,
+    indexForNewLines,
+    totalLineCountOfFile
+  } = data;
 
-  if (cache === 'miss') {
+  const [fileSize] = await getFileInfo(sourcePath);
+
+  const searchFromByte = Math.round(
+    (fileSize / totalLineCountOfFile) * indexForNewLines
+  );
+
+  // first cache search
+  let cache = searchCache(sourcePath, searchFromByte, nrOfLogLines);
+
+  if (cache === 'miss' || cache.lines.length < nrOfLogLines) {
     try {
-      const {
-        startByteOfLines,
-        lines,
-        linesStartAt,
-        linesEndAt
-      } = await fileReader.readDataFromByte(
-        path,
-        byteToReadFrom,
-        numberOfBytes
-      );
-      updateCache(path, lines, startByteOfLines);
+      const nrOfBytes = 120000;
+      let byteToReadFrom =
+        Math.round(searchFromByte - nrOfBytes / 2) < 0
+          ? 0
+          : Math.round(searchFromByte - nrOfBytes / 2);
 
-      // Check for size
+      const { startByteOfLines, lines } = await fileReader.readDataFromByte(
+        sourcePath,
+        byteToReadFrom,
+        nrOfBytes
+      );
+
+      // update cache with the new content
+      updateCache(sourcePath, lines, startByteOfLines);
+
+      // Check for size and flush if cache is too big
       if (!checkIfCacheIsWithinSizeLimit()) {
-        flushCacheForOneFile(path);
-        updateCache(path, lines, startByteOfLines);
+        flushCacheForOneFile(sourcePath);
+        updateCache(sourcePath, lines, startByteOfLines);
       }
 
-      cache = searchCache(path, startByte, amountOfLines, fileSize);
+      // Second cache search. Content should now be in the updated cache
+      cache = searchCache(sourcePath, searchFromByte, nrOfLogLines);
     } catch (error) {
-      console.log({ readLinesStartingAtByte }, error);
+      console.log({ getNewLinesFromCache }, error);
     }
   }
 
-  let { lines, startsAtByte } = cache;
-  lines = replaceEmptyLinesWithHiddenChar(lines);
+  const newLines = cache.lines;
 
-  const dataToReturn = { path, lines, startByteOfLines: startsAtByte };
+  // Send result to frontend
+  const dataToReturn = {
+    sourcePath,
+    newLines,
+    indexForNewLines
+  };
   const action = {
-    type: 'LOGLINES_FETCHED_FROM_BYTEPOSITION',
-    data: { dataToReturn, path }
+    type: 'LOGLINES_FETCHED_FROM_BACKEND_CACHE',
+    data: { dataToReturn }
   };
   sender.send(ipcChannel, action);
 };
@@ -283,8 +293,8 @@ const createEventHandler = state => {
       case 'STATE_LOAD':
         loadStateFromDisk(state, sender);
         break;
-      case 'FETCH_LOGLINES_STARTING_AT_SCROLL_BYTE_POSITION':
-        readLinesStartingAtByte(sender, _argObj.data).catch(err => {
+      case 'FETCH_NEW_LINES_FROM_BACKEND_CACHE':
+        getNewLinesFromCache(sender, _argObj.data).catch(err => {
           console.error(err);
         });
         break;

@@ -1,11 +1,5 @@
 import styled from 'styled-components';
 
-export const LogViewerRootContainer = styled.div`
-  display: flex;
-  flex: 1;
-  height: calc(100% - 32px);
-`;
-
 export const LogViewerContainer = styled.div`
   display: flex;
   flex: 1;
@@ -13,10 +7,9 @@ export const LogViewerContainer = styled.div`
   color: #ccc;
   background: #444;
   height: 100%;
-  overflow-anchor: none;
   min-width: 0;
-  overflow-y: hidden;
-  overflow-x: auto;
+  overflow-anchor: none;
+  overflow: auto;
 `;
 
 export const CloseFileButton = styled.button`

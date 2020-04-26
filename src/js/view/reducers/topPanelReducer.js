@@ -1,5 +1,5 @@
 const initialTabState = {
-  tailSwitch: true,
+  tailSwitch: false,
   highlightInput: '',
   filterInput: ''
 };
@@ -12,7 +12,6 @@ export const topPanelReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'tailSwitch': {
       const { sourcePath } = action.data;
-
       return {
         settings: {
           ...state.settings,

@@ -74,20 +74,11 @@ export const updateLastSeenLogSizes = (dispatch, path, fileSize) => {
   });
 };
 
-export const setFileData = (
-  dispatch,
-  filePath,
-  fileSize,
-  history,
-  startByteOfLines
-) => {
+export const setFileData = (dispatch, filePath, fileSize, history) => {
   dispatch({
-    type: 'LOGVIEWER_SET_LOG',
+    type: 'CREATE_SETTINGS_OBJECT',
     data: {
-      sourcePath: filePath,
-      log: history,
-      size: fileSize,
-      startByteOfLines
+      sourcePath: filePath
     }
   });
 
@@ -100,9 +91,10 @@ export const setFileData = (
   });
 
   dispatch({
-    type: 'CREATE_SETTINGS_OBJECT',
+    type: 'LOGVIEWER_SET_LOG',
     data: {
-      sourcePath: filePath
+      sourcePath: filePath,
+      log: history
     }
   });
 };
@@ -201,39 +193,38 @@ export const showSnackBar = (dispatch, message, level) => {
   });
 };
 
-export const addLinesFetchedFromBytePosition = (
+export const addLinesFetchedFromBackendCache = (
   dispatch,
-  startByteOfLines,
-  lines,
-  linesStartAt,
-  linesEndAt,
-  sourcePath
+  sourcePath,
+  newLines,
+  indexForNewLines
 ) => {
   dispatch({
-    type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION',
+    type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
     data: {
-      lines,
-      linesStartAt,
-      linesEndAt,
       sourcePath,
-      startByteOfLines
+      newLines,
+      indexForNewLines
     }
   });
 };
 
-export const updateNumberOfLinesToRenderInLogView = (
-  dispatch,
-  numberOfLinesToFillLogView
-) => {
+export const addCalculatedAmountOfLines = (dispatch, sourcePath, lineCount) => {
   dispatch({
-    type: 'LOGVIEWER_UPDATE_CURRENT_NR_OF_LINES_IN_VIEWER',
-    data: { numberOfLinesToFillLogView }
+    type: 'LOGVIEWER_ADD_LINE_COUNT_FOR_FILE',
+    data: {
+      sourcePath,
+      lineCount
+    }
   });
 };
 
-export const updateScrollPosition = (dispatch, sourcePath, scrollPosition) => {
+export const saveCurrentScrollTop = (dispatch, sourcePath, scrollTop) => {
   dispatch({
-    type: 'LOGVIEWER_UPDATE_SCROLL_POSITION',
-    data: { sourcePath, scrollPosition }
+    type: 'LOGVIEWER_SAVE_CURRENT_SCROLLTOP',
+    data: {
+      sourcePath,
+      scrollTop
+    }
   });
 };

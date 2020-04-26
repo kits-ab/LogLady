@@ -5,7 +5,8 @@ import {
   addNewLines,
   increaseSize,
   setLastSeenLogSizeToSize,
-  addLinesFetchedFromBytePosition
+  addLinesFetchedFromBackendCache,
+  addCalculatedAmountOfLines
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
@@ -50,10 +51,10 @@ const handleStateSet = (publisher, state) => {
 
 const handleFileOpened = (
   dispatch,
-  { filePath, fileSize, endIndex, history, startByteOfLines }
+  { filePath, fileSize, endIndex, history, lineCount }
 ) => {
   // clearAllLogs(dispatch);
-  setFileData(dispatch, filePath, fileSize, history, startByteOfLines);
+  setFileData(dispatch, filePath, fileSize, history);
   setLastSeenLogSizeToSize(dispatch, filePath, fileSize);
 
   const followSource = {
@@ -67,24 +68,22 @@ const handleFileOpened = (
   sendRequestToBackend(followSource);
 };
 
-const handleNewLines = (dispatch, { sourcePath, lines, size }, state) => {
-  let followTail = state.topPanelState.settings[sourcePath]
-    ? state.topPanelState.settings[sourcePath].tailSwitch
-    : true;
-
-  addNewLines(dispatch, sourcePath, lines, followTail);
+const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
+  addNewLines(dispatch, sourcePath, lines);
   increaseSize(dispatch, sourcePath, size);
 };
 
-const handleLinesFromBytePosition = (dispatch, { dataToReturn, path }) => {
-  addLinesFetchedFromBytePosition(
+const handleLinesFromBackendCache = (dispatch, { dataToReturn }) => {
+  addLinesFetchedFromBackendCache(
     dispatch,
-    dataToReturn.startByteOfLines,
-    dataToReturn.lines,
-    dataToReturn.linesStartAt,
-    dataToReturn.linesEndAt,
-    path
+    dataToReturn.sourcePath,
+    dataToReturn.newLines,
+    dataToReturn.indexForNewLines
   );
+};
+
+const handleLineAmount = (dispatch, { filePath, lineCount }) => {
+  addCalculatedAmountOfLines(dispatch, filePath, lineCount);
 };
 
 const handleError = (dispatch, { message, error }) => {
@@ -109,14 +108,17 @@ export const ipcListener = (store, publisher) => {
       case 'SOURCE_OPENED':
         handleSourceOpened(dispatch, action.data);
         break;
+      case 'TOTAL_LINE_AMOUNT_CALCULATED':
+        handleLineAmount(dispatch, action.data);
+        break;
       case 'ERROR':
         handleError(dispatch, action.data);
         break;
       case 'LINES_NEW':
         handleNewLines(dispatch, action.data, store.getState());
         break;
-      case 'LOGLINES_FETCHED_FROM_BYTEPOSITION':
-        handleLinesFromBytePosition(dispatch, action.data);
+      case 'LOGLINES_FETCHED_FROM_BACKEND_CACHE':
+        handleLinesFromBackendCache(dispatch, action.data);
         break;
       default:
         console.log('Warning: Unrecognized message, ', action);

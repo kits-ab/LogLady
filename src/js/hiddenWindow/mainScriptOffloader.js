@@ -41,26 +41,15 @@ class LogsFiltererAndHighlighter {
 
       // Continue to try to highlight if the filter matches the line or if no filter is set
       if (
-        (this.filterRegex && this.filterRegex.test(line)) ||
-        !this.filterRegex
+        filterExistsAndMatchesWithLineOrHasFilterNotBeenSet(
+          this.filterRegex,
+          line
+        )
       ) {
-        let lineObj = {};
-        if (this.highlightRegex && this.highlightRegex.test(line)) {
-          lineObj = {
-            highlightLine: true,
-            sections: line.split(this.highlightRegex).map(value => {
-              return {
-                text: value,
-                highlightSection: this.highlightRegex.test(value)
-              };
-            })
-          };
-        } else {
-          lineObj = {
-            highlightLine: false,
-            sections: [{ text: line, highlightSection: false }]
-          };
-        }
+        let lineObj = getHighlightedLineIfHighlightExistsAndMatches(
+          this.highlightRegex,
+          line
+        );
 
         if (sendLinesOneByOne) {
           this._sendLineToMainWindow(lineObj);
@@ -101,6 +90,37 @@ class LogsFiltererAndHighlighter {
   }
 }
 
+const filterExistsAndMatchesWithLineOrHasFilterNotBeenSet = (
+  filterRegex,
+  line
+) => {
+  return (filterRegex && filterRegex.test(line)) || !filterRegex;
+};
+
+const getHighlightedLineIfHighlightExistsAndMatches = (
+  highlightRegex,
+  line
+) => {
+  let lineObj = {};
+  if (highlightRegex && highlightRegex.test(line)) {
+    lineObj = {
+      highlightLine: true,
+      sections: line.split(highlightRegex).map(value => {
+        return {
+          text: value,
+          highlightSection: highlightRegex.test(value)
+        };
+      })
+    };
+  } else {
+    lineObj = {
+      highlightLine: false,
+      sections: [{ text: line, highlightSection: false }]
+    };
+  }
+  return lineObj;
+};
+
 /**
  * Register a listener for messages from the main window addressed to here.
  * Remember that the message has been stringified/serialized!
@@ -138,3 +158,8 @@ window.ipcRenderer.on('hiddenWindowMessages', (event, args) => {
     filtererForThisPath.start(args.sendLinesOneByOne);
   }
 });
+
+module.exports = {
+  filterExistsAndMatchesWithLineOrHasFilterNotBeenSet,
+  getHighlightedLineIfHighlightExistsAndMatches
+};

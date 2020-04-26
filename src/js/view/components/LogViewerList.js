@@ -1,80 +1,77 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import memoize from 'memoize-one';
-import {
-  LogViewerListContainer,
-  LogLineRuler
-} from '../styledComponents/LogViewerListStyledComponents';
-import SingleLogLineTranslator from './SingleLogLine';
-import { updateNumberOfLinesToRenderInLogView } from '../actions/dispatchActions';
+import { LogViewerListContainer } from '../styledComponents/LogViewerListStyledComponents';
+import { MemoedSingleLogLine } from './SingleLogLine';
+import { LogLine } from '../styledComponents/LogViewerListStyledComponents';
 import { List } from 'office-ui-fabric-react';
 
-const createItemData = memoize((lines, highlightColor, shouldWrap) => {
+const memoizeProps = memoize((highlightColor, shouldWrap) => {
   return {
-    lines,
     highlightColor,
     shouldWrap
   };
 });
 
 const LogViewerList = props => {
-  const [measuredCharHeight, setMeasuredCharHeight] = useState(null);
-  const [nbrOfLinesToFillLogView, setNbrOfLinesToFillLogView] = useState(null);
+  const listRef = useRef(); //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
+  const startItemIndexRef = useRef(0);
 
-  //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
-  const listRef = useRef();
+  // Used to send needed props and state from this component to the pure component that renders a single line
+  const memoizedLineProps = memoizeProps(props.highlightColor, props.wrapLines);
 
-  // Itemdata used to send needed props and state from this component to the pure component that renders a single line
-  const itemData = createItemData(
-    props.lines,
-    props.highlightColor,
-    props.wrapLines
-  );
+  const evaluateNrOfItemsScrolled = startItemIndexinView => {
+    // When the amount of items scrolled by are exceeding maxLineNrToScroll, a fetch of new lines from backend is triggered
+    if (props.wholeFileNotInFeCache) {
+      const startItemIndexDiff =
+        startItemIndexinView - startItemIndexRef.current;
+      const maxLineNrToScroll = props.logLinesLength / 3;
 
-  useEffect(() => {
-    // Calculating the amount of lines needed to fill the page in the logviewer
-    setNbrOfLinesToFillLogView(
-      measuredCharHeight
-        ? Math.round(props.containerHeight / measuredCharHeight)
-        : null
-    );
-  }, [props.containerHeight, measuredCharHeight]);
+      if (
+        startItemIndexDiff > maxLineNrToScroll ||
+        startItemIndexDiff < -maxLineNrToScroll
+      ) {
+        startItemIndexRef.current = startItemIndexinView;
 
-  useEffect(() => {
-    updateNumberOfLinesToRenderInLogView(
-      props.dispatcher,
-      nbrOfLinesToFillLogView
-    );
-  }, [nbrOfLinesToFillLogView]);
+        const halvedLogLineLength = props.logLinesLength / 2;
+        const indexForNewLines =
+          startItemIndexinView - halvedLogLineLength < 0
+            ? 0
+            : Math.round(startItemIndexinView - halvedLogLineLength);
+
+        props.getMoreLogLines(indexForNewLines);
+      }
+    }
+  };
 
   useEffect(() => {
     //Force updates the List when the user toggles Wrap Lines
     listRef.current.forceUpdate();
   }, [props.wrapLines]);
 
-  // Measure is used to measure the height of a character
-  const Measure = ({ onMeasured }) => {
-    const oneCharacterRef = useRef();
-
-    useEffect(() => {
-      onMeasured(oneCharacterRef.current.offsetHeight);
-    }, [onMeasured, oneCharacterRef]);
-
-    return <LogLineRuler ref={oneCharacterRef}>A</LogLineRuler>;
-  };
+  useEffect(() => {
+    const startItemIndexinView = listRef.current.getStartItemIndexInView();
+    evaluateNrOfItemsScrolled(startItemIndexinView);
+  }, [props.scrollTop]);
 
   const _onRenderCell = (item, index) => {
-    return (
-      <SingleLogLineTranslator
-        data={itemData}
+    const { highlightColor, shouldWrap } = memoizedLineProps;
+    return item ? (
+      <MemoedSingleLogLine
         index={index}
-      ></SingleLogLineTranslator>
+        line={item}
+        highlightColor={highlightColor}
+        shouldWrap={shouldWrap}
+      />
+    ) : (
+      <LogLine emptyline index={index}>
+        <span>.</span>
+      </LogLine>
     );
   };
 
   return (
     <LogViewerListContainer>
-      {!measuredCharHeight && <Measure onMeasured={setMeasuredCharHeight} />}
       <List
         ref={listRef}
         items={props.lines}

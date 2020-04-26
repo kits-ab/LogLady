@@ -1,16 +1,21 @@
 const initialState = {
   logs: {},
-  startByteOfLines: {},
-  nrOfLinesInViewer: null,
-  meanByteValuesOfInitialLines: {},
-  meanByteValuesOfLines: {},
-  scrollPositions: {}
+  lengthOfInitialLogLineArrays: {},
+  lengthOfEmptyLines: {},
+  totalNrOfLinesForFiles: {},
+  currentScrollTops: {},
+  indexesForNewLines: {}
 };
 
-const calculateMeanValueOfBytesPerLine = startBytes => {
-  return Math.round(
-    (startBytes[startBytes.length - 1] - startBytes[0]) / startBytes.length
-  );
+// Invisible character U+2800 being used in line.replace. Making the viewer display empty lines.
+const replaceEmptyLinesWithHiddenChar = arr => {
+  const regexList = [/^\s*$/];
+  return arr.map(line => {
+    const isMatch = regexList.some(rx => {
+      return rx.test(line);
+    });
+    return isMatch ? line.replace(regexList[0], '⠀') : line;
+  });
 };
 
 export const logViewerReducer = (state = initialState, action) => {
@@ -28,108 +33,104 @@ export const logViewerReducer = (state = initialState, action) => {
 
       return { ...state, logs: { ...logsToKeep } };
     }
+
     case 'LOGVIEWER_CLEAR':
       return {
         ...state,
         logs: {}
       };
+
     case 'LOGVIEWER_SET_LOG': {
-      console.log('SETTING');
-      const { sourcePath, log, startByteOfLines } = action.data;
-      let meanByteValueOfInitialLines = calculateMeanValueOfBytesPerLine(
-        startByteOfLines
-      );
+      console.log('SETTING LOG');
+      const { sourcePath, log } = action.data;
+      const _log = replaceEmptyLinesWithHiddenChar(log);
+
       return {
         ...state,
-        logs: { ...state.logs, [sourcePath]: log },
-        startByteOfLines: {
-          ...state.startByteOfLines,
-          [sourcePath]: [...startByteOfLines]
+        logs: {
+          ...state.logs,
+          [sourcePath]: _log
         },
-        meanByteValuesOfInitialLines: {
-          ...state.meanByteValuesOfInitialLines,
-          [sourcePath]: meanByteValueOfInitialLines
+        lengthOfInitialLogLineArrays: {
+          ...state.lengthOfInitialLogLineArrays,
+          [sourcePath]: log.length
         },
-        meanByteValuesOfLines: {
-          ...state.meanByteValuesOfLines,
-          [sourcePath]: meanByteValueOfInitialLines
+        indexesForNewLines: {
+          ...state.indexesForNewLines,
+          [sourcePath]: 0
+        },
+        currentScrollTops: {
+          ...state.currentScrollTops,
+          [sourcePath]: 0
         }
       };
     }
+
+    case 'LOGVIEWER_ADD_LINE_COUNT_FOR_FILE': {
+      console.log('ADDING LINE COUNT');
+      const { sourcePath, lineCount } = action.data;
+      const totalNrOfLines = lineCount ? lineCount : 0;
+      const emptyLinesLength =
+        lineCount - state.logs[sourcePath].length < 0
+          ? 0
+          : lineCount - state.logs[sourcePath].length;
+
+      return {
+        ...state,
+        totalNrOfLinesForFiles: {
+          ...state.totalNrOfLinesForFiles,
+          [sourcePath]: totalNrOfLines
+        },
+        lengthOfEmptyLines: {
+          ...state.lengthOfEmptyLines,
+          [sourcePath]: emptyLinesLength
+        }
+      };
+    }
+
     case 'LOGVIEWER_ADD_LINES': {
       console.log('ADDING');
-      const { sourcePath, lines, followTail } = action.data;
+      const { sourcePath, lines } = action.data;
       const log = state.logs[sourcePath] ? state.logs[sourcePath] : [];
-      const newLength = log.length + lines.length;
-
-      let newLines = [];
-      if (followTail) {
-        // If we are following tail and have not filled the screen,
-        // append new lines to logs. If the screen is filled, removes
-        // lines from the beginning of the logs and add to the
-        // end of them.
-        newLines =
-          newLength > state.nrOfLinesInViewer
-            ? log.slice(lines.length).concat(lines)
-            : log.concat(lines);
-      } else {
-        // If we are not following tail, but have not filled the screen
-        // we are at the bottom of the file and should update the logs
-        newLines =
-          log.length <= state.nrOfLinesInViewer ? log.concat(lines) : log;
-      }
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: [...newLines]
+          [sourcePath]: [...log, ...lines]
         }
       };
     }
-    case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BYTE_POSITION': {
-      console.log('ADDING FROM BYTE POS');
-      const { lines, sourcePath, startByteOfLines } = action.data;
-      let meanByteValueOfLines = calculateMeanValueOfBytesPerLine(
-        startByteOfLines
-      );
+
+    case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE': {
+      console.log('UPDATE CACHE');
+      const { sourcePath, newLines, indexForNewLines } = action.data;
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: [...lines]
+          [sourcePath]: newLines
         },
-        startByteOfLines: {
-          ...state.startByteOfLines,
-          [sourcePath]: [...startByteOfLines]
-        },
-        meanByteValuesOfLines: {
-          ...state.meanByteValuesOfLines,
-          [sourcePath]: meanByteValueOfLines
+        indexesForNewLines: {
+          ...state.indexesForNewLines,
+          [sourcePath]: indexForNewLines
         }
       };
     }
-    case 'LOGVIEWER_UPDATE_CURRENT_NR_OF_LINES_IN_VIEWER': {
-      const { numberOfLinesToFillLogView } = action.data;
+
+    case 'LOGVIEWER_SAVE_CURRENT_SCROLLTOP': {
+      const { sourcePath, scrollTop } = action.data;
 
       return {
         ...state,
-        nrOfLinesInViewer: numberOfLinesToFillLogView
-      };
-    }
-
-    case 'LOGVIEWER_UPDATE_SCROLL_POSITION': {
-      const { sourcePath, scrollPosition } = action.data;
-
-      return {
-        ...state,
-        scrollPositions: {
-          ...state.scrollPositions,
-          [sourcePath]: scrollPosition
+        currentScrollTops: {
+          ...state.currentScrollTops,
+          [sourcePath]: scrollTop
         }
       };
     }
+
     default:
       return state;
   }

@@ -1,41 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  LogViewerRootContainer,
-  LogViewerContainer
-} from '../styledComponents/LogViewerStyledComponents';
+import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponents';
 import LogViewerList from './LogViewerList';
-import CustomScrollBar from './CustomScrollBar';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
-import { fetchTextBasedOnByteFromScrollPosition } from './helpers/logHelper';
 import {
-  updateScrollPosition,
-  handleTailSwitch
+  handleTailSwitch,
+  saveCurrentScrollTop
 } from '../actions/dispatchActions';
-import _ from 'lodash';
-
-const debouncedFetchTextByBytePosition = _.debounce(
-  (path, position, nrOfLines) => {
-    fetchTextBasedOnByteFromScrollPosition(
-      path,
-      Math.round(position),
-      nrOfLines
-    );
-  },
-  100
-);
-
-const toggleTailSwitchToOffOnScrollWhenFileIsRunning = (
-  tailSwitch,
-  logFileIsRunning,
-  dispatch,
-  sourcePath
-) => {
-  if (tailSwitch && logFileIsRunning) {
-    handleTailSwitch(dispatch, { sourcePath });
-  }
-};
+import {
+  fetchNewLinesFromBackendCache,
+  updateLogViewerCache
+} from './helpers/logHelper';
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -46,51 +22,37 @@ const LogViewer = props => {
     : '';
   const highlightColor = props.tabSettings[props.source.path]
     ? props.tabSettings[props.source.path].highlightColor
-    : 'red';
+    : '#a4262c';
   const wrapLineOn = props.tabSettings[props.source.path]
     ? props.tabSettings[props.source.path].wrapLineOn
     : 'false';
   const tailSwitch = props.settings[props.source.path]
     ? props.settings[props.source.path].tailSwitch
     : 'false';
-  const logSize = props.logSizes[props.source.path]
-    ? props.logSizes[props.source.path]
+  const logLinesLength = props.lengthOfInitialLogLineArrays[props.source.path]
+    ? props.lengthOfInitialLogLineArrays[props.source.path]
     : 0;
-  const lastSeenLogSize = props.lastSeenLogSizes[props.source.path]
-    ? props.lastSeenLogSizes[props.source.path]
-    : 0;
-  const scrollPosition = props.scrollPositions[props.source.path]
-    ? props.scrollPositions[props.source.path]
-    : 0;
-  let meanByteValueOfCurrentLines = props.meanByteValuesOfLines[
-    props.source.path
-  ]
-    ? props.meanByteValuesOfLines[props.source.path]
-    : 100;
-
-  // Calculating nrOfLinesInViewer * meanByteValues for a line in the file,
-  // in order to make the base value of the scroll responsive to the size of the viewer
-  // and the current file line lengths.
-  const AMOUNT_OF_LINES_FROM_BOTTOM = 5;
-  const minScrollPositionValue = props.meanByteValuesOfInitialLines[
-    props.source.path
-  ]
-    ? props.nrOfLinesInViewer *
-        props.meanByteValuesOfInitialLines[props.source.path] -
-      props.meanByteValuesOfInitialLines[props.source.path] *
-        AMOUNT_OF_LINES_FROM_BOTTOM
+  const totalNrOfLinesInFile = props.totalNrOfLinesForFiles[props.source.path]
+    ? props.totalNrOfLinesForFiles[props.source.path]
+    : false;
+  const emptyLinesLength = props.lengthOfEmptyLines[props.source.path]
+    ? props.lengthOfEmptyLines[props.source.path]
     : 0;
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
-  const [currentTimeout, setCurrentTimeout] = useState();
-  const [currentLogViewerContainerHeight, setCurrentContainerHeight] = useState(
-    0
-  );
-  let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
-  const logViewerContainerRef = useRef();
+  const [currentScrollTop, setCurrentScrollTop] = useState(0);
 
-  let logFileHasRunningStatus =
-    logSize > 0 && lastSeenLogSize > 0 && logSize > lastSeenLogSize;
+  let previousLinesLength = useRef(0); // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
+  const scroller = useRef(); // A ref on the logViewerContainer used to keep track of scroll values.
+
+  const _getMoreLogLines = indexForNewLines => {
+    fetchNewLinesFromBackendCache(
+      props.source.path,
+      logLinesLength,
+      indexForNewLines,
+      totalNrOfLinesInFile
+    );
+  };
 
   const sendMessageToHiddenWindow = args => {
     /* Send a message to the hidden window that it should filter the logs.
@@ -99,6 +61,7 @@ const LogViewer = props => {
     For more information see mainScriptOffloader.js */
     let filterRegex = parseRegExp(filterInput),
       highlightRegex = parseRegExp(highlightInput);
+
     window.ipcRenderer.send('hiddenWindowMessages', {
       type: 'requestHelpFilterAndHighlightLines',
       filterRegexString: filterRegex ? filterRegex.toString() : '',
@@ -116,8 +79,21 @@ const LogViewer = props => {
         return lines.concat(args.line);
       });
     } else if (args.type === 'serveFilteredLogsAllDone') {
-      // Overwrite anything in the state
-      setLines(args.lines);
+      overWriteState(args.lines);
+    }
+  };
+
+  const overWriteState = newLogLines => {
+    if (props.totalNrOfLinesForFiles[props.source.path]) {
+      const cacheLength = props.totalNrOfLinesForFiles[props.source.path];
+      const startIndex = props.indexesForNewLines[props.source.path];
+      const newCache = updateLogViewerCache(cacheLength).insertRows(
+        startIndex,
+        newLogLines
+      );
+      setLines(newCache);
+    } else {
+      setLines(newLogLines);
     }
   };
 
@@ -131,19 +107,10 @@ const LogViewer = props => {
         eventListenerIPCMessage
       );
     };
-  }, []);
-
-  useEffect(() => {
-    const logViewerContainerResizeHandler = _.debounce(() => {
-      setCurrentContainerHeight(logViewerContainerRef.current.clientHeight);
-    }, 50);
-    logViewerContainerResizeHandler();
-    window.addEventListener('resize', logViewerContainerResizeHandler);
-
-    return () => {
-      window.removeEventListener('resize', logViewerContainerResizeHandler);
-    };
-  }, []);
+  }, [
+    props.totalNrOfLinesForFiles[props.source.path],
+    props.indexesForNewLines[props.source.path]
+  ]);
 
   useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
@@ -170,38 +137,8 @@ const LogViewer = props => {
         logs: newLines
       });
       previousLinesLength.current = props.logs.length;
-
-      // Checking if the follow switch is on and if the log file is running, then keep the scrollbar at the base to follow.
-      if (tailSwitch && logFileHasRunningStatus) {
-        updateScrollPosition(
-          props.dispatch,
-          props.source.path,
-          minScrollPositionValue
-        );
-      }
     }
   }, [props.logs]);
-
-  useEffect(() => {
-    // Effect for checking if tailswitch is on. If it is, and the file is running - lock the sliderPosition to the base and display the tail of the file.
-    const EMPTY_LINES_BELOW_LAST_LINE = 3;
-    const BYTE_AMOUNT_TO_FETCH =
-      (props.nrOfLinesInViewer - EMPTY_LINES_BELOW_LAST_LINE) *
-      meanByteValueOfCurrentLines;
-    const position = logSize - BYTE_AMOUNT_TO_FETCH;
-    if (logFileHasRunningStatus && tailSwitch) {
-      updateScrollPosition(
-        props.dispatch,
-        props.source.path,
-        minScrollPositionValue
-      );
-      debouncedFetchTextByBytePosition(
-        props.source.path,
-        position,
-        props.nrOfLinesInViewer
-      );
-    }
-  }, [tailSwitch, logFileHasRunningStatus]);
 
   useEffect(() => {
     /* Effect for when another source is selected,
@@ -212,121 +149,64 @@ const LogViewer = props => {
   }, [props.source.path]);
 
   useEffect(() => {
-    const wheelScrollEventHandler = event => {
-      const isVerticalScrollEvent = event.deltaY !== -0;
-      if (isVerticalScrollEvent) {
-        let amountOfPositionsToScroll =
-          event.deltaY > 0
-            ? -meanByteValueOfCurrentLines
-            : meanByteValueOfCurrentLines;
-
-        if (logViewerContainerRef.current) {
-          let newScrollPosition = scrollPosition + amountOfPositionsToScroll;
-          if (newScrollPosition > logSize) {
-            newScrollPosition = logSize;
-          } else if (newScrollPosition <= minScrollPositionValue) {
-            newScrollPosition = minScrollPositionValue;
-          }
-
-          toggleTailSwitchToOffOnScrollWhenFileIsRunning(
-            tailSwitch,
-            logFileHasRunningStatus,
-            props.dispatch,
-            props.source.path
-          );
-
-          updateScrollPosition(
-            props.dispatch,
-            props.source.path,
-            newScrollPosition
-          );
-        }
-      }
-    };
-
-    logViewerContainerRef.current.addEventListener(
-      'wheel',
-      wheelScrollEventHandler
-    );
-
-    return () => {
-      logViewerContainerRef.current.removeEventListener(
-        'wheel',
-        wheelScrollEventHandler
-      );
-    };
-  }, [scrollPosition, logSize]);
+    saveCurrentScrollTop(props.dispatch, props.source.path, currentScrollTop);
+  }, [currentScrollTop]);
 
   useEffect(() => {
-    const readBytesHandler = () => {
-      // Clear timeout so we don't read from files too often
-      clearTimeout(currentTimeout);
-      // Set new timeout to read from file in an appropriate amount of time
-      let timeout = setTimeout(() => {
-        // Scroll base value is minScrollPositionValue,
-        //we need to calculate logsize - scrollPosition to invert the values and get the text in the right order.
-        fetchTextBasedOnByteFromScrollPosition(
-          props.source.path,
-          Math.round(logSize - scrollPosition),
-          props.nrOfLinesInViewer
-        );
-        // Save timeout so it can be cleared if needed
-      }, 50);
-      setCurrentTimeout(timeout);
+    scroller.current.scrollTo(0, props.currentScrollTops[props.source.path]);
+  }, [props.source.path]);
+
+  useEffect(() => {
+    const handleScrollPositionEvent = event => {
+      setCurrentScrollTop(event.target.scrollTop);
     };
-
-    logViewerContainerRef.current.addEventListener('wheel', readBytesHandler);
-
+    scroller.current.addEventListener('scroll', event => {
+      return handleScrollPositionEvent(event);
+    });
     return () => {
-      logViewerContainerRef.current.removeEventListener(
-        'wheel',
-        readBytesHandler
-      );
+      scroller.current.removeEventListener('scroll', handleScrollPositionEvent);
     };
-  }, [
-    scrollPosition,
-    currentTimeout,
-    currentLogViewerContainerHeight,
-    props.nrOfLinesInViewer
-  ]);
+  }, [totalNrOfLinesInFile]);
 
-  const handleCustomScrollBarOnChange = value => {
-    toggleTailSwitchToOffOnScrollWhenFileIsRunning(
-      tailSwitch,
-      logFileHasRunningStatus,
-      props.dispatch,
-      props.source.path
-    );
-    updateScrollPosition(props.dispatch, props.source.path, value);
-    debouncedFetchTextByBytePosition(
-      props.source.path,
-      logSize - value,
-      props.nrOfLinesInViewer
-    );
-  };
+  useEffect(() => {
+    //Effect for toggling follow to on when scroller is at the bottom.
+    //Toggles to off when scrolling up again
+    const manageTailSwitchToggle = () => {
+      const isScrollerAtTheBottom =
+        scroller.current.scrollHeight ===
+        scroller.current.clientHeight + scroller.current.scrollTop;
+
+      if (isScrollerAtTheBottom && !tailSwitch) {
+        handleTailSwitch(props.dispatch, { sourcePath: props.source.path });
+      } else if (!isScrollerAtTheBottom && tailSwitch) {
+        handleTailSwitch(props.dispatch, { sourcePath: props.source.path });
+      }
+    };
+    scroller.current.addEventListener('scroll', manageTailSwitchToggle);
+    return () => {
+      scroller.current.removeEventListener('scroll', manageTailSwitchToggle);
+    };
+  }, [props.source.path, tailSwitch]);
+
+  useEffect(() => {
+    //Effect for scrolling to bottom of the file when toggling follow to on
+    if (tailSwitch) {
+      scroller.current.scrollTo(0, scroller.current.scrollHeight);
+    }
+  }, [tailSwitch]);
 
   return (
-    <LogViewerRootContainer>
-      <LogViewerContainer ref={logViewerContainerRef}>
-        <LogViewerList
-          key={props.source.index}
-          dispatcher={props.dispatch}
-          highlightColor={highlightColor}
-          wrapLines={wrapLineOn}
-          lines={filteredAndHighlightedLines}
-          sourcePath={props.source.path}
-          logSize={logSize}
-          containerHeight={currentLogViewerContainerHeight}
-        />
-      </LogViewerContainer>
-      <CustomScrollBar
-        onChange={handleCustomScrollBarOnChange}
-        max={logSize}
-        min={minScrollPositionValue}
-        value={scrollPosition}
-        step={1}
+    <LogViewerContainer ref={scroller}>
+      <LogViewerList
+        highlightColor={highlightColor}
+        wrapLines={wrapLineOn}
+        lines={filteredAndHighlightedLines}
+        scrollTop={currentScrollTop}
+        getMoreLogLines={_getMoreLogLines}
+        logLinesLength={logLinesLength}
+        wholeFileNotInFeCache={emptyLinesLength > 0}
       />
-    </LogViewerRootContainer>
+    </LogViewerContainer>
   );
 };
 
@@ -335,11 +215,11 @@ const mapStateToProps = ({
   settingsState: { tabSettings },
   logViewerState: {
     logs,
-    nrOfLinesInViewer,
-    startByteOfLines,
-    meanByteValuesOfInitialLines,
-    meanByteValuesOfLines,
-    scrollPositions
+    lengthOfInitialLogLineArrays,
+    totalNrOfLinesForFiles,
+    lengthOfEmptyLines,
+    currentScrollTops,
+    indexesForNewLines
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -349,11 +229,11 @@ const mapStateToProps = ({
     logs,
     logSizes,
     lastSeenLogSizes,
-    nrOfLinesInViewer,
-    startByteOfLines,
-    meanByteValuesOfInitialLines,
-    meanByteValuesOfLines,
-    scrollPositions
+    lengthOfInitialLogLineArrays,
+    totalNrOfLinesForFiles,
+    lengthOfEmptyLines,
+    currentScrollTops,
+    indexesForNewLines
   };
 };
 
