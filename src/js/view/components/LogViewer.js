@@ -1,6 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from 'react';
-import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponents';
+import {
+  LogViewerContainer,
+  SpinnerContainer
+} from '../styledComponents/LogViewerStyledComponents';
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
@@ -9,6 +12,7 @@ import {
   fetchNewLinesFromBackendCache,
   updateLogViewerCache
 } from './helpers/logHelper';
+import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -35,6 +39,7 @@ const LogViewer = props => {
   const emptyLinesLength = props.lengthOfEmptyLines[props.source.path]
     ? props.lengthOfEmptyLines[props.source.path]
     : 0;
+  const doneLoading = props.totalNrOfLinesForFiles[props.source.path] > 0;
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
   const [currentScrollTop, setCurrentScrollTop] = useState(0);
@@ -186,15 +191,25 @@ const LogViewer = props => {
 
   return (
     <LogViewerContainer ref={scroller} data-is-scrollable="true">
-      <LogViewerList
-        highlightColor={highlightColor}
-        wrapLines={wrapLineOn}
-        lines={[...filteredAndHighlightedLines]}
-        scrollTop={currentScrollTop}
-        getMoreLogLines={_getMoreLogLines}
-        logLinesLength={logLinesLength}
-        wholeFileNotInFeCache={emptyLinesLength > 0}
-      />
+      {doneLoading ? (
+        <LogViewerList
+          highlightColor={highlightColor}
+          wrapLines={wrapLineOn}
+          lines={[...filteredAndHighlightedLines]}
+          scrollTop={currentScrollTop}
+          getMoreLogLines={_getMoreLogLines}
+          logLinesLength={logLinesLength}
+          wholeFileNotInFeCache={emptyLinesLength > 0}
+        />
+      ) : (
+        <SpinnerContainer>
+          <Spinner
+            label="Loading file"
+            labelPosition="right"
+            size={SpinnerSize.large}
+          />
+        </SpinnerContainer>
+      )}
     </LogViewerContainer>
   );
 };
