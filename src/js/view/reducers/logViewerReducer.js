@@ -18,20 +18,49 @@ const replaceEmptyLinesWithHiddenChar = arr => {
   });
 };
 
+const filterObject = (object, sourcePath) => {
+  let keptValues = {};
+  Object.keys(object).forEach(source => {
+    let value = object[source];
+    if (source !== sourcePath) {
+      keptValues[source] = value;
+    }
+  });
+  return keptValues;
+};
+
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'LOGVIEWER_REMOVE_LOG': {
       const { sourcePath } = action.data;
-      const logsToKeep = {};
+      const logsToKeep = filterObject(state.logs, sourcePath);
+      const initialLengthsToKeep = filterObject(
+        state.lengthOfInitialLogLineArrays,
+        sourcePath
+      );
+      const emptyLinesToKeep = filterObject(
+        state.lengthOfEmptyLines,
+        sourcePath
+      );
+      const totalNrsToKeep = filterObject(
+        state.totalNrOfLinesForFiles,
+        sourcePath
+      );
+      const scrollTopsToKeep = filterObject(
+        state.currentScrollTops,
+        sourcePath
+      );
+      const indexesToKeep = filterObject(state.indexesForNewLines, sourcePath);
 
-      Object.keys(state.logs).forEach(source => {
-        let log = state.logs[source];
-        if (source !== sourcePath) {
-          logsToKeep[source] = log;
-        }
-      });
-
-      return { ...state, logs: { ...logsToKeep } };
+      return {
+        ...state,
+        logs: { ...logsToKeep },
+        lengthOfInitialLogLineArrays: { ...initialLengthsToKeep },
+        lengthOfEmptyLines: { ...emptyLinesToKeep },
+        totalNrOfLinesForFiles: { ...totalNrsToKeep },
+        currentScrollTops: { ...scrollTopsToKeep },
+        indexesForNewLines: { ...indexesToKeep }
+      };
     }
 
     case 'LOGVIEWER_CLEAR':
