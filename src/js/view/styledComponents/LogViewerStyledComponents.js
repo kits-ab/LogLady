@@ -48,3 +48,8 @@ export const CloseFileButton = styled.button`
     opacity: 1;
   }
 `;
+
+export const SpinnerContainer = styled.div`
+  display: flex;
+  margin: auto;
+`;
