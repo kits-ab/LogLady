@@ -4,10 +4,7 @@ import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponent
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
-import {
-  handleTailSwitch,
-  saveCurrentScrollTop
-} from '../actions/dispatchActions';
+import { saveCurrentScrollTop } from '../actions/dispatchActions';
 import {
   fetchNewLinesFromBackendCache,
   updateLogViewerCache
@@ -76,7 +73,9 @@ const LogViewer = props => {
     if (args.type === 'serveFilteredLogsOneDone') {
       // Update state using updater form, as the state in this function is stale
       setLines(lines => {
-        return lines.concat(args.line);
+        if (tailSwitch) {
+          return lines.concat(args.line);
+        }
       });
     } else if (args.type === 'serveFilteredLogsAllDone') {
       overWriteState(args.lines);
@@ -84,9 +83,14 @@ const LogViewer = props => {
   };
 
   const overWriteState = newLogLines => {
-    if (props.totalNrOfLinesForFiles[props.source.path]) {
+    const wholeFileIsNotInFeCache = emptyLinesLength > 0;
+    if (
+      props.totalNrOfLinesForFiles[props.source.path] &&
+      wholeFileIsNotInFeCache
+    ) {
       const cacheLength = props.totalNrOfLinesForFiles[props.source.path];
       const startIndex = props.indexesForNewLines[props.source.path];
+
       const newCache = updateLogViewerCache(cacheLength).insertRows(
         startIndex,
         newLogLines
@@ -149,14 +153,6 @@ const LogViewer = props => {
   }, [props.source.path]);
 
   useEffect(() => {
-    saveCurrentScrollTop(props.dispatch, props.source.path, currentScrollTop);
-  }, [currentScrollTop]);
-
-  useEffect(() => {
-    scroller.current.scrollTo(0, props.currentScrollTops[props.source.path]);
-  }, [props.source.path]);
-
-  useEffect(() => {
     const handleScrollPositionEvent = event => {
       setCurrentScrollTop(event.target.scrollTop);
     };
@@ -169,38 +165,31 @@ const LogViewer = props => {
   }, [totalNrOfLinesInFile]);
 
   useEffect(() => {
-    //Effect for toggling follow to on when scroller is at the bottom.
-    //Toggles to off when scrolling up again
-    const manageTailSwitchToggle = () => {
-      const isScrollerAtTheBottom =
-        scroller.current.scrollHeight ===
-        scroller.current.clientHeight + scroller.current.scrollTop;
-
-      if (isScrollerAtTheBottom && !tailSwitch) {
-        handleTailSwitch(props.dispatch, { sourcePath: props.source.path });
-      } else if (!isScrollerAtTheBottom && tailSwitch) {
-        handleTailSwitch(props.dispatch, { sourcePath: props.source.path });
-      }
-    };
-    scroller.current.addEventListener('scroll', manageTailSwitchToggle);
-    return () => {
-      scroller.current.removeEventListener('scroll', manageTailSwitchToggle);
-    };
-  }, [props.source.path, tailSwitch]);
-
-  useEffect(() => {
-    //Effect for scrolling to bottom of the file when toggling follow to on
-    if (tailSwitch) {
-      scroller.current.scrollTo(0, scroller.current.scrollHeight);
+    if (tailSwitch && emptyLinesLength > 0) {
+      _getMoreLogLines(totalNrOfLinesInFile - logLinesLength);
     }
   }, [tailSwitch]);
 
+  useEffect(() => {
+    if (tailSwitch) {
+      scroller.current.scrollTo(0, scroller.current.scrollHeight);
+    }
+  }, [tailSwitch, filteredAndHighlightedLines]);
+
+  useEffect(() => {
+    saveCurrentScrollTop(props.dispatch, props.source.path, currentScrollTop);
+  }, [currentScrollTop]);
+
+  useEffect(() => {
+    scroller.current.scrollTo(0, props.currentScrollTops[props.source.path]);
+  }, [props.source.path]);
+
   return (
-    <LogViewerContainer ref={scroller}>
+    <LogViewerContainer ref={scroller} data-is-scrollable="true">
       <LogViewerList
         highlightColor={highlightColor}
         wrapLines={wrapLineOn}
-        lines={filteredAndHighlightedLines}
+        lines={[...filteredAndHighlightedLines]}
         scrollTop={currentScrollTop}
         getMoreLogLines={_getMoreLogLines}
         logLinesLength={logLinesLength}

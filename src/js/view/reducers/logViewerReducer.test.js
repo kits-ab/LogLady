@@ -1,7 +1,5 @@
 import { logViewerReducer } from './logViewerReducer';
-describe('', () => {
-  it('', () => {});
-});
+
 describe('logviewer reducer', () => {
   it('should return the initial state', () => {
     const initialState = {
@@ -28,7 +26,7 @@ describe('logviewer reducer', () => {
     const lines = ['hej1', 'hej2', 'hej3'];
     const expectedState = {
       logs: { test: ['hej1', 'hej2', 'hej3'] },
-      totalNrOfLinesForFiles: {},
+      totalNrOfLinesForFiles: { test: 3 },
       lengthOfInitialLogLineArrays: {},
       lengthOfEmptyLines: {},
       currentScrollTops: {},
@@ -70,17 +68,16 @@ describe('logviewer reducer', () => {
     const lines = ['hej4', 'hej5'];
     const state = {
       logs: { test: ['hej1', 'hej2', 'hej3'] },
-      nrOfLinesInViewer: 5
+      totalNrOfLinesForFiles: { test: 3 }
     };
     const expectedState = {
       logs: { test: ['hej1', 'hej2', 'hej3', 'hej4', 'hej5'] },
-      nrOfLinesInViewer: 5
+      totalNrOfLinesForFiles: { test: 5 }
     };
     const sourcePath = 'test';
-    const followTail = true;
     const action = {
       type: 'LOGVIEWER_ADD_LINES',
-      data: { sourcePath, lines, followTail }
+      data: { sourcePath, lines }
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
