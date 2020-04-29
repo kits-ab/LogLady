@@ -154,6 +154,19 @@ export const clearSource = (dispatch, filePath) => {
       sourcePath: filePath
     }
   });
+
+  dispatch({
+    type: 'TOPPANEL_REMOVE_LOGSETTINGS',
+    data: {
+      sourcePath: filePath
+    }
+  });
+  dispatch({
+    type: 'SETTINGS_REMOVE_LOGSETTINGS',
+    data: {
+      sourcePath: filePath
+    }
+  });
 };
 
 export const hideSnackBar = dispatch => {

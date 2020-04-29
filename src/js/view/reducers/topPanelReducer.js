@@ -57,6 +57,17 @@ export const topPanelReducer = (state = initialState, action) => {
         }
       };
     }
+    case 'TOPPANEL_REMOVE_LOGSETTINGS': {
+      const { sourcePath } = action.data;
+      const settingsToKeep = {};
+      Object.keys(state.settings).forEach(source => {
+        let settings = state.settings[source];
+        if (source !== sourcePath) {
+          settingsToKeep[source] = settings;
+        }
+      });
+      return { ...state, settings: { ...settingsToKeep } };
+    }
     case 'TOP_PANEL_STATE_RESTORE':
       return { ...initialState, ...action.data };
     default:

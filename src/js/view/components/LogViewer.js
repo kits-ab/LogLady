@@ -230,7 +230,7 @@ const LogViewer = props => {
       <LogViewerList
         highlightColor={highlightColor}
         wrapLines={wrapLineOn}
-        lines={[...filteredAndHighlightedLines]}
+        lines={filteredAndHighlightedLines}
         scrollTop={currentScrollTop}
         filterInput={filterInput}
         getMoreLogLines={_getMoreLogLines}
