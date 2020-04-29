@@ -89,7 +89,6 @@ const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
     sendSourcePicked(sender, filePath);
-
     let { startByteOfLines, lines } = await getFileHistory(filePath, fileSize);
     updateCache(filePath, lines, startByteOfLines);
 
@@ -257,6 +256,42 @@ const getNewLinesFromCache = async (sender, data) => {
   sender.send(ipcChannel, action);
 };
 
+const getFilteredLines = async (sender, data) => {
+  const { sourcePath, filterRegexString } = data;
+  let filterRegex;
+
+  if (filterRegexString) {
+    let [, pattern, flags] = /\/(.*)\/(.*)/.exec(filterRegexString);
+    filterRegex = new RegExp(`(${pattern})`, flags);
+  }
+
+  const [fileSize] = await getFileInfo(sourcePath);
+  const startFromByte = 0;
+  const { lines } = await fileReader.readDataFromByte(
+    sourcePath,
+    startFromByte,
+    fileSize
+  );
+  let newLines = [];
+  for (let lineIndex in lines) {
+    let line = lines[lineIndex];
+    if (filterRegex && filterRegex.test(line)) {
+      newLines.push(line);
+    }
+  }
+  const dataToReturn = {
+    sourcePath,
+    filteredLines: newLines,
+    lineCount: newLines.length
+  };
+
+  const action = {
+    type: 'LOGLINES_FILTERED',
+    data: { dataToReturn }
+  };
+  sender.send(ipcChannel, action);
+};
+
 const sendError = (sender, message, error) => {
   const errorSender = error => {
     const action = {
@@ -301,6 +336,11 @@ const createEventHandler = state => {
         break;
       case 'FETCH_NEW_LINES_FROM_BACKEND_CACHE':
         getNewLinesFromCache(sender, _argObj.data).catch(err => {
+          console.error(err);
+        });
+        break;
+      case 'FETCH_FILTERED_LINES_FROM_BACKEND':
+        getFilteredLines(sender, _argObj.data).catch(err => {
           console.error(err);
         });
         break;

@@ -8,7 +8,9 @@ describe('logviewer reducer', () => {
       lengthOfInitialLogLineArrays: {},
       lengthOfEmptyLines: {},
       currentScrollTops: {},
-      indexesForNewLines: {}
+      indexesForNewLines: {},
+      filteredLogs: {},
+      totalNrOfFilteredLines: {}
     };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
@@ -30,7 +32,9 @@ describe('logviewer reducer', () => {
       lengthOfInitialLogLineArrays: {},
       lengthOfEmptyLines: {},
       currentScrollTops: {},
-      indexesForNewLines: {}
+      indexesForNewLines: {},
+      filteredLogs: {},
+      totalNrOfFilteredLines: {}
     };
     const sourcePath = 'test';
 
@@ -55,7 +59,9 @@ describe('logviewer reducer', () => {
       lengthOfEmptyLines: {},
       totalNrOfLinesForFiles: {},
       currentScrollTops: { test: 0 },
-      indexesForNewLines: { test: 0 }
+      indexesForNewLines: { test: 0 },
+      filteredLogs: {},
+      totalNrOfFilteredLines: {}
     };
     const action = {
       type: 'LOGVIEWER_SET_LOG',
@@ -81,4 +87,26 @@ describe('logviewer reducer', () => {
     };
     expect(logViewerReducer(state, action)).toEqual(expectedState);
   });
+});
+
+it('should set filtered lines', () => {
+  const sourcePath = 'test';
+  const filteredLines = ['line4', 'line7'];
+  const lineCount = 2;
+
+  const expectedState = {
+    logs: {},
+    totalNrOfLinesForFiles: {},
+    lengthOfInitialLogLineArrays: {},
+    lengthOfEmptyLines: {},
+    currentScrollTops: {},
+    indexesForNewLines: {},
+    filteredLogs: { test: ['line4', 'line7'] },
+    totalNrOfFilteredLines: { test: 2 }
+  };
+  const action = {
+    type: 'LOGVIEWER_ADD_FILTERED_LINES',
+    data: { sourcePath, filteredLines, lineCount }
+  };
+  expect(logViewerReducer(undefined, action)).toEqual(expectedState);
 });
