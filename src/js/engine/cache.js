@@ -1,3 +1,9 @@
+const {
+  formatCacheLines,
+  formatCachedPartsInfo,
+  parseResult
+} = require('../helpers/cacheHelper');
+
 let cache = {};
 
 const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
@@ -28,8 +34,7 @@ const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
         } else if (toReturn.isEndOfFile) {
           const fromIndex = cache[filepath].lines.length - amountOfLines;
           const endOfCache = cache[filepath].lines.slice(fromIndex);
-          const toReturn = parseResult(endOfCache, fileSize);
-          return toReturn;
+          return parseResult(endOfCache, fileSize);
         } else {
           return 'miss';
         }
@@ -41,32 +46,9 @@ const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
   }
 };
 
-const parseResult = (result, fileSize) => {
-  const startsAtByte = result.map(byte => {
-    return byte.startsAtByte;
-  });
-  const lines = result.map(line => {
-    return line.line;
-  });
-  const isEndOfFile = isResultEndOfFile(
-    fileSize,
-    startsAtByte[startsAtByte.length - 1],
-    lines[lines.length - 1]
-  );
-  return { lines, startsAtByte, isEndOfFile };
-};
-
-const isResultEndOfFile = (fileSize, lastLineStartsAtByte, lastLine) => {
-  const newLineBytes = 2;
-  return (
-    lastLineStartsAtByte + Buffer.byteLength(lastLine) + newLineBytes >=
-    fileSize
-  );
-};
-
 const updateCache = (filepath, lines, startByteOfLines) => {
-  let cacheLines = _formatCacheLines(lines, startByteOfLines);
-  let cachedPartsInfo = _formatCachedPartsInfo(startByteOfLines);
+  let cacheLines = formatCacheLines(lines, startByteOfLines);
+  let cachedPartsInfo = formatCachedPartsInfo(startByteOfLines);
 
   if (cache[filepath]) {
     let currentCacheLines = cache[filepath].lines;
@@ -214,23 +196,10 @@ const checkIfCacheIsWithinSizeLimit = (cache = cacheInit) => {
   return cacheSize < sizeLimit ? true : false;
 };
 
-const _formatCacheLines = (lines, startByteOfLines) => {
-  return lines.map((line, index) => {
-    return { line: line, startsAtByte: startByteOfLines[index] };
-  });
-};
-
-const _formatCachedPartsInfo = startByteOfLines => {
-  const startsAt = startByteOfLines[0];
-  const endsAt = startByteOfLines[startByteOfLines.length - 1];
-  return [{ startsAt, endsAt, startByteOfLines }];
-};
-
 module.exports = {
   updateCache,
   flushCache,
   flushCacheForOneFile,
   searchCache,
-  checkIfCacheIsWithinSizeLimit,
-  isResultEndOfFile
+  checkIfCacheIsWithinSizeLimit
 };
