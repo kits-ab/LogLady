@@ -233,15 +233,16 @@ const getNewLinesFromCache = async (sender, data) => {
   }
 
   const newLines = cache.lines;
-  const startBytes = cache.startsAtByte;
+  // const startBytes = cache.startsAtByte;
+  const isEndOfFile = cache.isEndOfFile;
   // If the length of the last index in the array of lines + the start byte of the line > filesize,
   // then we are returning the end of the file.
-  const newLineBytes = 2;
-  const isEndOfFile =
-    Buffer.byteLength(newLines[newLines.length - 1], 'utf8') +
-      startBytes[startBytes.length - 1] +
-      newLineBytes >=
-    fileSize;
+  // const newLineBytes = 2;
+  // const isEndOfFile =
+  //   Buffer.byteLength(newLines[newLines.length - 1], 'utf8') +
+  //     startBytes[startBytes.length - 1] +
+  //     newLineBytes >=
+  //   fileSize;
 
   // Send result to frontend
   const dataToReturn = {

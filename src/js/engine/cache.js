@@ -1,27 +1,67 @@
 let cache = {};
 
-const searchCache = (filepath, position, amountOfLines) => {
+const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
   if (cache[filepath]) {
-    const info = cache[filepath].cachedPartsInfo;
+    const chunkInfo = cache[filepath].cachedPartsInfo;
 
-    for (let part of info) {
+    for (let chunk of chunkInfo) {
       const positionIsWithinLimit =
-        position >= part.startsAt && position <= part.endsAt;
-
+        position >= chunk.startsAt && position <= chunk.endsAt;
       if (positionIsWithinLimit) {
-        const result = cache[filepath].lines
-          .filter(line => {
-            return line.startsAtByte >= position;
-          })
-          .slice(0, amountOfLines);
-        return _parseResult(result);
+        const nrOfLinesInChunk = chunk.startByteOfLines.filter(nr => {
+          return nr >= position;
+        }).length;
+
+        const toReturn = parseResult(
+          cache[filepath].lines
+            .filter(line => {
+              return line.startsAtByte >= position;
+            })
+            .slice(0, amountOfLines),
+          fileSize
+        );
+
+        const hasRequstedNrOfLines = nrOfLinesInChunk >= amountOfLines;
+
+        if (hasRequstedNrOfLines) {
+          return toReturn;
+        } else if (toReturn.isEndOfFile) {
+          const fromIndex = cache[filepath].lines.length - amountOfLines;
+          const endOfCache = cache[filepath].lines.slice(fromIndex);
+          const toReturn = parseResult(endOfCache, fileSize);
+          return toReturn;
+        } else {
+          return 'miss';
+        }
       }
     }
-
     return 'miss';
   } else {
     return 'miss';
   }
+};
+
+const parseResult = (result, fileSize) => {
+  const startsAtByte = result.map(byte => {
+    return byte.startsAtByte;
+  });
+  const lines = result.map(line => {
+    return line.line;
+  });
+  const isEndOfFile = isResultEndOfFile(
+    fileSize,
+    startsAtByte[startsAtByte.length - 1],
+    lines[lines.length - 1]
+  );
+  return { lines, startsAtByte, isEndOfFile };
+};
+
+const isResultEndOfFile = (fileSize, lastLineStartsAtByte, lastLine) => {
+  const newLineBytes = 2;
+  return (
+    lastLineStartsAtByte + Buffer.byteLength(lastLine) + newLineBytes >=
+    fileSize
+  );
 };
 
 const updateCache = (filepath, lines, startByteOfLines) => {
@@ -186,20 +226,11 @@ const _formatCachedPartsInfo = startByteOfLines => {
   return [{ startsAt, endsAt, startByteOfLines }];
 };
 
-const _parseResult = result => {
-  const startsAtByte = result.map(byte => {
-    return byte.startsAtByte;
-  });
-  const lines = result.map(line => {
-    return line.line;
-  });
-  return { lines, startsAtByte };
-};
-
 module.exports = {
   updateCache,
   flushCache,
   flushCacheForOneFile,
   searchCache,
-  checkIfCacheIsWithinSizeLimit
+  checkIfCacheIsWithinSizeLimit,
+  isResultEndOfFile
 };
