@@ -36,6 +36,9 @@ const LogViewer = props => {
   const emptyLinesLength = props.lengthOfEmptyLines[props.source.path]
     ? props.lengthOfEmptyLines[props.source.path]
     : 0;
+  const filteredLogs = props.filteredLogs[props.source.path]
+    ? props.filteredLogs[props.source.path]
+    : [];
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
   const [currentScrollTop, setCurrentScrollTop] = useState(0);
@@ -120,24 +123,36 @@ const LogViewer = props => {
       );
     };
   }, [
+    filteredLogs,
     props.totalNrOfLinesForFiles[props.source.path],
     props.indexesForNewLines[props.source.path],
     props.totalNrOfFilteredLines[props.source.path]
   ]);
 
+  const fetch = () => {
+    filterRef.current = filterInput;
+    let filterRegex = parseRegExp(filterInput);
+    fetchFilteredLinesFromBackend(
+      props.source.path,
+      filterRegex ? filterRegex.toString() : ''
+    );
+  };
+
+  useEffect(() => {
+    if (filterInput.length !== 0) {
+      fetch();
+    }
+  }, [filterInput]);
+
   useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
     let logs;
-    filterRef.current = filterInput;
-
     if (filterInput.length !== 0) {
-      fetchFilteredLinesFromBackend(
-        props.source.path,
-        parseRegExp(filterInput).toString()
-      );
-      logs = props.filteredLogs[props.source.path];
+      console.log({ fil: props.filteredLogs[props.source.path], filteredLogs });
+      logs = filteredLogs;
     } else {
+      filterRef.current = filterInput;
       logs = props.logs[props.source.path];
     }
 
@@ -149,7 +164,7 @@ const LogViewer = props => {
         logs
       });
     }
-  }, [filterInput, highlightInput, highlightColor, filterRef.current]);
+  }, [filterInput, highlightInput, highlightColor, filteredLogs]);
 
   useEffect(() => {
     // Effect for when new lines are added
@@ -166,14 +181,8 @@ const LogViewer = props => {
       });
       previousLinesLength.current = props.logs.length;
     } else if (filterInput.length !== 0) {
-      fetchFilteredLinesFromBackend(
-        props.source.path,
-        parseRegExp(filterInput).toString()
-      );
-
-      let newLines = props.filteredLogs[props.source.path].slice(
-        previousFilteredLinesLength.current
-      );
+      fetch();
+      let newLines = filteredLogs.slice(previousFilteredLinesLength.current);
 
       sendMessageToHiddenWindow({
         sendLinesOneByOne:
@@ -253,7 +262,6 @@ const mapStateToProps = ({
     indexesForNewLines,
     filteredLogs,
     totalNrOfFilteredLines
-    // indexesForFilteredLines
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -270,7 +278,6 @@ const mapStateToProps = ({
     indexesForNewLines,
     filteredLogs,
     totalNrOfFilteredLines
-    // indexesForFilteredLines
   };
 };
 
