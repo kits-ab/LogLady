@@ -18,20 +18,49 @@ const replaceEmptyLinesWithHiddenChar = arr => {
   });
 };
 
+const filterObject = (object, sourcePath) => {
+  let keptValues = {};
+  Object.keys(object).forEach(source => {
+    let value = object[source];
+    if (source !== sourcePath) {
+      keptValues[source] = value;
+    }
+  });
+  return keptValues;
+};
+
 export const logViewerReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'LOGVIEWER_REMOVE_LOG': {
       const { sourcePath } = action.data;
-      const logsToKeep = {};
+      const logsToKeep = filterObject(state.logs, sourcePath);
+      const initialLengthsToKeep = filterObject(
+        state.lengthOfInitialLogLineArrays,
+        sourcePath
+      );
+      const emptyLinesToKeep = filterObject(
+        state.lengthOfEmptyLines,
+        sourcePath
+      );
+      const totalNrsToKeep = filterObject(
+        state.totalNrOfLinesForFiles,
+        sourcePath
+      );
+      const scrollTopsToKeep = filterObject(
+        state.currentScrollTops,
+        sourcePath
+      );
+      const indexesToKeep = filterObject(state.indexesForNewLines, sourcePath);
 
-      Object.keys(state.logs).forEach(source => {
-        let log = state.logs[source];
-        if (source !== sourcePath) {
-          logsToKeep[source] = log;
-        }
-      });
-
-      return { ...state, logs: { ...logsToKeep } };
+      return {
+        ...state,
+        logs: { ...logsToKeep },
+        lengthOfInitialLogLineArrays: { ...initialLengthsToKeep },
+        lengthOfEmptyLines: { ...emptyLinesToKeep },
+        totalNrOfLinesForFiles: { ...totalNrsToKeep },
+        currentScrollTops: { ...scrollTopsToKeep },
+        indexesForNewLines: { ...indexesToKeep }
+      };
     }
 
     case 'LOGVIEWER_CLEAR':
@@ -91,21 +120,39 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_ADD_LINES': {
       console.log('ADDING');
       const { sourcePath, lines } = action.data;
-      const log = state.logs[sourcePath] ? state.logs[sourcePath] : [];
+      const logLines = state.logs[sourcePath] ? state.logs[sourcePath] : [];
+      const totalNrOfLines = state.totalNrOfLinesForFiles[sourcePath]
+        ? state.totalNrOfLinesForFiles[sourcePath]
+        : 0;
+      const newTotalLinesLength = totalNrOfLines + lines.length;
+      const _lines = replaceEmptyLinesWithHiddenChar(lines);
 
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: [...log, ...lines]
+          [sourcePath]: [...logLines, ..._lines]
+        },
+        totalNrOfLinesForFiles: {
+          ...state.totalNrOfLinesForFiles,
+          [sourcePath]: newTotalLinesLength
         }
       };
     }
 
     case 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE': {
       console.log('UPDATE CACHE');
-      const { sourcePath, newLines, indexForNewLines } = action.data;
-
+      const {
+        sourcePath,
+        newLines,
+        indexForNewLines,
+        isEndOfFile
+      } = action.data;
+      // If we have the end of the file in newLines, adjusting the index for where the new lines will be inserted
+      // takes away possible empty lines at the end of the file.
+      const newIndex = isEndOfFile
+        ? state.totalNrOfLinesForFiles[sourcePath] - newLines.length
+        : indexForNewLines;
       return {
         ...state,
         logs: {
@@ -114,7 +161,7 @@ export const logViewerReducer = (state = initialState, action) => {
         },
         indexesForNewLines: {
           ...state.indexesForNewLines,
-          [sourcePath]: indexForNewLines
+          [sourcePath]: newIndex
         }
       };
     }

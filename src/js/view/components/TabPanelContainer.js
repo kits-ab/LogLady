@@ -33,8 +33,12 @@ function TabPanelContainer(props) {
   const {
     menuState: { openSources, currentSourceHandle },
     logInfoState: { logSizes, lastSeenLogSizes },
+    logViewerState: { totalNrOfLinesForFiles },
     dispatch
   } = props;
+
+  const doneLoading =
+    totalNrOfLinesForFiles[openSources[currentSourceHandle].path] > 0;
 
   // Set overflow on stack so that scrollbars appear when overflowing
   const stackStyles = {
@@ -132,7 +136,8 @@ function TabPanelContainer(props) {
                 exitLog,
                 currentSourceHandle,
                 logSize,
-                lastSeenLogSize
+                lastSeenLogSize,
+                doneLoading
               )}
               index={index}
               key={source}
@@ -157,7 +162,8 @@ function customRenderer(
   exitLog,
   currentSourceHandle,
   logSize,
-  lastSeenLogSize
+  lastSeenLogSize,
+  doneLoading
 ) {
   return function _customRenderer(link, defaultRenderer) {
     return (
@@ -173,6 +179,7 @@ function customRenderer(
               openSources[source].index === currentSourceHandle ? true : false
             }
             activity={logSize !== lastSeenLogSize ? true : false}
+            doneLoading={doneLoading}
           >
             <Spinner
               size={SpinnerSize.small}
@@ -202,7 +209,8 @@ const mapStateToProps = function (state) {
   return {
     state: state,
     menuState: state.menuState,
-    logInfoState: state.logInfoState
+    logInfoState: state.logInfoState,
+    logViewerState: state.logViewerState
   };
 };
 

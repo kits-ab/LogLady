@@ -154,6 +154,19 @@ export const clearSource = (dispatch, filePath) => {
       sourcePath: filePath
     }
   });
+
+  dispatch({
+    type: 'TOPPANEL_REMOVE_LOGSETTINGS',
+    data: {
+      sourcePath: filePath
+    }
+  });
+  dispatch({
+    type: 'SETTINGS_REMOVE_LOGSETTINGS',
+    data: {
+      sourcePath: filePath
+    }
+  });
 };
 
 export const hideSnackBar = dispatch => {
@@ -162,13 +175,12 @@ export const hideSnackBar = dispatch => {
   });
 };
 
-export const addNewLines = (dispatch, sourcePath, lines, followTail) => {
+export const addNewLines = (dispatch, sourcePath, lines) => {
   dispatch({
     type: 'LOGVIEWER_ADD_LINES',
     data: {
       sourcePath,
-      lines,
-      followTail
+      lines
     }
   });
 };
@@ -197,14 +209,16 @@ export const addLinesFetchedFromBackendCache = (
   dispatch,
   sourcePath,
   newLines,
-  indexForNewLines
+  indexForNewLines,
+  isEndOfFile
 ) => {
   dispatch({
     type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
     data: {
       sourcePath,
       newLines,
-      indexForNewLines
+      indexForNewLines,
+      isEndOfFile
     }
   });
 };
