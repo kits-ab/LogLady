@@ -50,8 +50,14 @@ class TopPanel extends React.Component {
           </Stack.Item>
           <Stack.Item align="center">
             <TextFieldInput
-              placeholder="Filter"
-              debounce={222}
+              disabled={this.props.logSizes[sourcePath] > 10000000}
+              label={'Filter'}
+              placeholder={
+                this.props.logSizes[sourcePath] > 10000000
+                  ? 'File too large'
+                  : 'Filter'
+              }
+              debounce={300}
               onTextChange={text => {
                 handleFilterInput(this.props.dispatch, { sourcePath, text });
               }}
@@ -61,7 +67,8 @@ class TopPanel extends React.Component {
           <Stack.Item align="center">
             <TextFieldInput
               placeholder="Highlight"
-              debounce={222}
+              label={'Highlight'}
+              debounce={300}
               onTextChange={text => {
                 handleHighlightInput(this.props.dispatch, { sourcePath, text });
               }}
@@ -89,12 +96,14 @@ class TopPanel extends React.Component {
 
 const mapStateToProps = ({
   menuState: { openSources, currentSourceHandle },
-  topPanelState: { settings }
+  topPanelState: { settings },
+  logInfoState: { logSizes }
 }) => {
   return {
     currentSourceHandle,
     openSources,
-    settings
+    settings,
+    logSizes
   };
 };
 

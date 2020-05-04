@@ -33,15 +33,6 @@ describe('mainScriptOffLoader', () => {
     ).toEqual(expectedResult);
   });
 
-  it('should return true because filter exists', () => {
-    const filterRegex = new RegExp('bla');
-    const line = 'Line 1: blablabla';
-    const expectedResult = true;
-    expect(
-      filterExistsAndMatchesWithLineOrHasFilterNotBeenSet(filterRegex, line)
-    ).toEqual(expectedResult);
-  });
-
   it('should return length of 0 due to line being undefined', () => {
     const highlightRegex = new RegExp('Hello World');
     const list = new Array(3);
