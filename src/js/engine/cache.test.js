@@ -11,27 +11,9 @@ describe('searchCache', () => {
     flushCache();
   });
 
-  it('should return end of file with the specified amount of lines when position is close to the end', () => {
-    const filepath = 'testpath';
-    const fileSize = 50;
-    const lines1 = ['rad01', 'rad02', 'rad03', 'rad04', 'rad05'];
-    const lines2 = ['rad09', 'rad10', 'rad11', 'rad12'];
-    const startByteOfLines = [0, 5, 10, 15, 20];
-    const startByteOfLines2 = [30, 35, 40, 45];
-    const position = 41;
-    const amountOfLines = 3;
-
-    updateCache(filepath, lines1, startByteOfLines);
-    updateCache(filepath, lines2, startByteOfLines2);
-
-    const result = searchCache(filepath, position, amountOfLines, fileSize);
-
-    const expectedResult = {
-      lines: ['rad10', 'rad11', 'rad12'],
-      startsAtByte: [35, 40, 45],
-      isEndOfFile: true
-    };
-
+  it('should return miss if filepath does not exist', () => {
+    const result = searchCache('testpath', 0, 5, 50);
+    const expectedResult = 'miss';
     expect(result).toEqual(expectedResult);
   });
 
@@ -42,19 +24,63 @@ describe('searchCache', () => {
     const lines2 = ['rad09', 'rad10', 'rad11', 'rad12'];
     const startByteOfLines = [0, 5, 10, 15, 20];
     const startByteOfLines2 = [30, 35, 40, 45];
-    const position = 41;
+    const bytePosition = 41;
     const amountOfLines = 3;
 
     updateCache(filepath, lines1, startByteOfLines);
     updateCache(filepath, lines2, startByteOfLines2);
 
-    const result = searchCache(filepath, position, amountOfLines, fileSize);
+    const result = searchCache(filepath, bytePosition, amountOfLines, fileSize);
 
     const expectedResult = {
       lines: ['rad10', 'rad11', 'rad12'],
       startsAtByte: [35, 40, 45],
       isEndOfFile: true
     };
+
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('should return the beginning of the file when byte position is 0', () => {
+    const filepath = 'testpath';
+    const fileSize = 50;
+    const lines1 = ['rad01', 'rad02', 'rad03', 'rad04', 'rad05'];
+    const lines2 = ['rad09', 'rad10', 'rad11', 'rad12'];
+    const startByteOfLines = [0, 5, 10, 15, 20];
+    const startByteOfLines2 = [30, 35, 40, 45];
+    const bytePosition = 0;
+    const amountOfLines = 4;
+
+    updateCache(filepath, lines1, startByteOfLines);
+    updateCache(filepath, lines2, startByteOfLines2);
+
+    const result = searchCache(filepath, bytePosition, amountOfLines, fileSize);
+
+    const expectedResult = {
+      lines: ['rad01', 'rad02', 'rad03', 'rad04'],
+      startsAtByte: [0, 5, 10, 15],
+      isEndOfFile: false
+    };
+
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('should return miss when cached chunk is too short', () => {
+    const filepath = 'testpath';
+    const fileSize = 50;
+    const lines1 = ['rad01', 'rad02', 'rad03', 'rad04', 'rad05'];
+    const lines2 = ['rad09', 'rad10', 'rad11', 'rad12'];
+    const startByteOfLines = [0, 5, 10, 15, 20];
+    const startByteOfLines2 = [30, 35, 40, 45];
+    const bytePosition = 15;
+    const amountOfLines = 4;
+
+    updateCache(filepath, lines1, startByteOfLines);
+    updateCache(filepath, lines2, startByteOfLines2);
+
+    const result = searchCache(filepath, bytePosition, amountOfLines, fileSize);
+
+    const expectedResult = 'miss';
 
     expect(result).toEqual(expectedResult);
   });
