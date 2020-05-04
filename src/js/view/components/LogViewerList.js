@@ -56,7 +56,7 @@ const LogViewerList = props => {
 
   const _onRenderCell = (item, index) => {
     const { highlightColor, shouldWrap } = memoizedLineProps;
-    return item ? (
+    return item && isNotOnlyWhitespace(item.sections[0].text) ? (
       <MemoedSingleLogLine
         index={index}
         line={item}
@@ -65,7 +65,7 @@ const LogViewerList = props => {
       />
     ) : (
       <LogLine emptyline index={index}>
-        <span>.</span>
+        <span>&zwnj;</span>
       </LogLine>
     );
   };
@@ -83,3 +83,7 @@ const LogViewerList = props => {
 };
 
 export default LogViewerList;
+
+const isNotOnlyWhitespace = str => {
+  return !(str.length === 1 && /\s/.test(str));
+};

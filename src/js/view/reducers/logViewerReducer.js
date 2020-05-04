@@ -14,7 +14,7 @@ const replaceEmptyLinesWithHiddenChar = arr => {
     const isMatch = regexList.some(rx => {
       return rx.test(line);
     });
-    return isMatch ? line.replace(regexList[0], '⠀') : line;
+    return isMatch ? line.replace(regexList[0], ' ') : line;
   });
 };
 
@@ -153,11 +153,12 @@ export const logViewerReducer = (state = initialState, action) => {
       const newIndex = isEndOfFile
         ? state.totalNrOfLinesForFiles[sourcePath] - newLines.length
         : indexForNewLines;
+      const _newLines = replaceEmptyLinesWithHiddenChar(newLines);
       return {
         ...state,
         logs: {
           ...state.logs,
-          [sourcePath]: newLines
+          [sourcePath]: _newLines
         },
         indexesForNewLines: {
           ...state.indexesForNewLines,
