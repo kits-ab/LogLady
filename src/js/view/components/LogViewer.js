@@ -8,7 +8,7 @@ import { saveCurrentScrollTop } from '../actions/dispatchActions';
 import {
   fetchNewLinesFromBackendCache,
   updateLogViewerCache,
-  debouncedfetchFilteredLinesFromBackend
+  fetchFilteredLinesFromBackend
 } from './helpers/logHelper';
 
 const LogViewer = props => {
@@ -132,7 +132,7 @@ const LogViewer = props => {
   const fetch = () => {
     filterRef.current = filterInput;
     let filterRegex = parseRegExp(filterInput);
-    debouncedfetchFilteredLinesFromBackend(
+    fetchFilteredLinesFromBackend(
       props.source.path,
       filterRegex ? filterRegex.toString() : ''
     );
@@ -148,10 +148,11 @@ const LogViewer = props => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
     let logs;
-    filterRef.current = filterInput;
     if (filterInput.length !== 0) {
+      console.log({ fil: props.filteredLogs[props.source.path], filteredLogs });
       logs = filteredLogs;
     } else {
+      filterRef.current = filterInput;
       logs = props.logs[props.source.path];
     }
 
