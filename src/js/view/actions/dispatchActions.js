@@ -242,3 +242,19 @@ export const saveCurrentScrollTop = (dispatch, sourcePath, scrollTop) => {
     }
   });
 };
+
+export const addFilteredLines = (
+  dispatch,
+  sourcePath,
+  filteredLines,
+  lineCount
+) => {
+  dispatch({
+    type: 'LOGVIEWER_ADD_FILTERED_LINES',
+    data: {
+      sourcePath,
+      filteredLines,
+      lineCount
+    }
+  });
+};

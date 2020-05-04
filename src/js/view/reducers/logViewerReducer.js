@@ -4,7 +4,9 @@ const initialState = {
   lengthOfEmptyLines: {},
   totalNrOfLinesForFiles: {},
   currentScrollTops: {},
-  indexesForNewLines: {}
+  indexesForNewLines: {},
+  filteredLogs: {},
+  totalNrOfFilteredLines: {}
 };
 
 // Invisible character U+2800 being used in line.replace. Making the viewer display empty lines.
@@ -175,6 +177,22 @@ export const logViewerReducer = (state = initialState, action) => {
         currentScrollTops: {
           ...state.currentScrollTops,
           [sourcePath]: scrollTop
+        }
+      };
+    }
+
+    case 'LOGVIEWER_ADD_FILTERED_LINES': {
+      console.log('ADDING FILTERED LINES');
+      const { sourcePath, filteredLines, lineCount } = action.data;
+      return {
+        ...state,
+        filteredLogs: {
+          ...state.filteredLogs,
+          [sourcePath]: filteredLines
+        },
+        totalNrOfFilteredLines: {
+          ...state.totalNrOfFilteredLines,
+          [sourcePath]: lineCount
         }
       };
     }
