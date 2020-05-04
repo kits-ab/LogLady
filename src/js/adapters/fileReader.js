@@ -157,18 +157,18 @@ const getFileSizeInBytes = filePath => {
 
 const readDataFromByte = (filePath, startReadFromByte, numberOfBytes) => {
   return new Promise((resolve, reject) => {
-    stat(filePath, function(error, stats) {
+    stat(filePath, function (error, stats) {
       if (error) {
         reject(error);
       }
 
-      open(filePath, 'r', function(error, fd) {
+      open(filePath, 'r', function (error, fd) {
         if (error) {
           reject(error);
         }
 
         var buffer = Buffer.alloc(numberOfBytes);
-        read(fd, buffer, 0, buffer.length, startReadFromByte, function(
+        read(fd, buffer, 0, buffer.length, startReadFromByte, function (
           error,
           bytesRead,
           buffer

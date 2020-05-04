@@ -55,7 +55,7 @@ function TabPanelContainer(props) {
     updateSourceHandle(dispatch, index);
   }
 
-  const onLinkClick = function(PivotItem) {
+  const onLinkClick = function (PivotItem) {
     const index = PivotItem.props.index;
     tabOnClick(index);
   };
@@ -205,7 +205,7 @@ function customRenderer(
   };
 }
 
-const mapStateToProps = function(state) {
+const mapStateToProps = function (state) {
   return {
     state: state,
     menuState: state.menuState,
