@@ -1,7 +1,4 @@
-import {
-  filterExistsAndMatchesWithLineOrHasFilterNotBeenSet,
-  getHighlightedLineIfHighlightExistsAndMatches
-} from './mainScriptOffloader';
+import { getHighlightedLineIfHighlightExistsAndMatches } from './mainScriptOffloader';
 
 describe('mainScriptOffLoader', () => {
   it('should return highlighted line', () => {
