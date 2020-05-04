@@ -51,8 +51,10 @@ const LogViewerList = props => {
 
   useEffect(() => {
     const startItemIndexinView = listRef.current.getStartItemIndexInView();
-    evaluateNrOfItemsScrolled(startItemIndexinView);
-  }, [props.scrollTop]);
+    if (props.filterInput.length === 0) {
+      evaluateNrOfItemsScrolled(startItemIndexinView);
+    }
+  }, [props.scrollTop, props.filterInput]);
 
   const _onRenderCell = (item, index) => {
     const { highlightColor, shouldWrap } = memoizedLineProps;

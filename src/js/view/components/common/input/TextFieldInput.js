@@ -33,8 +33,9 @@ class TextFieldInput extends React.Component {
   render() {
     return (
       <TextField
+        disabled={this.props.disabled}
         underlined
-        label={this.props.placeholder}
+        label={this.props.label}
         placeholder={this.props.placeholder}
         value={this.state.input}
         onChange={event => {

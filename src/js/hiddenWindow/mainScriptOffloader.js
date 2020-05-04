@@ -19,10 +19,9 @@ class LogsFiltererAndHighlighter {
    * @param {RegExp|undefined} filterRegex - The regex to use for filtering, or undefined if nothing should be filtered
    * @param {RegExp|undefined} highlightRegex - The regex to use for highlighting, or undefined if nothing should be highlighted
    */
-  constructor(logsToFilter, logsPath, filterRegex, highlightRegex) {
+  constructor(logsToFilter, logsPath, highlightRegex) {
     this.lines = logsToFilter;
     this.path = logsPath;
-    this.filterRegex = filterRegex;
     this.highlightRegex = highlightRegex;
   }
 
@@ -39,24 +38,17 @@ class LogsFiltererAndHighlighter {
     for (let lineIndex in this.lines) {
       let line = this.lines[lineIndex];
 
-      // Continue to try to highlight if the filter matches the line or if no filter is set
-      if (
-        filterExistsAndMatchesWithLineOrHasFilterNotBeenSet(
-          this.filterRegex,
-          line
-        )
-      ) {
-        let lineObj = getHighlightedLineIfHighlightExistsAndMatches(
-          this.highlightRegex,
-          line
-        );
+      let lineObj = getHighlightedLineIfHighlightExistsAndMatches(
+        this.highlightRegex,
+        line
+      );
 
-        if (sendLinesOneByOne) {
-          this._sendLineToMainWindow(lineObj);
-        } else {
-          filteredAndHighlightedLines.push(lineObj);
-        }
+      if (sendLinesOneByOne) {
+        this._sendLineToMainWindow(lineObj);
+      } else {
+        filteredAndHighlightedLines.push(lineObj);
       }
+      // }
     }
     if (!sendLinesOneByOne) {
       this._sendAllLinesToMainWindow(filteredAndHighlightedLines);
@@ -89,13 +81,6 @@ class LogsFiltererAndHighlighter {
     });
   }
 }
-
-const filterExistsAndMatchesWithLineOrHasFilterNotBeenSet = (
-  filterRegex,
-  line
-) => {
-  return (filterRegex && filterRegex.test(line)) || !filterRegex;
-};
 
 const getHighlightedLineIfHighlightExistsAndMatches = (
   highlightRegex,
@@ -135,13 +120,10 @@ const getHighlightedLineIfHighlightExistsAndMatches = (
  */
 window.ipcRenderer.on('hiddenWindowMessages', (event, args) => {
   if (args.type === 'requestHelpFilterAndHighlightLines') {
-    let filterRegex, highlightRegex;
+    let highlightRegex;
     // Expect args.filterRegexString to either be a RegEx converted to string, or an empty string
     //  /\/(.*)\/(.*)/ is a regex for capturing two groups (pattern and flags) in a stringified regex, e.g "/(?:)/gi"
-    if (args.filterRegexString) {
-      let [, pattern, flags] = /\/(.*)\/(.*)/.exec(args.filterRegexString);
-      filterRegex = new RegExp(`(${pattern})`, flags);
-    }
+
     if (args.highlightRegexString) {
       let [, pattern, flags] = /\/(.*)\/(.*)/.exec(args.highlightRegexString);
       flags = flags.indexOf('g') === -1 ? flags + 'g' : flags;
@@ -152,7 +134,6 @@ window.ipcRenderer.on('hiddenWindowMessages', (event, args) => {
     const filtererForThisPath = new LogsFiltererAndHighlighter(
       args.logs,
       args.path,
-      filterRegex,
       highlightRegex
     );
     filtererForThisPath.start(args.sendLinesOneByOne);
@@ -160,6 +141,5 @@ window.ipcRenderer.on('hiddenWindowMessages', (event, args) => {
 });
 
 module.exports = {
-  filterExistsAndMatchesWithLineOrHasFilterNotBeenSet,
   getHighlightedLineIfHighlightExistsAndMatches
 };

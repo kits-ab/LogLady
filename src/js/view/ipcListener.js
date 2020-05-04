@@ -6,7 +6,8 @@ import {
   increaseSize,
   setLastSeenLogSizeToSize,
   addLinesFetchedFromBackendCache,
-  addCalculatedAmountOfLines
+  addCalculatedAmountOfLines,
+  addFilteredLines
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
@@ -92,6 +93,15 @@ const handleError = (dispatch, { message, error }) => {
   showSnackBar(dispatch, errorMessage, 'error');
 };
 
+const handleFilteredLines = (dispatch, { dataToReturn }) => {
+  addFilteredLines(
+    dispatch,
+    dataToReturn.sourcePath,
+    dataToReturn.filteredLines,
+    dataToReturn.lineCount
+  );
+};
+
 export const ipcListener = (store, publisher) => {
   const dispatch = store.dispatch;
 
@@ -120,6 +130,9 @@ export const ipcListener = (store, publisher) => {
         break;
       case 'LOGLINES_FETCHED_FROM_BACKEND_CACHE':
         handleLinesFromBackendCache(dispatch, action.data);
+        break;
+      case 'LOGLINES_FILTERED':
+        handleFilteredLines(dispatch, action.data);
         break;
       default:
         console.log('Warning: Unrecognized message, ', action);
