@@ -253,7 +253,6 @@ const mapStateToProps = ({
     indexesForNewLines,
     filteredLogs,
     totalNrOfFilteredLines
-    // indexesForFilteredLines
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -270,7 +269,6 @@ const mapStateToProps = ({
     indexesForNewLines,
     filteredLogs,
     totalNrOfFilteredLines
-    // indexesForFilteredLines
   };
 };
 
