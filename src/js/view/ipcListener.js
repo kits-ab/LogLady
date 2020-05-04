@@ -4,7 +4,10 @@ import {
   showSnackBar,
   addNewLines,
   increaseSize,
-  setLastSeenLogSizeToSize
+  setLastSeenLogSizeToSize,
+  addLinesFetchedFromBackendCache,
+  addCalculatedAmountOfLines,
+  addFilteredLines
 } from 'js/view/actions/dispatchActions';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
 import { prettifyErrorMessage } from 'js/view/components/helpers/errorHelper';
@@ -49,7 +52,7 @@ const handleStateSet = (publisher, state) => {
 
 const handleFileOpened = (
   dispatch,
-  { filePath, fileSize, endIndex, history }
+  { filePath, fileSize, endIndex, history, lineCount }
 ) => {
   // clearAllLogs(dispatch);
   setFileData(dispatch, filePath, fileSize, history);
@@ -71,9 +74,32 @@ const handleNewLines = (dispatch, { sourcePath, lines, size }) => {
   increaseSize(dispatch, sourcePath, size);
 };
 
+const handleLinesFromBackendCache = (dispatch, { dataToReturn }) => {
+  addLinesFetchedFromBackendCache(
+    dispatch,
+    dataToReturn.sourcePath,
+    dataToReturn.newLines,
+    dataToReturn.indexForNewLines,
+    dataToReturn.isEndOfFile
+  );
+};
+
+const handleLineAmount = (dispatch, { filePath, lineCount }) => {
+  addCalculatedAmountOfLines(dispatch, filePath, lineCount);
+};
+
 const handleError = (dispatch, { message, error }) => {
   const errorMessage = prettifyErrorMessage(message, error);
   showSnackBar(dispatch, errorMessage, 'error');
+};
+
+const handleFilteredLines = (dispatch, { dataToReturn }) => {
+  addFilteredLines(
+    dispatch,
+    dataToReturn.sourcePath,
+    dataToReturn.filteredLines,
+    dataToReturn.lineCount
+  );
 };
 
 export const ipcListener = (store, publisher) => {
@@ -93,11 +119,20 @@ export const ipcListener = (store, publisher) => {
       case 'SOURCE_OPENED':
         handleSourceOpened(dispatch, action.data);
         break;
+      case 'TOTAL_LINE_AMOUNT_CALCULATED':
+        handleLineAmount(dispatch, action.data);
+        break;
       case 'ERROR':
         handleError(dispatch, action.data);
         break;
       case 'LINES_NEW':
         handleNewLines(dispatch, action.data);
+        break;
+      case 'LOGLINES_FETCHED_FROM_BACKEND_CACHE':
+        handleLinesFromBackendCache(dispatch, action.data);
+        break;
+      case 'LOGLINES_FILTERED':
+        handleFilteredLines(dispatch, action.data);
         break;
       default:
         console.log('Warning: Unrecognized message, ', action);

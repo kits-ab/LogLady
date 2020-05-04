@@ -15,7 +15,12 @@ import {
 } from '../actions/dispatchActions';
 import { closeFile, showOpenDialog } from './helpers/handleFileHelper';
 import Mousetrap from 'mousetrap';
-import { Stack, IconButton } from 'office-ui-fabric-react';
+import {
+  Spinner,
+  SpinnerSize,
+  Stack,
+  IconButton
+} from 'office-ui-fabric-react';
 
 /**
  * Helper function to get actual modulo operation, as %-operator doesn't quite fit the bill
@@ -28,8 +33,12 @@ function TabPanelContainer(props) {
   const {
     menuState: { openSources, currentSourceHandle },
     logInfoState: { logSizes, lastSeenLogSizes },
+    logViewerState: { totalNrOfLinesForFiles },
     dispatch
   } = props;
+
+  const doneLoading =
+    totalNrOfLinesForFiles[openSources[currentSourceHandle].path] > 0;
 
   // Set overflow on stack so that scrollbars appear when overflowing
   const stackStyles = {
@@ -46,7 +55,7 @@ function TabPanelContainer(props) {
     updateSourceHandle(dispatch, index);
   }
 
-  const onLinkClick = function(PivotItem) {
+  const onLinkClick = function (PivotItem) {
     const index = PivotItem.props.index;
     tabOnClick(index);
   };
@@ -127,7 +136,8 @@ function TabPanelContainer(props) {
                 exitLog,
                 currentSourceHandle,
                 logSize,
-                lastSeenLogSize
+                lastSeenLogSize,
+                doneLoading
               )}
               index={index}
               key={source}
@@ -152,38 +162,55 @@ function customRenderer(
   exitLog,
   currentSourceHandle,
   logSize,
-  lastSeenLogSize
+  lastSeenLogSize,
+  doneLoading
 ) {
   return function _customRenderer(link, defaultRenderer) {
     return (
       <span>
         {defaultRenderer(link)}
-        <div style={{ display: 'inline' }}>
-          <div
-            onClick={event => {
-              exitLog(openSources[source].path, event);
-            }}
-            style={{ display: 'inline-block', marginLeft: '10px' }}
-          >
-            <Icon iconName="Cancel" />
-          </div>
+        <div
+          style={{
+            display: 'inline'
+          }}
+        >
           <Indicator
             selected={
               openSources[source].index === currentSourceHandle ? true : false
             }
             activity={logSize !== lastSeenLogSize ? true : false}
-          />
+            doneLoading={doneLoading}
+          >
+            <Spinner
+              size={SpinnerSize.small}
+              styles={{
+                circle: {
+                  borderColor: '#B2DFDB',
+                  borderRightColor: '#00796B'
+                }
+              }}
+            />
+          </Indicator>
+        </div>
+        <div
+          onClick={event => {
+            exitLog(openSources[source].path, event);
+          }}
+          style={{ display: 'inline-block', marginLeft: '15px' }}
+        >
+          <Icon iconName="Cancel" />
         </div>
       </span>
     );
   };
 }
 
-const mapStateToProps = function(state) {
+const mapStateToProps = function (state) {
   return {
     state: state,
     menuState: state.menuState,
-    logInfoState: state.logInfoState
+    logInfoState: state.logInfoState,
+    logViewerState: state.logViewerState
   };
 };
 

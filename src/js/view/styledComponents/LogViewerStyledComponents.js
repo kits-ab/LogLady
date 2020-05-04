@@ -6,9 +6,10 @@ export const LogViewerContainer = styled.div`
   border: 1px solid white;
   color: #ccc;
   background: #444;
-  height: calc(100% - 32px);
-  overflow-anchor: none;
+  height: 100%;
   min-width: 0;
+  overflow-anchor: none;
+  overflow: auto;
 `;
 
 export const CloseFileButton = styled.button`

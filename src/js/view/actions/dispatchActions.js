@@ -1,12 +1,14 @@
-export const handleShowSettings = dispatch => {
+export const handleShowSettings = (dispatch, data) => {
   dispatch({
-    type: 'showSettings'
+    type: 'showSettings',
+    data: data
   });
 };
 
-export const handleTailSwitch = dispatch => {
+export const handleTailSwitch = (dispatch, data) => {
   dispatch({
-    type: 'tailSwitch'
+    type: 'tailSwitch',
+    data: data
   });
 };
 
@@ -31,9 +33,10 @@ export const handleHighlightColor = (dispatch, data) => {
   });
 };
 
-export const handleWrapLineOn = dispatch => {
+export const handleWrapLineOn = (dispatch, data) => {
   dispatch({
-    type: 'wrapLineOn'
+    type: 'wrapLineOn',
+    data: data
   });
 };
 
@@ -73,10 +76,9 @@ export const updateLastSeenLogSizes = (dispatch, path, fileSize) => {
 
 export const setFileData = (dispatch, filePath, fileSize, history) => {
   dispatch({
-    type: 'LOGVIEWER_SET_LOG',
+    type: 'CREATE_SETTINGS_OBJECT',
     data: {
-      sourcePath: filePath,
-      log: history
+      sourcePath: filePath
     }
   });
 
@@ -85,6 +87,14 @@ export const setFileData = (dispatch, filePath, fileSize, history) => {
     data: {
       sourcePath: filePath,
       size: fileSize
+    }
+  });
+
+  dispatch({
+    type: 'LOGVIEWER_SET_LOG',
+    data: {
+      sourcePath: filePath,
+      log: history
     }
   });
 };
@@ -144,6 +154,19 @@ export const clearSource = (dispatch, filePath) => {
       sourcePath: filePath
     }
   });
+
+  dispatch({
+    type: 'TOPPANEL_REMOVE_LOGSETTINGS',
+    data: {
+      sourcePath: filePath
+    }
+  });
+  dispatch({
+    type: 'SETTINGS_REMOVE_LOGSETTINGS',
+    data: {
+      sourcePath: filePath
+    }
+  });
 };
 
 export const hideSnackBar = dispatch => {
@@ -178,6 +201,60 @@ export const showSnackBar = (dispatch, message, level) => {
     data: {
       message,
       level
+    }
+  });
+};
+
+export const addLinesFetchedFromBackendCache = (
+  dispatch,
+  sourcePath,
+  newLines,
+  indexForNewLines,
+  isEndOfFile
+) => {
+  dispatch({
+    type: 'LOGVIEWER_ADD_LINES_FETCHED_FROM_BACKEND_CACHE',
+    data: {
+      sourcePath,
+      newLines,
+      indexForNewLines,
+      isEndOfFile
+    }
+  });
+};
+
+export const addCalculatedAmountOfLines = (dispatch, sourcePath, lineCount) => {
+  dispatch({
+    type: 'LOGVIEWER_ADD_LINE_COUNT_FOR_FILE',
+    data: {
+      sourcePath,
+      lineCount
+    }
+  });
+};
+
+export const saveCurrentScrollTop = (dispatch, sourcePath, scrollTop) => {
+  dispatch({
+    type: 'LOGVIEWER_SAVE_CURRENT_SCROLLTOP',
+    data: {
+      sourcePath,
+      scrollTop
+    }
+  });
+};
+
+export const addFilteredLines = (
+  dispatch,
+  sourcePath,
+  filteredLines,
+  lineCount
+) => {
+  dispatch({
+    type: 'LOGVIEWER_ADD_FILTERED_LINES',
+    data: {
+      sourcePath,
+      filteredLines,
+      lineCount
     }
   });
 };

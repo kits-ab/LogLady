@@ -19,6 +19,21 @@ const stackTokens = {
 
 class TopPanel extends React.Component {
   render() {
+    const sourcePath = this.props.openSources[this.props.currentSourceHandle]
+      .path;
+
+    // Get sane defaults if settings object is not initialized
+    // and prevents crashes due to undefined objects
+    const filterText = this.props.settings[sourcePath]
+      ? this.props.settings[sourcePath].filterInput
+      : '';
+    const highlightText = this.props.settings[sourcePath]
+      ? this.props.settings[sourcePath].highlightInput
+      : '';
+    const tailSwitch = this.props.settings[sourcePath]
+      ? this.props.settings[sourcePath].tailSwitch
+      : true;
+
     return (
       <Stack wrap horizontal horizontalAlign="space-between">
         <Stack wrap horizontal tokens={stackTokens}>
@@ -35,31 +50,38 @@ class TopPanel extends React.Component {
           </Stack.Item>
           <Stack.Item align="center">
             <TextFieldInput
-              placeholder="Filter"
-              debounce={222}
+              disabled={this.props.logSizes[sourcePath] > 10000000}
+              label={'Filter'}
+              placeholder={
+                this.props.logSizes[sourcePath] > 10000000
+                  ? 'File too large'
+                  : 'Filter'
+              }
+              debounce={300}
               onTextChange={text => {
-                handleFilterInput(this.props.dispatch, text);
+                handleFilterInput(this.props.dispatch, { sourcePath, text });
               }}
-              value={this.props.filterInput}
+              value={filterText}
             />
           </Stack.Item>
           <Stack.Item align="center">
             <TextFieldInput
               placeholder="Highlight"
-              debounce={222}
+              label={'Highlight'}
+              debounce={300}
               onTextChange={text => {
-                handleHighlightInput(this.props.dispatch, text);
+                handleHighlightInput(this.props.dispatch, { sourcePath, text });
               }}
-              value={this.props.highlightInput}
+              value={highlightText}
             />
           </Stack.Item>
         </Stack>
         <Stack horizontal tokens={stackTokens}>
           <Stack.Item disableShrink align="center">
             <SwitchButton
-              checked={this.props.tailSwitch}
+              checked={tailSwitch}
               onChange={() => {
-                handleTailSwitch(this.props.dispatch);
+                handleTailSwitch(this.props.dispatch, { sourcePath });
               }}
               label="Follow"
               onText="On"
@@ -73,14 +95,15 @@ class TopPanel extends React.Component {
 }
 
 const mapStateToProps = ({
-  menuState: { openFiles },
-  topPanelState: { tailSwitch, filterInput, highlightInput }
+  menuState: { openSources, currentSourceHandle },
+  topPanelState: { settings },
+  logInfoState: { logSizes }
 }) => {
   return {
-    openFiles,
-    tailSwitch,
-    filterInput,
-    highlightInput
+    currentSourceHandle,
+    openSources,
+    settings,
+    logSizes
   };
 };
 

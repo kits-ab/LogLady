@@ -1,5 +1,5 @@
 const initialState = {
-  nextIndex: 0,
+  nextIndex: 1,
   openSources: {},
   currentSourceHandle: undefined
 };
