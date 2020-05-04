@@ -1,5 +1,6 @@
 import { calculateWrappedHeight } from './measureHelper';
 import { sendRequestToBackend } from 'js/view/ipcPublisher';
+import _ from 'lodash';
 
 export const createHeightReducer = (charSize, elWidth) => {
   return (map, next) => {
@@ -39,6 +40,13 @@ export const fetchNewLinesFromBackendCache = (
   };
   sendRequestToBackend(argObj);
 };
+
+export const debouncedfetchFilteredLinesFromBackend = _.debounce(
+  (path, filterRegexString) => {
+    fetchFilteredLinesFromBackend(path, filterRegexString);
+  },
+  500
+);
 
 export const fetchFilteredLinesFromBackend = (
   sourcePath,

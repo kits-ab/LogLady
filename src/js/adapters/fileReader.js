@@ -196,6 +196,32 @@ const readDataFromByte = (filePath, startReadFromByte, numberOfBytes) => {
   });
 };
 
+const readFileWithStream = (filePath, filterRegex) => {
+  return new Promise((resolve, reject) => {
+    let out = [];
+    let buffer = '';
+    createReadStream(filePath, {
+      start: 0,
+      encoding: 'utf8'
+    })
+      .on('data', chunk => {
+        let lines = (buffer + chunk).split(/\r?\n/);
+        buffer = lines.pop();
+        for (let i = 0; i < lines.length; ++i) {
+          if (filterRegex.test(lines[i])) {
+            out.push(lines[i]);
+          }
+        }
+      })
+      .on('error', err => {
+        reject(err);
+      })
+      .on('end', () => {
+        resolve(out);
+      });
+  });
+};
+
 const parseByteDataIntoStringArrayWithStartByteOfLines = (
   data,
   start,
@@ -267,6 +293,7 @@ module.exports = {
   stopWatcher,
   stopAllWatchers,
   readDataFromByte,
+  readFileWithStream,
   extractStartByteOfLinesFromByteData,
   parseByteDataIntoStringArray
 };

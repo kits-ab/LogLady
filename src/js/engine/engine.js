@@ -264,25 +264,12 @@ const getFilteredLines = async (sender, data) => {
     let [, pattern, flags] = /\/(.*)\/(.*)/.exec(filterRegexString);
     filterRegex = new RegExp(`(${pattern})`, flags);
   }
+  const lines = await fileReader.readFileWithStream(sourcePath, filterRegex);
 
-  const [fileSize] = await getFileInfo(sourcePath);
-  const startFromByte = 0;
-  const { lines } = await fileReader.readDataFromByte(
-    sourcePath,
-    startFromByte,
-    fileSize
-  );
-  let newLines = [];
-  for (let lineIndex in lines) {
-    let line = lines[lineIndex];
-    if (filterRegex && filterRegex.test(line)) {
-      newLines.push(line);
-    }
-  }
   const dataToReturn = {
     sourcePath,
-    filteredLines: newLines,
-    lineCount: newLines.length
+    filteredLines: lines,
+    lineCount: lines.length
   };
 
   const action = {
