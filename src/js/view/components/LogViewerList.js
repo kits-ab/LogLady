@@ -13,6 +13,10 @@ const memoizeProps = memoize((highlightColor, shouldWrap) => {
   };
 });
 
+const isNotOnlyWhitespace = str => {
+  return !(str.length === 1 && /\s/.test(str));
+};
+
 const LogViewerList = props => {
   const listRef = useRef(); //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
   const startItemIndexRef = useRef(0);
@@ -85,7 +89,3 @@ const LogViewerList = props => {
 };
 
 export default LogViewerList;
-
-const isNotOnlyWhitespace = str => {
-  return !(str.length === 1 && /\s/.test(str));
-};
