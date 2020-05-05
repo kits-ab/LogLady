@@ -160,25 +160,19 @@ describe('_checkIfCacheIsWithinSizeLimit', () => {
   const BytesAddedByJSONStringify = 2;
   it('should return true if cache object size is within limit', () => {
     const cacheSize = 99999999 - BytesAddedByJSONStringify;
-    const cache = Buffer.alloc(cacheSize)
-      .fill('a')
-      .toString();
+    const cache = Buffer.alloc(cacheSize).fill('a').toString();
     expect(checkIfCacheIsWithinSizeLimit(cache)).toEqual(true);
   });
 
   it('should return false if cache object size is outside limit', () => {
     const cacheSize = 100000001 - BytesAddedByJSONStringify;
-    const cache = Buffer.alloc(cacheSize)
-      .fill('a')
-      .toString();
+    const cache = Buffer.alloc(cacheSize).fill('a').toString();
     expect(checkIfCacheIsWithinSizeLimit(cache)).toEqual(false);
   });
 
   it('should return false if cache object size is equal to the size limit', () => {
     const cacheSize = 100000000 - BytesAddedByJSONStringify;
-    const cache = Buffer.alloc(cacheSize)
-      .fill('a')
-      .toString();
+    const cache = Buffer.alloc(cacheSize).fill('a').toString();
     expect(checkIfCacheIsWithinSizeLimit(cache)).toEqual(false);
   });
 });
