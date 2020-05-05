@@ -40,6 +40,20 @@ export const fetchNewLinesFromBackendCache = (
   sendRequestToBackend(argObj);
 };
 
+export const fetchFilteredLinesFromBackend = (
+  sourcePath,
+  filterRegexString
+) => {
+  const argObj = {
+    function: 'FETCH_FILTERED_LINES_FROM_BACKEND',
+    data: {
+      sourcePath,
+      filterRegexString
+    }
+  };
+  sendRequestToBackend(argObj);
+};
+
 export const updateLogViewerCache = cache_length => {
   const insertRows = (startIndex, newLines) => {
     const updatedCache = new Array(cache_length).fill(undefined, 0);

@@ -1,7 +1,4 @@
-import {
-  filterExistsAndMatchesWithLineOrHasFilterNotBeenSet,
-  getHighlightedLineIfHighlightExistsAndMatches
-} from './mainScriptOffloader';
+import { getHighlightedLineIfHighlightExistsAndMatches } from './mainScriptOffloader';
 
 describe('mainScriptOffLoader', () => {
   it('should return highlighted line', () => {
@@ -30,15 +27,6 @@ describe('mainScriptOffLoader', () => {
     };
     expect(
       getHighlightedLineIfHighlightExistsAndMatches(highlightRegex, line)
-    ).toEqual(expectedResult);
-  });
-
-  it('should return true because filter exists', () => {
-    const filterRegex = new RegExp('bla');
-    const line = 'Line 1: blablabla';
-    const expectedResult = true;
-    expect(
-      filterExistsAndMatchesWithLineOrHasFilterNotBeenSet(filterRegex, line)
     ).toEqual(expectedResult);
   });
 

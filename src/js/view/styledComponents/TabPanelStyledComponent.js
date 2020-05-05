@@ -7,7 +7,10 @@ export const Indicator = styled.div`
   left: 8px;
   opacity: ${props => {
     let opacity = 0;
-    if (!props.selected && props.activity) {
+    if (
+      (!props.selected && props.activity) ||
+      (props.selected && !props.doneLoading)
+    ) {
       opacity = 1;
     }
     return opacity;

@@ -1,5 +1,4 @@
 import {
-  getFileSizeInBytes,
   parseLines,
   countLinesInBuffer,
   readDataFromByte,

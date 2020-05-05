@@ -61,6 +61,17 @@ export const settingsReducer = (state = initialState, action) => {
         }
       };
     }
+    case 'SETTINGS_REMOVE_LOGSETTINGS': {
+      const { sourcePath } = action.data;
+      const settingsToKeep = {};
+      Object.keys(state.tabSettings).forEach(source => {
+        let settings = state.tabSettings[source];
+        if (source !== sourcePath) {
+          settingsToKeep[source] = settings;
+        }
+      });
+      return { ...state, tabSettings: { ...settingsToKeep } };
+    }
     default:
       return state;
   }

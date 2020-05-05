@@ -154,6 +154,19 @@ export const clearSource = (dispatch, filePath) => {
       sourcePath: filePath
     }
   });
+
+  dispatch({
+    type: 'TOPPANEL_REMOVE_LOGSETTINGS',
+    data: {
+      sourcePath: filePath
+    }
+  });
+  dispatch({
+    type: 'SETTINGS_REMOVE_LOGSETTINGS',
+    data: {
+      sourcePath: filePath
+    }
+  });
 };
 
 export const hideSnackBar = dispatch => {
@@ -226,6 +239,22 @@ export const saveCurrentScrollTop = (dispatch, sourcePath, scrollTop) => {
     data: {
       sourcePath,
       scrollTop
+    }
+  });
+};
+
+export const addFilteredLines = (
+  dispatch,
+  sourcePath,
+  filteredLines,
+  lineCount
+) => {
+  dispatch({
+    type: 'LOGVIEWER_ADD_FILTERED_LINES',
+    data: {
+      sourcePath,
+      filteredLines,
+      lineCount
     }
   });
 };
