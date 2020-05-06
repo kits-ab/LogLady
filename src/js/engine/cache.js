@@ -4,6 +4,14 @@ const {
   parseResult
 } = require('../helpers/cacheHelper');
 
+// cache object format example
+// cache = {
+//        'filepath/example.log': {
+//                                  lines: [{line: 'hi', startsAtByte: 0},
+//                                          {line: 'hi', startsAtByte: 2}],
+//                                  cachedPartsInfo: [ {startsAt: 0, endsAt: 2, startByteOfLines: [0, 2]}, ],
+//                                 },
+//        }
 let cache = {};
 
 const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
@@ -14,34 +22,34 @@ const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
       const positionIsWithinLimit =
         position >= chunk.startsAt && position <= chunk.endsAt;
       if (positionIsWithinLimit) {
-        const nrOfLinesInChunk = chunk.startByteOfLines.filter(nr => {
+        // used to control that enough lines exist in the chunk.
+        const nrOfLinesFromPos = chunk.startByteOfLines.filter(nr => {
           return nr >= position;
         }).length;
 
-        const toReturn = parseResult(
-          cache[filepath].lines
-            .filter(line => {
-              return line.startsAtByte >= position;
-            })
-            .slice(0, amountOfLines),
-          fileSize
-        );
+        const linesToReturn = cache[filepath].lines
+          .filter(line => {
+            return line.startsAtByte >= position;
+          })
+          .slice(0, amountOfLines);
 
-        const hasRequstedNrOfLines = nrOfLinesInChunk >= amountOfLines;
+        const toReturn = parseResult(linesToReturn, fileSize);
+        const hasRequstedNrOfLines = nrOfLinesFromPos >= amountOfLines;
 
         if (hasRequstedNrOfLines) {
           return toReturn;
         } else if (toReturn.isEndOfFile) {
+          // Make sure that the correct amount of lines are returned if the position is close to the end of the file
           const fromIndex = cache[filepath].lines.length - amountOfLines;
           const endOfCache = cache[filepath].lines.slice(fromIndex);
           return parseResult(endOfCache, fileSize);
-        } else {
-          return 'miss';
         }
       }
     }
+    // Cached chunk does not have enough lines or data from the position does not exist in cache
     return 'miss';
   } else {
+    // File does not exist in cache
     return 'miss';
   }
 };
