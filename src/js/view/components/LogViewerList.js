@@ -13,6 +13,10 @@ const memoizeProps = memoize((highlightColor, shouldWrap) => {
   };
 });
 
+const isNotOnlyWhitespace = str => {
+  return !(str.length === 1 && /\s/.test(str));
+};
+
 const LogViewerList = props => {
   const listRef = useRef(); //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
   const startItemIndexRef = useRef(0);
@@ -58,7 +62,7 @@ const LogViewerList = props => {
 
   const _onRenderCell = (item, index) => {
     const { highlightColor, shouldWrap } = memoizedLineProps;
-    return item ? (
+    return item && isNotOnlyWhitespace(item.sections[0].text) ? (
       <MemoedSingleLogLine
         index={index}
         line={item}
@@ -67,7 +71,7 @@ const LogViewerList = props => {
       />
     ) : (
       <LogLine emptyline index={index}>
-        <span>.</span>
+        <span>&zwnj;</span>
       </LogLine>
     );
   };
