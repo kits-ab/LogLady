@@ -6,6 +6,7 @@ export const configureStore = (store, send = sendRequestToBackend) => {
     send({
       function: 'STATE_SAVE',
       reduxStateValue: JSON.stringify({
+        version: process.env.REACT_APP_VERSION,
         topPanelState,
         settingsState,
         menuState
