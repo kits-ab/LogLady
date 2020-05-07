@@ -36,7 +36,10 @@ The script starts with install [Homebrew](https://brew.sh/) and brew formulas wh
 #### Help, the app won't start!
 Some developers have reported problems with the startup-scripts working correctly, but electron refuses to display a window. I.e., running `npm run dev` or starting via F5 in VS Code does not produce an error, but displays `Compiled successfully!` as expected, yet no window is displayed by electron.
 
-This seems to somehow be related to saved appData, and clearing folder `C:\Users\<user>\AppData\Roaming\loglady` is confirmed to have helped.
+This seems to somehow be related to the saved data related to the app. Clearing the folder containing this data is confirmed to have helped. You can find this folder in the following places.
+Windows: `C:\Users\<user>\AppData\Roaming\loglady`
+Mac: `~/Library/Application Support/loglady`
+Linux: `$XDG_CONFIG_HOME` or `~/.config`
 
 #### Using Visual Studio Code (Recommended)
 Simply run the debug configuration using F5. Then, use the [Debug toolbar](https://code.visualstudio.com/docs/editor/debugging#_debug-actions) to stop or restart the application.  
