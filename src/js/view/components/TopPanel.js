@@ -1,5 +1,5 @@
 import { TextFieldInput } from 'js/view/components/common/input';
-import { SwitchButton } from 'js/view/components/common/buttons';
+import { SwitchButton, ArrowButton } from 'js/view/components/common/buttons';
 import React from 'react';
 import {
   handleFilterInput,
@@ -75,6 +75,8 @@ class TopPanel extends React.Component {
               value={highlightText}
             />
           </Stack.Item>
+          <ArrowButton iconProps={{ iconName: 'Up' }} />
+          <ArrowButton iconProps={{ iconName: 'Down' }} />
         </Stack>
         <Stack horizontal tokens={stackTokens}>
           <Stack.Item disableShrink align="center">
