@@ -10,6 +10,7 @@ const {
   checkIfCacheIsWithinSizeLimit,
   flushCacheForOneFile
 } = require('./cache');
+const { version } = require('../../../package.json');
 
 const updateRecentFiles = recentFiles => {
   createMenu(recentFiles);
@@ -125,12 +126,15 @@ const loadStateFromDisk = async (state, sender) => {
   diskPersistance
     .loadStateFromDisk()
     .then(_data => {
-      const action = {
-        type: 'STATE_SET',
-        data: JSON.parse(_data)
-      };
+      const data = JSON.parse(_data);
+      if (data.version === version.slice(1)) {
+        const action = {
+          type: 'STATE_SET',
+          data: data
+        };
 
-      sender.send(ipcChannel, action);
+        sender.send(ipcChannel, action);
+      }
     })
     .catch(error => {
       if (error.code === 'ENOENT') return;
