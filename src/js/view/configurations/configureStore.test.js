@@ -11,7 +11,8 @@ it('should saveStateToDisk', () => {
     logViewerState: 'one',
     menuState: 'menu',
     topPanelState: 'top',
-    settingsState: 'settings'
+    settingsState: 'settings',
+    version: process.env.REACT_APP_VERSION
   });
 
   const publisher = configureStore(fakeStore, fakeRequester);
@@ -27,7 +28,8 @@ it('should saveStateToDisk', () => {
       reduxStateValue: {
         topPanelState: 'top',
         menuState: 'menu',
-        settingsState: 'settings'
+        settingsState: 'settings',
+        version: process.env.REACT_APP_VERSION
       }
     }
   ]);
