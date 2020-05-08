@@ -23,7 +23,7 @@ const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
         position >= chunk.startsAt && position <= chunk.endsAt;
       if (positionIsWithinLimit) {
         // used to control that enough lines exist in the chunk.
-        const nrOfLinesFromPos = chunk.startByteOfLines.filter(nr => {
+        const nrOfLinesToEndOfChunk = chunk.startByteOfLines.filter(nr => {
           return nr >= position;
         }).length;
 
@@ -34,7 +34,7 @@ const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
           .slice(0, amountOfLines);
 
         const toReturn = parseResult(linesToReturn, fileSize);
-        const hasRequstedNrOfLines = nrOfLinesFromPos >= amountOfLines;
+        const hasRequstedNrOfLines = nrOfLinesToEndOfChunk >= amountOfLines;
 
         if (hasRequstedNrOfLines) {
           return toReturn;
@@ -116,7 +116,7 @@ const addNewLinesPartiallyBeforeCurrent = (
   currentCacheLines,
   cachedPartsInfo
 ) => {
-  console.log('new is partially before current');
+  console.log('Cache: new is partially before current');
   const filteredLines = currentCacheLines.filter(line => {
     return line.startsAtByte > cacheLines[cacheLines.length - 1].startsAtByte;
   });
@@ -132,7 +132,7 @@ const addNewLinesBeforeCurrentLines = (
   cacheLines,
   cachedPartsInfo
 ) => {
-  console.log('new is before current');
+  console.log('Cache: new is before current');
   cache[filepath] = {
     lines: [...cacheLines, ...cache[filepath].lines],
     cachedPartsInfo: [...cachedPartsInfo, ...cache[filepath].cachedPartsInfo]
@@ -144,7 +144,7 @@ const addNewLinesAfterCurrentLines = (
   cacheLines,
   cachedPartsInfo
 ) => {
-  console.log('new is after current');
+  console.log('Cache: new is after current');
   cache[filepath] = {
     lines: [...cache[filepath].lines, ...cacheLines],
     cachedPartsInfo: [...cache[filepath].cachedPartsInfo, ...cachedPartsInfo]
@@ -157,7 +157,7 @@ const addNewLinesEndingPartiallyAfterCurrent = (
   currentCacheLines,
   cachedPartsInfo
 ) => {
-  console.log('new ends partially after current');
+  console.log('Cache: new ends partially after current');
   const filteredLines = currentCacheLines.filter(line => {
     return line.startsAtByte < cacheLines[0].startsAtByte;
   });
@@ -173,7 +173,7 @@ const addCurrentLinesBeforeAndAfterNewLines = (
   currentCacheLines,
   cachedPartsInfo
 ) => {
-  console.log('new is contained within current');
+  console.log('Cache: new is contained within current');
 
   const filteredLinesStart = currentCacheLines.filter(line => {
     return line.startsAtByte < cacheLines[0].startsAtByte;

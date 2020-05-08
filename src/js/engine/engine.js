@@ -26,22 +26,15 @@ const getFileInfo = async filePath => {
   return Promise.all([fileSize, endIndex]);
 };
 
-const getFileHistory = async (filePath, fileSize) => {
+const getFileHistory = async filePath => {
   const startFromByteBegin = 0;
-  const startFromByteEnd =
-    fileSize - CACHE_CHUNK_SIZE < 0 ? 0 : fileSize - CACHE_CHUNK_SIZE;
 
   const beginningOfFile = await fileReader.readDataFromByte(
     filePath,
     startFromByteBegin,
     CACHE_CHUNK_SIZE
   );
-  const endOfFile = await fileReader.readDataFromByte(
-    filePath,
-    startFromByteEnd,
-    CACHE_CHUNK_SIZE
-  );
-  return { beginningOfFile, endOfFile };
+  return { beginningOfFile };
 };
 
 const sendSourcePicked = (sender, sourcePath) => {
@@ -97,28 +90,22 @@ const openFile = async (sender, filePath) => {
   try {
     const [fileSize, endIndex] = await getFileInfo(filePath);
     sendSourcePicked(sender, filePath);
-    // let { startByteOfLines, lines } = await getFileHistory(filePath, fileSize);
-    let { beginningOfFile, endOfFile } = await getFileHistory(
-      filePath,
-      fileSize
-    );
+    let { beginningOfFile } = await getFileHistory(filePath);
 
-    // Send half of the content and add to cache if the file is bigger than the cached content.
     if (fileSize > CACHE_CHUNK_SIZE) {
-      // add both the beginning and the end to the cache if it is large enough to be cached
+      // add both the beginning to the cache if the file is large enough to need a cache
       updateCache(
         filePath,
         beginningOfFile.lines,
         beginningOfFile.startByteOfLines
       );
-      updateCache(filePath, endOfFile.lines, endOfFile.startByteOfLines);
-
+      // Cut the lines in half if the file is larger than the initial cached chunk
       beginningOfFile.lines = beginningOfFile.lines.slice(
         0,
         beginningOfFile.lines.length / 2
       );
     }
-    // Send half of the lines if the file is larger than the initial cached chunk or all the lines if not
+
     sendFileOpened(sender, filePath, fileSize, endIndex, beginningOfFile.lines);
   } catch (error) {
     sendError(sender, "Couldn't read file", error);
@@ -149,6 +136,7 @@ const loadStateFromDisk = async (state, sender) => {
     .loadStateFromDisk()
     .then(_data => {
       const data = JSON.parse(_data);
+      // slice to skip the v before version nr
       if (data.version === version.slice(1)) {
         const action = {
           type: 'STATE_SET',
@@ -215,72 +203,100 @@ const getNewLinesFromCache = async (sender, data) => {
     sourcePath,
     nrOfLogLines,
     indexForNewLines,
-    totalLineCountOfFile
+    totalLineCountOfFile,
+    getEndOfFile
   } = data;
-
   const [fileSize] = await getFileInfo(sourcePath);
   const approximateBytesPerRow = Math.round(fileSize / totalLineCountOfFile);
   const searchFromByte = approximateBytesPerRow * indexForNewLines;
 
-  let cache = searchCache(sourcePath, searchFromByte, nrOfLogLines, fileSize);
-  const byteToReadFrom = searchFromByte - 2000;
-  let nrOfBytes = CACHE_CHUNK_SIZE;
-  let infiniteLoopStopper = 0; // TODO: This ugly thing is here for now, until I've figured out what goes wrong with the loop
+  if (getEndOfFile) {
+    // The requested content contains the end of the file. To make sure that the current end is being returned, in case the file is running, have fileReader read the correct ending, add it to the cache and send to frontend.
+    const endOfFile = await fileReader.readDataFromByte(
+      sourcePath,
+      fileSize - CACHE_CHUNK_SIZE,
+      CACHE_CHUNK_SIZE
+    );
 
-  try {
-    while (cache === 'miss' && infiniteLoopStopper < 50) {
-      const { startByteOfLines, lines } = await fileReader.readDataFromByte(
-        sourcePath,
-        byteToReadFrom,
-        nrOfBytes
-      );
+    updateCache(sourcePath, endOfFile.lines, endOfFile.startByteOfLines);
 
-      // update cache with the new content
-      updateCache(sourcePath, lines, startByteOfLines);
+    const dataToReturn = {
+      sourcePath,
+      newLines: endOfFile.lines.slice(endOfFile.lines.length - nrOfLogLines),
+      indexForNewLines,
+      isEndOfFile: true
+    };
+    const action = {
+      type: 'LOGLINES_FETCHED_FROM_BACKEND_CACHE',
+      data: { dataToReturn }
+    };
 
-      const [fileSize] = await getFileInfo(sourcePath);
+    sender.send(ipcChannel, action);
+  } else {
+    let cache = searchCache(sourcePath, searchFromByte, nrOfLogLines, fileSize);
+    try {
+      if (cache === 'miss') {
+        const byteToReadFrom = searchFromByte - 2000;
+        let nrOfBytesToRead = CACHE_CHUNK_SIZE;
 
-      // Check for size and flush if cache has grown too large
-      if (!checkIfCacheIsWithinSizeLimit()) {
-        flushCacheForOneFile(sourcePath);
-        updateCache(sourcePath, lines, startByteOfLines);
-        // Make sure that the end of the file is in the cache
-        const endOfFile = await fileReader.readDataFromByte(
+        const { startByteOfLines, lines } = await fileReader.readDataFromByte(
           sourcePath,
-          fileSize - CACHE_CHUNK_SIZE,
-          CACHE_CHUNK_SIZE
+          byteToReadFrom,
+          nrOfBytesToRead
         );
-        updateCache(sourcePath, endOfFile.lines, endOfFile.startByteOfLines);
+
+        updateCache(sourcePath, lines, startByteOfLines);
+
+        const [fileSize] = await getFileInfo(sourcePath);
+        await flushAndUpdateCacheIfOverSizeLimit(
+          sourcePath,
+          lines,
+          startByteOfLines,
+          fileSize
+        );
+
+        cache = searchCache(sourcePath, searchFromByte, nrOfLogLines, fileSize);
       }
 
-      cache = searchCache(sourcePath, searchFromByte, nrOfLogLines, fileSize);
-
-      nrOfBytes += Math.round(CACHE_CHUNK_SIZE / 2);
-      infiniteLoopStopper += 1;
+      if (cache !== 'miss') {
+        const newLines = cache.lines;
+        const isEndOfFile = cache.isEndOfFile;
+        // Send result to frontend
+        const dataToReturn = {
+          sourcePath,
+          newLines,
+          indexForNewLines,
+          isEndOfFile
+        };
+        const action = {
+          type: 'LOGLINES_FETCHED_FROM_BACKEND_CACHE',
+          data: { dataToReturn }
+        };
+        sender.send(ipcChannel, action);
+      }
+    } catch (error) {
+      console.log({ getNewLinesFromCache }, error);
     }
-  } catch (error) {
-    console.log({ getNewLinesFromCache }, error);
   }
+};
 
-  const newLines = cache.lines;
-  const isEndOfFile = cache.isEndOfFile;
-
-  if (cache === 'miss') {
-    console.log(cache);
+const flushAndUpdateCacheIfOverSizeLimit = async (
+  sourcePath,
+  lines,
+  startByteOfLines,
+  fileSize
+) => {
+  if (!checkIfCacheIsWithinSizeLimit()) {
+    flushCacheForOneFile(sourcePath);
+    updateCache(sourcePath, lines, startByteOfLines);
+    // Make sure that the cache contains the end of the file
+    const endOfFile = await fileReader.readDataFromByte(
+      sourcePath,
+      fileSize - CACHE_CHUNK_SIZE,
+      CACHE_CHUNK_SIZE
+    );
+    updateCache(sourcePath, endOfFile.lines, endOfFile.startByteOfLines);
   }
-  console.log({ isEndOfFile });
-  // Send result to frontend
-  const dataToReturn = {
-    sourcePath,
-    newLines,
-    indexForNewLines,
-    isEndOfFile
-  };
-  const action = {
-    type: 'LOGLINES_FETCHED_FROM_BACKEND_CACHE',
-    data: { dataToReturn }
-  };
-  sender.send(ipcChannel, action);
 };
 
 const getFilteredLines = async (sender, data) => {
@@ -362,7 +378,7 @@ const createEventHandler = state => {
         loadStateFromDisk(state, sender);
         break;
       case 'FETCH_NEW_LINES_FROM_BACKEND_CACHE':
-        getNewLinesFromCache(sender, _argObj.data).catch(err => {
+        await getNewLinesFromCache(sender, _argObj.data).catch(err => {
           console.error(err);
         });
         break;

@@ -48,11 +48,14 @@ const LogViewer = props => {
   const scroller = useRef(); // A ref on the logViewerContainer used to keep track of scroll values.
 
   const _getMoreLogLines = _.debounce(indexForNewLines => {
+    const getEndOfFile =
+      totalNrOfLinesInFile - indexForNewLines < logLinesLength;
     fetchNewLinesFromBackendCache(
       props.source.path,
       logLinesLength,
       indexForNewLines,
-      totalNrOfLinesInFile
+      totalNrOfLinesInFile,
+      getEndOfFile
     );
   }, 500);
 
@@ -207,8 +210,9 @@ const LogViewer = props => {
   }, [totalNrOfLinesInFile]);
 
   useEffect(() => {
-    if (tailSwitch && emptyLinesLength > 0) {
-      _getMoreLogLines(totalNrOfLinesInFile - logLinesLength);
+    const totalFileNotInFeCache = emptyLinesLength > 0;
+    if (tailSwitch && totalFileNotInFeCache) {
+      _getMoreLogLines(totalNrOfLinesInFile - logLinesLength + 100);
     }
   }, [tailSwitch]);
 
@@ -216,7 +220,7 @@ const LogViewer = props => {
     if (tailSwitch) {
       scroller.current.scrollTo(0, scroller.current.scrollHeight);
     }
-  }, [tailSwitch, /*filteredAndHighlightedLines, */ totalNrOfLinesInFile]);
+  }, [tailSwitch, totalNrOfLinesInFile]);
 
   useEffect(() => {
     saveCurrentScrollTop(props.dispatch, props.source.path, currentScrollTop);
