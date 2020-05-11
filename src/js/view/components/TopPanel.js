@@ -9,6 +9,7 @@ import {
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
 import { PrimaryButton, Stack, Image } from 'office-ui-fabric-react';
+import { increment, decrement } from './helpers/highlightHelper';
 
 const logoText = require('../../../resources/text.png');
 
@@ -75,8 +76,18 @@ class TopPanel extends React.Component {
               value={highlightText}
             />
           </Stack.Item>
-          <ArrowButton iconProps={{ iconName: 'Up' }} />
-          <ArrowButton iconProps={{ iconName: 'Down' }} />
+          <ArrowButton
+            iconProps={{ iconName: 'Up' }}
+            onClick={() => {
+              decrement();
+            }}
+          />
+          <ArrowButton
+            iconProps={{ iconName: 'Down' }}
+            onClick={() => {
+              increment();
+            }}
+          />
         </Stack>
         <Stack horizontal tokens={stackTokens}>
           <Stack.Item disableShrink align="center">

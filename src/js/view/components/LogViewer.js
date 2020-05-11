@@ -10,6 +10,7 @@ import {
   updateLogViewerCache,
   fetchFilteredLinesFromBackend
 } from './helpers/logHelper';
+import { updateHighlightMark } from './helpers/highlightHelper';
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -43,6 +44,7 @@ const LogViewer = props => {
   let filterRef = useRef('');
   let previousFilteredLinesLength = useRef(0);
   let previousLinesLength = useRef(0);
+  let highlightMarkerRef = useRef();
   // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
   const scroller = useRef(); // A ref on the logViewerContainer used to keep track of scroll values.
 
@@ -225,12 +227,19 @@ const LogViewer = props => {
     scroller.current.scrollTo(0, props.currentScrollTops[props.source.path]);
   }, [props.source.path]);
 
+  useEffect(() => {
+    highlightMarkerRef.current = updateHighlightMark(
+      filteredAndHighlightedLines
+    );
+  }, [filteredAndHighlightedLines]);
+
   return (
     <LogViewerContainer ref={scroller} data-is-scrollable="true">
       <LogViewerList
         highlightColor={highlightColor}
         wrapLines={wrapLineOn}
         lines={filteredAndHighlightedLines}
+        highlightMarker={highlightMarkerRef.current}
         scrollTop={currentScrollTop}
         filterInput={filterInput}
         getMoreLogLines={_getMoreLogLines}
