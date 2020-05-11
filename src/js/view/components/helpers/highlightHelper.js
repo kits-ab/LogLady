@@ -19,17 +19,17 @@ export const updateHighlightMark = lines => {
 };
 
 export const increment = () => {
-  const findIndex = allHighlightedLines.findIndex(line => {
+  const currentIndex = allHighlightedLines.findIndex(line => {
     return line.mark === true;
   });
-  allHighlightedLines[findIndex].mark = false;
-  allHighlightedLines[findIndex + 1].mark = true;
+  allHighlightedLines[currentIndex].mark = false;
+  allHighlightedLines[currentIndex + 1].mark = true;
 };
 
 export const decrement = () => {
-  const findIndex = allHighlightedLines.findIndex(line => {
+  const currentIndex = allHighlightedLines.findIndex(line => {
     return line.mark === true;
   });
-  allHighlightedLines[findIndex].mark = false;
-  allHighlightedLines[findIndex - 1].mark = true;
+  allHighlightedLines[currentIndex].mark = false;
+  allHighlightedLines[currentIndex - 1].mark = true;
 };

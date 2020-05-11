@@ -48,7 +48,6 @@ class LogsFiltererAndHighlighter {
       } else {
         filteredAndHighlightedLines.push(lineObj);
       }
-      // }
     }
     if (!sendLinesOneByOne) {
       this._sendAllLinesToMainWindow(filteredAndHighlightedLines);

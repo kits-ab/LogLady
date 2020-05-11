@@ -1,7 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import memoize from 'memoize-one';
-import { LogViewerListContainer } from '../styledComponents/LogViewerListStyledComponents';
+import {
+  LogViewerListContainer,
+  LogLineRuler
+} from '../styledComponents/LogViewerListStyledComponents';
 import { MemoedSingleLogLine } from './SingleLogLine';
 import { LogLine } from '../styledComponents/LogViewerListStyledComponents';
 import { List } from 'office-ui-fabric-react';
@@ -19,30 +22,30 @@ const isNotOnlyWhitespace = str => {
 
 const LogViewerList = props => {
   const listRef = useRef(); //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
-  const startItemIndexRef = useRef(0);
+  const [measuredCharHeight, setMeasuredCharHeight] = useState(null);
+  const previousIndex = useRef(0);
 
   // Used to send needed props and state from this component to the pure component that renders a single line
   const memoizedLineProps = memoizeProps(props.highlightColor, props.wrapLines);
 
-  const evaluateNrOfItemsScrolled = startItemIndexinView => {
+  const evaluateNrOfItemsScrolled = scrollTop => {
     // When the amount of items scrolled by are exceeding maxLineNrToScroll, a fetch of new lines from backend is triggered
     if (props.wholeFileNotInFeCache) {
-      const startItemIndexDiff =
-        startItemIndexinView - startItemIndexRef.current;
+      const indexOfTopItemInView = Math.floor(scrollTop / measuredCharHeight);
+      const startItemIndexDiff = indexOfTopItemInView - previousIndex.current;
       const maxLineNrToScroll = props.logLinesLength / 3;
-
-      if (
+      const timeToFetchNewLines =
         startItemIndexDiff > maxLineNrToScroll ||
-        startItemIndexDiff < -maxLineNrToScroll
-      ) {
-        startItemIndexRef.current = startItemIndexinView;
+        startItemIndexDiff < -maxLineNrToScroll;
+
+      if (timeToFetchNewLines) {
+        previousIndex.current = indexOfTopItemInView;
 
         const halvedLogLineLength = props.logLinesLength / 2;
         const indexForNewLines =
-          startItemIndexinView - halvedLogLineLength < 0
+          indexOfTopItemInView - halvedLogLineLength < 0
             ? 0
-            : Math.round(startItemIndexinView - halvedLogLineLength);
-
+            : Math.round(indexOfTopItemInView - halvedLogLineLength);
         props.getMoreLogLines(indexForNewLines);
       }
     }
@@ -54,11 +57,21 @@ const LogViewerList = props => {
   }, [props.wrapLines]);
 
   useEffect(() => {
-    const startItemIndexinView = listRef.current.getStartItemIndexInView();
     if (props.filterInput.length === 0) {
-      evaluateNrOfItemsScrolled(startItemIndexinView);
+      evaluateNrOfItemsScrolled(props.scrollTop);
     }
   }, [props.scrollTop, props.filterInput]);
+
+  // Measure is used to measure the height of a character
+  const Measure = ({ onMeasured }) => {
+    const oneCharacterRef = useRef();
+
+    useEffect(() => {
+      onMeasured(oneCharacterRef.current.offsetHeight);
+    }, [onMeasured, oneCharacterRef]);
+
+    return <LogLineRuler ref={oneCharacterRef}>A</LogLineRuler>;
+  };
 
   const _onRenderCell = (item, index) => {
     const { highlightColor, shouldWrap } = memoizedLineProps;
@@ -78,6 +91,7 @@ const LogViewerList = props => {
 
   return (
     <LogViewerListContainer>
+      {!measuredCharHeight && <Measure onMeasured={setMeasuredCharHeight} />}
       <List
         ref={listRef}
         items={props.lines}
