@@ -26,7 +26,8 @@ export const fetchNewLinesFromBackendCache = (
   sourcePath,
   nrOfLogLines,
   indexForNewLines,
-  totalLineCountOfFile
+  totalLineCountOfFile,
+  getEndOfFile
 ) => {
   const argObj = {
     function: 'FETCH_NEW_LINES_FROM_BACKEND_CACHE',
@@ -34,7 +35,8 @@ export const fetchNewLinesFromBackendCache = (
       sourcePath,
       nrOfLogLines,
       indexForNewLines,
-      totalLineCountOfFile
+      totalLineCountOfFile,
+      getEndOfFile
     }
   };
   sendRequestToBackend(argObj);
