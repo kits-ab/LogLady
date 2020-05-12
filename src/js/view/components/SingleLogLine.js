@@ -8,6 +8,14 @@ import TextHighlightRegex from './TextHighlightRegex';
  * the function will not be called and the earlier result will be used.
  */
 export const MemoedSingleLogLine = React.memo(props => {
+  let textHighlight;
+  props.match
+    ? (textHighlight = (
+        <TextHighlightRegex line={props.line} color={'#8764b8'} />
+      ))
+    : (textHighlight = (
+        <TextHighlightRegex line={props.line} color={props.highlightColor} />
+      ));
   return (
     <LogLine
       style={{
@@ -17,7 +25,7 @@ export const MemoedSingleLogLine = React.memo(props => {
       index={props.index}
     >
       {props.line.highlightLine ? (
-        <TextHighlightRegex line={props.line} color={props.highlightColor} />
+        textHighlight
       ) : (
         <span>{props.line.sections[0].text}</span>
       )}

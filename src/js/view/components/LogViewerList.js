@@ -75,11 +75,16 @@ const LogViewerList = props => {
 
   const _onRenderCell = (item, index) => {
     const { highlightColor, shouldWrap } = memoizedLineProps;
+    let match = false;
+    if (item === props.highlightMarker[0]) {
+      match = true;
+    }
     return item && isNotOnlyWhitespace(item.sections[0].text) ? (
       <MemoedSingleLogLine
         index={index}
         line={item}
         highlightColor={highlightColor}
+        match={match}
         shouldWrap={shouldWrap}
       />
     ) : (
