@@ -7,11 +7,6 @@
  * - This helper then starts working through these lines, sending them back using IPC when finished or as it's going.
  */
 
-import {
-  updateCurrentMarkedHighlight,
-  updateAllHighlightedLines
-} from '../view/components/helpers/highlightHelper';
-
 /**
  * Class for filtering and highlighting lines of text
  * @class
@@ -38,9 +33,8 @@ class LogsFiltererAndHighlighter {
    * Will also send out an update to highlightHelper.
    * @public
    * @param {boolean} [sendLinesOneByOne=false]
-   * @param {boolean} [inputChanged = false]
    */
-  start(sendLinesOneByOne = false, inputChanged = false) {
+  start(sendLinesOneByOne = false) {
     let filteredAndHighlightedLines = [];
     for (let lineIndex in this.lines) {
       let line = this.lines[lineIndex];
@@ -58,10 +52,6 @@ class LogsFiltererAndHighlighter {
     }
     if (!sendLinesOneByOne) {
       this._sendAllLinesToMainWindow(filteredAndHighlightedLines);
-    }
-    updateAllHighlightedLines(filteredAndHighlightedLines);
-    if (inputChanged) {
-      updateCurrentMarkedHighlight();
     }
   }
 
@@ -127,7 +117,6 @@ const getHighlightedLineIfHighlightExistsAndMatches = (
  * @param {string} args.path - The path the logs are associated with
  * @param {object} args.logs - An object that contains all of the logs to filter and highlighted, fieldnames of the object should be the path the logs are associated with and the field properties should be an array with the line
  * @param {boolean} [args.sendLinesOneByOne=false] - If the lines should be sent back immediately after they are handled, or as a bulk when all are done.
- * @param {boolean} args.inputChanged - If the filter or highlight input has been changed when this is called upon then the variable is true, otherwise false.
  */
 window.ipcRenderer.on('hiddenWindowMessages', (event, args) => {
   if (args.type === 'requestHelpFilterAndHighlightLines') {
@@ -147,7 +136,7 @@ window.ipcRenderer.on('hiddenWindowMessages', (event, args) => {
       args.path,
       highlightRegex
     );
-    filtererForThisPath.start(args.sendLinesOneByOne, args.inputChanged);
+    filtererForThisPath.start(args.sendLinesOneByOne);
   }
 });
 

@@ -21,9 +21,10 @@ const isNotOnlyWhitespace = str => {
 };
 
 const LogViewerList = props => {
-  const listRef = useRef(); //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
+  const listRef = useRef();
   const [measuredCharHeight, setMeasuredCharHeight] = useState(null);
   const previousIndex = useRef(0);
+  let indexOfCurrentMarkedHighlight = {};
 
   // Used to send needed props and state from this component to the pure component that renders a single line
   const memoizedLineProps = memoizeProps(props.highlightColor, props.wrapLines);
@@ -73,10 +74,15 @@ const LogViewerList = props => {
     return <LogLineRuler ref={oneCharacterRef}>A</LogLineRuler>;
   };
 
+  useEffect(() => {
+    listRef.current.scrollToIndex(indexOfCurrentMarkedHighlight);
+  }, [props.highlightMarker]);
+
   const _onRenderCell = (item, index) => {
     const { highlightColor, shouldWrap } = memoizedLineProps;
-    let match = false;
+    let match;
     if (item === props.highlightMarker[0]) {
+      indexOfCurrentMarkedHighlight = { index };
       match = true;
     }
     return item && isNotOnlyWhitespace(item.sections[0].text) ? (

@@ -10,7 +10,12 @@ import {
   updateLogViewerCache,
   fetchFilteredLinesFromBackend
 } from './helpers/logHelper';
-import { setDispatcher, setSourcePath } from './helpers/highlightHelper';
+import {
+  setDispatcher,
+  setSourcePath,
+  updateAllHighlightedLines,
+  setCurrentMarkedHighlight
+} from './helpers/highlightHelper';
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -40,7 +45,6 @@ const LogViewer = props => {
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
   const [currentScrollTop, setCurrentScrollTop] = useState(0);
-  const [currentMarkedHighlight, setHighlightMarker] = useState({});
 
   let filterRef = useRef('');
   let previousFilteredLinesLength = useRef(0);
@@ -148,10 +152,11 @@ const LogViewer = props => {
       previousFilteredLinesLength.current = 0;
       previousLinesLength.current = 0;
       sendMessageToHiddenWindow({
-        logs,
-        inputChanged: true
+        logs
       });
     }
+    updateAllHighlightedLines(filteredAndHighlightedLines);
+    setCurrentMarkedHighlight();
   }, [filterInput, highlightInput, highlightColor, filterRef.current]);
 
   useEffect(() => {
@@ -183,9 +188,9 @@ const LogViewer = props => {
           previousFilteredLinesLength.current > 0 ? true : false,
         logs: newLines
       });
-
       previousFilteredLinesLength.current = props.filteredLogs.length;
     }
+    updateAllHighlightedLines(filteredAndHighlightedLines);
   }, [props.logs]);
 
   useEffect(() => {
@@ -193,8 +198,7 @@ const LogViewer = props => {
     to send the correct lines to be filtered and highlighted and update the ref to be the correct source */
     sendMessageToHiddenWindow({
       logs: props.logs[props.source.path],
-      sourcePath: props.source.path,
-      inputChanged: false
+      sourcePath: props.source.path
     });
   }, [props.source.path]);
 
@@ -233,18 +237,14 @@ const LogViewer = props => {
   }, [props.source.path]);
 
   useEffect(() => {
-    //TODO Fixa så att vi scrollar till current
-  }, [currentMarkedHighlight]);
-
-  useEffect(() => {
     setDispatcher(props.dispatch);
-  }, []);
+  }, [props.dispatch]);
 
   return (
     <LogViewerContainer ref={scroller} data-is-scrollable="true">
       <LogViewerList
-        key={currentMarkedHighlight}
-        highlightMarker={currentMarkedHighlight}
+        key={props.currentMarkedHighlight}
+        highlightMarker={props.currentMarkedHighlight}
         highlightColor={highlightColor}
         wrapLines={wrapLineOn}
         lines={filteredAndHighlightedLines}
