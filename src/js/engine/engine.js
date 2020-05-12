@@ -348,6 +348,9 @@ const createEventHandler = state => {
           console.error(err);
         });
         break;
+      case 'FLUSH_CACHE_FOR_FILE':
+        flushCacheForOneFile(_argObj.filePath);
+        break;
       default:
     }
   };
