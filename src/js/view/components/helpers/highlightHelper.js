@@ -19,17 +19,26 @@ export const updateHighlightMark = lines => {
 };
 
 export const increment = () => {
-  const currentIndex = allHighlightedLines.findIndex(line => {
-    return line.mark === true;
-  });
-  allHighlightedLines[currentIndex].mark = false;
-  allHighlightedLines[currentIndex + 1].mark = true;
+  if (allHighlightedLines.length > 0) {
+    const currentIndex = allHighlightedLines.findIndex(line => {
+      return line.mark === true;
+    });
+    if (allHighlightedLines[currentIndex + 1] !== undefined) {
+      allHighlightedLines[currentIndex].mark = false;
+      allHighlightedLines[currentIndex + 1].mark = true;
+      console.log({ allHighlightedLines });
+    }
+  }
 };
-
 export const decrement = () => {
-  const currentIndex = allHighlightedLines.findIndex(line => {
-    return line.mark === true;
-  });
-  allHighlightedLines[currentIndex].mark = false;
-  allHighlightedLines[currentIndex - 1].mark = true;
+  if (allHighlightedLines.length > 0) {
+    const currentIndex = allHighlightedLines.findIndex(line => {
+      return line.mark === true;
+    });
+    if (allHighlightedLines[currentIndex - 1] !== undefined) {
+      allHighlightedLines[currentIndex].mark = false;
+      allHighlightedLines[currentIndex - 1].mark = true;
+      console.log({ allHighlightedLines });
+    }
+  }
 };
