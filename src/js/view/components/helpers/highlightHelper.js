@@ -1,8 +1,18 @@
+import { updateCurrentMarkedHighlight } from 'js/view/actions/dispatchActions';
+
 let allHighlightedLines = {};
 let dispatch;
 let sourcePath;
 
-export const updateHighlightMark = lines => {
+export const setDispatcher = disp => {
+  dispatch = disp;
+};
+
+export const setSourcePath = source => {
+  sourcePath = source;
+};
+
+export const updateAllHighlightedLines = lines => {
   for (let i = 0; i < lines.length; i++) {
     if (lines[i] !== undefined) {
       allHighlightedLines.length === 0
@@ -14,18 +24,14 @@ export const updateHighlightMark = lines => {
       }
     }
   }
-  const filteredHighlightMark = allHighlightedLines.filter(line => {
+  setCurrentMarkedHighlight();
+};
+
+export const setCurrentMarkedHighlight = () => {
+  const currentMarkedHighlight = allHighlightedLines.filter(line => {
     return line.mark === true;
   });
-  return filteredHighlightMark;
-};
-
-export const setDispatcher = disp => {
-  dispatch = disp;
-};
-
-export const setSourcePath = source => {
-  sourcePath = source;
+  updateCurrentMarkedHighlight(dispatch, sourcePath, currentMarkedHighlight);
 };
 
 export const increment = () => {
@@ -36,7 +42,7 @@ export const increment = () => {
     if (allHighlightedLines[currentIndex + 1] !== undefined) {
       allHighlightedLines[currentIndex].mark = false;
       allHighlightedLines[currentIndex + 1].mark = true;
-      console.log({ allHighlightedLines });
+      setCurrentMarkedHighlight();
     }
   }
 };
@@ -48,7 +54,7 @@ export const decrement = () => {
     if (allHighlightedLines[currentIndex - 1] !== undefined) {
       allHighlightedLines[currentIndex].mark = false;
       allHighlightedLines[currentIndex - 1].mark = true;
-      console.log({ allHighlightedLines });
+      setCurrentMarkedHighlight();
     }
   }
 };
