@@ -10,7 +10,8 @@ describe('logviewer reducer', () => {
       currentScrollTops: {},
       indexesForNewLines: {},
       filteredLogs: {},
-      totalNrOfFilteredLines: {}
+      totalNrOfFilteredLines: {},
+      currentMarkedHighlight: {}
     };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
@@ -34,7 +35,8 @@ describe('logviewer reducer', () => {
       currentScrollTops: {},
       indexesForNewLines: {},
       filteredLogs: {},
-      totalNrOfFilteredLines: {}
+      totalNrOfFilteredLines: {},
+      currentMarkedHighlight: {}
     };
     const sourcePath = 'test';
 
@@ -61,7 +63,8 @@ describe('logviewer reducer', () => {
       currentScrollTops: { test: 0 },
       indexesForNewLines: { test: 0 },
       filteredLogs: {},
-      totalNrOfFilteredLines: {}
+      totalNrOfFilteredLines: {},
+      currentMarkedHighlight: {}
     };
     const action = {
       type: 'LOGVIEWER_SET_LOG',
@@ -102,7 +105,8 @@ it('should set filtered lines', () => {
     currentScrollTops: {},
     indexesForNewLines: {},
     filteredLogs: { test: ['line4', 'line7'] },
-    totalNrOfFilteredLines: { test: 2 }
+    totalNrOfFilteredLines: { test: 2 },
+    currentMarkedHighlight: {}
   };
   const action = {
     type: 'LOGVIEWER_ADD_FILTERED_LINES',

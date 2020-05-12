@@ -6,7 +6,8 @@ const initialState = {
   currentScrollTops: {},
   indexesForNewLines: {},
   filteredLogs: {},
-  totalNrOfFilteredLines: {}
+  totalNrOfFilteredLines: {},
+  currentMarkedHighlight: {}
 };
 
 // Invisible character U+2800 being used in line.replace. Making the viewer display empty lines.
@@ -193,6 +194,16 @@ export const logViewerReducer = (state = initialState, action) => {
         totalNrOfFilteredLines: {
           ...state.totalNrOfFilteredLines,
           [sourcePath]: lineCount
+        }
+      };
+    }
+
+    case 'UPDATE_CURRENT_MARKED_HIGHLIGHT': {
+      const { sourcePath, newCurrent } = action.data;
+      return {
+        ...state,
+        currentMarkedHighlight: {
+          [sourcePath]: newCurrent
         }
       };
     }

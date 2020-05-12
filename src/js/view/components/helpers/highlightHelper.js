@@ -1,4 +1,6 @@
-let allHighlightedLines = [];
+let allHighlightedLines = {};
+let dispatch;
+let sourcePath;
 
 export const updateHighlightMark = lines => {
   for (let i = 0; i < lines.length; i++) {
@@ -16,6 +18,14 @@ export const updateHighlightMark = lines => {
     return line.mark === true;
   });
   return filteredHighlightMark;
+};
+
+export const setDispatcher = disp => {
+  dispatch = disp;
+};
+
+export const setSourcePath = source => {
+  sourcePath = source;
 };
 
 export const increment = () => {

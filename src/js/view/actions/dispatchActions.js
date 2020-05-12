@@ -258,3 +258,17 @@ export const addFilteredLines = (
     }
   });
 };
+
+export const updateCurrentMarkedHighlight = (
+  dispatch,
+  sourcePath,
+  newCurrent
+) => {
+  dispatch({
+    type: 'UPDATE_CURRENT_MARKED_HIGHLIGHT',
+    data: {
+      sourcePath,
+      newCurrent
+    }
+  });
+};
