@@ -8,6 +8,7 @@ import {
 import { MemoedSingleLogLine } from './SingleLogLine';
 import { LogLine } from '../styledComponents/LogViewerListStyledComponents';
 import { List } from 'office-ui-fabric-react';
+import _ from 'lodash';
 
 const memoizeProps = memoize((highlightColor, shouldWrap) => {
   return {
@@ -20,19 +21,22 @@ const isNotOnlyWhitespace = str => {
   return !(str.length === 1 && /\s/.test(str));
 };
 
+let indexOfMarkedHighlight = 0;
+
 const LogViewerList = props => {
   const listRef = useRef();
+  const containerRef = useRef();
+  const [containerHeight, setContainerHeight] = useState(null);
+  const [nbrOfItemsInView, setNbrOfItemsInView] = useState(0);
   const [measuredCharHeight, setMeasuredCharHeight] = useState(null);
   const previousIndex = useRef(0);
-  let indexOfCurrentMarkedHighlight = {};
 
   // Used to send needed props and state from this component to the pure component that renders a single line
   const memoizedLineProps = memoizeProps(props.highlightColor, props.wrapLines);
 
-  const evaluateNrOfItemsScrolled = scrollTop => {
+  const evaluateNrOfItemsScrolled = indexOfTopItemInView => {
     // When the amount of items scrolled by are exceeding maxLineNrToScroll, a fetch of new lines from backend is triggered
     if (props.wholeFileNotInFeCache) {
-      const indexOfTopItemInView = Math.floor(scrollTop / measuredCharHeight);
       const startItemIndexDiff = indexOfTopItemInView - previousIndex.current;
       const maxLineNrToScroll = props.logLinesLength / 3;
       const timeToFetchNewLines =
@@ -53,15 +57,53 @@ const LogViewerList = props => {
   };
 
   useEffect(() => {
-    //Force updates the List when the user toggles Wrap Lines
+    // Force updates the List when the user toggles Wrap Lines
     listRef.current.forceUpdate();
   }, [props.wrapLines]);
 
   useEffect(() => {
     if (props.filterInput.length === 0) {
-      evaluateNrOfItemsScrolled(props.scrollTop);
+      const indexOfTopItemInView = Math.floor(
+        props.scrollTop / measuredCharHeight
+      );
+      evaluateNrOfItemsScrolled(indexOfTopItemInView);
     }
   }, [props.scrollTop, props.filterInput]);
+
+  useEffect(() => {
+    // Updates the height of the container upon resize
+    const handleResize = () => {
+      setContainerHeight(containerRef.current.offsetHeight);
+    };
+    handleResize();
+    // Debounce is used to limit the number of calls to the event handler so that it doesn't get spammed and risk impairing the UX
+    const debouncedResizeHandler = _.debounce(handleResize, 200);
+    window.addEventListener('resize', debouncedResizeHandler);
+    return () => {
+      window.removeEventListener('resize', debouncedResizeHandler);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Calculate if the marked highlight is currently in the view or not, and if not we scroll that item into view
+    const indexOfTopItemInView = Math.floor(
+      props.scrollTop / measuredCharHeight
+    );
+    const indexOfBottomItemInView = Math.floor(
+      (indexOfTopItemInView + nbrOfItemsInView) / measuredCharHeight
+    );
+    const markedItemNotInView =
+      indexOfMarkedHighlight < indexOfTopItemInView ||
+      indexOfMarkedHighlight > indexOfBottomItemInView;
+    if (markedItemNotInView) {
+      listRef.current.scrollToIndex(indexOfMarkedHighlight);
+    }
+  }, [props.markedHighlight]);
+
+  useEffect(() => {
+    // Calculates the number of items that is currently in the view
+    setNbrOfItemsInView(Math.floor(containerHeight / 16));
+  }, [containerHeight]);
 
   // Measure is used to measure the height of a character
   const Measure = ({ onMeasured }) => {
@@ -74,15 +116,11 @@ const LogViewerList = props => {
     return <LogLineRuler ref={oneCharacterRef}>A</LogLineRuler>;
   };
 
-  useEffect(() => {
-    listRef.current.scrollToIndex(indexOfCurrentMarkedHighlight);
-  }, [props.highlightMarker]);
-
   const _onRenderCell = (item, index) => {
     const { highlightColor, shouldWrap } = memoizedLineProps;
     let match;
-    if (item === props.highlightMarker[0]) {
-      indexOfCurrentMarkedHighlight = { index };
+    if (item !== undefined && item === props.markedHighlight[0]) {
+      indexOfMarkedHighlight = index;
       match = true;
     }
     return item && isNotOnlyWhitespace(item.sections[0].text) ? (
@@ -101,7 +139,7 @@ const LogViewerList = props => {
   };
 
   return (
-    <LogViewerListContainer>
+    <LogViewerListContainer ref={containerRef}>
       {!measuredCharHeight && <Measure onMeasured={setMeasuredCharHeight} />}
       <List
         ref={listRef}

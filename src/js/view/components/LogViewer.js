@@ -17,6 +17,8 @@ import {
   setCurrentMarkedHighlight
 } from './helpers/highlightHelper';
 
+let inputChanged = false;
+
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
     ? props.settings[props.source.path].filterInput
@@ -155,8 +157,7 @@ const LogViewer = props => {
         logs
       });
     }
-    updateAllHighlightedLines(filteredAndHighlightedLines);
-    setCurrentMarkedHighlight();
+    inputChanged = true;
   }, [filterInput, highlightInput, highlightColor, filterRef.current]);
 
   useEffect(() => {
@@ -190,7 +191,6 @@ const LogViewer = props => {
       });
       previousFilteredLinesLength.current = props.filteredLogs.length;
     }
-    updateAllHighlightedLines(filteredAndHighlightedLines);
   }, [props.logs]);
 
   useEffect(() => {
@@ -230,8 +230,8 @@ const LogViewer = props => {
     saveCurrentScrollTop(props.dispatch, props.source.path, currentScrollTop);
   }, [currentScrollTop]);
 
-  //Used when changing between opened logs
   useEffect(() => {
+    // Triggers when changing between opened logs
     scroller.current.scrollTo(0, props.currentScrollTops[props.source.path]);
     setSourcePath(props.source.path);
   }, [props.source.path]);
@@ -240,11 +240,19 @@ const LogViewer = props => {
     setDispatcher(props.dispatch);
   }, [props.dispatch]);
 
+  useEffect(() => {
+    updateAllHighlightedLines(filteredAndHighlightedLines);
+    if (inputChanged) {
+      setCurrentMarkedHighlight();
+      inputChanged = false;
+    }
+  }, [filteredAndHighlightedLines]);
+
   return (
     <LogViewerContainer ref={scroller} data-is-scrollable="true">
       <LogViewerList
         key={props.currentMarkedHighlight}
-        highlightMarker={props.currentMarkedHighlight}
+        markedHighlight={props.currentMarkedHighlight}
         highlightColor={highlightColor}
         wrapLines={wrapLineOn}
         lines={filteredAndHighlightedLines}
