@@ -10,6 +10,7 @@ import {
   updateLogViewerCache,
   fetchFilteredLinesFromBackend
 } from './helpers/logHelper';
+import _ from 'lodash';
 
 const LogViewer = props => {
   const filterInput = props.settings[props.source.path]
@@ -46,14 +47,17 @@ const LogViewer = props => {
   // Used to keep track of how many lines there were last time useEffect was called, for optimizing and only sending the new lines
   const scroller = useRef(); // A ref on the logViewerContainer used to keep track of scroll values.
 
-  const _getMoreLogLines = indexForNewLines => {
+  const _getMoreLogLines = _.debounce(indexForNewLines => {
+    const getEndOfFile =
+      totalNrOfLinesInFile - indexForNewLines < logLinesLength;
     fetchNewLinesFromBackendCache(
       props.source.path,
       logLinesLength,
       indexForNewLines,
-      totalNrOfLinesInFile
+      totalNrOfLinesInFile,
+      getEndOfFile
     );
-  };
+  }, 500);
 
   const sendMessageToHiddenWindow = args => {
     /* Send a message to the hidden window that it should filter the logs.
@@ -206,8 +210,9 @@ const LogViewer = props => {
   }, [totalNrOfLinesInFile]);
 
   useEffect(() => {
-    if (tailSwitch && emptyLinesLength > 0) {
-      _getMoreLogLines(totalNrOfLinesInFile - logLinesLength);
+    const totalFileNotInFeCache = emptyLinesLength > 0;
+    if (tailSwitch && totalFileNotInFeCache) {
+      _getMoreLogLines(totalNrOfLinesInFile - logLinesLength + 100);
     }
   }, [tailSwitch]);
 
@@ -215,7 +220,7 @@ const LogViewer = props => {
     if (tailSwitch) {
       scroller.current.scrollTo(0, scroller.current.scrollHeight);
     }
-  }, [tailSwitch, filteredAndHighlightedLines]);
+  }, [tailSwitch, totalNrOfLinesInFile]);
 
   useEffect(() => {
     saveCurrentScrollTop(props.dispatch, props.source.path, currentScrollTop);

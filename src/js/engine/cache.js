@@ -1,32 +1,62 @@
+const {
+  formatCacheLines,
+  formatCachedPartsInfo,
+  parseResult
+} = require('../helpers/cacheHelper');
+
+// cache object format example
+// cache = {
+//        'filepath/example.log': {
+//                                  lines: [{line: 'hi', startsAtByte: 0},
+//                                          {line: 'hi', startsAtByte: 2}],
+//                                  cachedPartsInfo: [ {startsAt: 0, endsAt: 2, startByteOfLines: [0, 2]}, ],
+//                                 },
+//        }
 let cache = {};
 
-const searchCache = (filepath, position, amountOfLines) => {
+const searchCache = (filepath, position, amountOfLines, fileSize = 0) => {
   if (cache[filepath]) {
-    const info = cache[filepath].cachedPartsInfo;
+    const chunkInfo = cache[filepath].cachedPartsInfo;
 
-    for (let part of info) {
+    for (let chunk of chunkInfo) {
       const positionIsWithinLimit =
-        position >= part.startsAt && position <= part.endsAt;
-
+        position >= chunk.startsAt && position <= chunk.endsAt;
       if (positionIsWithinLimit) {
-        const result = cache[filepath].lines
+        // used to control that enough lines exist in the chunk.
+        const nrOfLinesToEndOfChunk = chunk.startByteOfLines.filter(nr => {
+          return nr >= position;
+        }).length;
+
+        const linesToReturn = cache[filepath].lines
           .filter(line => {
             return line.startsAtByte >= position;
           })
           .slice(0, amountOfLines);
-        return _parseResult(result);
+
+        const toReturn = parseResult(linesToReturn, fileSize);
+        const hasRequstedNrOfLines = nrOfLinesToEndOfChunk >= amountOfLines;
+
+        if (hasRequstedNrOfLines) {
+          return toReturn;
+        } else if (toReturn.isEndOfFile) {
+          // Make sure that the correct amount of lines are returned if the position is close to the end of the file
+          const fromIndex = cache[filepath].lines.length - amountOfLines;
+          const endOfCache = cache[filepath].lines.slice(fromIndex);
+          return parseResult(endOfCache, fileSize);
+        }
       }
     }
-
+    // Cached chunk does not have enough lines or data from the position does not exist in cache
     return 'miss';
   } else {
+    // File does not exist in cache
     return 'miss';
   }
 };
 
 const updateCache = (filepath, lines, startByteOfLines) => {
-  let cacheLines = _formatCacheLines(lines, startByteOfLines);
-  let cachedPartsInfo = _formatCachedPartsInfo(startByteOfLines);
+  let cacheLines = formatCacheLines(lines, startByteOfLines);
+  let cachedPartsInfo = formatCachedPartsInfo(startByteOfLines);
 
   if (cache[filepath]) {
     let currentCacheLines = cache[filepath].lines;
@@ -86,7 +116,7 @@ const addNewLinesPartiallyBeforeCurrent = (
   currentCacheLines,
   cachedPartsInfo
 ) => {
-  console.log('new is partially before current');
+  console.log('Cache: new is partially before current');
   const filteredLines = currentCacheLines.filter(line => {
     return line.startsAtByte > cacheLines[cacheLines.length - 1].startsAtByte;
   });
@@ -102,7 +132,7 @@ const addNewLinesBeforeCurrentLines = (
   cacheLines,
   cachedPartsInfo
 ) => {
-  console.log('new is before current');
+  console.log('Cache: new is before current');
   cache[filepath] = {
     lines: [...cacheLines, ...cache[filepath].lines],
     cachedPartsInfo: [...cachedPartsInfo, ...cache[filepath].cachedPartsInfo]
@@ -114,7 +144,7 @@ const addNewLinesAfterCurrentLines = (
   cacheLines,
   cachedPartsInfo
 ) => {
-  console.log('new is after current');
+  console.log('Cache: new is after current');
   cache[filepath] = {
     lines: [...cache[filepath].lines, ...cacheLines],
     cachedPartsInfo: [...cache[filepath].cachedPartsInfo, ...cachedPartsInfo]
@@ -127,7 +157,7 @@ const addNewLinesEndingPartiallyAfterCurrent = (
   currentCacheLines,
   cachedPartsInfo
 ) => {
-  console.log('new ends partially after current');
+  console.log('Cache: new ends partially after current');
   const filteredLines = currentCacheLines.filter(line => {
     return line.startsAtByte < cacheLines[0].startsAtByte;
   });
@@ -143,7 +173,7 @@ const addCurrentLinesBeforeAndAfterNewLines = (
   currentCacheLines,
   cachedPartsInfo
 ) => {
-  console.log('new is contained within current');
+  console.log('Cache: new is contained within current');
 
   const filteredLinesStart = currentCacheLines.filter(line => {
     return line.startsAtByte < cacheLines[0].startsAtByte;
@@ -172,28 +202,6 @@ const checkIfCacheIsWithinSizeLimit = (cache = cacheInit) => {
   const cacheSize = Buffer.byteLength(JSON.stringify(cache), 'utf8');
   const sizeLimit = 100000000;
   return cacheSize < sizeLimit ? true : false;
-};
-
-const _formatCacheLines = (lines, startByteOfLines) => {
-  return lines.map((line, index) => {
-    return { line: line, startsAtByte: startByteOfLines[index] };
-  });
-};
-
-const _formatCachedPartsInfo = startByteOfLines => {
-  const startsAt = startByteOfLines[0];
-  const endsAt = startByteOfLines[startByteOfLines.length - 1];
-  return [{ startsAt, endsAt, startByteOfLines }];
-};
-
-const _parseResult = result => {
-  const startsAtByte = result.map(byte => {
-    return byte.startsAtByte;
-  });
-  const lines = result.map(line => {
-    return line.line;
-  });
-  return { lines, startsAtByte };
 };
 
 module.exports = {
