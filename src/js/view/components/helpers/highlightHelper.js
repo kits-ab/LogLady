@@ -1,59 +1,71 @@
 import { updateCurrentMarkedHighlight } from 'js/view/actions/dispatchActions';
-
 let allHighlightedLines = {};
 let dispatch;
 let sourcePath;
-
-export const setDispatcher = disp => {
-  dispatch = disp;
-};
 
 export const setSourcePath = source => {
   sourcePath = source;
 };
 
+export const setDispatcher = disp => {
+  dispatch = disp;
+};
+
 export const updateAllHighlightedLines = lines => {
+  let highlightedLines = [];
   for (let i = 0; i < lines.length; i++) {
     if (lines[i] !== undefined) {
-      allHighlightedLines.length === 0
-        ? (lines[i].mark = true)
-        : (lines[i].mark = false);
-      lines[i].originalIndex = i;
       if (lines[i].highlightLine === true) {
-        allHighlightedLines.push(lines[i]);
+        highlightedLines.push(lines[i]);
       }
     }
   }
-  setCurrentMarkedHighlight();
+  highlightedLines.map(line => {
+    line.mark = false;
+  });
+  allHighlightedLines = { [sourcePath]: highlightedLines };
 };
 
 export const setCurrentMarkedHighlight = () => {
-  const currentMarkedHighlight = allHighlightedLines.filter(line => {
+  let currentMarkedHighlight = allHighlightedLines[sourcePath].filter(line => {
     return line.mark === true;
   });
-  updateCurrentMarkedHighlight(dispatch, sourcePath, currentMarkedHighlight);
+
+  if (currentMarkedHighlight.length === 0) {
+    allHighlightedLines[sourcePath].map((line, index) => {
+      if (index === 0) {
+        line.mark = true;
+      }
+    });
+    currentMarkedHighlight = allHighlightedLines[sourcePath].filter(line => {
+      return line.mark === true;
+    });
+  }
+  if (dispatch !== undefined) {
+    updateCurrentMarkedHighlight(dispatch, sourcePath, currentMarkedHighlight);
+  }
 };
 
 export const increment = () => {
-  if (allHighlightedLines.length > 0) {
-    const currentIndex = allHighlightedLines.findIndex(line => {
+  if (allHighlightedLines[sourcePath].length > 0) {
+    const currentIndex = allHighlightedLines[sourcePath].findIndex(line => {
       return line.mark === true;
     });
-    if (allHighlightedLines[currentIndex + 1] !== undefined) {
-      allHighlightedLines[currentIndex].mark = false;
-      allHighlightedLines[currentIndex + 1].mark = true;
+    if (allHighlightedLines[sourcePath][currentIndex + 1] !== undefined) {
+      allHighlightedLines[sourcePath][currentIndex].mark = false;
+      allHighlightedLines[sourcePath][currentIndex + 1].mark = true;
       setCurrentMarkedHighlight();
     }
   }
 };
 export const decrement = () => {
-  if (allHighlightedLines.length > 0) {
-    const currentIndex = allHighlightedLines.findIndex(line => {
+  if (allHighlightedLines[sourcePath].length > 0) {
+    const currentIndex = allHighlightedLines[sourcePath].findIndex(line => {
       return line.mark === true;
     });
-    if (allHighlightedLines[currentIndex - 1] !== undefined) {
-      allHighlightedLines[currentIndex].mark = false;
-      allHighlightedLines[currentIndex - 1].mark = true;
+    if (allHighlightedLines[sourcePath][currentIndex - 1] !== undefined) {
+      allHighlightedLines[sourcePath][currentIndex].mark = false;
+      allHighlightedLines[sourcePath][currentIndex - 1].mark = true;
       setCurrentMarkedHighlight();
     }
   }
