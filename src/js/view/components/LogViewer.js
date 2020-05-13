@@ -251,8 +251,7 @@ const LogViewer = props => {
   return (
     <LogViewerContainer ref={scroller} data-is-scrollable="true">
       <LogViewerList
-        key={props.currentMarkedHighlight}
-        markedHighlight={props.currentMarkedHighlight}
+        markedHighlight={props.currentMarkedHighlight[props.source.path]}
         highlightColor={highlightColor}
         wrapLines={wrapLineOn}
         lines={filteredAndHighlightedLines}

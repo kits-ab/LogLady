@@ -85,12 +85,12 @@ const LogViewerList = props => {
   }, []);
 
   useEffect(() => {
-    // Calculate if the marked highlight is currently in the view or not, and if not we scroll that item into view
+    // Effect that changes the scroll position if we search for a line that is not currently in view
     const indexOfTopItemInView = Math.floor(
       props.scrollTop / measuredCharHeight
     );
     const indexOfBottomItemInView = Math.floor(
-      (indexOfTopItemInView + nbrOfItemsInView) / measuredCharHeight
+      indexOfTopItemInView + nbrOfItemsInView
     );
     const markedItemNotInView =
       indexOfMarkedHighlight < indexOfTopItemInView ||
@@ -102,7 +102,7 @@ const LogViewerList = props => {
 
   useEffect(() => {
     // Calculates the number of items that is currently in the view
-    setNbrOfItemsInView(Math.floor(containerHeight / 16));
+    setNbrOfItemsInView(Math.floor(containerHeight / measuredCharHeight));
   }, [containerHeight]);
 
   // Measure is used to measure the height of a character
@@ -146,6 +146,7 @@ const LogViewerList = props => {
         items={props.lines}
         onRenderCell={_onRenderCell}
         style={{ display: 'inline-block', minWidth: '100%' }}
+        version={props.markedHighlight}
       />
     </LogViewerListContainer>
   );
