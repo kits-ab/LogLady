@@ -119,7 +119,10 @@ const LogViewerList = props => {
   const _onRenderCell = (item, index) => {
     const { highlightColor, shouldWrap } = memoizedLineProps;
     let match;
-    if (item !== undefined && item === props.markedHighlight[0]) {
+    if (
+      props.markedHighlight !== undefined &&
+      item === props.markedHighlight[0]
+    ) {
       indexOfMarkedHighlight = index;
       match = true;
     }

@@ -54,9 +54,7 @@ export const increment = () => {
       return line.mark === true;
     });
     if (allHighlightedLines[sourcePath][currentIndex + 1] !== undefined) {
-      allHighlightedLines[sourcePath].map(line => {
-        return (line.mark = false);
-      });
+      allHighlightedLines[sourcePath][currentIndex].mark = false;
       allHighlightedLines[sourcePath][currentIndex + 1].mark = true;
       setCurrentMarkedHighlight();
     }
