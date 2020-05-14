@@ -21,7 +21,7 @@ export const updateAllHighlightedLines = lines => {
     }
   }
   highlightedLines.map(line => {
-    line.mark = false;
+    return (line.mark = false);
   });
   allHighlightedLines = { [sourcePath]: highlightedLines };
 };
@@ -34,7 +34,9 @@ export const setCurrentMarkedHighlight = () => {
   if (currentMarkedHighlight.length === 0) {
     allHighlightedLines[sourcePath].map((line, index) => {
       if (index === 0) {
-        line.mark = true;
+        return (line.mark = true);
+      } else {
+        return (line.mark = false);
       }
     });
     currentMarkedHighlight = allHighlightedLines[sourcePath].filter(line => {
@@ -52,7 +54,9 @@ export const increment = () => {
       return line.mark === true;
     });
     if (allHighlightedLines[sourcePath][currentIndex + 1] !== undefined) {
-      allHighlightedLines[sourcePath][currentIndex].mark = false;
+      allHighlightedLines[sourcePath].map(line => {
+        return (line.mark = false);
+      });
       allHighlightedLines[sourcePath][currentIndex + 1].mark = true;
       setCurrentMarkedHighlight();
     }
@@ -64,7 +68,9 @@ export const decrement = () => {
       return line.mark === true;
     });
     if (allHighlightedLines[sourcePath][currentIndex - 1] !== undefined) {
-      allHighlightedLines[sourcePath][currentIndex].mark = false;
+      allHighlightedLines[sourcePath].map(line => {
+        return (line.mark = false);
+      });
       allHighlightedLines[sourcePath][currentIndex - 1].mark = true;
       setCurrentMarkedHighlight();
     }
