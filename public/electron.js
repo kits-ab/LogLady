@@ -139,7 +139,7 @@ const createWindow = async () => {
   );
 
   mainWindow.on('close', () => {
-    const argObj = { type: 'QUIT' };
+    const argObj = { type: 'SAVE_CURRENT_STATE' };
     mainWindow.webContents.send('backendMessages', argObj);
   });
   loadingWindow.show();
