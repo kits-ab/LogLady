@@ -138,10 +138,6 @@ const createWindow = async () => {
     path.join(__dirname, '..', '/src/resources/hiddenWindow.html')
   );
 
-  mainWindow.on('close', () => {
-    const argObj = { type: 'SAVE_CURRENT_STATE' };
-    mainWindow.webContents.send('backendMessages', argObj);
-  });
   loadingWindow.show();
 
   mainWindow.on('closed', () => {
