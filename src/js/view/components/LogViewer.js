@@ -157,6 +157,7 @@ const LogViewer = props => {
         logs
       });
     }
+    //("Input changed");
     inputChanged = true;
   }, [filterInput, highlightInput, highlightColor, filterRef.current]);
 
@@ -168,7 +169,7 @@ const LogViewer = props => {
       let newLines = props.logs[props.source.path].slice(
         previousLinesLength.current
       );
-
+      //console.log("Logs changed, no call to helper");
       sendMessageToHiddenWindow({
         sendLinesOneByOne: previousLinesLength.current > 0 ? true : false,
         logs: newLines
@@ -196,6 +197,7 @@ const LogViewer = props => {
   useEffect(() => {
     /* Effect for when another source is selected,
     to send the correct lines to be filtered and highlighted and update the ref to be the correct source */
+    //console.log("Source changed, no call to helper");
     sendMessageToHiddenWindow({
       logs: props.logs[props.source.path],
       sourcePath: props.source.path
@@ -241,8 +243,10 @@ const LogViewer = props => {
   }, [props.dispatch]);
 
   useEffect(() => {
+    //console.log("filteredAndHighlightedLines changed");
     updateAllHighlightedLines(filteredAndHighlightedLines);
     if (inputChanged) {
+      //console.log("Setting current");
       setCurrentMarkedHighlight();
       inputChanged = false;
     }

@@ -9,6 +9,7 @@ import { MemoedSingleLogLine } from './SingleLogLine';
 import { LogLine } from '../styledComponents/LogViewerListStyledComponents';
 import { List } from 'office-ui-fabric-react';
 import _ from 'lodash';
+import { setCurrentMarkedHighlightWithItem } from './helpers/highlightHelper';
 
 const memoizeProps = memoize((highlightColor, shouldWrap) => {
   return {
@@ -21,7 +22,8 @@ const isNotOnlyWhitespace = str => {
   return !(str.length === 1 && /\s/.test(str));
 };
 
-let indexOfMarkedHighlight = 0;
+let indexOfMarkedHighlight;
+let newCacheFetch = false;
 
 const LogViewerList = props => {
   const listRef = useRef();
@@ -52,6 +54,7 @@ const LogViewerList = props => {
             ? 0
             : Math.round(indexOfTopItemInView - halvedLogLineLength);
         props.getMoreLogLines(indexForNewLines);
+        newCacheFetch = true;
       }
     }
   };
@@ -89,9 +92,7 @@ const LogViewerList = props => {
     const indexOfTopItemInView = Math.floor(
       props.scrollTop / measuredCharHeight
     );
-    const indexOfBottomItemInView = Math.floor(
-      indexOfTopItemInView + nbrOfItemsInView
-    );
+    const indexOfBottomItemInView = indexOfTopItemInView + nbrOfItemsInView - 1;
     const markedItemNotInView =
       indexOfMarkedHighlight < indexOfTopItemInView ||
       indexOfMarkedHighlight > indexOfBottomItemInView;
@@ -120,9 +121,26 @@ const LogViewerList = props => {
     const { highlightColor, shouldWrap } = memoizedLineProps;
     let match;
     if (
-      props.markedHighlight !== undefined &&
-      item === props.markedHighlight[0]
+      newCacheFetch &&
+      index === indexOfMarkedHighlight &&
+      item !== props.markedHighlight[0]
     ) {
+      //console.log("Should probably be a match here");
+      //console.log("item: ", item);
+      //console.log("current: ", props.markedHighlight[0]);
+      setCurrentMarkedHighlightWithItem(item);
+      newCacheFetch = false;
+    }
+    if (
+      props.markedHighlight !== undefined &&
+      item !== undefined &&
+      props.markedHighlight[0] !== undefined &&
+      item.sections === props.markedHighlight[0].sections &&
+      item.mark === props.markedHighlight[0].mark
+    ) {
+      //console.log(`Matched log with index ${index}`);
+      //console.log("item: ", item);
+      //console.log("current: ", props.markedHighlight[0]);
       indexOfMarkedHighlight = index;
       match = true;
     }
