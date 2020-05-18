@@ -6,12 +6,13 @@ export const Statusbar = styled.div`
   height: 30px;
   width: 100%;
   border-top: 2px solid #e6e6e6;
-  background-color: darkgrey;
+  background-color: white;
 
   ul {
     list-style: none;
-    color: white;
+    color: black;
     margin: 3px;
+    padding: 0px 0px 0px 10px;
   }
 
   li {
@@ -19,9 +20,4 @@ export const Statusbar = styled.div`
     display: inline-block;
     font-size: 15px;
   }
-`;
-
-export const SettingIcon = styled.img`
-  margin: 5px 0 5px 17px;
-  width: 20px;
 `;
