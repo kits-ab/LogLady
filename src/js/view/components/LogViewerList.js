@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import memoize from 'memoize-one';
 import { LogViewerListContainer } from '../styledComponents/LogViewerListStyledComponents';
 import { MemoedSingleLogLine } from './SingleLogLine';
@@ -20,7 +20,6 @@ const isNotOnlyWhitespace = str => {
 const LogViewerList = props => {
   const listRef = useRef(); //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
   const startItemIndexRef = useRef(0);
-
   // Used to send needed props and state from this component to the pure component that renders a single line
   const memoizedLineProps = memoizeProps(props.highlightColor, props.wrapLines);
 
@@ -30,11 +29,11 @@ const LogViewerList = props => {
       const startItemIndexDiff =
         startItemIndexinView - startItemIndexRef.current;
       const maxLineNrToScroll = props.logLinesLength / 3;
-
-      if (
+      const timeToGetNewLines =
         startItemIndexDiff > maxLineNrToScroll ||
-        startItemIndexDiff < -maxLineNrToScroll
-      ) {
+        startItemIndexDiff < -maxLineNrToScroll;
+
+      if (timeToGetNewLines) {
         startItemIndexRef.current = startItemIndexinView;
 
         const halvedLogLineLength = props.logLinesLength / 2;
@@ -54,11 +53,11 @@ const LogViewerList = props => {
   }, [props.wrapLines]);
 
   useEffect(() => {
-    const startItemIndexinView = listRef.current.getStartItemIndexInView();
     if (props.filterInput.length === 0) {
-      evaluateNrOfItemsScrolled(startItemIndexinView);
+      const indexOfTopItemInView = listRef.current.getStartItemIndexInView();
+      evaluateNrOfItemsScrolled(indexOfTopItemInView);
     }
-  }, [props.scrollTop, props.filterInput]);
+  }, [props.scrollTop, props.filterInput, props.tabChanged]);
 
   const _onRenderCell = (item, index) => {
     const { highlightColor, shouldWrap } = memoizedLineProps;
@@ -78,11 +77,16 @@ const LogViewerList = props => {
 
   return (
     <LogViewerListContainer>
+      {/* {!measuredCharHeight && <Measure onMeasured={setMeasuredCharHeight} />} */}
       <List
         ref={listRef}
         items={props.lines}
         onRenderCell={_onRenderCell}
-        style={{ display: 'inline-block', minWidth: '100%' }}
+        style={{
+          display: 'inline-block',
+          minWidth: '100%'
+        }}
+        version={props.markedHighlight}
       />
     </LogViewerListContainer>
   );
