@@ -96,7 +96,7 @@ class TopPanel extends React.Component {
               offText="Off"
             />
           </Stack.Item>
-          <Stack.Item aligh="center">
+          <Stack.Item align="center">
             <TooltipHost
               content="Show settings"
               id="openSettings"

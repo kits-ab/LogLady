@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const SettingIcon = styled.img`
-  margin-top: 5px;
+  margin-right: 20px;
   width: 25px;
   color: black;
 `;

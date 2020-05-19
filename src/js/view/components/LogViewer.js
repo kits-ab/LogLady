@@ -228,7 +228,7 @@ const LogViewer = props => {
         top: props.currentScrollTops[props.source.path],
         behavior: 'auto'
       });
-    }, 200);
+    }, 250);
   }, [props.source.path]);
 
   useEffect(() => {
