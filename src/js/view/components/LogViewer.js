@@ -67,9 +67,7 @@ const LogViewer = props => {
 
   const throttledFetchFilteredLinesFromBackend = useCallback(
     _.throttle((sourcePath, filterRegexString, previousFilteredLinesLength) => {
-      setThrottleCallBack(throttleCallBack => {
-        return throttleCallBack + 1;
-      });
+      setThrottleCallBack(throttleCallBack);
       fetchFilteredLinesFromBackend(
         sourcePath,
         filterRegexString,
