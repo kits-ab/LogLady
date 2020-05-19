@@ -84,7 +84,6 @@ const LogViewerList = props => {
           display: 'inline-block',
           minWidth: '100%'
         }}
-        version={props.markedHighlight}
       />
     </LogViewerListContainer>
   );
