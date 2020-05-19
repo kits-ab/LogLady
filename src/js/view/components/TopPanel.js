@@ -54,7 +54,7 @@ class TopPanel extends React.Component {
               label={'Filter'}
               placeholder={
                 this.props.logSizes[sourcePath] > 10000000
-                  ? 'File too large'
+                  ? 'File too big'
                   : 'Filter'
               }
               debounce={300}
