@@ -200,7 +200,7 @@ const LogViewer = props => {
   useEffect(() => {
     const handleScrollPositionEvent = _.debounce(event => {
       setCurrentScrollTop(event.target.scrollTop);
-    }, 100);
+    }, 500);
     scroller.current.addEventListener('scroll', event => {
       return handleScrollPositionEvent(event);
     });
@@ -228,7 +228,7 @@ const LogViewer = props => {
         top: props.currentScrollTops[props.source.path],
         behavior: 'auto'
       });
-    }, 200);
+    }, 250);
   }, [props.source.path]);
 
   useEffect(() => {
