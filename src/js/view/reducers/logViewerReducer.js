@@ -193,7 +193,6 @@ export const logViewerReducer = (state = initialState, action) => {
         ? state.filterString[sourcePath]
         : '';
 
-      console.log({ previousLines, previousFilterString });
       let lines;
       if (filterString === previousFilterString) {
         lines = [...new Set([...previousLines, ...filteredLines])];
