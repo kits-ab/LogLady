@@ -17,33 +17,33 @@ const isNotOnlyWhitespace = str => {
   return !(str.length === 1 && /\s/.test(str));
 };
 
+let oldIndex = 0;
+
 const LogViewerList = props => {
   const listRef = useRef(); //listRef is used to call upon forceUpdate on the List object when wrap lines is toggled
   const startItemIndexRef = useRef(0);
   // Used to send needed props and state from this component to the pure component that renders a single line
   const memoizedLineProps = memoizeProps(props.highlightColor, props.wrapLines);
 
-  const evaluateNrOfItemsScrolled = startItemIndexinView => {
+  const evaluateNrOfItemsScrolled = startItemIndexInView => {
     // When the amount of items scrolled by are exceeding maxLineNrToScroll, a fetch of new lines from backend is triggered
-    if (props.wholeFileNotInFeCache) {
-      const startItemIndexDiff =
-        startItemIndexinView - startItemIndexRef.current;
+    if (props.wholeFileNotInFeCache && oldIndex !== startItemIndexInView) {
+      const indexDiff = startItemIndexInView - startItemIndexRef.current;
       const maxLineNrToScroll = props.logLinesLength / 3;
       const timeToGetNewLines =
-        startItemIndexDiff > maxLineNrToScroll ||
-        startItemIndexDiff < -maxLineNrToScroll;
-
+        indexDiff > maxLineNrToScroll || indexDiff < -maxLineNrToScroll;
       if (timeToGetNewLines) {
-        startItemIndexRef.current = startItemIndexinView;
+        startItemIndexRef.current = startItemIndexInView;
         const halvedLogLineLength = props.logLinesLength / 2;
         const indexForNewLines =
-          startItemIndexinView - halvedLogLineLength < 0
+          startItemIndexInView - halvedLogLineLength < 0
             ? 0
-            : Math.round(startItemIndexinView - halvedLogLineLength);
+            : Math.round(startItemIndexInView - halvedLogLineLength);
 
         props.getMoreLogLines(indexForNewLines);
       }
     }
+    oldIndex = startItemIndexInView;
   };
 
   useEffect(() => {
