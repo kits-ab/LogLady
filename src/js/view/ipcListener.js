@@ -107,7 +107,7 @@ export const ipcListener = (store, publisher) => {
 
   window.ipcRenderer.on('backendMessages', (_event, action) => {
     switch (action.type) {
-      case 'QUIT':
+      case 'SAVE_CURRENT_STATE':
         publisher.saveStateToDisk();
         break;
       case 'STATE_SET':
