@@ -6,7 +6,8 @@ const initialState = {
   currentScrollTops: {},
   indexesForNewLines: {},
   filteredLogs: {},
-  totalNrOfFilteredLines: {}
+  totalNrOfFilteredLines: {},
+  filterString: {}
 };
 
 // Invisible character U+2800 being used in line.replace. Making the viewer display empty lines.
@@ -68,7 +69,8 @@ export const logViewerReducer = (state = initialState, action) => {
     case 'LOGVIEWER_CLEAR':
       return {
         ...state,
-        logs: {}
+        logs: {},
+        filteredLogs: {}
       };
 
     case 'LOGVIEWER_SET_LOG': {
@@ -183,16 +185,32 @@ export const logViewerReducer = (state = initialState, action) => {
 
     case 'LOGVIEWER_ADD_FILTERED_LINES': {
       console.log('ADDING FILTERED LINES');
-      const { sourcePath, filteredLines, lineCount } = action.data;
+      const { sourcePath, filteredLines, filterString } = action.data;
+      const previousLines = state.filteredLogs[sourcePath]
+        ? state.filteredLogs[sourcePath]
+        : [];
+      const previousFilterString = state.filterString[sourcePath]
+        ? state.filterString[sourcePath]
+        : '';
+      let lines;
+      if (filterString === previousFilterString) {
+        lines = [...new Set([...previousLines, ...filteredLines])];
+      } else {
+        lines = filteredLines;
+      }
       return {
         ...state,
         filteredLogs: {
           ...state.filteredLogs,
-          [sourcePath]: filteredLines
+          [sourcePath]: lines
         },
         totalNrOfFilteredLines: {
           ...state.totalNrOfFilteredLines,
-          [sourcePath]: lineCount
+          [sourcePath]: lines.length
+        },
+        filterString: {
+          ...state.filterString,
+          [sourcePath]: filterString
         }
       };
     }

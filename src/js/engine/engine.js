@@ -301,32 +301,30 @@ const flushAndUpdateCacheIfOverSizeLimit = async (
 };
 
 const getFilteredLines = async (sender, data) => {
-  const { sourcePath, filterRegexString } = data;
+  const { sourcePath, filterRegexString, previousFilteredLinesLength } = data;
   let filterRegex;
-
+  const [endIndex] = await getFileInfo(sourcePath);
+  let lines;
   if (filterRegexString) {
     let [, pattern, flags] = /\/(.*)\/(.*)/.exec(filterRegexString);
     filterRegex = new RegExp(`(${pattern})`, flags);
   }
 
-  const [fileSize] = await getFileInfo(sourcePath);
-  const startFromByte = 0;
-  const { lines } = await fileReader.readDataFromByte(
-    sourcePath,
-    startFromByte,
-    fileSize
-  );
-  let newLines = [];
-  for (let lineIndex in lines) {
-    let line = lines[lineIndex];
-    if (filterRegex && filterRegex.test(line)) {
-      newLines.push(line);
-    }
+  if (previousFilteredLinesLength !== 0) {
+    //If file have previously been filtered read the last 10 lines and filter those using filterRegex.
+    lines = await fileReader.readNLastLines(sourcePath, 10, endIndex);
+    lines = lines.filter(line => {
+      return filterRegex.test(line);
+    });
+  } else {
+    //If previousFilteredLinesLength is 0, read the whole file
+    lines = await fileReader.readFileWithStream(sourcePath, filterRegex);
   }
+
   const dataToReturn = {
     sourcePath,
-    filteredLines: newLines,
-    lineCount: newLines.length
+    filteredLines: lines,
+    filterString: filterRegexString
   };
 
   const action = {
