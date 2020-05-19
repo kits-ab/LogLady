@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponents';
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
@@ -37,10 +37,13 @@ const LogViewer = props => {
   const emptyLinesLength = props.lengthOfEmptyLines[props.source.path]
     ? props.lengthOfEmptyLines[props.source.path]
     : 0;
+  const filteredLogs = props.filteredLogs[props.source.path]
+    ? props.filteredLogs[props.source.path]
+    : [];
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
   const [currentScrollTop, setCurrentScrollTop] = useState(0);
-
+  const [throttleCallBack, setThrottleCallBack] = useState(0);
   let filterRef = useRef('');
   let previousFilteredLinesLength = useRef(0);
   let previousLinesLength = useRef(0);
@@ -58,6 +61,33 @@ const LogViewer = props => {
       getEndOfFile
     );
   }, 500);
+
+  const throttledFetchFilteredLinesFromBackend = useCallback(
+    _.throttle((sourcePath, filterRegexString, previousFilteredLinesLength) => {
+      setThrottleCallBack(throttleCallBack => {
+        return throttleCallBack + 1;
+      });
+      fetchFilteredLinesFromBackend(
+        sourcePath,
+        filterRegexString,
+        previousFilteredLinesLength
+      );
+    }, 2000),
+    [setThrottleCallBack]
+  );
+
+  const fetch = () => {
+    filterRef.current = filterInput;
+    let filterRegex = parseRegExp(filterInput);
+    if (filterRegex.toString() !== props.filterString[props.source.path]) {
+      previousFilteredLinesLength.current = 0;
+    }
+    throttledFetchFilteredLinesFromBackend(
+      props.source.path,
+      filterRegex ? filterRegex.toString() : '',
+      previousFilteredLinesLength.current
+    );
+  };
 
   const sendMessageToHiddenWindow = args => {
     /* Send a message to the hidden window that it should filter the logs.
@@ -114,6 +144,12 @@ const LogViewer = props => {
   };
 
   useEffect(() => {
+    // Reset the previous lines count, as all lines should be wiped.
+    previousFilteredLinesLength.current = 0;
+    previousLinesLength.current = 0;
+  }, [filterInput, highlightInput, highlightColor]);
+
+  useEffect(() => {
     // Register the eventlistener for a message from the hidden window
     window.ipcRenderer.on('hiddenWindowMessages', eventListenerIPCMessage);
     // Return cleanup function for React to run when suited
@@ -130,64 +166,63 @@ const LogViewer = props => {
   ]);
 
   useEffect(() => {
+    if (filterInput.length !== 0) {
+      fetch();
+    }
+  }, [filterInput, props.logs[props.source.path]]);
+
+  useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
     let logs;
     filterRef.current = filterInput;
 
     if (filterInput.length !== 0) {
-      fetchFilteredLinesFromBackend(
-        props.source.path,
-        parseRegExp(filterInput).toString()
-      );
       logs = props.filteredLogs[props.source.path];
     } else {
       logs = props.logs[props.source.path];
     }
 
     if (logs) {
-      // Reset the previous lines count, as all lines should be wiped.
-      previousFilteredLinesLength.current = 0;
-      previousLinesLength.current = 0;
       sendMessageToHiddenWindow({
         logs
       });
     }
-  }, [filterInput, highlightInput, highlightColor, filterRef.current]);
+  }, [
+    filterInput,
+    highlightInput,
+    highlightColor,
+    props.filteredLogs[props.source.path]
+  ]);
 
   useEffect(() => {
     // Effect for when new lines are added
     if (props.logs[props.source.path] && filterInput.length === 0) {
       /* Only send lines one by one if there already are lines set.
       Slice used so only newer lines is sent or the entire array if no lines */
-      let newLines = props.logs[props.source.path].slice(
-        previousLinesLength.current
-      );
 
+      // let newLines = props.logs[props.source.path].slice(
+      //   previousLinesLength.current
+      // );
       sendMessageToHiddenWindow({
-        sendLinesOneByOne: previousLinesLength.current > 0 ? true : false,
-        logs: newLines
+        // sendLinesOneByOne: previousLinesLength.current > 0 ? true : false,
+        // logs: newLines
+        sendLinesOneByOne: false,
+        logs: props.logs[props.source.path]
       });
-      previousLinesLength.current = props.logs.length;
+      previousLinesLength.current = props.logs[props.source.path].length;
     } else if (filterInput.length !== 0) {
-      fetchFilteredLinesFromBackend(
-        props.source.path,
-        parseRegExp(filterInput).toString()
-      );
-
-      let newLines = props.filteredLogs[props.source.path].slice(
-        previousFilteredLinesLength.current
-      );
-
+      // let newLines = filteredLogs.slice(previousFilteredLinesLength.current);
       sendMessageToHiddenWindow({
-        sendLinesOneByOne:
-          previousFilteredLinesLength.current > 0 ? true : false,
-        logs: newLines
+        // sendLinesOneByOne:
+        //   previousFilteredLinesLength.current > 0 ? true : false,
+        // logs: newLines,
+        sendLinesOneByOne: false,
+        logs: filteredLogs
       });
-
-      previousFilteredLinesLength.current = props.filteredLogs.length;
+      previousFilteredLinesLength.current = filteredLogs.length;
     }
-  }, [props.logs]);
+  }, [props.logs, props.filteredLogs[props.source.path]]);
 
   useEffect(() => {
     /* Effect for when another source is selected,
@@ -257,7 +292,8 @@ const mapStateToProps = ({
     currentScrollTops,
     indexesForNewLines,
     filteredLogs,
-    totalNrOfFilteredLines
+    totalNrOfFilteredLines,
+    filterString
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -273,7 +309,8 @@ const mapStateToProps = ({
     currentScrollTops,
     indexesForNewLines,
     filteredLogs,
-    totalNrOfFilteredLines
+    totalNrOfFilteredLines,
+    filterString
   };
 };
 
