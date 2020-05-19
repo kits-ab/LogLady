@@ -221,6 +221,7 @@ const LogViewer = props => {
   }, [currentScrollTop]);
 
   useEffect(() => {
+    // Sets a timeout before scrolling to ensure that the rendering is done before scrolling
     setTimeout(() => {
       scroller.current.scrollTo({
         left: 0,
@@ -231,7 +232,7 @@ const LogViewer = props => {
   }, [props.source.path]);
 
   useEffect(() => {
-    // Keeps the scroller at the bottom of the file when following tail
+    // Scrolls to the bottom of the list when tailswitch is toggled to on
     if (tailSwitch) {
       scroller.current.scrollTo({
         left: 0,
@@ -242,7 +243,8 @@ const LogViewer = props => {
   }, [tailSwitch]);
 
   useEffect(() => {
-    // Keeps the scroller at the bottom of the file when following tail
+    // Keeps the scroller at the bottom of the file when following tail,
+    // scrolls down 'smooth' when user scrolls up
     if (tailSwitch) {
       scroller.current.scrollTo({
         left: 0,

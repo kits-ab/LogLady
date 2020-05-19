@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import memoize from 'memoize-one';
 import { LogViewerListContainer } from '../styledComponents/LogViewerListStyledComponents';
 import { MemoedSingleLogLine } from './SingleLogLine';
@@ -35,7 +35,6 @@ const LogViewerList = props => {
 
       if (timeToGetNewLines) {
         startItemIndexRef.current = startItemIndexinView;
-
         const halvedLogLineLength = props.logLinesLength / 2;
         const indexForNewLines =
           startItemIndexinView - halvedLogLineLength < 0
@@ -77,7 +76,6 @@ const LogViewerList = props => {
 
   return (
     <LogViewerListContainer>
-      {/* {!measuredCharHeight && <Measure onMeasured={setMeasuredCharHeight} />} */}
       <List
         ref={listRef}
         items={props.lines}
