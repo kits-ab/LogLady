@@ -4,7 +4,10 @@ import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponent
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
-import { saveCurrentScrollTop } from '../actions/dispatchActions';
+import {
+  saveCurrentScrollTop,
+  clearFilteredLines
+} from '../actions/dispatchActions';
 import {
   fetchNewLinesFromBackendCache,
   updateLogViewerCache,
@@ -72,7 +75,7 @@ const LogViewer = props => {
         filterRegexString,
         previousFilteredLinesLength
       );
-    }, 2000),
+    }, 1500),
     [setThrottleCallBack]
   );
 
@@ -168,25 +171,31 @@ const LogViewer = props => {
   useEffect(() => {
     if (filterInput.length !== 0) {
       fetch();
+    } else if (filterInput.length === 0) {
+      if (props.totalNrOfFilteredLines[props.source.path] !== 0) {
+        clearFilteredLines(props.dispatch, props.source.path);
+      }
     }
   }, [filterInput, props.logs[props.source.path]]);
 
   useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
-    let logs;
     filterRef.current = filterInput;
-
     if (filterInput.length !== 0) {
-      logs = props.filteredLogs[props.source.path];
-    } else {
-      logs = props.logs[props.source.path];
-    }
-
-    if (logs) {
+      // let newLines = filteredLogs.slice(previousFilteredLinesLength.current);
       sendMessageToHiddenWindow({
-        logs
+        // sendLinesOneByOne: previousFilteredLinesLength.current > 0 ? true : false,
+        // logs: newLines,
+        logs: filteredLogs
       });
+      previousFilteredLinesLength.current = filteredLogs.length;
+    } else {
+      if (props.logs[props.source.path]) {
+        sendMessageToHiddenWindow({
+          logs: props.logs[props.source.path]
+        });
+      }
     }
   }, [
     filterInput,
@@ -207,22 +216,11 @@ const LogViewer = props => {
       sendMessageToHiddenWindow({
         // sendLinesOneByOne: previousLinesLength.current > 0 ? true : false,
         // logs: newLines
-        sendLinesOneByOne: false,
         logs: props.logs[props.source.path]
       });
       previousLinesLength.current = props.logs[props.source.path].length;
-    } else if (filterInput.length !== 0) {
-      // let newLines = filteredLogs.slice(previousFilteredLinesLength.current);
-      sendMessageToHiddenWindow({
-        // sendLinesOneByOne:
-        //   previousFilteredLinesLength.current > 0 ? true : false,
-        // logs: newLines,
-        sendLinesOneByOne: false,
-        logs: filteredLogs
-      });
-      previousFilteredLinesLength.current = filteredLogs.length;
     }
-  }, [props.logs, props.filteredLogs[props.source.path]]);
+  }, [props.logs]);
 
   useEffect(() => {
     /* Effect for when another source is selected,

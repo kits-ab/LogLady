@@ -258,3 +258,11 @@ export const addFilteredLines = (
     }
   });
 };
+export const clearFilteredLines = (dispatch, sourcePath) => {
+  dispatch({
+    type: 'LOGVIEWER_CLEAR_FILTERED_LINES',
+    data: {
+      sourcePath
+    }
+  });
+};

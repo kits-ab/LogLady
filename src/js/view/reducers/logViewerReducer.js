@@ -192,6 +192,8 @@ export const logViewerReducer = (state = initialState, action) => {
       const previousFilterString = state.filterString[sourcePath]
         ? state.filterString[sourcePath]
         : '';
+
+      console.log({ previousLines, previousFilterString });
       let lines;
       if (filterString === previousFilterString) {
         lines = [...new Set([...previousLines, ...filteredLines])];
@@ -211,6 +213,26 @@ export const logViewerReducer = (state = initialState, action) => {
         filterString: {
           ...state.filterString,
           [sourcePath]: filterString
+        }
+      };
+    }
+
+    case 'LOGVIEWER_CLEAR_FILTERED_LINES': {
+      console.log('CLEAR FILTERED LINES');
+      const { sourcePath } = action.data;
+      return {
+        ...state,
+        filteredLogs: {
+          ...state.filteredLogs,
+          [sourcePath]: []
+        },
+        totalNrOfFilteredLines: {
+          ...state.totalNrOfFilteredLines,
+          [sourcePath]: 0
+        },
+        filterString: {
+          ...state.filterString,
+          [sourcePath]: ''
         }
       };
     }
