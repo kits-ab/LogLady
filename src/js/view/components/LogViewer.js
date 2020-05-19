@@ -181,6 +181,9 @@ const LogViewer = props => {
     send the lines to be filtered and highlighted again */
     filterRef.current = filterInput;
     if (filterInput.length !== 0) {
+      /*See issue ticket #543
+      Sending lines one by one causes a crash when not following. Until #543 is fixed we want to avoid sending lines one by one. The following commented lines should for that reason be commented until #543 is fixed and/or we can sendLinesOneByOne safely and then replace the current logs:filteredLogs*/
+
       // let newLines = filteredLogs.slice(previousFilteredLinesLength.current);
       sendMessageToHiddenWindow({
         // sendLinesOneByOne: previousFilteredLinesLength.current > 0 ? true : false,
@@ -207,6 +210,9 @@ const LogViewer = props => {
     if (props.logs[props.source.path] && filterInput.length === 0) {
       /* Only send lines one by one if there already are lines set.
       Slice used so only newer lines is sent or the entire array if no lines */
+
+      /*See issue ticket #543
+      Sending lines one by one causes a crash when not following. This went unnoticed because the sendLinedOneByOne was ending up false due to previousLinesLength.current being assigned undefined. previousLinesLength.current should now have the correct value but until #543 is fixed we want to avoid sending lines one by one.  The following commented lines should for that reason be commented until #543 is fixed and/or we can sendLinesOneByOne safely and then replace the current logs:props.logs[props.source.path]*/
 
       // let newLines = props.logs[props.source.path].slice(
       //   previousLinesLength.current
