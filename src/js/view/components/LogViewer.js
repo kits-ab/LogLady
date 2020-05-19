@@ -198,16 +198,16 @@ const LogViewer = props => {
   }, [props.source.path]);
 
   useEffect(() => {
-    const handleScrollPositionEvent = event => {
+    const handleScrollPositionEvent = _.debounce(event => {
       setCurrentScrollTop(event.target.scrollTop);
-    };
+    }, 500);
     scroller.current.addEventListener('scroll', event => {
       return handleScrollPositionEvent(event);
     });
     return () => {
       scroller.current.removeEventListener('scroll', handleScrollPositionEvent);
     };
-  }, [totalNrOfLinesInFile]);
+  }, []);
 
   useEffect(() => {
     const totalFileNotInFeCache = emptyLinesLength > 0;
@@ -217,18 +217,42 @@ const LogViewer = props => {
   }, [tailSwitch]);
 
   useEffect(() => {
-    if (tailSwitch) {
-      scroller.current.scrollTo(0, scroller.current.scrollHeight);
-    }
-  }, [tailSwitch, totalNrOfLinesInFile]);
-
-  useEffect(() => {
     saveCurrentScrollTop(props.dispatch, props.source.path, currentScrollTop);
   }, [currentScrollTop]);
 
   useEffect(() => {
-    scroller.current.scrollTo(0, props.currentScrollTops[props.source.path]);
+    // Sets a timeout before scrolling to ensure that the rendering is done before scrolling
+    setTimeout(() => {
+      scroller.current.scrollTo({
+        left: 0,
+        top: props.currentScrollTops[props.source.path],
+        behavior: 'auto'
+      });
+    }, 250);
   }, [props.source.path]);
+
+  useEffect(() => {
+    // Scrolls to the bottom of the list when tailswitch is toggled to on
+    if (tailSwitch) {
+      scroller.current.scrollTo({
+        left: 0,
+        top: scroller.current.scrollHeight,
+        behavior: 'auto'
+      });
+    }
+  }, [tailSwitch]);
+
+  useEffect(() => {
+    // Keeps the scroller at the bottom of the file when following tail,
+    // scrolls down 'smooth' when user scrolls up
+    if (tailSwitch) {
+      scroller.current.scrollTo({
+        left: 0,
+        top: scroller.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  });
 
   return (
     <LogViewerContainer ref={scroller} data-is-scrollable="true">
@@ -241,6 +265,7 @@ const LogViewer = props => {
         getMoreLogLines={_getMoreLogLines}
         logLinesLength={logLinesLength}
         wholeFileNotInFeCache={emptyLinesLength > 0}
+        tabChanged={props.source.path}
       />
     </LogViewerContainer>
   );
