@@ -81,7 +81,6 @@ Example: `feature/branchName-#5`
 
 **Note:** _feature_ is an example, it could be:
 
-- feature
 - hotfix
 - release
 - bug
