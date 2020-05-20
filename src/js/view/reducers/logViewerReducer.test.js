@@ -10,14 +10,18 @@ describe('logviewer reducer', () => {
       currentScrollTops: {},
       indexesForNewLines: {},
       filteredLogs: {},
-      totalNrOfFilteredLines: {}
+      totalNrOfFilteredLines: {},
+      filterString: {}
     };
     expect(logViewerReducer(undefined, {})).toEqual(initialState);
   });
 
   it('should reset all logs', () => {
-    const state = { logs: ['lalala', 'lililil'] };
-    const expectedState = { logs: {} };
+    const state = {
+      logs: ['lalala', 'lililil'],
+      filteredLogs: ['lalala', 'lililil']
+    };
+    const expectedState = { logs: {}, filteredLogs: {} };
     const action = {
       type: 'LOGVIEWER_CLEAR'
     };
@@ -34,7 +38,8 @@ describe('logviewer reducer', () => {
       currentScrollTops: {},
       indexesForNewLines: {},
       filteredLogs: {},
-      totalNrOfFilteredLines: {}
+      totalNrOfFilteredLines: {},
+      filterString: {}
     };
     const sourcePath = 'test';
 
@@ -61,7 +66,8 @@ describe('logviewer reducer', () => {
       currentScrollTops: { test: 0 },
       indexesForNewLines: { test: 0 },
       filteredLogs: {},
-      totalNrOfFilteredLines: {}
+      totalNrOfFilteredLines: {},
+      filterString: {}
     };
     const action = {
       type: 'LOGVIEWER_SET_LOG',
@@ -92,7 +98,7 @@ describe('logviewer reducer', () => {
 it('should set filtered lines', () => {
   const sourcePath = 'test';
   const filteredLines = ['line4', 'line7'];
-  const lineCount = 2;
+  const filterString = 'debug';
 
   const expectedState = {
     logs: {},
@@ -101,12 +107,13 @@ it('should set filtered lines', () => {
     lengthOfEmptyLines: {},
     currentScrollTops: {},
     indexesForNewLines: {},
-    filteredLogs: { test: ['line4', 'line7'] },
-    totalNrOfFilteredLines: { test: 2 }
+    filteredLogs: { test: filteredLines },
+    totalNrOfFilteredLines: { test: filteredLines.length },
+    filterString: { test: filterString }
   };
   const action = {
     type: 'LOGVIEWER_ADD_FILTERED_LINES',
-    data: { sourcePath, filteredLines, lineCount }
+    data: { sourcePath, filteredLines, filterString }
   };
   expect(logViewerReducer(undefined, action)).toEqual(expectedState);
 });

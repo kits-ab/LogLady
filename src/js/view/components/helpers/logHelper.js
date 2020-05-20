@@ -44,13 +44,15 @@ export const fetchNewLinesFromBackendCache = (
 
 export const fetchFilteredLinesFromBackend = (
   sourcePath,
-  filterRegexString
+  filterRegexString,
+  previousFilteredLinesLength
 ) => {
   const argObj = {
     function: 'FETCH_FILTERED_LINES_FROM_BACKEND',
     data: {
       sourcePath,
-      filterRegexString
+      filterRegexString,
+      previousFilteredLinesLength
     }
   };
   sendRequestToBackend(argObj);

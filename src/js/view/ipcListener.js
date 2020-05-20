@@ -98,7 +98,7 @@ const handleFilteredLines = (dispatch, { dataToReturn }) => {
     dispatch,
     dataToReturn.sourcePath,
     dataToReturn.filteredLines,
-    dataToReturn.lineCount
+    dataToReturn.filterString
   );
 };
 

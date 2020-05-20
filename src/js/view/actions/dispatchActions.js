@@ -247,14 +247,22 @@ export const addFilteredLines = (
   dispatch,
   sourcePath,
   filteredLines,
-  lineCount
+  filterString
 ) => {
   dispatch({
     type: 'LOGVIEWER_ADD_FILTERED_LINES',
     data: {
       sourcePath,
       filteredLines,
-      lineCount
+      filterString
+    }
+  });
+};
+export const clearFilteredLines = (dispatch, sourcePath) => {
+  dispatch({
+    type: 'LOGVIEWER_CLEAR_FILTERED_LINES',
+    data: {
+      sourcePath
     }
   });
 };
