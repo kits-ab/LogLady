@@ -1,314 +1,293 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <link rel="shortcut icon" href="./resources/icon.ico" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=yes"
-    />
-    <title>LogLady</title>
+    <title>LogLady - Making logs bearable!</title>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="icon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes" />
+    
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans:100,200,300,400,700,800" rel="stylesheet">
 
-    <style>
-      body {
-        background: #222;
-        height: 100%;
-        margin: 0;
-        font-family: Menlo, "Courier New", Courier, monospace;
-        line-height: 1.5em;
-      }
+    <link rel="stylesheet" href="css/open-iconic-bootstrap.min.css">
+    <link rel="stylesheet" href="css/animate.css">
+    
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" href="css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
 
-      a {
-        color: #ccc;
-        text-decoration: none;
-      }
-      a:hover {
-        color: #ab0f78;
-      }
+    <link rel="stylesheet" href="css/aos.css">
 
-      .start-container {
-        display: flex;
-        flex-direction: row;
-        height: 600px;
-        color: #ccc;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-      }
+    <link rel="stylesheet" href="css/ionicons.min.css">
 
-      .content-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        background: #ccc;
-        color: #222;
-        width: 100%;
-      }
+    <link rel="stylesheet" href="css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="css/jquery.timepicker.css">
 
-      .logLady-logo {
-        width: 550px;
-        align-self: center;
-      }
-      .info-what {
-        width: 700px;
-        align-self: center;
-      }
-
-      .info-how {
-        align-self: center;
-        width: 700px;
-      }
-
-      .img-logladyGif {
-        width: 100%;
-      }
-
-      .img-highlightAndFilter {
-        width: 100%;
-        margin-bottom: 60px;
-      }
-      .img-follow {
-        width: 150px;
-      }
-
-      .btn {
-        padding: 0.9em 1.25em;
-        color: #ab0f78;
-        background: transparent;
-        border: solid 3px #ab0f78;
-        border-radius: 0.3em;
-        font-family: "Courier New", Courier, monospace;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 50px;
-        width: 220px;
-        text-align: center;
-        align-self: center;
-        margin-top: 50px;
-      }
-
-      .btn:hover {
-        color: #ccc;
-        border: solid 3px #ccc;
-      }
-
-      .download-btn {
-        padding: 0.9em 1.25em;
-        color: #ab0f78;
-        background: transparent;
-        border: solid 3px #ab0f78;
-        border-radius: 0.3em;
-        font-family: "Courier New", Courier, monospace;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        width: 220px;
-        text-align: center;
-        align-self: center;
-      }
-
-      .download-btn:hover {
-        color: #ccc;
-        border: solid 3px #ccc;
-      }
-
-      .download-btn:focus {
-        outline: none;
-      }
-
-      .other-platform {
-        color: #959595;
-        font-size: 12px;
-      }
-
-      .other-platform:hover {
-        color: #ccc;
-      }
-
-      footer {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-
-      .links {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
-        margin-bottom: 30px;
-      }
-
-      @media screen and (max-width: 800px) and (min-width: 300px) {
-        .start-container {
-          flex-flow: row wrap;
-          height: 100%;
-        }
-
-        .content-container {
-          font-size: 13px;
-        }
-
-        .logLady-logo {
-          width: 100%;
-          margin-bottom: -50px;
-        }
-
-        .info-what {
-          width: 90%;
-          padding: 0px 15px;
-        }
-
-        .info-how {
-          width: 90%;
-          padding: 0px 15px;
-        }
-
-        .download-text {
-          width: 90%;
-          text-align: center;
-          margin-bottom: 50px;
-        }
-      }
-    </style>
-    <script>
-      const determineUserOS = () => {
-        if (navigator.platform.startsWith("Mac")) {
-          return "Mac";
-        }
-        if (navigator.platform.startsWith("Linux")) {
-          return "Linux";
-        }
-        if (navigator.platform.startsWith("Win")) {
-          return "Windows";
-        }
-      };
-      window.onload = () => {
-        let downloadButton = document.querySelector("button.download-btn"),
-          downloadLink = "https://github.com/kits-ab/LogLady/releases/latest"; // Default state, link to the latest release on GitHub
-
-        downloadButton.onclick = () => {
-          location.href = downloadLink;
-        };
-
-        // Fetch information on the latest release using GitHub API and then update button text and link for the users OS
-        fetch("https://api.github.com/repos/kits-ab/LogLady/releases/latest")
-          .then(response => {
-            if (response.status !== 200) {
-              console.error(`GitHub API response not OK: ${response.status}`);
-              return;
-            }
-            response.json().then(data => {
-              // Determine what file extension is the correct one for user
-              let wantedFileExtensionRegex;
-              switch (determineUserOS()) {
-                case "Mac":
-                  downloadButton.innerText = "Download for Mac";
-                  wantedFileExtensionRegex = /\.dmg$/g;
-                  break;
-                case "Linux":
-                  downloadButton.innerText = "Download for Linux";
-                  wantedFileExtensionRegex = /\.AppImage$/g;
-                  break;
-                case "Windows":
-                  downloadButton.innerText = "Download for Windows";
-                  wantedFileExtensionRegex = /\.exe$/g;
-                  break;
-                default:
-                  wantedFileExtensionRegex = /^$/g; // Do-nothing regex
-                  break;
-              }
-
-              // Loop through the assets in the release. Assume there is at least one AppImage, one dmg and one exe
-              for (let index in data.assets) {
-                let asset = data.assets[index];
-                if (wantedFileExtensionRegex.test(asset.name)) {
-                  // Update so the button links directly to the download of a file for the correct OS, if supported
-                  downloadLink = asset.browser_download_url;
-                }
-              }
-            });
-          })
-          .catch(err => {
-            console.error(
-              "An error occured while fetching information about latest release from GitHub API:",
-              err
-            );
-          });
-      };
-    </script>
+    
+    <link rel="stylesheet" href="css/flaticon.css">
+    <link rel="stylesheet" href="css/icomoon.css">
+    <link rel="stylesheet" href="css/style.css">
   </head>
-
   <body>
-    <div class="start-container">
-      <img class="logLady-logo" src="./resources/loglady.png" alt="Logo" />
-      <div class="download-text ">
-        <p>
-          Making logs bearable!
-        </p>
-        <button class="download-btn">
-          Download on GitHub
+    
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+      <div class="container">
+        <a class="navbar-brand" href="index.html"><img width="72%" height="72%" src="images/loglady.png" /></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="oi oi-menu"></span> Menu
         </button>
 
-        <p>
-          <a
-            class="other-platform"
-            href="https://github.com/kits-ab/LogLady/releases/latest"
-            >Other platforms
-          </a>
-        </p>
+        <div class="collapse navbar-collapse" id="ftco-nav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-item"><a href="downloads.html" class="nav-link">Downloads</a></li>
+            <li class="nav-item"><a href="#ftco-section" class="nav-link">Features</a></li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">About</a>
+                <div class="dropdown-menu" aria-labelledby="dropdown04">
+                  <a class="dropdown-item" href="https://kits.se">KITS.se</a>
+                  <a class="dropdown-item" href="contact.html">Contact</a>
+                </div>
+              </li>
+            <li class="nav-item"><a href="https://github.com/kits-ab/LogLady/releases" class="nav-link">Releases</a></li>
+          </ul>
+        </div>
       </div>
-    </div>
-    <div class="content-container">
-      <div class="info-what">
-        <h3>What is LogLady?</h3>
-        <p>
-          LogLady is an open-source cross-platform application for managing
-          logfiles.
-        </p>
+    </nav>
+    <!-- END nav -->
+    
+    <section class="home-slider ftco-degree-bg">
+      <div class="slider-item">
+        <div class="overlay"></div>
+        <div class="container">
+          <div class="row slider-text align-items-center justify-content-center">
+            <div class="col-md-10 ftco-animate text-center">
+              <h1 class="mb-4">Manage your logs
+                <strong class="typewrite" data-period="4000" data-type='[ "Easier.", "Faster.", "Better." ]'>
+                  <span class="wrap"></span>
+                </strong>
+              </h1>
+              <p>LogLady, the Open Source Tool for Monitoring Log Files. Filter, highlight and follow your log files live for easier reading. Start logging and analyzing your log files, easily and quickly, with one of the best log file analyzing softwares there is.</p>
+              <p><a href="loglady.mp4" class="btn btn-primary btn-outline-white px-4 py-3 popup-vimeo"><span class="ion-ios-play mr-2"></span> Watch Demo</a></p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="info-how">
-        <h3>How to use</h3>
-        <p>
-          Simple download and install. Open file and let LogLady read it.
-        </p>
-        <video
-          width="100%"
-          playsinline
-          loop
-          autoplay
-          muted
-          src="./resources/loglady.mp4"
-          type="video/mp4"
-        ></video>
-        <p>You can follow the log in real time</p>
-        <img class="img-follow" src="./resources/Follow.png" alt="Follow" />
-        <p>
-          You can filter and highlight on whatever you want in your file with a 
-          palette of the best colors we've chosen for you. Switch between plain 
-          text match or a regular expression on the fly. Just add @ in the text 
-          field to escape from plain text to regular expression. 
-        </p>
-        <img
-          class="img-highlightAndFilter"
-          src="./resources/highlightAndFilter.png"
-          alt="highlightAndFilter"
-        />
-      </div>
-    </div>
+    </section>
+    <!-- END slider -->
 
-    <footer>
-      <a class="btn" href="https://github.com/kits-ab/LogLady"
-        >View source code on Github</a
-      >
+    <section class="ftco-section-featured ftco-animate">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="carousel owl-carousel">
+              <div class="item">
+                <a href="#">
+                  <img src="images/slide_1.png" class="img-fluid" alt="">
+                </a>
+              </div>
+              <div class="item">
+                <a href="portfolio.html">
+                  <img src="images/slide_2.png" class="img-fluid" alt="">
+                </a>
+              </div>
+              <div class="item">
+                <a href="portfolio.html">
+                  <img src="images/slide_3.png" class="img-fluid" alt="">
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="ftco-section ftco-degree-bg" id="ftco-section">
+      <div class="container">
+        <div class="row justify-content-center mb-5 pb-5">
+          <div class="col-md-7 text-center heading-section ftco-animate">
+            <span class="subheading">Features</span>
+            <h2>LogLady provides a fully featured log files management software!</h2>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 col-lg-3 d-flex align-self-stretch ftco-animate">
+            <div class="media block-6 services d-block text-center">
+              <div class="d-flex justify-content-center"><div class="icon color-1 d-flex justify-content-center mb-3"><span class="align-self-center icon-layers"></span></div></div>
+              <div class="media-body p-2">
+                <h3 class="heading">Open huge log files</h3>
+                <p>Handles GB-size logs easily while still maintaing features like highlighting and following the file live. With intelligent buffering LogLady will only keep a small part of large files in memory.</p>
+              </div>
+            </div>      
+          </div>
+          <div class="col-md-6 col-lg-3 d-flex align-self-stretch ftco-animate">
+            <div class="media block-6 services d-block text-center">
+              <div class="d-flex justify-content-center"><div class="icon color-2 d-flex justify-content-center mb-3"><span class="align-self-center icon-hourglass"></span></div></div>
+              <div class="media-body p-2">
+                <h3 class="heading">Real time</h3>
+                <p>Unsurprisingly, there is tail functionality. Monitor log files in real-time. You can toggle whether to follow a file or not.</p>
+              </div>
+            </div>      
+          </div>
+          <div class="col-md-6 col-lg-3 d-flex align-self-stretch ftco-animate">
+            <div class="media block-6 services d-block text-center">
+              <div class="d-flex justify-content-center"><div class="icon color-3 d-flex justify-content-center mb-3"><span class="align-self-center icon-arrow-down"></span></div></div>
+              <div class="media-body p-2">
+                <h3 class="heading">Follow multiple logs</h3>
+                <p>Keep track of all your log files. LogLady will remember your settings and all your opened files, and restore your tabs when restarting.</p>
+              </div>
+            </div>    
+          </div>
 
-      <div class="links">
-        <a href="https://github.com/kits-ab/LogLady/graphs/contributors"
-          >About us</a
-        >
-        <a href="https://kits.se/">Kits</a>
-        <a href="https://github.com/kits-ab/LogLady/releases">Releases</a>
+          <div class="col-md-6 col-lg-3 d-flex align-self-stretch ftco-animate">
+            <div class="media block-6 services d-block text-center">
+              <div class="d-flex justify-content-center"><div class="icon color-4 d-flex justify-content-center mb-3"><span class="align-self-center icon-fire"></span></div></div>
+              <div class="media-body p-2">
+                <h3 class="heading">Highlight what you are looking for</h3>
+                <p>Enter a highlight text and LogLady will mark all occurences of that text. Every affected line, and every occurence within the line is highlited, using a two level color scheme.</p>
+              </div>
+            </div>      
+          </div>
+
+          <div class="col-md-6 col-lg-3 d-flex align-self-stretch ftco-animate">
+            <div class="media block-6 services d-block text-center">
+              <div class="d-flex justify-content-center"><div class="icon color-1 d-flex justify-content-center mb-3"><span class="align-self-center icon-diamond"></span></div></div>
+              <div class="media-body p-2">
+                <h3 class="heading">Cross-platform</h3>
+                <p>If you, like us, switch between different operating systems all the time, you will appreciate being able to use the same tool no matter the platform.</p>
+              </div>
+            </div>      
+          </div>
+
+          <div class="col-md-6 col-lg-3 d-flex align-self-stretch ftco-animate">
+            <div class="media block-6 services d-block text-center">
+              <div class="d-flex justify-content-center"><div class="icon color-2 d-flex justify-content-center mb-3"><span class="align-self-center icon-flag"></span></div></div>
+              <div class="media-body p-2">
+                <h3 class="heading">Filtering</h3>
+                <p>Complementary to highlighting, filtering lets you concentrate on only the lines you want to see. Filtering and highlighting can be used in concert for even easier review.</p>
+              </div>
+            </div>      
+          </div>
+
+          <div class="col-md-6 col-lg-3 d-flex align-self-stretch ftco-animate">
+            <div class="media block-6 services d-block text-center">
+              <div class="d-flex justify-content-center"><div class="icon color-3 d-flex justify-content-center mb-3"><span class="align-self-center icon-wrench"></span></div></div>
+              <div class="media-body p-2">
+                <h3 class="heading">Regular expressions</h3>
+                <p>Both filtering and highlighting support the use of regular expression. Prefix the text with @ to use regular expressions.</p>
+              </div>
+            </div>      
+          </div>
+
+          <div class="col-md-6 col-lg-3 d-flex align-self-stretch ftco-animate">
+            <div class="media block-6 services d-block text-center">
+              <div class="d-flex justify-content-center"><div class="icon color-4 d-flex justify-content-center mb-3"><span class="align-self-center icon-refresh"></span></div></div>
+              <div class="media-body p-2">
+                <h3 class="heading">File activity</h3>
+                <p>As files grow, an activity indicator in the form of a spinner is visible on the tab of each file. Find out immediately when something’s afoot in all your open logs.</p>
+              </div>
+            </div>      
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="ftco-section-parallax ftco-degree-bg">
+      <div class="parallax-img d-flex align-items-center">
+        <div class="container">
+          <div class="row d-flex justify-content-center">
+            <div class="col-md-10 text-center heading-section heading-section-white ftco-animate">
+              <h2 class="h1 font-weight-bold">Interested in contributing? Have some feedback? Or just curious what this project is all about? Come and check us out on Github!</h2>
+              <p><a href="https://github.com/kits-ab/LogLady" class="btn btn-primary btn-outline-white mt-3 py-3 px-4">View source code on Github</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="ftco-footer ftco-bg-dark ftco-section">
+      <div class="container">
+        <div class="row mb-5">
+          <div class="col-md">
+            <div class="ftco-footer-widget mb-4">
+              <h2 class="ftco-heading-2">Company</h2>
+              <p>We (KITS AB) are dedicated and creative consultants who like to keep it simple with a strong focus on delivering results while having fun.</p>
+              <ul class="ftco-footer-social list-unstyled float-md-left float-lft">
+                <li class="ftco-animate"><a href="https://twitter.com/kokitotsos"><span class="icon-twitter"></span></a></li>
+                <li class="ftco-animate"><a href="https://www.facebook.com/kokitotsos"><span class="icon-facebook"></span></a></li>
+                <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md">
+             <div class="ftco-footer-widget mb-4">
+              <h2 class="ftco-heading-2">Quick Links</h2>
+              <ul class="list-unstyled">
+                <li><a href="index.html" class="py-2 d-block">Home</a></li> 
+                <li><a href="downloads.html" class="py-2 d-block">Downloads</a></li>
+                <li><a href="#ftco-section" class="py-2 d-block">Features</a></li>
+                <li><a href="https://kits.se" class="py-2 d-block">KITS.se</a></li>
+                <li><a href="https://github.com/kits-ab/LogLady/releases" class="py-2 d-block">Releases</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md">
+             <div class="ftco-footer-widget mb-4">
+              <h2 class="ftco-heading-2">Contact Information</h2>
+              <ul class="list-unstyled">
+                <li><a href="#" class="py-2 d-block">KITS AB</a></li>
+                <li><a href="#" class="py-2 d-block">Norra Allégatan 8 413 01 Göteborg</a></li>
+                <li><a href="#" class="py-2 d-block">0708 – 27 74 99</a></li>
+                <li><a href="#" class="py-2 d-block">info@kits.se</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="ftco-footer-widget mb-4">
+              <h2 class="ftco-heading-2">Newsletter</h2>
+              <p>Put your email in order to receive LogLady news</p>
+              <form action="#" class="subscribe-form">
+                <div class="form-group">
+                  <span class="icon icon-paper-plane"></span>
+                  <input type="text" class="form-control" placeholder="Subscribe">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 text-center">
+
+            <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+              Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+              <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+          </div>
+        </div>
       </div>
     </footer>
+    
+  
+
+  <!-- loader -->
+  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/jquery.waypoints.min.js"></script>
+  <script src="js/jquery.stellar.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/aos.js"></script>
+  <script src="js/jquery.animateNumber.min.js"></script>
+  <script src="js/bootstrap-datepicker.js"></script>
+  <script src="js/jquery.timepicker.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+  <script src="js/google-map.js"></script>
+  <script src="js/main.js"></script>
+    
   </body>
 </html>

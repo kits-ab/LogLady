@@ -257,6 +257,82 @@ const extractStartByteOfLinesFromByteData = (lines, linesStartAt) => {
   return startByteOfLines;
 };
 
+const readFileWithStream = (filePath, filterRegex, startReadFromByte = 0) => {
+  return new Promise((resolve, reject) => {
+    let out = [];
+    let lineCounter = 0;
+    let buffer = '';
+    createReadStream(filePath, {
+      start: startReadFromByte,
+      encoding: 'utf8'
+    })
+      .on('data', chunk => {
+        let lines = (buffer + chunk).split(/\r?\n/);
+        buffer = lines.pop();
+        lineCounter = +lines.length;
+        for (let i = 0; i < lines.length; ++i) {
+          if (filterRegex.test(lines[i])) {
+            out.push(lines[i]);
+          }
+        }
+      })
+      .on('error', err => {
+        reject(err);
+      })
+      .on('end', () => {
+        resolve(out);
+      });
+  });
+};
+
+const readNLastLines = (filePath, numberOfLines, endIndex) => {
+  return new Promise((resolve, reject) => {
+    let unusedChars = '';
+    let result = [];
+    let backwardsStream = createBackwardsStream(filePath, {
+      start: endIndex - 1
+    });
+    backwardsStream
+      .on('data', buffer => {
+        const chunk = buffer.toString('utf-8');
+        const [lines, trailingChars] = parseLinesBackwards(chunk, unusedChars);
+        unusedChars = trailingChars;
+        if (lines.length > 0) {
+          if (result.length + lines.length >= numberOfLines) {
+            const offset = lines.length - (numberOfLines - result.length);
+            result = [...lines.slice(Math.max(offset, 0)), ...result];
+            backwardsStream.emit('end');
+            return;
+          }
+          result = [...lines, ...result];
+        }
+      })
+      .on('end', () => {
+        if (result.length < numberOfLines && unusedChars) {
+          result.unshift(unusedChars);
+        }
+
+        resolve(result);
+      })
+      .on('error', err => {
+        reject(err);
+      });
+  });
+};
+
+const parseLinesBackwards = (chunk, trailingChars) => {
+  // Move over the previous chunk character to check for CRLF
+  if (trailingChars.length > 0) {
+    chunk = chunk + trailingChars[0];
+    trailingChars = trailingChars.slice(1);
+  }
+  const lines = chunk.split(/\r?\n/);
+  lines[lines.length - 1] += trailingChars;
+  const unusedChars = lines[0];
+  lines.shift();
+  return [lines, unusedChars];
+};
+
 module.exports = {
   getLineCount,
   followFile,
@@ -267,6 +343,8 @@ module.exports = {
   stopWatcher,
   stopAllWatchers,
   readDataFromByte,
+  readNLastLines,
   extractStartByteOfLinesFromByteData,
-  parseByteDataIntoStringArray
+  parseByteDataIntoStringArray,
+  readFileWithStream
 };

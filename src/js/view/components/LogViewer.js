@@ -1,10 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { LogViewerContainer } from '../styledComponents/LogViewerStyledComponents';
 import LogViewerList from './LogViewerList';
 import { connect } from 'react-redux';
 import { parseRegExp } from './helpers/regexHelper';
-import { saveCurrentScrollTop } from '../actions/dispatchActions';
+import {
+  saveCurrentScrollTop,
+  clearFilteredLines
+} from '../actions/dispatchActions';
 import {
   fetchNewLinesFromBackendCache,
   updateLogViewerCache,
@@ -37,10 +40,13 @@ const LogViewer = props => {
   const emptyLinesLength = props.lengthOfEmptyLines[props.source.path]
     ? props.lengthOfEmptyLines[props.source.path]
     : 0;
+  const filteredLogs = props.filteredLogs[props.source.path]
+    ? props.filteredLogs[props.source.path]
+    : [];
 
   const [filteredAndHighlightedLines, setLines] = useState([]);
   const [currentScrollTop, setCurrentScrollTop] = useState(0);
-
+  const [throttleCallBack, setThrottleCallBack] = useState(0);
   let filterRef = useRef('');
   let previousFilteredLinesLength = useRef(0);
   let previousLinesLength = useRef(0);
@@ -58,6 +64,31 @@ const LogViewer = props => {
       getEndOfFile
     );
   }, 500);
+
+  const throttledFetchFilteredLinesFromBackend = useCallback(
+    _.throttle((sourcePath, filterRegexString, previousFilteredLinesLength) => {
+      setThrottleCallBack(throttleCallBack);
+      fetchFilteredLinesFromBackend(
+        sourcePath,
+        filterRegexString,
+        previousFilteredLinesLength
+      );
+    }, 1500),
+    [setThrottleCallBack]
+  );
+
+  const fetch = () => {
+    filterRef.current = filterInput;
+    let filterRegex = parseRegExp(filterInput);
+    if (filterRegex.toString() !== props.filterString[props.source.path]) {
+      previousFilteredLinesLength.current = 0;
+    }
+    throttledFetchFilteredLinesFromBackend(
+      props.source.path,
+      filterRegex ? filterRegex.toString() : '',
+      previousFilteredLinesLength.current
+    );
+  };
 
   const sendMessageToHiddenWindow = args => {
     /* Send a message to the hidden window that it should filter the logs.
@@ -114,6 +145,12 @@ const LogViewer = props => {
   };
 
   useEffect(() => {
+    // Reset the previous lines count, as all lines should be wiped.
+    previousFilteredLinesLength.current = 0;
+    previousLinesLength.current = 0;
+  }, [filterInput, highlightInput, highlightColor]);
+
+  useEffect(() => {
     // Register the eventlistener for a message from the hidden window
     window.ipcRenderer.on('hiddenWindowMessages', eventListenerIPCMessage);
     // Return cleanup function for React to run when suited
@@ -130,62 +167,62 @@ const LogViewer = props => {
   ]);
 
   useEffect(() => {
+    if (filterInput.length !== 0) {
+      fetch();
+    } else if (filterInput.length === 0) {
+      if (props.totalNrOfFilteredLines[props.source.path] !== 0) {
+        clearFilteredLines(props.dispatch, props.source.path);
+      }
+    }
+  }, [filterInput, props.logs[props.source.path]]);
+
+  useEffect(() => {
     /* Effect for when a new filter or highlight is applied,
     send the lines to be filtered and highlighted again */
-    let logs;
     filterRef.current = filterInput;
-
     if (filterInput.length !== 0) {
-      fetchFilteredLinesFromBackend(
-        props.source.path,
-        parseRegExp(filterInput).toString()
-      );
-      logs = props.filteredLogs[props.source.path];
-    } else {
-      logs = props.logs[props.source.path];
-    }
+      /*See issue ticket #543
+      Sending lines one by one causes a crash when not following. Until #543 is fixed we want to avoid sending lines one by one. The following commented lines should for that reason be commented until #543 is fixed and/or we can sendLinesOneByOne safely and then replace the current logs:filteredLogs*/
 
-    if (logs) {
-      // Reset the previous lines count, as all lines should be wiped.
-      previousFilteredLinesLength.current = 0;
-      previousLinesLength.current = 0;
+      // let newLines = filteredLogs.slice(previousFilteredLinesLength.current);
       sendMessageToHiddenWindow({
-        logs
+        // sendLinesOneByOne: previousFilteredLinesLength.current > 0 ? true : false,
+        // logs: newLines,
+        logs: filteredLogs
       });
+      previousFilteredLinesLength.current = filteredLogs.length;
+    } else {
+      if (props.logs[props.source.path]) {
+        sendMessageToHiddenWindow({
+          logs: props.logs[props.source.path]
+        });
+      }
     }
-  }, [filterInput, highlightInput, highlightColor, filterRef.current]);
+  }, [
+    filterInput,
+    highlightInput,
+    highlightColor,
+    props.filteredLogs[props.source.path]
+  ]);
 
   useEffect(() => {
     // Effect for when new lines are added
     if (props.logs[props.source.path] && filterInput.length === 0) {
       /* Only send lines one by one if there already are lines set.
       Slice used so only newer lines is sent or the entire array if no lines */
-      let newLines = props.logs[props.source.path].slice(
-        previousLinesLength.current
-      );
 
+      /*See issue ticket #543
+      Sending lines one by one causes a crash when not following. This went unnoticed because the sendLinedOneByOne was ending up false due to previousLinesLength.current being assigned undefined. previousLinesLength.current should now have the correct value but until #543 is fixed we want to avoid sending lines one by one.  The following commented lines should for that reason be commented until #543 is fixed and/or we can sendLinesOneByOne safely and then replace the current logs:props.logs[props.source.path]*/
+
+      // let newLines = props.logs[props.source.path].slice(
+      //   previousLinesLength.current
+      // );
       sendMessageToHiddenWindow({
-        sendLinesOneByOne: previousLinesLength.current > 0 ? true : false,
-        logs: newLines
+        // sendLinesOneByOne: previousLinesLength.current > 0 ? true : false,
+        // logs: newLines
+        logs: props.logs[props.source.path]
       });
-      previousLinesLength.current = props.logs.length;
-    } else if (filterInput.length !== 0) {
-      fetchFilteredLinesFromBackend(
-        props.source.path,
-        parseRegExp(filterInput).toString()
-      );
-
-      let newLines = props.filteredLogs[props.source.path].slice(
-        previousFilteredLinesLength.current
-      );
-
-      sendMessageToHiddenWindow({
-        sendLinesOneByOne:
-          previousFilteredLinesLength.current > 0 ? true : false,
-        logs: newLines
-      });
-
-      previousFilteredLinesLength.current = props.filteredLogs.length;
+      previousLinesLength.current = props.logs[props.source.path].length;
     }
   }, [props.logs]);
 
@@ -198,16 +235,16 @@ const LogViewer = props => {
   }, [props.source.path]);
 
   useEffect(() => {
-    const handleScrollPositionEvent = event => {
+    const handleScrollPositionEvent = _.debounce(event => {
       setCurrentScrollTop(event.target.scrollTop);
-    };
+    }, 500);
     scroller.current.addEventListener('scroll', event => {
       return handleScrollPositionEvent(event);
     });
     return () => {
       scroller.current.removeEventListener('scroll', handleScrollPositionEvent);
     };
-  }, [totalNrOfLinesInFile]);
+  }, []);
 
   useEffect(() => {
     const totalFileNotInFeCache = emptyLinesLength > 0;
@@ -217,18 +254,42 @@ const LogViewer = props => {
   }, [tailSwitch]);
 
   useEffect(() => {
-    if (tailSwitch) {
-      scroller.current.scrollTo(0, scroller.current.scrollHeight);
-    }
-  }, [tailSwitch, totalNrOfLinesInFile]);
-
-  useEffect(() => {
     saveCurrentScrollTop(props.dispatch, props.source.path, currentScrollTop);
   }, [currentScrollTop]);
 
   useEffect(() => {
-    scroller.current.scrollTo(0, props.currentScrollTops[props.source.path]);
+    // Sets a timeout before scrolling to ensure that the rendering is done before scrolling
+    setTimeout(() => {
+      scroller.current.scrollTo({
+        left: 0,
+        top: props.currentScrollTops[props.source.path],
+        behavior: 'auto'
+      });
+    }, 250);
   }, [props.source.path]);
+
+  useEffect(() => {
+    // Scrolls to the bottom of the list when tailswitch is toggled to on
+    if (tailSwitch) {
+      scroller.current.scrollTo({
+        left: 0,
+        top: scroller.current.scrollHeight,
+        behavior: 'auto'
+      });
+    }
+  }, [tailSwitch]);
+
+  useEffect(() => {
+    // Keeps the scroller at the bottom of the file when following tail,
+    // scrolls down 'smooth' when user scrolls up
+    if (tailSwitch) {
+      scroller.current.scrollTo({
+        left: 0,
+        top: scroller.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  });
 
   return (
     <LogViewerContainer ref={scroller} data-is-scrollable="true">
@@ -241,6 +302,7 @@ const LogViewer = props => {
         getMoreLogLines={_getMoreLogLines}
         logLinesLength={logLinesLength}
         wholeFileNotInFeCache={emptyLinesLength > 0}
+        tabChanged={props.source.path}
       />
     </LogViewerContainer>
   );
@@ -257,7 +319,8 @@ const mapStateToProps = ({
     currentScrollTops,
     indexesForNewLines,
     filteredLogs,
-    totalNrOfFilteredLines
+    totalNrOfFilteredLines,
+    filterString
   },
   logInfoState: { logSizes, lastSeenLogSizes }
 }) => {
@@ -273,7 +336,8 @@ const mapStateToProps = ({
     currentScrollTops,
     indexesForNewLines,
     filteredLogs,
-    totalNrOfFilteredLines
+    totalNrOfFilteredLines,
+    filterString
   };
 };
 

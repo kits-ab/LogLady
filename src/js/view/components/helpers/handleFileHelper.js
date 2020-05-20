@@ -14,16 +14,17 @@ export const openFile = filePath => {
 
 export const closeFile = (dispatch, filePath) => {
   //send request to backend
-  const argObj = {
+  const argObjUnfollow = {
     function: 'SOURCE_UNFOLLOW',
     filePath
   };
-  sendRequestToBackend(argObj);
-  const argObj2 = {
-    function: 'FLUSH_CACHE_FOR_FILE',
+  sendRequestToBackend(argObjUnfollow);
+
+  const argObjOnTabClose = {
+    function: 'ON_TAB_CLOSE',
     filePath
   };
-  sendRequestToBackend(argObj2);
+  sendRequestToBackend(argObjOnTabClose);
 
   //handle related states on frontend
   clearSource(dispatch, filePath);

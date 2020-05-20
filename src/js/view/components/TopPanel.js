@@ -4,12 +4,19 @@ import React from 'react';
 import {
   handleFilterInput,
   handleHighlightInput,
-  handleTailSwitch
+  handleTailSwitch,
+  handleShowSettings
 } from 'js/view/actions/dispatchActions';
 import { connect } from 'react-redux';
 import { showOpenDialog } from './helpers/handleFileHelper';
-import { PrimaryButton, Stack, Image } from 'office-ui-fabric-react';
-
+import {
+  PrimaryButton,
+  Stack,
+  Image,
+  TooltipHost
+} from 'office-ui-fabric-react';
+import { SettingIcon } from '../styledComponents/TopPanelStyledComponents';
+const settings = require('../../../resources/settings.png');
 const logoText = require('../../../resources/text.png');
 
 const stackTokens = {
@@ -48,13 +55,14 @@ class TopPanel extends React.Component {
               }}
             />
           </Stack.Item>
+
           <Stack.Item align="center">
             <TextFieldInput
               disabled={this.props.logSizes[sourcePath] > 10000000}
               label={'Filter'}
               placeholder={
                 this.props.logSizes[sourcePath] > 10000000
-                  ? 'File too large'
+                  ? 'File too big'
                   : 'Filter'
               }
               debounce={300}
@@ -87,6 +95,23 @@ class TopPanel extends React.Component {
               onText="On"
               offText="Off"
             />
+          </Stack.Item>
+          <Stack.Item align="center">
+            <TooltipHost
+              content="Show settings"
+              id="openSettings"
+              styles={{ root: { display: 'inline-block' } }}
+            >
+              <SettingIcon
+                src={settings}
+                onClick={() => {
+                  handleShowSettings(this.props.dispatch, {
+                    sourcePath
+                  });
+                }}
+                alt="settings"
+              />
+            </TooltipHost>
           </Stack.Item>
         </Stack>
       </Stack>

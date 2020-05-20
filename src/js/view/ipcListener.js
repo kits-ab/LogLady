@@ -98,7 +98,7 @@ const handleFilteredLines = (dispatch, { dataToReturn }) => {
     dispatch,
     dataToReturn.sourcePath,
     dataToReturn.filteredLines,
-    dataToReturn.lineCount
+    dataToReturn.filterString
   );
 };
 
@@ -107,7 +107,7 @@ export const ipcListener = (store, publisher) => {
 
   window.ipcRenderer.on('backendMessages', (_event, action) => {
     switch (action.type) {
-      case 'QUIT':
+      case 'SAVE_CURRENT_STATE':
         publisher.saveStateToDisk();
         break;
       case 'STATE_SET':
