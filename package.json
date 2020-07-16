@@ -11,7 +11,7 @@
     "electron-settings": "^3.2.0",
     "electron-updater": "^4.2.5",
     "fs-backwards-stream": "^1.0.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "memoize-one": "^5.1.1",
     "mousetrap": "^1.6.5",
     "office-ui-fabric-react": "^7.107.5",
